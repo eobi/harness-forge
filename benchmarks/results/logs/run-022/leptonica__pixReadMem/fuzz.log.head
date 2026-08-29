@@ -1,0 +1,1202 @@
+Dictionary: 512 entries
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3004880069
+INFO: Loaded 1 modules   (59962 inline 8-bit counters): 59962 [0xaaaab0ac4610, 0xaaaab0ad304a), 
+INFO: Loaded 1 PC tables (59962 PCs): 59962 [0xaaaab0ad3050,0xaaaab0bbd3f0), 
+INFO:      256 files found in /b/runs/leptonica__pixReadMem/corpus
+INFO: seed corpus: files: 256 min: 69b max: 65442b total: 3304807b rss: 53Mb
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Pdf reading is not supported
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMem: Pdf reading is not supported
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMem: Pdf reading is not supported
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemBmp: invalid resolution
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemBmp: width too large
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Info in pixReadMemBmp: removing opaque cmap from 1 bpp
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+#257	INITED cov: 243 ft: 313 corp: 16/103Kb exec/s: 0 rss: 67Mb
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+#261	REDUCE cov: 243 ft: 313 corp: 16/102Kb lim: 30734 exec/s: 0 rss: 67Mb L: 1377/30734 MS: 4 ChangeASCIIInt-InsertByte-CrossOver-EraseBytes-
+Error in pixReadMem: Pdf reading is not supported
+Error in pixReadMem: Pdf reading is not supported
+Error in pixReadMem: Pdf reading is not supported
+#264	REDUCE cov: 243 ft: 313 corp: 16/102Kb lim: 30734 exec/s: 0 rss: 67Mb L: 1265/30734 MS: 3 ManualDict-CrossOver-EraseBytes- DE: "stream not defined"-
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+#268	NEW    cov: 244 ft: 314 corp: 17/102Kb lim: 30734 exec/s: 0 rss: 67Mb L: 85/30734 MS: 4 ChangeBinInt-InsertByte-ChangeBinInt-ManualDict- DE: "char*"-
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMemBmp: width too large
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: width too large
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: width too large
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: width too large
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: width too large
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+#291	REDUCE cov: 244 ft: 314 corp: 17/101Kb lim: 30734 exec/s: 0 rss: 67Mb L: 3587/30734 MS: 3 ManualDict-ManualDict-EraseBytes- DE: "width must be >= 1"-"invalid component"-
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+#293	REDUCE cov: 244 ft: 314 corp: 17/100Kb lim: 30734 exec/s: 0 rss: 67Mb L: 6676/30734 MS: 2 ShuffleBytes-EraseBytes-
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+#310	REDUCE cov: 244 ft: 314 corp: 17/100Kb lim: 30734 exec/s: 0 rss: 67Mb L: 1089/30734 MS: 2 InsertRepeatedBytes-EraseBytes-
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+#321	NEW    cov: 244 ft: 315 corp: 18/103Kb lim: 30734 exec/s: 0 rss: 67Mb L: 3414/30734 MS: 1 ChangeByte-
+Error in pixReadMemBmp: invalid resolution
+Error in pixReadMem: bmp: no pix returned
+#322	REDUCE cov: 244 ft: 315 corp: 18/103Kb lim: 30734 exec/s: 0 rss: 67Mb L: 2771/30734 MS: 1 EraseBytes-
+#325	NEW    cov: 244 ft: 317 corp: 19/106Kb lim: 30734 exec/s: 0 rss: 67Mb L: 3414/30734 MS: 3 ChangeBit-ChangeBit-ManualDict- DE: "box not made"-
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: width too large
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: width too large
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: width too large
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: width too large
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: width too large
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+#339	REDUCE cov: 244 ft: 317 corp: 19/106Kb lim: 30734 exec/s: 0 rss: 68Mb L: 137/30734 MS: 4 ChangeBinInt-ChangeASCIIInt-ShuffleBytes-EraseBytes-
+Info in pixReadMemBmp: removing opaque cmap from 1 bpp
+Info in pixReadMemBmp: removing opaque cmap from 1 bpp
+Info in pixReadMemBmp: removing opaque cmap from 1 bpp
+Info in pixReadMemBmp: removing opaque cmap from 1 bpp
+Info in pixReadMemBmp: removing opaque cmap from 1 bpp
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMem: Pdf reading is not supported
+Error in pixReadMem: Pdf reading is not supported
+#356	REDUCE cov: 244 ft: 317 corp: 19/106Kb lim: 30734 exec/s: 0 rss: 69Mb L: 1155/30734 MS: 2 InsertByte-EraseBytes-
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMemBmp: invalid resolution
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+#415	REDUCE cov: 244 ft: 317 corp: 19/106Kb lim: 30734 exec/s: 0 rss: 69Mb L: 64/30734 MS: 4 ChangeBit-CopyPart-ChangeByte-EraseBytes-
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+#416	REDUCE cov: 244 ft: 317 corp: 19/105Kb lim: 30734 exec/s: 0 rss: 69Mb L: 5027/30734 MS: 1 EraseBytes-
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+#434	REDUCE cov: 244 ft: 317 corp: 19/104Kb lim: 30734 exec/s: 0 rss: 69Mb L: 3273/30734 MS: 3 ManualDict-ChangeBit-EraseBytes- DE: "keld not made"-
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemJpeg: function not present
+Error in pixReadMem: jpeg: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+#446	REDUCE cov: 244 ft: 317 corp: 19/102Kb lim: 30734 exec/s: 0 rss: 69Mb L: 3099/30734 MS: 2 ChangeByte-EraseBytes-
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+#467	REDUCE cov: 244 ft: 317 corp: 19/102Kb lim: 30734 exec/s: 0 rss: 69Mb L: 874/30734 MS: 1 EraseBytes-
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+#474	REDUCE cov: 244 ft: 317 corp: 19/102Kb lim: 30734 exec/s: 0 rss: 69Mb L: 2643/30734 MS: 2 InsertByte-EraseBytes-
+#479	NEW    cov: 244 ft: 319 corp: 20/105Kb lim: 30734 exec/s: 0 rss: 69Mb L: 3414/30734 MS: 5 ShuffleBytes-CrossOver-ChangeASCIIInt-ChangeASCIIInt-ManualDict- DE: "box not defined"-
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Info in pixReadMemBmp: removing opaque cmap from 1 bpp
+Info in pixReadMemBmp: removing opaque cmap from 1 bpp
+Info in pixReadMemBmp: removing opaque cmap from 1 bpp
+Info in pixReadMemBmp: removing opaque cmap from 1 bpp
+Info in pixReadMemBmp: removing opaque cmap from 1 bpp
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+#491	REDUCE cov: 244 ft: 319 corp: 20/105Kb lim: 30734 exec/s: 0 rss: 70Mb L: 735/30734 MS: 2 InsertRepeatedBytes-EraseBytes-
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+#501	REDUCE cov: 244 ft: 319 corp: 20/104Kb lim: 30734 exec/s: 0 rss: 70Mb L: 2518/30734 MS: 5 ChangeBit-ChangeBit-CrossOver-ChangeASCIIInt-EraseBytes-
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Pdf reading is not supported
+Error in pixReadMem: Pdf reading is not supported
+Error in pixReadMem: Pdf reading is not supported
+Error in pixReadMem: Pdf reading is not supported
+Error in pixReadMem: Pdf reading is not supported
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+#524	REDUCE cov: 244 ft: 319 corp: 20/103Kb lim: 30734 exec/s: 0 rss: 70Mb L: 1265/30734 MS: 3 CrossOver-InsertByte-EraseBytes-
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Info in pixReadMemBmp: removing opaque cmap from 1 bpp
+Info in pixReadMemBmp: removing opaque cmap from 1 bpp
+Info in pixReadMemBmp: removing opaque cmap from 1 bpp
+Info in pixReadMemBmp: removing opaque cmap from 1 bpp
+Info in pixReadMemBmp: removing opaque cmap from 1 bpp
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+#563	REDUCE cov: 244 ft: 319 corp: 20/103Kb lim: 30734 exec/s: 0 rss: 71Mb L: 47/30734 MS: 4 ChangeBinInt-InsertByte-PersAutoDict-EraseBytes- DE: "width must be >= 1"-
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+#569	REDUCE cov: 244 ft: 319 corp: 20/103Kb lim: 30734 exec/s: 0 rss: 71Mb L: 729/30734 MS: 1 EraseBytes-
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: invalid resolution
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: invalid resolution
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: invalid resolution
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: invalid resolution
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: invalid resolution
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: invalid resolution
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: invalid resolution
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: invalid resolution
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: invalid resolution
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: invalid resolution
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Info in pixReadMemBmp: removing opaque cmap from 1 bpp
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Info in pixReadMemBmp: removing opaque cmap from 1 bpp
+Info in pixReadMemBmp: removing opaque cmap from 1 bpp
+Info in pixReadMemBmp: removing opaque cmap from 1 bpp
+Info in pixReadMemBmp: removing opaque cmap from 1 bpp
+Info in pixReadMemBmp: removing opaque cmap from 1 bpp
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+#627	NEW    cov: 244 ft: 322 corp: 21/107Kb lim: 30734 exec/s: 0 rss: 71Mb L: 3414/30734 MS: 3 CrossOver-ManualDict-ChangeByte- DE: "height must be > 0"-
+Error in pixReadMemBmp: width too large
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: width too large
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: width too large
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: width too large
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: width too large
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Info in pixReadMemBmp: removing opaque cmap from 1 bpp
+Info in pixReadMemBmp: removing opaque cmap from 1 bpp
+Info in pixReadMemBmp: removing opaque cmap from 1 bpp
+Info in pixReadMemBmp: removing opaque cmap from 1 bpp
+Info in pixReadMemBmp: removing opaque cmap from 1 bpp
+Error in pixReadMemBmp: invalid resolution
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: invalid resolution
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: invalid resolution
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: invalid resolution
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: invalid resolution
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+#649	REDUCE cov: 245 ft: 323 corp: 22/107Kb lim: 30734 exec/s: 0 rss: 72Mb L: 258/30734 MS: 2 CrossOver-EraseBytes-
+Error in pixReadMem: Pdf reading is not supported
+Error in pixReadMem: Pdf reading is not supported
+Error in pixReadMem: Pdf reading is not supported
+Error in pixReadMem: Pdf reading is not supported
+#653	REDUCE cov: 245 ft: 323 corp: 22/107Kb lim: 30734 exec/s: 0 rss: 72Mb L: 930/30734 MS: 4 ChangeASCIIInt-ChangeASCIIInt-ManualDict-EraseBytes- DE: "nay not defined"-
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+#678	REDUCE cov: 245 ft: 323 corp: 22/106Kb lim: 30734 exec/s: 0 rss: 72Mb L: 652/30734 MS: 5 ChangeByte-ChangeBinInt-ChangeBinInt-ChangeASCIIInt-EraseBytes-
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+#681	REDUCE cov: 245 ft: 323 corp: 22/106Kb lim: 30734 exec/s: 0 rss: 72Mb L: 195/30734 MS: 3 CopyPart-InsertByte-EraseBytes-
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMemBmp: invalid resolution
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: invalid resolution
+Error in pixReadMem: bmp: no pix returned
+#688	REDUCE cov: 245 ft: 323 corp: 22/104Kb lim: 30734 exec/s: 0 rss: 72Mb L: 132/30734 MS: 2 InsertByte-CrossOver-
+Info in pixReadMemBmp: removing opaque cmap from 1 bpp
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+#712	NEW    cov: 246 ft: 324 corp: 23/104Kb lim: 30734 exec/s: 0 rss: 73Mb L: 109/30734 MS: 4 ChangeByte-ManualDict-InsertRepeatedBytes-ChangeBinInt- DE: "ptad count not 3"-
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemPng: function not present
+Error in pixReadMem: png: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: cannot read compressed BMP files
+Error in pixReadMem: bmp: no pix returned
+#724	NEW    cov: 247 ft: 326 corp: 24/108Kb lim: 30734 exec/s: 0 rss: 73Mb L: 4292/30734 MS: 2 InsertByte-CopyPart-
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMemBmp: size incommensurate with image data
+Error in pixReadMem: bmp: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+Error in pixReadMemTiff: function not present
+Error in pixReadMem: tiff: no pix returned
+#743	REDUCE cov: 247 ft: 326 corp: 24/108Kb lim: 30734 exec/s: 0 rss: 73Mb L: 853/30734 MS: 4 ManualDict-InsertByte-PersAutoDict-EraseBytes- DE: "invalid regionflag"-"char*"-
+E

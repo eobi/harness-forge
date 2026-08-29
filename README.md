@@ -21,7 +21,7 @@ A producer proposes a plan; the gates certify it; confidence decides nothing.
 |---|---|---|---|
 | `P1` | IR, static gates, C emitter | 6/6 | **done** |
 | `P2` | dynamic gates and positive control | 6/6 | **done** |
-| `P3` | producers: test-lift, LLM->IR, graph traversal | 51/63 | partial |
+| `P3` | producers: test-lift, LLM->IR, graph traversal | 52/63 | partial |
 | `PX` | cross-platform hardening: run the same way on every host | 5/5 | **done** |
 | `T0` | target choice, seeds and input size: the work that decides findings | 5/5 | **done** |
 | `TF` | findings: the half the engine was missing | 5/5 | **done** |
@@ -34,7 +34,7 @@ A producer proposes a plan; the gates certify it; confidence decides nothing.
 | `P8` | snapshot and scale | 0/2 | planned |
 | `P9` | exotic targets | 0/2 | planned |
 
-**96 of 123 deliverables done**, and `plancheck` refuses to let any of them say so without a module that imports and a test that exists.
+**97 of 123 deliverables done**, and `plancheck` refuses to let any of them say so without a module that imports and a test that exists.
 
 <!-- PHASES:END -->
 
@@ -244,17 +244,26 @@ confirmed reports — on its own 100-case benchmark with its gold OSS-Fuzz basel
 
 | case | ours | QuartetFuzz | gold | ours/gold | QF/gold |
 |---|---|---|---|---|---|
-| libyaml/libyaml_loader_fuzzer | *not yet run* | 73.89 | 77.7 |  | 0.95x |
-| libyaml/libyaml_scanner_fuzzer | *not yet run* | 67.30 | 70.6 |  | 0.95x |
-| brotli/decode_fuzzer | *not yet run* | 84.15 | 77.2 |  | 1.09x |
-| yajl-ruby/json_fuzzer | *not yet run* | 79.87 | 69.1 |  | 1.16x |
-| iperf/cjson_fuzzer | *not yet run* | 0.00 | 24.5 |  | 0.00x |
-| zopfli/zopfli_deflate_fuzzer | *not yet run* | 80.06 | 85.7 |  | 0.93x |
-| zlib/zlib_uncompress2_fuzzer | *not yet run* | 51.74 | 53.1 |  | 0.97x |
+| libyaml/libyaml_loader_fuzzer | **77.77** | 73.89 | 77.7 | 1.00x | 0.95x |
+| libyaml/libyaml_scanner_fuzzer | **70.47** | 67.30 | 70.6 | 1.00x | 0.95x |
+| brotli/decode_fuzzer | **85.50** | 84.15 | 77.2 | 1.11x | 1.09x |
+| yajl-ruby/json_fuzzer | **72.80** | 79.87 | 69.1 | 1.05x | 1.16x |
+| iperf/cjson_fuzzer | **25.10** | 0.00 | 24.5 | 1.02x | 0.00x |
+| zopfli/zopfli_deflate_fuzzer | **86.17** | 80.06 | 85.7 | 1.01x | 0.93x |
+| zlib/zlib_uncompress2_fuzzer | **53.93** | 51.74 | 53.1 | 1.02x | 0.97x |
 | lcms2/cmsOpenProfileFromMem | **5.14** | — | — |  |  |
-| libwebp/WebPDecodeRGBA | **50.09** | — | — |  |  |
+| libde265/stream_decode | **14.57** | — | 14.80† | 0.98x |  |
+| jbig2dec/jbig2_data_in | *NOT MEASURED: campaign ended on out-of-memory, so no coverage was flushed; 0.00% would be a failed measurement reported as a real one* | — | — |  |  |
+| leptonica/pixReadMem | **17.24** | — | — |  |  |
+| jansson/json_loadb | **18.98** | — | — |  |  |
+| libwebp/WebPDecodeRGBA | **50.33** | — | — |  |  |
+| libpng/png_image_begin_read_from_memory | **0.15** | — | — |  |  |
 
-Sources: run-021.
+† gold MEASURED by this repository from the project's own in-tree harness, not cited. Same machine, same compiler, same 600 s, same file list, and a fresh corpus from the same seeds — so the comparison differs in the harness and in nothing else.
+
+Measured cases with a gold baseline: **8**. Median ours/gold: **1.02x**. Ahead of the cited QuartetFuzz figure on **6 of the 7** cases it published one for.
+
+Sources: run-009, run-010, run-013, run-016, run-017, run-018, run-019, run-020, run-021, run-022.
 
 <!-- BENCH:END -->
 

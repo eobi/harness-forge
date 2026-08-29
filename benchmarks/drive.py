@@ -440,6 +440,12 @@ def main():
     # D3, VALID INPUT MUST NOT CRASH: a short run over the mined seeds. A harness that
     # faults on input the library ACCEPTS is reporting its own defect, and every finding
     # from it would be the harness's own.
+    #
+    # NOTE FOR ANYONE READING A ROW AGAINST A LOG: this gate GROWS THE CORPUS. libFuzzer
+    # writes newly-interesting inputs back into a writable corpus directory, so libwebp's
+    # 24 mined seeds became 79 files by the time the campaign started. `seeds` on the row is
+    # what the miner supplied; the log's "seed corpus: files: N" is what existed after this
+    # check. Both are true and they measure different moments.
     smoke = subprocess.run([str(binp), str(corp), "-runs=400", f"-max_len={mlen}"],
                            capture_output=True, text=True, errors="replace",
                            timeout=300)

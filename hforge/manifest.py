@@ -929,7 +929,7 @@ PHASES: tuple = (
                          "by the same format argument."),
         Deliverable("P3.SEEDS_BY_FORMAT",
                     "seeds matter in proportion to how unlikely valid input is by chance",
-                    PARTIAL,
+                    DONE,
                     modules=("hforge.analysis.seeds",),
                     tests=("test_an_explicitly_named_seed_directory_is_trusted",),
                     note="A CONTROLLED COMPARISON, one variable, same engine and same "
@@ -969,7 +969,20 @@ PHASES: tuple = (
                          "nearly reach what the whole 600-second seeded campaign got "
                          "(50.09%), which locates almost all of that coverage in the seeds "
                          "rather than in the search. This is what the run-to-run comparison "
-                         "was trying and failing to measure."),
+                         "was trying and failing to measure. "
+                         "REPLICATED on a second binary format, same instrument, 358 files "
+                         "each: leptonica's own test images read 8.32% and random bytes of "
+                         "identical sizes read 0.84%, a factor of ten beside libwebp's "
+                         "twenty. Two independent formats, same direction, same order of "
+                         "magnitude. "
+                         "AND THE CLEAN RUNS ARE IN, which is what this was downgraded for. "
+                         "On fresh corpora: libwebp 50.33 (confounded run said 50.09, so its "
+                         "seeds had been doing the work all along), leptonica 17.24 "
+                         "(confounded said 20.67 — carry-over was worth 3.4 points and the "
+                         "withdrawal was justified), jansson 18.98 (identical, carry-over "
+                         "worth nothing, which fits a format that saturates fast). Same fix, "
+                         "three different consequences, and no way to know which without "
+                         "measuring."),
         Deliverable("P3.SIZED_FROM_STRUCT",
                     "a buffer whose size the library computed into a struct it filled",
                     PLANNED,
