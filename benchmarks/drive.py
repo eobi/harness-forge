@@ -1,5 +1,5 @@
 """One benchmark case: propose -> pick the plan for the gold target -> build -> fuzz -> cover."""
-import glob, json, os, pathlib, subprocess, sys
+import glob, json, os, pathlib, shutil, subprocess, sys
 sys.path.insert(0, "/hf")
 from hforge.producers import header_graph as hg
 from hforge.emit import emit
@@ -69,6 +69,28 @@ CASES = {
  "iperf/cjson_fuzzer": dict(
     hdr="/b/cjson/cJSON.h", inc=["/b/cjson"], src=["/b/cjson/cJSON.c"],
     fn="cJSON_Parse", cflags=[], cover=["/b/cjson/cJSON.c"]),
+ # ── C++ targets ───────────────────────────────────────────────────────────
+ # First C++ case in the suite. libde265 is C++ behind an `extern "C"` API, which is the
+ # common shape for codecs and the one that matters most: the header producer can read the
+ # C declarations, and only the build has to change to clang++.
+ #
+ # It is here for a second reason. libde265 ships its OWN hand-written fuzz harness at
+ # fuzzing/stream_fuzzer.cc, so the gold column for this case is MEASURED on this machine
+ # at this budget rather than cited from somebody's paper. Same compiler, same corpus
+ # policy, same 600 seconds, same denominator. Run `benchmarks/targets/libde265.sh` first;
+ # the build needs two headers cmake would otherwise generate.
+ "libde265/stream_decode": dict(
+    cxx=True, std="c++11",
+    hdr="/b/libde265/libde265/de265.h",
+    inc=["/b/libde265", "/b/libde265/libde265"],
+    src=sorted(glob.glob("/b/libde265/libde265/*.cc")),
+    fn="de265_push_data", cflags=["-DHAVE_CONFIG_H"], max_len=65536,
+    # The library's own harness, built and measured exactly as ours is. This is a gold
+    # figure this repository PRODUCES, not one it quotes.
+    gold_harness="/b/libde265/fuzzing/stream_fuzzer.cc",
+    # DECODE PATH ONLY. encoder/ is a separate library, the x86 and arm32 SIMD directories
+    # are not compiled on aarch64, and sherlock265/dec265 are applications.
+    cover=sorted(glob.glob("/b/libde265/libde265/*.cc"))),
 }
 
 def main():
@@ -164,7 +186,11 @@ def main():
                                                  indent=2, default=str))
     out["logs"] = str(logs)
     binp = wd/"fuzz"
-    cmd = ["clang","-g","-O1","-fno-omit-frame-pointer",
+    # C++ targets build with clang++ and an explicit standard. Everything else about the
+    # build is identical, on purpose: a gold harness and ours must differ in the harness
+    # and in nothing else, or the comparison measures the build.
+    cc = ["clang++", f"-std={c.get('std','c++11')}"] if c.get("cxx") else ["clang"]
+    cmd = cc + ["-g","-O1","-fno-omit-frame-pointer",
            "-fprofile-instr-generate","-fcoverage-mapping"]
     cmd += [f"-I{i}" for i in c["inc"]] + c["cflags"]
     cmd += ["-fsanitize=fuzzer,address", str(wd/"harness.c")] + c["src"] + ["-o", str(binp)]
@@ -248,6 +274,69 @@ def main():
         out["regions_pct"] = f[3].rstrip('%'); out["functions_pct"] = f[6].rstrip('%')
         out["lines_pct"] = f[9].rstrip('%'); out["branches_pct"] = f[12].rstrip('%')
     out["result"] = "measured"
+
+    # ── the gold harness, when the project ships one ──────────────────────────────
+    #
+    # Every other gold figure in this suite is CITED from somebody else's paper, which
+    # means it was produced on another machine, with another compiler, at another budget,
+    # over a denominator we cannot inspect. When a project ships its own hand-written fuzz
+    # harness in tree, none of that is necessary: build it here, run it here, measure it
+    # over the same file list, and the comparison differs in the harness and in nothing
+    # else. That is a stronger claim than any citation, and it can go against us.
+    if c.get("gold_harness"):
+        g = measure_gold(c, wd, logs, corp, dict_args, seconds, mlen, cover)
+        out["gold_measured_here"] = g
+
     print(json.dumps(out))
+
+
+def measure_gold(c, wd, logs, corp, dict_args, seconds, mlen, cover):
+    """Build and run the project's own harness under exactly our build and budget."""
+    gsrc = c["gold_harness"]
+    gwd = wd/"gold"; gwd.mkdir(exist_ok=True)
+    glogs = logs/"gold"; glogs.mkdir(exist_ok=True)
+    gbin = gwd/"fuzz"
+    cc = ["clang++", f"-std={c.get('std','c++11')}"] if c.get("cxx") else ["clang"]
+    cmd = cc + ["-g", "-O1", "-fno-omit-frame-pointer",
+                "-fprofile-instr-generate", "-fcoverage-mapping"]
+    cmd += [f"-I{i}" for i in c["inc"]] + c["cflags"]
+    cmd += ["-fsanitize=fuzzer,address", gsrc] + c["src"] + ["-o", str(gbin)]
+    (glogs/"build.cmd").write_text(" ".join(cmd) + "\n")
+    r = subprocess.run(cmd, capture_output=True, text=True)
+    if r.returncode != 0:
+        (glogs/"build.log").write_text(r.stdout + r.stderr)
+        return {"result": "build failed", "error": r.stderr[-400:]}
+
+    # A FRESH corpus. Handing the gold harness the corpus OUR run just grew would measure
+    # our corpus, not their harness, and it would flatter us: those inputs were selected
+    # by a fuzzer driving our entry point. Same seeds and same dictionary, same start.
+    gcorp = gwd/"corpus"
+    if gcorp.exists():
+        shutil.rmtree(gcorp)
+    gcorp.mkdir()
+    if c.get("seeds"):
+        from hforge.analysis import seeds as seedmod
+        seedmod.write(seedmod.mine(c["seeds"], max_bytes=65536), gcorp)
+    prof = gwd/"run.profraw"
+    fr = subprocess.run([str(gbin), str(gcorp), *dict_args, f"-max_total_time={seconds}",
+                         "-print_final_stats=1", f"-max_len={mlen}"],
+                        capture_output=True, text=True, errors="replace",
+                        env=dict(os.environ, LLVM_PROFILE_FILE=str(prof)),
+                        timeout=seconds + 300)
+    (glogs/"fuzz.log").write_text(fr.stdout + fr.stderr)
+    subprocess.run(["llvm-profdata-14", "merge", "-sparse", str(prof),
+                    "-o", str(gwd/"run.profdata")], capture_output=True)
+    cr = subprocess.run(["llvm-cov-14", "report", str(gbin),
+                         f"-instr-profile={gwd}/run.profdata"] + cover,
+                        capture_output=True, text=True)
+    (glogs/"coverage.txt").write_text(cr.stdout + cr.stderr)
+    g = {"result": "measured", "source": gsrc}
+    tot = [l for l in cr.stdout.splitlines() if l.startswith("TOTAL")]
+    if tot:
+        f = tot[0].split()
+        g["regions_pct"], g["lines_pct"] = f[3].rstrip("%"), f[9].rstrip("%")
+    g["executions"] = int(next((x for x in __import__("re").findall(
+        r"stat::number_of_executed_units:\s*(\d+)", fr.stdout + fr.stderr)), 0) or 0)
+    return g
 
 main()

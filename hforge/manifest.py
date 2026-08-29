@@ -559,6 +559,54 @@ PHASES: tuple = (
                          "const Bytef *source, uLong *sourceLen)` also needs something the "
                          "IR cannot express: a caller-allocated SCRATCH OUTPUT buffer with "
                          "an in/out size. Recorded as a gap rather than rushed."),
+        Deliverable("P3.ERROR_ACCESSOR",
+                    "error accessors are finishers on the FAILURE branch", PLANNED,
+                    note="found by measurement, not by reading a header. yajl is the one "
+                         "run-009 case behind gold (65.12 vs 69.1, 0.94x), and the deficit "
+                         "is almost entirely one file: yajl.c at 45.26% while the lexer is "
+                         "at 77%. The uncovered functions are yajl_render_error_string (72 "
+                         "lines), yajl_status_to_string, yajl_get_bytes_consumed and "
+                         "yajl_get_error itself — roughly a hundred lines reachable ONLY "
+                         "after a parse fails and the caller asks why. A fuzzer drives that "
+                         "path constantly; our harness never asks. The emitted lifecycle "
+                         "(alloc/parse/complete/free) is CORRECT and every gate passes; the "
+                         "coverage it misses is coverage no correct lifecycle reaches. "
+                         "_finisher_for already models finishers, but it picks queries on "
+                         "the SUCCESS path. This is a different shape: an accessor gated on "
+                         "the consuming call returning non-OK, paired with a matching free. "
+                         "The pairing is not optional — without yajl_free_error the harness "
+                         "leaks on every failing input and under LeakSanitizer every "
+                         "finding would be the harness's own, which is what S1 exists to "
+                         "block. So the free comes with it or the plan is refused. "
+                         "Evidence: benchmarks/results/logs/run-009/yajl-ruby__json_fuzzer/"),
+        Deliverable("P3.OPTION_SETTER",
+                    "varargs option setters between create and consume", PLANNED,
+                    note="`yajl_config(yajl_handle h, yajl_option opt, ...)` — 19 lines at "
+                         "0%, and each option it sets (allow_comments, "
+                         "allow_trailing_garbage, allow_multiple_values, "
+                         "dont_validate_strings) unlocks lexer and parser paths that are "
+                         "dead under the defaults. _CONFIG_INIT models a config STRUCT "
+                         "filled before construction, not a (handle, enum, value) setter "
+                         "called after it. This one needs care rather than enthusiasm: a "
+                         "harness that flips dont_validate_strings is testing a different "
+                         "contract, so the honest form is ONE PLAN PER CONFIGURATION, each "
+                         "certified separately with its options recorded in the IR — never "
+                         "one harness that sets everything."),
+        Deliverable("P3.OPS_TABLE",
+                    "synthesise a callback table for libraries that take one", PLANNED,
+                    note="graphite2 has NO entry point that takes (bytes, len). Every face "
+                         "constructor takes a callback table — gr_make_face_with_ops(handle, "
+                         "const gr_face_ops*, options), or the deprecated gr_make_face with "
+                         "a gr_get_table_fn. A harness must SYNTHESISE a callback that "
+                         "serves TTF tables out of the fuzzer buffer. Today S2.TYPE_CONFUSION "
+                         "correctly blocks binding fuzzer bytes to a function pointer, so "
+                         "the engine refuses graphite2 — and refusing is right, but it is "
+                         "not a harness. The shape is common across font and codec "
+                         "libraries. We already have the Scratch machinery for a "
+                         "caller-owned buffer; the missing half is emitting a fixed static "
+                         "function that reads from it. Note the emitted callback must NOT be "
+                         "fuzzer-derived: the bytes it SERVES come from input, the code that "
+                         "serves them does not."),
         Deliverable("P3.LIFT", "unit tests -> IR (the UTopia insight)", PLANNED),
         Deliverable("P3.LLM", "LLM fleet emitting IR, never C", PLANNED),
     )),
