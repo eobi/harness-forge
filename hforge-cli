@@ -1,0 +1,10 @@
+#!/bin/sh
+# Run the Harness Forge CLI from anywhere.
+#
+#   sudo ln -s "/path/to/harness-forge/hforge-cli" /usr/local/bin/hforge
+#
+# `hforge` is a Python package, not an installed binary, so it has to run from the repo.
+# This resolves the repo from the script's own location and cds there first.
+here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd) || exit 1
+cd "$here" || exit 1
+exec python3 -m hforge "$@"

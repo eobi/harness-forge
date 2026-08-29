@@ -1,0 +1,86 @@
+{
+  "schema_version": "1.0",
+  "name": "hf_demo_parse_broken",
+  "producer": "hand",
+  "notes": "The cJSON mistake, reproduced. Identical to hf_demo.good except the input slice is kind 'bytes', so the emitter hands hd_parse an exact-size buffer with no terminator. hd_parse calls strlen() on it, over-reads on EVERY input, and turns a correct library into an infinite source of false findings. Gate S2 rejects this plan without compiling anything.",
+  "target": {
+    "name": "hf_demo",
+    "version": "0.1",
+    "commit": "local",
+    "public_headers": ["hf_demo.h"],
+    "include_dirs": ["examples/lib"],
+    "sources": ["examples/lib/hf_demo.c"],
+    "link_libs": [],
+    "language": "c"
+  },
+  "platforms": ["linux-x86_64-glibc", "macos-arm64"],
+  "apis": {
+    "hd_open": {
+      "symbol": "hd_open",
+      "header": "hf_demo.h",
+      "params": [],
+      "returns": {"name": "hd_ctx *", "kind": "pointer", "const": false},
+      "role": "create",
+      "contract": {"error_return": "null"}
+    },
+    "hd_parse": {
+      "symbol": "hd_parse",
+      "header": "hf_demo.h",
+      "params": [
+        {"name": "c", "type": {"name": "hd_ctx *", "kind": "pointer", "const": false}},
+        {"name": "json", "type": {"name": "const char *", "kind": "pointer", "const": true}}
+      ],
+      "returns": {"name": "int", "kind": "scalar", "const": false},
+      "role": "consume",
+      "contract": {
+        "nul_terminated": ["json"],
+        "requires_nonnull": ["c"],
+        "error_return": "negative"
+      }
+    },
+    "hd_close": {
+      "symbol": "hd_close",
+      "header": "hf_demo.h",
+      "params": [
+        {"name": "c", "type": {"name": "hd_ctx *", "kind": "pointer", "const": false}}
+      ],
+      "returns": {"name": "void", "kind": "void", "const": false},
+      "role": "destroy",
+      "contract": {}
+    }
+  },
+  "slices": [
+    {"id": "json", "kind": "bytes", "remainder": true, "min_len": 1, "max_len": 0}
+  ],
+  "resources": [
+    {"id": "ctx", "type": {"name": "hd_ctx *", "kind": "pointer", "const": false}}
+  ],
+  "sequence": [
+    {"id": "o_open", "api": "hd_open", "args": [], "binds": "ctx", "targets": "", "guarded_by": []},
+    {
+      "id": "o_parse",
+      "api": "hd_parse",
+      "args": [
+        {"param": "c", "source": "resource", "ref": "ctx"},
+        {"param": "json", "source": "input", "ref": "json"}
+      ],
+      "binds": "", "targets": "", "guarded_by": []
+    },
+    {
+      "id": "o_close",
+      "api": "hd_close",
+      "args": [{"param": "c", "source": "resource", "ref": "ctx"}],
+      "binds": "", "targets": "ctx", "guarded_by": []
+    }
+  ],
+  "knobs": {
+    "max_len": 4096,
+    "min_len": 1,
+    "timeout_s": 25,
+    "rss_limit_mb": 2048,
+    "sanitizers": ["address"],
+    "detect_leaks": false,
+    "optimisation": "-O1"
+  },
+  "raw_blocks": []
+}

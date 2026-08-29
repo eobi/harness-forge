@@ -1,0 +1,5 @@
+FROM debian:bookworm
+RUN apt-get update -qq && apt-get install -y -qq \
+      python3 clang llvm binutils make ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+WORKDIR /hf

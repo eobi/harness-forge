@@ -1,0 +1,23 @@
+
+DEFECT                 STATIC                       BUILT  CRASHES  ESCAPED  RUNGS
+--------------------------------------------------------------------------------------------
+bytes-to-struct        S2.TYPE_CONFUSION            True   2        0        2
+unterminated-cstring   S2.CSTRING                   True   2        0        2
+unchecked-handle       S2.UNGUARDED_NONNULL,S6.UNC  True   0        0        -
+use-after-destroy      S1.USE_AFTER_DESTROY         True   2        0        2
+double-destroy         S3.DESTROY_NO_TARGET         True   2        0        2
+
+INTERCEPTED  5/5 defective plans refused by a static gate, before any compiler ran.
+ESCAPED      0/8 crashes from the SAME plans, built anyway, reached rung 3+.
+             false-positive rate 0.0% over 8 crashing inputs across 4 defect classes.
+             Both denominators are stated because they answer different questions and
+             neither is large. A defect crashes on nearly every input, so the input
+             count is not an independent sample; the class count is the honest one.
+
+NO OBSERVATION  unchecked-handle: the defect did not manifest on this library: no crash to judge, which is no evidence either way
+
+Every plan above contains a bug in the HARNESS, so every crash is false by
+construction. Both lines are needed: the second is only meaningful when crashes
+were actually produced, and the first is why many were not.
+
+written to /out/fprate.json

@@ -1,0 +1,12 @@
+# The Ring 2 runtime. Everything a build and a campaign need, and nothing else.
+#
+# No network is available to anything running in here (`--network none` is passed at run
+# time), the target is mounted read-only, and the process runs as a non-root user with all
+# capabilities dropped.
+FROM debian:bookworm-slim
+RUN apt-get update -qq && apt-get install -y -qq --no-install-recommends \
+      python3 clang llvm binutils libc6-dev \
+    && rm -rf /var/lib/apt/lists/*
+RUN useradd -m -u 1000 forge
+USER forge
+WORKDIR /work

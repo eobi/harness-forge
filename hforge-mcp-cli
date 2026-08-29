@@ -1,0 +1,5 @@
+#!/bin/sh
+# The MCP server, runnable from anywhere. Point an MCP client at this path.
+here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd) || exit 1
+cd "$here" || exit 1
+exec python3 -m hforge_mcp "$@"
