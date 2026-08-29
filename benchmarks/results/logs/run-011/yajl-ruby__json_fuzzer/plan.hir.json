@@ -1,0 +1,508 @@
+{
+  "schema_version": "1.0",
+  "name": "yajl-ruby_yajl_parse",
+  "producer": "header_graph",
+  "notes": "proposed from yajl_parse.h by signature inference; handle type inferred as 'yajl_handle'. Every inference here is checked by a static gate, and the producer certifies nothing.",
+  "target": {
+    "name": "yajl-ruby",
+    "version": "",
+    "commit": "",
+    "public_headers": [
+      "/b/yajl/inc/yajl/yajl_parse.h"
+    ],
+    "include_dirs": [
+      "/b/yajl/inc",
+      "/b/yajl/src",
+      "/b/yajl/src/api"
+    ],
+    "sources": [
+      "/b/yajl/src/yajl.c",
+      "/b/yajl/src/yajl_alloc.c",
+      "/b/yajl/src/yajl_buf.c",
+      "/b/yajl/src/yajl_encode.c",
+      "/b/yajl/src/yajl_gen.c",
+      "/b/yajl/src/yajl_lex.c",
+      "/b/yajl/src/yajl_parser.c",
+      "/b/yajl/src/yajl_tree.c",
+      "/b/yajl/src/yajl_version.c"
+    ],
+    "link_libs": [],
+    "cflags": [],
+    "seed_dirs": [],
+    "language": "c"
+  },
+  "platforms": [
+    "linux-aarch64-glibc"
+  ],
+  "apis": {
+    "yajl_alloc": {
+      "symbol": "yajl_alloc",
+      "header": "yajl_parse.h",
+      "params": [
+        {
+          "name": "callbacks",
+          "type": {
+            "name": "const yajl_callbacks *",
+            "kind": "pointer",
+            "const": true
+          }
+        },
+        {
+          "name": "afs",
+          "type": {
+            "name": "yajl_alloc_funcs *",
+            "kind": "pointer",
+            "const": false
+          }
+        },
+        {
+          "name": "ctx",
+          "type": {
+            "name": "void *",
+            "kind": "pointer",
+            "const": false
+          }
+        }
+      ],
+      "returns": {
+        "name": "yajl_handle",
+        "kind": "pointer",
+        "const": false
+      },
+      "role": "create",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [],
+        "transfers_ownership": [],
+        "requires_nonnull": [],
+        "error_return": "null",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    },
+    "yajl_complete_parse": {
+      "symbol": "yajl_complete_parse",
+      "header": "yajl_parse.h",
+      "params": [
+        {
+          "name": "hand",
+          "type": {
+            "name": "yajl_handle",
+            "kind": "pointer",
+            "const": false
+          }
+        }
+      ],
+      "returns": {
+        "name": "yajl_status",
+        "kind": "scalar",
+        "const": false
+      },
+      "role": "query",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [],
+        "transfers_ownership": [],
+        "requires_nonnull": [
+          "hand"
+        ],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    },
+    "yajl_free": {
+      "symbol": "yajl_free",
+      "header": "yajl_parse.h",
+      "params": [
+        {
+          "name": "handle",
+          "type": {
+            "name": "yajl_handle",
+            "kind": "pointer",
+            "const": false
+          }
+        }
+      ],
+      "returns": {
+        "name": "void",
+        "kind": "void",
+        "const": false
+      },
+      "role": "destroy",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [],
+        "transfers_ownership": [],
+        "requires_nonnull": [],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    },
+    "yajl_free_error": {
+      "symbol": "yajl_free_error",
+      "header": "yajl_parse.h",
+      "params": [
+        {
+          "name": "hand",
+          "type": {
+            "name": "yajl_handle",
+            "kind": "pointer",
+            "const": false
+          }
+        },
+        {
+          "name": "str",
+          "type": {
+            "name": "unsigned char *",
+            "kind": "pointer",
+            "const": false
+          }
+        }
+      ],
+      "returns": {
+        "name": "void",
+        "kind": "void",
+        "const": false
+      },
+      "role": "consume",
+      "contract": {
+        "nul_terminated": [
+          "str"
+        ],
+        "length_delimited": [],
+        "transfers_ownership": [],
+        "requires_nonnull": [
+          "hand"
+        ],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    },
+    "yajl_get_error": {
+      "symbol": "yajl_get_error",
+      "header": "yajl_parse.h",
+      "params": [
+        {
+          "name": "hand",
+          "type": {
+            "name": "yajl_handle",
+            "kind": "pointer",
+            "const": false
+          }
+        },
+        {
+          "name": "verbose",
+          "type": {
+            "name": "int",
+            "kind": "scalar",
+            "const": false
+          }
+        },
+        {
+          "name": "jsonText",
+          "type": {
+            "name": "const unsigned char *",
+            "kind": "pointer",
+            "const": true
+          }
+        },
+        {
+          "name": "jsonTextLength",
+          "type": {
+            "name": "size_t",
+            "kind": "scalar",
+            "const": false
+          }
+        }
+      ],
+      "returns": {
+        "name": "unsigned char *",
+        "kind": "pointer",
+        "const": false
+      },
+      "role": "consume",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [
+          [
+            "jsonText",
+            "jsonTextLength"
+          ]
+        ],
+        "transfers_ownership": [],
+        "requires_nonnull": [
+          "hand"
+        ],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    },
+    "yajl_parse": {
+      "symbol": "yajl_parse",
+      "header": "yajl_parse.h",
+      "params": [
+        {
+          "name": "hand",
+          "type": {
+            "name": "yajl_handle",
+            "kind": "pointer",
+            "const": false
+          }
+        },
+        {
+          "name": "jsonText",
+          "type": {
+            "name": "const unsigned char *",
+            "kind": "pointer",
+            "const": true
+          }
+        },
+        {
+          "name": "jsonTextLength",
+          "type": {
+            "name": "size_t",
+            "kind": "scalar",
+            "const": false
+          }
+        }
+      ],
+      "returns": {
+        "name": "yajl_status",
+        "kind": "scalar",
+        "const": false
+      },
+      "role": "consume",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [
+          [
+            "jsonText",
+            "jsonTextLength"
+          ]
+        ],
+        "transfers_ownership": [],
+        "requires_nonnull": [
+          "hand"
+        ],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    }
+  },
+  "slices": [
+    {
+      "id": "jsonText",
+      "kind": "bytes",
+      "remainder": true,
+      "min_len": 1,
+      "max_len": 0
+    }
+  ],
+  "resources": [
+    {
+      "id": "h",
+      "type": {
+        "name": "yajl_handle",
+        "kind": "pointer",
+        "const": false
+      },
+      "storage": "handle"
+    },
+    {
+      "id": "err",
+      "type": {
+        "name": "unsigned char",
+        "kind": "pointer",
+        "const": false
+      },
+      "storage": "handle"
+    }
+  ],
+  "scratch": [],
+  "sequence": [
+    {
+      "id": "o_create",
+      "api": "yajl_alloc",
+      "args": [
+        {
+          "param": "callbacks",
+          "source": "literal",
+          "ref": "",
+          "value": 0
+        },
+        {
+          "param": "afs",
+          "source": "literal",
+          "ref": "",
+          "value": 0
+        },
+        {
+          "param": "ctx",
+          "source": "literal",
+          "ref": "",
+          "value": 0
+        }
+      ],
+      "binds": "h",
+      "targets": "",
+      "repeat": 0,
+      "guarded_by": []
+    },
+    {
+      "id": "o_consume",
+      "api": "yajl_parse",
+      "args": [
+        {
+          "param": "hand",
+          "source": "resource",
+          "ref": "h",
+          "value": null
+        },
+        {
+          "param": "jsonText",
+          "source": "input",
+          "ref": "jsonText",
+          "value": null
+        },
+        {
+          "param": "jsonTextLength",
+          "source": "length_of",
+          "ref": "jsonText",
+          "value": null
+        }
+      ],
+      "binds": "",
+      "targets": "",
+      "repeat": 0,
+      "guarded_by": [
+        "h"
+      ]
+    },
+    {
+      "id": "o_finish",
+      "api": "yajl_complete_parse",
+      "args": [
+        {
+          "param": "hand",
+          "source": "resource",
+          "ref": "h",
+          "value": null
+        }
+      ],
+      "binds": "",
+      "targets": "",
+      "repeat": 0,
+      "guarded_by": [
+        "h"
+      ]
+    },
+    {
+      "id": "o_error",
+      "api": "yajl_get_error",
+      "args": [
+        {
+          "param": "hand",
+          "source": "resource",
+          "ref": "h",
+          "value": null
+        },
+        {
+          "param": "verbose",
+          "source": "literal",
+          "ref": "",
+          "value": 1
+        },
+        {
+          "param": "jsonText",
+          "source": "input",
+          "ref": "jsonText",
+          "value": null
+        },
+        {
+          "param": "jsonTextLength",
+          "source": "length_of",
+          "ref": "jsonText",
+          "value": null
+        }
+      ],
+      "binds": "err",
+      "targets": "",
+      "repeat": 0,
+      "guarded_by": [
+        "h"
+      ]
+    },
+    {
+      "id": "o_error_free",
+      "api": "yajl_free_error",
+      "args": [
+        {
+          "param": "hand",
+          "source": "resource",
+          "ref": "h",
+          "value": null
+        },
+        {
+          "param": "str",
+          "source": "resource",
+          "ref": "err",
+          "value": null
+        }
+      ],
+      "binds": "",
+      "targets": "err",
+      "repeat": 0,
+      "guarded_by": [
+        "h",
+        "err"
+      ]
+    },
+    {
+      "id": "o_destroy",
+      "api": "yajl_free",
+      "args": [
+        {
+          "param": "handle",
+          "source": "resource",
+          "ref": "h",
+          "value": null
+        }
+      ],
+      "binds": "",
+      "targets": "h",
+      "repeat": 0,
+      "guarded_by": []
+    }
+  ],
+  "knobs": {
+    "max_len": 4096,
+    "min_len": 0,
+    "timeout_s": 25,
+    "rss_limit_mb": 2048,
+    "malloc_limit_mb": 0,
+    "sanitizers": [
+      "address"
+    ],
+    "detect_leaks": false,
+    "optimisation": "-O1"
+  },
+  "format_model": null,
+  "raw_blocks": []
+}

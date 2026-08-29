@@ -605,7 +605,20 @@ PHASES: tuple = (
                            "test_the_error_string_is_freed_by_its_own_pair",
                            "test_an_error_accessor_with_no_freer_is_not_called_at_all",
                            "test_a_verbose_flag_is_not_bound_to_the_input_length"),
-                    note="v1 SHIPPED. The plan for yajl now runs alloc -> parse -> "
+                    note="CORRECTED AFTER MEASUREMENT. The first version of this entry "
+                         "claimed the harness was right and said only that the coverage "
+                         "effect was unmeasured. Measuring it (run-011) returned 0.00% "
+                         "against 65.12% before: the harness SEGV'd on its third execution, "
+                         "inside yajl_free_error, because the scalar `verbose` was bound to "
+                         "1 and yajl_render_error_string's verbose branch writes up to about "
+                         "a hundred bytes into `char text[72]` behind an assert that fires "
+                         "after the overflow. I picked 1 so the flag would select the longer "
+                         "message and reach more of the renderer — optimising an argument "
+                         "for coverage rather than choosing it because the contract allows "
+                         "it, which is the instinct this engine exists to refuse. Now 0, "
+                         "pinned. The deeper defect is P3.BENCH_NO_DYNAMIC_GATES: D3 would "
+                         "have caught this before a 600-second campaign was spent. "
+                         "v1 SHIPPED. The plan for yajl now runs alloc -> parse -> "
                          "complete_parse -> get_error(h, 1, data, len) -> free_error -> "
                          "free, all static gates pass, and the emitted C guards the release "
                          "on both the handle and the string. NOT gated on failure, "
@@ -624,6 +637,20 @@ PHASES: tuple = (
                          "this moves 65.12 toward gold's 69.1 is unmeasured as of this "
                          "entry — the claim here is that the harness is right, not that the "
                          "number moved."),
+        Deliverable("P3.BENCH_NO_DYNAMIC_GATES",
+                    "the benchmark driver runs static gates only", PLANNED,
+                    note="benchmarks/drive.py calls run_static_gates and nothing else, so "
+                         "every case is built and campaigned on a plan that passed S1-S6 and "
+                         "was never checked by D1-D11. The cost is not theoretical: the "
+                         "error-accessor harness crashed on its third execution with a "
+                         "corrupted stack, D3 (valid input must not crash) exists precisely "
+                         "to catch that, and instead the defect consumed a 600-second "
+                         "campaign and produced a 0.00% row. A benchmark that bypasses the "
+                         "gate bank is measuring a generator, which is the thing this "
+                         "project argues is not the bottleneck. Fix: run the dynamic gates "
+                         "in drive.py before the campaign and record their verdicts on the "
+                         "row, so a refused plan is reported as refused rather than measured "
+                         "as zero."),
         Deliverable("P3.DRIVE_LOOP",
                     "loop a drive call on its continuation out-parameter", PLANNED,
                     note="libde265's gold harness loops `while (more) { de265_decode(ctx, "

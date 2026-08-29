@@ -1424,4 +1424,8 @@ def test_a_verbose_flag_is_not_bound_to_the_input_length():
     by = {a.param: a for a in acc.args}
     assert by["verbose"].source == "literal", (
         f"verbose bound as {by['verbose'].source!r}, not a literal")
+    # 0, not 1. Choosing 1 to "reach more of the renderer" walked into a stack overflow in
+    # yajl_render_error_string and took the case from 65.12% to 0.00%.
+    assert by["verbose"].value == 0, (
+        f"verbose is {by['verbose'].value}; a scalar we did not have to choose gets 0")
     assert by["jsonTextLen"].source == "length_of", "the real length lost its binding"

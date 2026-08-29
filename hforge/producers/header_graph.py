@@ -1490,10 +1490,20 @@ def _error_accessor_for(handle, cons, apis: dict, pm: dict, used: set, slice_id:
             elif slice_id and _byte_carrying(pd) and not _path_like(pd.name):
                 out.append(Arg(pd.name, "input", slice_id))
             elif pd.type.kind != "pointer":
-                # A plain scalar gets 1. For the `verbose` flag every one of these
-                # accessors carries, that selects the LONGER message and therefore more of
-                # the renderer — which is the code this whole call exists to reach.
-                out.append(Arg(pd.name, "literal", value=1))
+                # A plain scalar gets 0, the conservative value.
+                #
+                # It was 1, chosen so a `verbose` flag would select the longer message and
+                # reach more of the renderer. MEASURED: that took yajl from 65.12% to
+                # 0.00%. yajl_render_error_string's verbose branch writes up to about a
+                # hundred bytes into `char text[72]`, guarded by an assert that fires after
+                # the overflow, and the corrupted stack made the paired free segfault on
+                # the third execution.
+                #
+                # The instinct — pick the argument that reaches more code — is the one this
+                # engine exists to refuse. An argument is chosen because the contract allows
+                # it, not because it looks productive. 0 is what a caller who has not
+                # thought about it passes, and it is what we pass.
+                out.append(Arg(pd.name, "literal", value=0))
             else:
                 return None
         return out if seen_handle else None
