@@ -903,6 +903,30 @@ PHASES: tuple = (
                          "The row records `coverage_from: corpus replay` rather than "
                          "presenting it as the same kind of measurement as a clean run, "
                          "because it covers the corpus and not the campaign's full history."),
+        Deliverable("T0.ROUNDTRIP_SEEDS",
+                    "synthesise seeds with the library's own encoder", PARTIAL,
+                    modules=("hforge.analysis.seeds",),
+                    tests=("test_an_explicitly_named_seed_directory_is_trusted",),
+                    note="FIRST TARGET DONE, THE MECHANISM IS NOT GENERAL YET. "
+                         "benchmarks/targets/libwebp.sh builds WebPEncodeRGBA out of the "
+                         "library under test and emits 24 valid RIFF/WEBP files — verified "
+                         "by their magic — across lossy, lossless and a quality sweep, at "
+                         "nine dimension pairs that cross the block boundaries a codec cares "
+                         "about, with an alpha channel that alternates per pixel so the ALPH "
+                         "chunk is exercised. A corpus of one image teaches a mutator one "
+                         "shape; the point is several starting points in different parts of "
+                         "the format, not merely getting past the magic number. "
+                         "WHY LIBWEBP FIRST: it is the only case in the suite that ran at "
+                         "seeds=0, because the project keeps its corpus outside the "
+                         "repository, and P3.SEEDS_BY_FORMAT says the payoff tracks how "
+                         "unlikely valid input is by chance — a RIFF container wrapping a "
+                         "VP8 bitstream is at the far end of that scale. "
+                         "STILL A SHELL SCRIPT PER TARGET, not a producer capability. Making "
+                         "it general means recognising an encode/decode PAIR in the API "
+                         "surface — an entry point taking bytes and one producing them for "
+                         "the same format — and emitting a generator plan from the second to "
+                         "feed the first. libde265 and lcms2 both ship encoders and are next "
+                         "by the same format argument."),
         Deliverable("P3.SEEDS_BY_FORMAT",
                     "seeds matter in proportion to how unlikely valid input is by chance",
                     DONE,

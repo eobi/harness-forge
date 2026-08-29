@@ -198,12 +198,19 @@ CASES = {
          + sorted(glob.glob("/b/libwebp/src/dsp/*.c"))
          + sorted(glob.glob("/b/libwebp/src/utils/*.c"))),
     fn="WebPDecodeRGBA", cflags=[], max_len=65536,
-    # NO SEEDS, and that is a finding rather than an oversight: libwebp's tests/ directory
-    # holds a fuzzer harness and a README, not .webp files — the project keeps its corpus
-    # outside the repository. A WebP is a RIFF container wrapping a VP8 bitstream, so an
-    # empty corpus means the campaign spends most of its budget failing the container
-    # check. This is the case that most needs the round-trip synthesis on the roadmap:
-    # libwebp ships its own ENCODER, and an encoder is a seed generator.
+    # SEEDS SYNTHESISED BY THE LIBRARY'S OWN ENCODER. Run benchmarks/targets/libwebp.sh
+    # first; it builds WebPEncodeRGBA and emits 24 valid RIFF/WEBP files across lossy,
+    # lossless and a quality sweep, at sizes that cross the block boundaries a codec cares
+    # about.
+    #
+    # libwebp keeps its corpus outside the repository, so this case ran at seeds=0 and
+    # spent its budget failing the container check. An encoder IS a seed generator, and
+    # this is the round-trip idea at its simplest.
+    #
+    # Prioritised by FORMAT on measured grounds: leptonica went 10.73 -> 20.67 on real BMP
+    # headers while jansson moved 0.16 on real JSON, because a mutator reaches "{}" in two
+    # bytes and never reaches a RIFF container.
+    seeds=["/b/libwebp/hf-seeds"],
     # DECODE PATH ONLY. enc/, mux/ and demux/ are separate libraries a decode entry point
     # cannot reach; dsp/ carries both, but its encode kernels are unreachable from here and
     # excluding the directory wholesale would drop the decode kernels with them.
