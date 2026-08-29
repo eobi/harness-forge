@@ -70,6 +70,42 @@ CASES = {
  "iperf/cjson_fuzzer": dict(
     hdr="/b/cjson/cJSON.h", inc=["/b/cjson"], src=["/b/cjson/cJSON.c"],
     fn="cJSON_Parse", cflags=[], cover=["/b/cjson/cJSON.c"]),
+ # ── Tier B and unfuzzed parsers, from the native attack-surface map ───────
+ # The map's own advice: the big names are the blast-radius answer, not the find-a-bug
+ # answer. Tier B is "real blast radius, a fraction of the scrutiny", and it is where
+ # lcms2 and libde265 came from — eight engine defects between them. None of these have a
+ # gold or QuartetFuzz figure, which is the point: they are cases a model cannot recall.
+ #
+ # Each was chosen for a SHAPE the suite has not tested, not for the name.
+ "jbig2dec/jbig2_data_in": dict(
+    # Tier B. The constructor is a MACRO wrapping jbig2_ctx_new_imp with two version
+    # arguments — a producer that only reads function declarations cannot see it.
+    hdr="/b/jbig2dec/jbig2.h", inc=["/b/jbig2dec"],
+    src=[f for f in sorted(glob.glob("/b/jbig2dec/*.c"))
+         if not f.endswith(("/jbig2dec.c", "/getopt.c", "/getopt1.c", "/sha1.c"))],
+    fn="jbig2_data_in", cflags=["-DHAVE_STDINT_H"], max_len=65536,
+    cover=[f for f in sorted(glob.glob("/b/jbig2dec/*.c"))
+           if not f.endswith(("/jbig2dec.c", "/getopt.c", "/getopt1.c", "/sha1.c"))]),
+ "leptonica/pixReadMem": dict(
+    # Tier B, in tesseract and every OCR stack. The destructor takes a POINTER TO THE
+    # HANDLE — `void pixDestroy(PIX **ppix)` — which is the shape that broke sqlite's
+    # constructor inference from the other direction.
+    hdr="/b/leptonica/src/allheaders.h", inc=["/b/leptonica/src"],
+    src=sorted(glob.glob("/b/leptonica/src/*.c")),
+    fn="pixReadMem", cflags=[], max_len=65536,
+    cover=["/b/leptonica/src/readfile.c", "/b/leptonica/src/pngio.c",
+           "/b/leptonica/src/jpegio.c", "/b/leptonica/src/gifio.c",
+           "/b/leptonica/src/bmpio.c", "/b/leptonica/src/pnmio.c",
+           "/b/leptonica/src/webpio.c", "/b/leptonica/src/tiffio.c",
+           "/b/leptonica/src/spixio.c", "/b/leptonica/src/pix1.c"]),
+ "jansson/json_loadb": dict(
+    # The destructor is a STATIC INLINE in the header — `json_decref` calls json_delete —
+    # so a producer reading declarations sees no destroyer for a handle it must free.
+    # There is also an out-parameter that is NOT a handle: `json_error_t *error`.
+    hdr="/b/jansson/src/jansson.h", inc=["/b/jansson/src", "/b/jansson"],
+    src=sorted(glob.glob("/b/jansson/src/*.c")),
+    fn="json_loadb", cflags=[], max_len=65536,
+    cover=sorted(glob.glob("/b/jansson/src/*.c"))),
  # ── C++ targets ───────────────────────────────────────────────────────────
  # First C++ case in the suite. libde265 is C++ behind an `extern "C"` API, which is the
  # common shape for codecs and the one that matters most: the header producer can read the
