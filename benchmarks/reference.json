@@ -1,0 +1,29 @@
+{
+  "_note": [
+    "Third-party figures ONLY. Nothing in this file was measured by this repository, and",
+    "nothing measured by this repository is written here. The two never share a cell.",
+    "",
+    "Source: the QuartetFuzz artifact at github.com/OwenSanzas/QuartetFuzz, which publishes",
+    "a 100-case benchmark with gold OSS-Fuzz coverage baselines and precomputed per-case",
+    "results. That artifact carries NO LICENSE FILE, so it is read and reproduced against,",
+    "never vendored into this tree. Every figure below is a citation, keyed by the case id",
+    "the artifact itself uses, so anyone can check it at source.",
+    "",
+    "'gold' is the hand-written OSS-Fuzz harness for the same entry point. It is the number",
+    "that matters: absolute coverage is set by the target, so ours/gold is the only quantity",
+    "that survives comparison across libraries."
+  ],
+  "_source": "github.com/OwenSanzas/QuartetFuzz — published artifact, no LICENSE, not vendored",
+  "_protocol": "10 x 600s libFuzzer, empty corpus, ASan, per-case median (their protocol)",
+  "cases": {
+    "libyaml/libyaml_loader_fuzzer":     {"quartetfuzz": 73.89, "gold": 77.7},
+    "libyaml/libyaml_scanner_fuzzer":    {"quartetfuzz": 67.30, "gold": 70.6},
+    "brotli/decode_fuzzer":              {"quartetfuzz": 84.15, "gold": 77.2},
+    "yajl-ruby/json_fuzzer":             {"quartetfuzz": 79.87, "gold": 69.1},
+    "iperf/cjson_fuzzer":                {"quartetfuzz":  0.00, "gold": 24.5},
+    "zopfli/zopfli_deflate_fuzzer":      {"quartetfuzz": 80.06, "gold": 85.7},
+    "zlib/zlib_uncompress2_fuzzer":      {"quartetfuzz": 51.74, "gold": 53.1},
+    "lcms2/cmsOpenProfileFromMem":       {"quartetfuzz": null,  "gold": null,
+      "note": "UNFUZZED. Tier B of the native attack-surface map: no public OSS-Fuzz harness for this entry point, so there is no gold and no QuartetFuzz figure. That is the point of including it — it is the case a language model cannot have memorised."}
+  }
+}

@@ -45,6 +45,253 @@ the one nobody else prints: **what this harness cannot find.**
 
 ---
 
+## The pipeline
+
+```mermaid
+flowchart TB
+    H["C / C++ / Java headers"] --> PR
+    T["someone else's harness"] -->|lift| IR
+
+    subgraph PR["producers — plug-ins, and none of them decide anything"]
+        direction LR
+        HG["header graph"]
+        JA["java api"]
+        EX["your producer"]
+    end
+
+    PR --> IR["Harness IR<br/>resources · lifetimes · call sequence<br/>byte mapping · contracts"]
+
+    IR --> S{"static gates<br/>S1 – S6"}
+    S -->|blocked| X1["rejected<br/>no compiler ever ran"]
+    S -->|certified| EM["emit — c · c++ · java"]
+
+    EM --> BUILD["build"]
+    BUILD --> D{"dynamic gates<br/>D1 – D11"}
+    D -->|blocked| X2["refused"]
+    D -->|"NOT_RUN"| U["downgraded, not dropped"]
+    D -->|certified| C["certificate.json<br/>harness · driver · build.sh · evidence"]
+
+    C --> CAMP["campaign — libFuzzer / AFL++ / TinyInst"]
+    CAMP --> CRASH["crash = a hypothesis"]
+    CRASH --> F{"findings gates<br/>F1 – F8"}
+    F --> LAD["exploitability ladder rung 0 – 6<br/>rung 3 needs an oracle independent<br/>of the one that found it"]
+    LAD --> FIND["finding = a hypothesis<br/>with a proof attached"]
+
+    classDef kill fill:#fee,stroke:#c33,color:#900
+    classDef good fill:#efe,stroke:#3a3,color:#060
+    classDef core fill:#eef,stroke:#33c,color:#006
+    class X1,X2 kill
+    class C,FIND good
+    class IR,LAD core
+```
+
+A gate never returns a boolean. It returns a verdict and the evidence behind it, and
+`NOT_RUN` is a **third outcome** — so a check that could not run never reads as one that
+passed.
+
+---
+
+## Where the engine stands
+
+```mermaid
+flowchart LR
+    subgraph WORKS["running today"]
+        direction TB
+        A1["IR + 6 static gates"]
+        A2["9 dynamic gates<br/>against a real build"]
+        A3["C · C++ · Java backends<br/>behind one emitter router"]
+        A4["header-graph producer<br/>multi-resource lifecycles"]
+        A5["harness lifting<br/>grade someone else's C"]
+        A6["24-platform matrix<br/>with trust ceilings"]
+        A7["seed mining from the<br/>target's own test data"]
+        A8["target-written dictionaries"]
+        A9["findings gates F1–F8<br/>+ ladder rungs 0–6"]
+        A10["plancheck — 85 DONE claims,<br/>each backed by a test that runs"]
+    end
+
+    subgraph PART["partly built"]
+        direction TB
+        B1["suite coverage<br/>tool built, not yet run"]
+        B2["C++ targets<br/>backend done, 2 recipes open"]
+    end
+
+    subgraph OPEN["not started"]
+        direction TB
+        C1["seed synthesis via the<br/>library's own encoder"]
+        C2["measurement-driven<br/>repair loop"]
+        C3["Linux GUI"]
+    end
+
+    WORKS --> PART --> OPEN
+
+    classDef ok fill:#efe,stroke:#3a3,color:#060
+    classDef mid fill:#ffd,stroke:#ca0,color:#750
+    classDef no fill:#eee,stroke:#999,color:#555
+    class A1,A2,A3,A4,A5,A6,A7,A8,A9,A10 ok
+    class B1,B2 mid
+    class C1,C2,C3 no
+```
+
+---
+
+## Try it — five commands, and the output they actually print
+
+No installation, no build step, no dependencies beyond a C compiler. Every block below is
+copied from a real run against the demo library in [`examples/lib/`](examples/lib/), so
+`git clone` and paste gets you the same thing.
+
+### 1. Propose harnesses from a header, and rank them by evidence
+
+```console
+$ python3 -m hforge propose examples/lib/hf_demo.h --source examples/lib/hf_demo.c --dynamic
+
+4 plan(s) proposed from examples/lib/hf_demo.h, written to build/proposed/
+
+RANK  PLAN                               BLOCK   EDGES  GREW   KILL  SINKS  N/RUN  WARN
+--------------------------------------------------------------------------------------------
+ 1    hf_demo_hd_parse_n_len64k              0       ?     ?  100%   67%      3     0
+ 2    hf_demo_hd_parse_n                     0       ?     ?  100%   67%      3     1
+ 3    hf_demo_hd_parse_len64k                0       ?     ?   50%  100%      3     0
+ 4    hf_demo_hd_parse                       0       ?     ?   50%  100%      3     1
+
+Winner: hf_demo_hd_parse_n_len64k (producer: header_graph).
+Selected by gate evidence. No producer supplied a score, a confidence or a preference.
+```
+
+`KILL` is the mutation-testing rate — of the defects deliberately planted in the target, how
+many this harness catches. That is why the length-delimited variant wins over the plain one:
+not because a model preferred it, but because it killed twice as many planted bugs.
+
+### 2. Reject a bad plan before any compiler runs
+
+```console
+$ python3 -m hforge validate examples/hf_demo.broken.hir.json
+
+[PASS] S1  lifetime: created once, destroyed once, never used after
+[FAIL] S2  contract: NUL-termination, (ptr,len) pairs, ownership, non-null
+        [block] S2.CSTRING: op o_parse: hd_parse requires 'json' to be NUL-terminated,
+                but slice 'json' is kind='bytes' and adds no terminator. The library will
+                read past the end of EVERY input, so every input becomes a crash and every
+                finding is the harness's own.
+                fix: set slice 'json' kind to 'cstring', or call the length-delimited
+                     variant of hd_parse instead
+
+3 blocking violation(s). This plan must not be emitted as-is.
+```
+
+That harness would have produced a crash on the first input and a bug report on the first
+day. **Cost to find it: no compiler, no campaign, 40 milliseconds.**
+
+### 3. Certify a good one end to end
+
+```console
+$ python3 -m hforge certify examples/hf_demo.good.hir.json --campaign-seconds 8
+
+==========================================================================
+HARNESS CERTIFICATE   hf_demo_parse   [PROVISIONAL]
+==========================================================================
+target      hf_demo 0.1 local
+producer    hand
+ir sha256   39f0c906a40055d90ea06a728468daf9...
+max rung    5 (best: linux-x86_64-glibc)
+
+GATES
+  PASS  S1   lifetime: created once, destroyed once, never used after
+  PASS  S2   contract: NUL-termination, (ptr,len) pairs, ownership, non-null
+  PASS  S3   ordering: create before use before destroy
+  PASS  S4   boundary: public interface only
+  PASS  S5   input flow: the fuzzer's bytes reach the target
+  PASS  S6   error handling: failure returns are checked before use
+  PASS  D1   liveness: the target call survived the optimiser
+  PASS  D2   positive control: the harness finds a planted defect
+  PASS  D3   valid input must not crash
+  PASS  D4   sink reachability: fraction of the sink surface reached
+  PASS  D5   execution rate is plausible
+  PASS  D6   behaviour is deterministic across identical runs
+  PASS  D7   knobs recorded, and what they exclude computed
+           [warn ] D7.DEFAULT_MAX_LEN: max_len is 4096, at or below libFuzzer's silent
+                   default. A defect needing a larger input is not hard to find here, it is
+                   IMPOSSIBLE TO EXPRESS, and no amount of runtime changes that.
+  PASS  D8   campaign productivity: edges the fuzzer can actually see
+    -   D9   misuse provenance: harness-allocated or library-allocated
+           reason: no sanitizer report to attribute. This gate runs when a campaign
+                   produces a crash, not during certification of a clean harness.
+    -   D11  differential consistency across producers
+           reason: only 1 buildable plan(s) for this entry point; consistency needs at
+                   least two producers to have emitted one
+
+WHAT THIS HARNESS CANNOT FIND
+  - any input larger than 4096 bytes cannot be generated
+  - leaks are not detected: LeakSanitizer is off
+  - uninitialised-memory reads are not detected: MemorySanitizer is off
+  - integer truncation and other undefined behaviour is not detected at the arithmetic;
+    only its downstream memory error is
+  - gate D9 did not run: no sanitizer report to attribute
+  - gate D11 did not run: only 1 buildable plan for this entry point
+
+REPRODUCTION
+  build  $CC -g -O1 -fno-omit-frame-pointer -Iexamples/lib -fsanitize=fuzzer,address \
+             harness.c examples/lib/hf_demo.c -o hf_demo_parse_fuzz
+  env    ASAN_OPTIONS=abort_on_error=0:detect_leaks=0:allocator_may_return_null=1
+  run    ./hf_demo_parse_fuzz corpus/ -max_len=4096 -timeout=25 -rss_limit_mb=2048
+==========================================================================
+```
+
+Three things here exist in no other harness generator I know of.
+
+`-` **is not `PASS`.** D9 and D11 did not run, and the certificate says so in the same
+column, with the reason. A missing check never reads as a satisfied one.
+
+**`WHAT THIS HARNESS CANNOT FIND` is generated, not written.** It is computed from the knobs
+and sanitizers actually used. When this harness reports nothing, that block is the honest
+scope of the silence — and it is the difference between "no bugs" and "no bugs *of the kinds
+this configuration can observe*".
+
+**`[PROVISIONAL]`** because `max rung 5`: the ladder's top rung needs an oracle independent
+of the one that found the crash, and certification alone cannot supply it.
+
+### 4. Grade a harness somebody else wrote
+
+```console
+$ python3 -m hforge audit path/to/their/harness.c
+
+  3 call(s), 1 resource(s), 1 value(s) the lifter could not attribute
+  [BLOCK] S5.INPUT_NOT_CONSUMED: no op receives fuzzer input; the harness runs a fixed
+          program and the campaign cannot find anything
+
+==========================================================================
+AUDITED 1 harness(es) from 1 file(s)
+==========================================================================
+  blocking defects : 1   (high-fidelity lifts only)
+  warnings         : 2
+  low fidelity     : 0   NOT counted as defects
+  not liftable     : 0
+
+Contract gates (S2) need the target's headers. Without them they report what
+they could check and NOT RUN for the rest, rather than guessing — a harness
+graded on a guess is worse than one not graded at all.
+```
+
+Point it at an OSS-Fuzz project directory and it grades the whole set. **`low fidelity` is
+tracked separately and never counted as a defect**, because a harness the lifter only partly
+understood must not be scored as a harness that is wrong.
+
+### 5. Run the whole thing against a real library
+
+```console
+$ python3 -m hforge batch --target libmagic --source /path/to/file-5.44 --top 32
+
+36 plan(s) proposed, 2 rejected before a compiler ran
+26 reach >= 8 edges — shipped
+10 reach < 8 edges — REFUSED: a harness that cannot get past the library's
+   error path finds nothing
+```
+
+Each shipped harness lands in `out/` as `harness.c`, `driver.c`, `build.sh` and
+`certificate.json` — enough to reproduce the result without this tool.
+
+---
+
 ## Why an IR
 
 Every published generator emits C for one backend. A harness validated for libFuzzer on
@@ -206,11 +453,81 @@ The same entry point, proposed three ways and chosen by measurement:
 | `magic_buffer_with_magic_load` | 542 | yes | — |
 | `magic_buffer_setup` | **551** | yes | 664,461 |
 
-15× the reach — and the search finds *which* call mattered, rather than assuming. See [`plans/03-WHAT-THE-FIELD-CANNOT-DO.md`](../plans/03-WHAT-THE-FIELD-CANNOT-DO.md) for
-why emitting C makes this impossible, and
-[`plans/04-QUARTETFUZZ-COMPARISON.md`](../plans/04-QUARTETFUZZ-COMPARISON.md) for a
-side-by-side against the state of the art that does not flatter us — they have 3 CVEs and we
-have none.
+15× the reach — and the search finds *which* call mattered, rather than assuming. 15x the reach is the argument for an IR: emitting C directly makes this search impossible,
+because the thing being compared has already been flattened into text. The side-by-side
+against the state of the art is below, and it does not flatter us — QuartetFuzz has 3 CVEs
+and this repository has none.
+
+---
+
+## Measured against the state of the art
+
+The comparison is against **QuartetFuzz** — the strongest published LLM-driven harness
+generator, four cooperating agents, 3 CVEs and 29 confirmed reports. Its artifact publishes
+a 100-case benchmark with gold OSS-Fuzz baselines and per-case results.
+
+Ground rules, because a benchmark whose rules are loose is not evidence:
+
+- **Their artifact is never vendored.** It carries no LICENSE file, so it is read and
+  reproduced against, and its numbers appear only as citations keyed by case id. See
+  [`THIRD-PARTY.md`](THIRD-PARTY.md).
+- **A cell holds either a number we measured or a number somebody published, never both.**
+  [`benchmarks/rank.py`](benchmarks/rank.py) enforces this: measured figures can only come
+  from `results/`, cited figures only from `reference.json`.
+- **The protocol is theirs, and it favours them.** Gold and QuartetFuzz are the median of
+  10 x 600 s runs. Ours is **one** 600 s run — a single sample against a median.
+
+### run-009, 600 s, Linux aarch64, clang 14
+
+<!-- BENCH:BEGIN -->
+
+| case | ours | QuartetFuzz | gold | ours/gold | QF/gold |
+|---|---|---|---|---|---|
+| libyaml/libyaml_loader_fuzzer | **77.77** | 73.89 | 77.7 | 1.00x | 0.95x |
+| libyaml/libyaml_scanner_fuzzer | **70.47** | 67.30 | 70.6 | 1.00x | 0.95x |
+| brotli/decode_fuzzer | **85.50** | 84.15 | 77.2 | 1.11x | 1.09x |
+| yajl-ruby/json_fuzzer | *not yet run* | 79.87 | 69.1 |  | 1.16x |
+| iperf/cjson_fuzzer | *not yet run* | 0.00 | 24.5 |  | 0.00x |
+| zopfli/zopfli_deflate_fuzzer | *not yet run* | 80.06 | 85.7 |  | 0.93x |
+| zlib/zlib_uncompress2_fuzzer | *not yet run* | 51.74 | 53.1 |  | 0.97x |
+| lcms2/cmsOpenProfileFromMem | *not yet run* | — | — |  |  |
+
+Measured cases with a gold baseline: **3**. Median ours/gold: **1.00x**. Ahead of the cited QuartetFuzz figure on **3 of 3**.
+
+<!-- BENCH:END -->
+
+**`ours/gold` is the number that matters.** Absolute coverage is a property of the target,
+not of the harness — 85% on brotli and 53% on zlib say nothing about each other. The ratio
+to the hand-written OSS-Fuzz harness is the only quantity that survives comparison across
+libraries. For scale: **PromeFuzz claims 1.40x**, and **QuartetFuzz's own median across its
+25 C cases is 0.95x** — the state of the art is still, on median, slightly behind the
+hand-written harness it is trying to replace.
+
+Two rows deserve a second look.
+
+**`iperf/cjson_fuzzer`, QuartetFuzz 0.00.** Not a low score — no working harness at all.
+This is the failure mode the gate bank exists to make visible: a generator with no
+certification step cannot tell that outcome apart from a hard target.
+
+**`lcms2/cmsOpenProfileFromMem` has no gold and no QuartetFuzz column,** because there is no
+public OSS-Fuzz harness for that entry point. It is Tier B of the native attack-surface map
+and it is here precisely because **it is the case a language model cannot have memorised** —
+lcms2 parses ICC colour profiles inside the JDK, Skia, Pillow and libvips. Pointing the
+engine at it found **five defects in this engine** that seven benchmark cases never
+exposed, because the benchmark libraries do not spell things the way older C does: `void *`
+handle typedefs, a destroy verb in the middle of a name, `dwSize` Hungarian length
+parameters. Details in
+[`README` § defects found in this engine](#defects-found-in-this-engine-while-building-it-kept-on-the-record).
+
+Full protocol, the denominator rule and its ceiling argument, and what is deliberately not
+measured: [`benchmarks/RANKING.md`](benchmarks/RANKING.md).
+
+### What this table does not say
+
+**QuartetFuzz has 3 CVEs. This repository has none.** Coverage is instrumentation, not the
+product. A harness that reaches more of a library is better *positioned* to find a defect,
+and being better positioned is not the same as having found one. That column is theirs and
+it is the column that counts in the end.
 
 ## A dictionary the target wrote itself
 

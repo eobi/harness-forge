@@ -147,13 +147,32 @@ def main():
         out["result"] = f"emit refused: {ex}"; print(json.dumps(out)); return
     wd = pathlib.Path(f"/b/runs/{case.replace('/','__')}"); wd.mkdir(parents=True, exist_ok=True)
     (wd/"harness.c").write_text(e.source)
+
+    # KEEP EVERY RUN'S EVIDENCE ON DISK.
+    #
+    # A benchmark row is a summary, and a summary cannot be audited. Three of this
+    # project's four wrong diagnoses were caught by re-reading a raw libFuzzer log
+    # after the number had already been written down: `corp: 1/1b` with coverage
+    # frozen at 42 is what exposed the scratch-initialisation bug, and no JSON
+    # field would have shown it. So the log outlives the run.
+    logs = pathlib.Path(os.environ.get("HF_LOGDIR", "/b/logs")) / case.replace("/", "__")
+    logs.mkdir(parents=True, exist_ok=True)
+    (logs/"harness.c").write_text(e.source)
+    (logs/"plan.hir.json").write_text(json.dumps(p.to_json() if hasattr(p, "to_json")
+                                                 else {"name": p.name,
+                                                       "sequence": [o.api for o in p.sequence]},
+                                                 indent=2, default=str))
+    out["logs"] = str(logs)
     binp = wd/"fuzz"
     cmd = ["clang","-g","-O1","-fno-omit-frame-pointer",
            "-fprofile-instr-generate","-fcoverage-mapping"]
     cmd += [f"-I{i}" for i in c["inc"]] + c["cflags"]
     cmd += ["-fsanitize=fuzzer,address", str(wd/"harness.c")] + c["src"] + ["-o", str(binp)]
     r = subprocess.run(cmd, capture_output=True, text=True)
+    (logs/"build.cmd").write_text(" ".join(cmd) + "\n")
     if r.returncode != 0:
+        # The truncated field in the JSON row is for reading; the file is for fixing.
+        (logs/"build.log").write_text(r.stdout + r.stderr)
         out["result"] = "build failed"; out["error"] = r.stderr[-400:]
         print(json.dumps(out)); return
     corp = wd/"corpus"; corp.mkdir(exist_ok=True)
@@ -184,6 +203,12 @@ def main():
                         capture_output=True, text=True, errors="replace",
                         env=env, timeout=seconds+300)
     log = fr.stdout + fr.stderr
+    (logs/"fuzz.log").write_text(log)
+    (logs/"fuzz.cmd").write_text(
+        " ".join([str(binp), str(corp), *dict_args, f"-max_total_time={seconds}",
+                  "-print_final_stats=1", f"-max_len={mlen}"]) + "\n")
+    if dict_args and dpath.exists():
+        (logs/"target.dict").write_text(dpath.read_text(errors="replace"))
     out["executions"] = int(next((x for x in __import__("re").findall(
         r"stat::number_of_executed_units:\s*(\d+)", log)), 0) or 0)
     subprocess.run(["llvm-profdata-14","merge","-sparse",str(prof),"-o",str(wd/"run.profdata")],
@@ -214,6 +239,9 @@ def main():
     cr = subprocess.run(["llvm-cov-14","report",str(binp),
                          f"-instr-profile={wd}/run.profdata"] + cover,
                         capture_output=True, text=True)
+    # The TOTAL row is the only thing the JSON carries, but the per-file breakdown is
+    # what makes a denominator argument checkable by someone who does not trust ours.
+    (logs/"coverage.txt").write_text(cr.stdout + cr.stderr)
     tot = [l for l in cr.stdout.splitlines() if l.startswith("TOTAL")]
     if tot:
         f = tot[0].split()

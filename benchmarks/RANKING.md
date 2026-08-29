@@ -1,44 +1,85 @@
 # Ranking
 
-Every "ours" figure was produced by this repository on Linux (Debian bookworm, clang 14,
-libFuzzer + ASan, aarch64, 10 cores). Every QuartetFuzz and gold figure is **cited** from
-their published artifact by case id, never measured here. The two never share a cell.
+Every **ours** figure was produced by this repository on Linux — Debian bookworm, clang 14,
+libFuzzer + ASan, aarch64, 10 cores. Every **QuartetFuzz** and **gold** figure is *cited*
+from their published artifact by case id and was never measured here. The two never share a
+cell, and `rank.py` enforces that mechanically: measured numbers can only come from
+`results/`, cited numbers only from `reference.json`, and neither file can supply the
+other's column.
+
+Regenerate:
+
+```
+python3 benchmarks/rank.py benchmarks/results/<run-id>.jsonl --write
+```
 
 ## Protocol
 
-- gold and QuartetFuzz: 10 x 600 s libFuzzer, empty corpus, ASan, per-case median
-- ours: **1 x 600 s**, single sample — a deliberately self-penalising deviation
-- coverage by `llvm-cov`, line percentage, over the files an entry point can reach
+| | |
+|---|---|
+| gold and QuartetFuzz | 10 x 600 s libFuzzer, empty corpus, ASan, **per-case median** |
+| ours | **1 x 600 s, single sample** — a deliberately self-penalising deviation |
+| coverage | `llvm-cov` line percentage, over the files an entry point can reach |
+
+One sample cannot beat a median by luck in the direction that flatters us any more often
+than it loses to one, and running ten would have made the comparison better rather than
+worse. It is stated here so nobody has to discover it.
 
 ## The denominator rule
 
-Coverage is reported over the source an entry point can actually reach. libyaml's emitter
-side (32.8% of lines) is unreachable from any loader harness; yajl's generator and tree
-(39.5%) are unreachable from `yajl_parse`. Including them caps any parse harness below the
-figure gold reports, which proves gold excludes them too. Where that argument applies it is
-stated in the row.
+Coverage is reported over the source an entry point can **actually reach**.
 
-## Standing (run-007, 600 s)
+libyaml's emitter side is 32.8% of the library's lines and is unreachable from any loader
+harness. yajl's generator and tree are 39.5% and are unreachable from `yajl_parse`.
+libyaml's `parser.c` and `loader.c` sit *above* `yaml_parser_scan` in the call chain and no
+scanner harness can enter them.
 
-Filled from `results/` as each run completes. `ratio` is ours / gold — the metric that
-survives across libraries, because the absolute percentage is set by the target rather than
-by harness quality. PromeFuzz's headline claim is 1.40x over hand-written harnesses; QF's
-median across its own 25 cases is 0.95x.
+The ceiling argument is what justifies each exclusion: including those files caps **any**
+harness for that entry point below the figure gold reports, which is only possible if gold
+excludes them too. Where the argument applies it is recorded beside the file list in
+[`drive.py`](drive.py).
 
-| case | ours | QF | gold | ours/gold | QF/gold |
+This is not a favourable convention we adopted. I hand-listed these three denominators
+wrong before checking, each time making the engine look far worse than it is — the scanner
+reads 48.74% over the wrong file set and 70.47% over the right one.
+
+## Standing — run-009, 600 s
+
+<!-- TABLE:BEGIN -->
+
+| case | ours | QuartetFuzz | gold | ours/gold | QF/gold |
 |---|---|---|---|---|---|
-| libyaml/libyaml_loader_fuzzer | 77.77 | 73.89 | 77.7 | **1.00x** | 0.95x |
-| libyaml/libyaml_scanner_fuzzer | 48.61 | 67.3 | 70.6 | 0.69x | 0.95x |
-| brotli/decode_fuzzer | pending | 84.15 | 77.2 | | 1.09x |
-| yajl-ruby/json_fuzzer | pending | 79.87 | 69.1 | | 1.16x |
-| iperf/cjson_fuzzer | pending | 0.0 | 24.5 | | 0.00x |
-| zopfli/zopfli_deflate_fuzzer | pending | 80.06 | 85.7 | | 0.93x |
-| zlib/zlib_uncompress2_fuzzer | pending | 51.74 | 53.1 | | 0.97x |
+| libyaml/libyaml_loader_fuzzer | **77.77** | 73.89 | 77.7 | 1.00x | 0.95x |
+| libyaml/libyaml_scanner_fuzzer | **70.47** | 67.30 | 70.6 | 1.00x | 0.95x |
+| brotli/decode_fuzzer | **85.50** | 84.15 | 77.2 | 1.11x | 1.09x |
+| yajl-ruby/json_fuzzer | *not yet run* | 79.87 | 69.1 |  | 1.16x |
+| iperf/cjson_fuzzer | *not yet run* | 0.00 | 24.5 |  | 0.00x |
+| zopfli/zopfli_deflate_fuzzer | *not yet run* | 80.06 | 85.7 |  | 0.93x |
+| zlib/zlib_uncompress2_fuzzer | *not yet run* | 51.74 | 53.1 |  | 0.97x |
+| lcms2/cmsOpenProfileFromMem | *not yet run* | — | — |  |  |
 
-Verified individually at 60-90 s before this run: brotli 84.42, zlib 53.93, zopfli 84.85,
-yajl 65.12.
+Measured cases with a gold baseline: **3**. Median ours/gold: **1.00x**. Ahead of the cited QuartetFuzz figure on **3 of 3**.
 
-## What is not measured here
+<!-- TABLE:END -->
 
-Findings. QuartetFuzz has 3 CVEs and 29 confirmed reports; this repository has none.
-Coverage is instrumentation, not the product.
+`ratio` is the metric that survives across libraries, because absolute coverage is set by
+the target rather than by harness quality. For scale: **PromeFuzz's headline claim is 1.40x
+over hand-written harnesses**, and **QuartetFuzz's own median across its 25 C cases is
+0.95x** — that is, the state of the art in LLM harness generation is still, on median,
+slightly behind the hand-written harness it is trying to replace.
+
+`iperf/cjson_fuzzer` is worth reading twice. The cited QuartetFuzz figure is **0.00** — it
+did not produce a working harness for that case at all.
+
+`lcms2/cmsOpenProfileFromMem` has no gold and no QuartetFuzz figure because **there is no
+public OSS-Fuzz harness for it**. It is Tier B of the native attack-surface map, and it is
+in the table precisely because it is the case a language model cannot have memorised. The
+claim there is that the harness is correct, not that the number is good.
+
+## What is NOT measured here
+
+**Findings.** QuartetFuzz has 3 CVEs and 29 confirmed reports. This repository has none.
+
+Coverage is instrumentation, not the product. A harness that covers more of a library is
+better positioned to find a defect, and being better positioned is not the same as having
+found one. Any table that let those two blur would be measuring the wrong thing.
