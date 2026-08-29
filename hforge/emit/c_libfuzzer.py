@@ -476,6 +476,21 @@ def emit(ir: HarnessIR, *, with_driver: bool = True) -> Emitted:
         "",
         includes,
         "",
+        # THE ENTRY POINT IS GUARDED FOR C++ COMPILATION, AND THIS IS NOT DECORATION.
+        #
+        # A C harness gets compiled by a C++ compiler more often than it sounds: a library
+        # written in C++ behind an `extern "C"` API — libde265, and most codecs — is read
+        # by the C producer, emitted as C, and then MUST link against C++ objects, so the
+        # build uses clang++. Without this guard the symbol is mangled, libFuzzer looks up
+        # an unmangled `LLVMFuzzerTestOneInput`, does not find it, and the campaign runs
+        # doing NOTHING. It compiles, it links, it reports executions, and it never calls
+        # the harness — a silent zero that reads as "the engine cannot do C++".
+        #
+        # The C++ backend has carried this since it was written; the C backend had not,
+        # because until there was a C-API-in-C++-library case nothing exercised the path.
+        "#ifdef __cplusplus",
+        "extern \"C\"",
+        "#endif",
         f"int LLVMFuzzerTestOneInput(const uint8_t *{P}data, size_t {P}size) {{",
     ]
     lines += op_decls + slice_decls + scratch_decls
@@ -530,6 +545,9 @@ def emit(ir: HarnessIR, *, with_driver: bool = True) -> Emitted:
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef __cplusplus
+extern "C"
+#endif
 int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size);
 
 #define HF_MAX_INPUT (1u << 22)

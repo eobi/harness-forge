@@ -425,6 +425,22 @@ PHASES: tuple = (
                          "71.3% branches vs 66.4%, and vs QuartetFuzz's own published run on "
                          "the same case, 73.89% lines / 57.74% branches. `uint8_t` was not "
                          "in the byte-type set, which our own tests caught and I did not."),
+        Deliverable("P3.CXX_LINKAGE",
+                    "a C harness keeps an unmangled entry point under a C++ compiler", DONE,
+                    modules=("hforge.emit.c_libfuzzer",),
+                    tests=("test_a_c_harness_still_exports_an_unmangled_entry_point_under_cxx",),
+                    note="found by ADDING A TARGET, before that target ever ran. libde265 is "
+                         "C++ behind an extern \"C\" API — the common codec shape — so the C "
+                         "producer reads its header and the C backend emits the harness, but "
+                         "the build must use clang++ to link against C++ objects. The C "
+                         "backend emitted a bare `int LLVMFuzzerTestOneInput`, which clang++ "
+                         "MANGLES. libFuzzer looks up the unmangled symbol, does not find it, "
+                         "and the campaign then compiles, links, reports executions and NEVER "
+                         "CALLS THE HARNESS — a silent zero that would have read as 'the "
+                         "engine cannot do C++'. The C++ backend has carried the guard since "
+                         "it was written; the C backend never had it because no case "
+                         "exercised the path until now. Guarded with #ifdef __cplusplus in "
+                         "both the harness and the replay driver, so a C build is unchanged."),
         Deliverable("P3.NOMINAL",
                     "opaque `void *` typedefs are distinct types, not all `void`", DONE,
                     modules=("hforge.producers.header_graph",),

@@ -200,3 +200,30 @@ if __name__ == "__main__":
         check(name, fn)
     print(f"\n{_pass}/{_pass + _fail} passed")
     raise SystemExit(1 if _fail else 0)
+
+
+def test_a_c_harness_still_exports_an_unmangled_entry_point_under_cxx():
+    """A C plan compiled by a C++ compiler must still be found by libFuzzer.
+
+    This is the shape that makes it matter: a library written in C++ behind an
+    `extern "C"` API — libde265, and most codecs — is read by the C producer and emitted
+    as C, but it has to link against C++ objects, so the build uses clang++.
+
+    Without the guard the symbol is mangled, libFuzzer looks up an unmangled
+    `LLVMFuzzerTestOneInput`, does not find it, and the campaign runs DOING NOTHING. It
+    compiles, it links, it reports executions, and it never calls the harness. A silent
+    zero that reads as "the engine cannot do C++".
+    """
+    import json as _json
+    from hforge.emit.c_libfuzzer import emit as emit_c
+
+    root = Path(__file__).resolve().parent.parent
+    ir = HarnessIR.from_json(_json.loads(
+        (root / "examples" / "hf_demo.good.hir.json").read_text()))
+    out = emit_c(ir)
+
+    for text, what in ((out.source, "harness"), (out.driver, "replay driver")):
+        i = text.index("LLVMFuzzerTestOneInput")
+        before = text[:i]
+        assert "#ifdef __cplusplus" in before, f"{what}: entry point is not guarded"
+        assert 'extern "C"' in before, f"{what}: no extern \"C\" for a C++ build"
