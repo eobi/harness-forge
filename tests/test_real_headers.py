@@ -1618,3 +1618,59 @@ def test_an_opaque_struct_typedef_is_not_followed():
     """)
     assert hg.base_type("Jbig2Ctx") == "Jbig2Ctx", "an opaque handle typedef was followed"
     assert hg.base_type("const jb_byte *") == "unsigned char", "the byte alias was not"
+
+
+def test_a_declaration_after_an_inline_body_is_not_discarded():
+    """Header-only helpers are everywhere, and jansson showed what they cost.
+
+        static JSON_INLINE json_t *json_incref(json_t *j) { ... }
+        void json_delete(json_t *json);
+
+    Statements split on `;`, so the second arrives carrying the first's closing brace, and
+    a check for `{` threw the whole thing away. jansson then had a handle it must free and
+    NO destructor, so every plan using its entry point was dropped for leaking and the
+    benchmark reported "NO PLAN for the gold target" on a library that parsed fine.
+
+    The brace strip has to run BEFORE the definition check, because the statement carries
+    both braces. The version that ran it after did not work.
+    """
+    decls = hg.parse_header(_hdr("""
+        typedef struct json_t json_t;
+        static inline json_t *json_incref(json_t *j) { return j; }
+        void json_delete(json_t *json);
+        json_t *json_loadb(const char *buffer, size_t buflen);
+    """))
+    names = {d.name for d in decls}
+    assert "json_delete" in names, (
+        f"the declaration after the inline body was discarded: {sorted(names)}")
+    assert "json_incref" not in names, "an inline DEFINITION is not a declaration"
+
+
+def test_the_ir_records_what_a_typedef_resolves_to():
+    """A gate must not depend on the producer, and it still has to know what a type is.
+
+    `const l_uint8 *` and `const unsigned char *` are the same type, and only leptonica's
+    environ.h says so. Without a place to record it, S2 saw a pointer to an unknown
+    structured type, called binding fuzzer bytes to it type confusion, and refused the only
+    correct harness for pixReadMem.
+
+    Recorded on the IR, so the gate judges a fact printed in the certificate rather than a
+    claim passed to it.
+    """
+    plans = _plans_for("""
+        typedef unsigned char l_uint8;
+        typedef struct Pix PIX;
+        PIX * pixReadMem(const l_uint8 *data, size_t size);
+        void pixDestroy(PIX **ppix);
+    """)
+    p = next(x for x in plans if any(o.api == "pixReadMem" for o in x.sequence))
+    api = p.apis["pixReadMem"]
+    data = next(q for q in api.params if q.name == "data")
+    assert data.type.resolved == "unsigned char", (
+        f"resolution not recorded: name={data.type.name!r} resolved={data.type.resolved!r}")
+
+    from hforge.gates.static_gates import run_static_gates
+    from hforge.gates.result import BLOCK
+    blocks = {v.code for r in run_static_gates(p) for v in r.violations if v.severity == BLOCK}
+    assert "S2.TYPE_CONFUSION" not in blocks, (
+        "the gate still refuses a byte buffer it cannot spell")

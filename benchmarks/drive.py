@@ -102,6 +102,11 @@ CASES = {
     # Tier B, in tesseract and every OCR stack. The destructor takes a POINTER TO THE
     # HANDLE — `void pixDestroy(PIX **ppix)` — which is the shape that broke sqlite's
     # constructor inference from the other direction.
+    # Run benchmarks/targets/leptonica.sh first: allheaders.h includes alltypes.h which
+    # includes endianness.h, a file leptonica's configure GENERATES. Without it the C
+    # preprocessor fails, the parse falls back to raw text, environ.h's
+    # `typedef unsigned char l_uint8` is never seen, and pixReadMem stops looking like it
+    # takes bytes — five steps to a gate verdict about something else entirely.
     hdr="/b/leptonica/src/allheaders.h", inc=["/b/leptonica/src"],
     src=sorted(glob.glob("/b/leptonica/src/*.c")),
     fn="pixReadMem", cflags=[], max_len=65536,

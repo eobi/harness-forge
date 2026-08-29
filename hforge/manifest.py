@@ -510,6 +510,56 @@ PHASES: tuple = (
                          "Object-like integer macros are collected from the raw text before "
                          "preprocessing, since making them disappear is what the "
                          "preprocessor is for."),
+        Deliverable("P3.INLINE_BODY_DECL",
+                    "a declaration after a static inline body is not discarded", DONE,
+                    modules=("hforge.producers.header_graph",),
+                    tests=("test_a_declaration_after_an_inline_body_is_not_discarded",),
+                    note="jansson.h defines json_incref as a static inline and declares "
+                         "`void json_delete(json_t *json);` on the next line. Statements "
+                         "split on `;`, so the declaration arrives carrying the inline "
+                         "body's closing brace and a check for `{` threw the whole thing "
+                         "away. jansson then had a handle it must free and NO DESTRUCTOR, "
+                         "every plan using its entry point was dropped for leaking, and the "
+                         "benchmark reported NO PLAN for a library that parsed fine. "
+                         "Header-only helpers are everywhere. The brace strip must run "
+                         "BEFORE the definition check because the statement carries both "
+                         "braces — the version that ran it after did not work, which is why "
+                         "the test asserts json_delete IS parsed and json_incref is NOT."),
+        Deliverable("P3.RESOLVED_TYPE",
+                    "the IR records what a typedef resolves to, so a gate can judge it",
+                    DONE,
+                    modules=("hforge.ir", "hforge.gates.static_gates"),
+                    tests=("test_the_ir_records_what_a_typedef_resolves_to",),
+                    note="S2 keeps its own list of byte spellings ON PURPOSE — a gate must "
+                         "not depend on the thing it judges — and so it could not know that "
+                         "leptonica's `l_uint8` is `unsigned char`. It saw a pointer to an "
+                         "unknown structured type, called binding fuzzer bytes to it type "
+                         "confusion, and refused the ONLY correct harness for pixReadMem. "
+                         "TypeRef now carries `resolved`, filled by the producer when a "
+                         "typedef changed the answer, and the gate reads that. Independence "
+                         "is preserved in the right way: the gate judges a fact RECORDED IN "
+                         "THE ARTIFACT, printed and diffable in the certificate, rather than "
+                         "a claim handed to it by the producer."),
+        Deliverable("P3.CROSS_HEADER_ALIASES",
+                    "collect scalar aliases across the whole translation unit", DONE,
+                    modules=("hforge.producers.header_graph",),
+                    tests=("test_a_librarys_own_byte_spelling_is_read_not_guessed",),
+                    note="was PLANNED an hour ago and is now shipped, plus the root cause "
+                         "underneath it. The per-header filter in _preprocess is right for "
+                         "declarations — without it the producer proposes harnesses for "
+                         "stdio — and wrong for TYPEDEFS, because what a type MEANS is not "
+                         "local to a file. header_byte_aliases now preprocesses with the "
+                         "filter off. THE DEEPER CAUSE was that _preprocess returned None "
+                         "for leptonica at all: allheaders.h includes alltypes.h which "
+                         "includes endianness.h, a file leptonica's configure GENERATES. "
+                         "Five steps from a missing generated header to a gate verdict about "
+                         "something else: no endianness.h -> no preprocessing -> raw text -> "
+                         "environ.h's `typedef unsigned char l_uint8` unseen -> pixReadMem "
+                         "does not look like it takes bytes -> the producer hunts for a "
+                         "setter and picks boxaPlotSides, a PLOTTING function -> S1 and S2 "
+                         "refuse it. benchmarks/targets/leptonica.sh writes the header, and "
+                         "the case now yields two gate-passing plans reading "
+                         "pixReadMem -> pixDestroy."),
         Deliverable("P3.BYTE_ALIAS",
                     "a library's own byte spelling is read from the header, not guessed",
                     DONE,

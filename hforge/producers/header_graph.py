@@ -432,6 +432,20 @@ def _typedefs(stmts: list) -> frozenset:
     return frozenset(_typedef_map(stmts))
 
 
+def header_byte_aliases(path: str, include_dirs=(), cflags=()) -> dict:
+    """Scalar typedefs that bottom out in a byte type, from the WHOLE translation unit.
+
+    The sibling of header_typedefs, and for the same reason: a type alias is a fact about
+    the library, not about the file that happens to hold it.
+    """
+    from ..analysis.sinks import strip_noise
+    if not Path(path).exists():
+        return {}
+    pp = _preprocess(path, include_dirs, cflags, whole_translation_unit=True)
+    text = pp if pp is not None else Path(path).read_text(errors="replace")
+    return _scalar_typedefs(_statements(strip_noise(text)))
+
+
 def header_typedefs(path: str, include_dirs=(), cflags=()) -> frozenset:
     """Pointer typedefs declared in one header, independent of whether it declares any
     functions.
@@ -448,7 +462,8 @@ def header_typedefs(path: str, include_dirs=(), cflags=()) -> frozenset:
         pp if pp is not None else Path(path).read_text(errors="replace"))))
 
 
-def _preprocess(path: str, include_dirs=(), cflags=()) -> Optional[str]:
+def _preprocess(path: str, include_dirs=(), cflags=(),
+                whole_translation_unit: bool = False) -> Optional[str]:
     """Run the real C preprocessor and keep only what came from THIS header.
 
     Text parsing loses to macros, and the losses are silent. Four of eight real libraries
@@ -486,6 +501,16 @@ def _preprocess(path: str, include_dirs=(), cflags=()) -> Optional[str]:
         target = Path(path).resolve()
     except OSError:
         return None
+    # TYPE FACTS COME FROM THE WHOLE TRANSLATION UNIT; API SURFACE DOES NOT.
+    #
+    # The per-header filter is right for declarations — without it the producer proposes
+    # harnesses for stdio. It is wrong for TYPEDEFS: leptonica declares its API in
+    # allheaders.h and spells a byte in environ.h, so filtering to the named header threw
+    # away `typedef unsigned char l_uint8;` and `pixReadMem(const l_uint8 *, size_t)`
+    # stopped looking like it takes bytes. What a type MEANS is not local to a file.
+    if whole_translation_unit:
+        return r.stdout or None
+
     out, keeping = [], False
     for line in r.stdout.splitlines():
         if line.startswith("# "):
@@ -544,7 +569,25 @@ def parse_header(path: str, include_dirs=(), cflags=()) -> list:
 
     out = []
     for st in stmts:
-        if st.startswith("typedef ") or "{" in st or "}" in st:
+        if st.startswith("typedef "):
+            continue
+        # A DECLARATION AFTER A static inline BODY STILL CARRIES ITS CLOSING BRACE.
+        #
+        # jansson.h defines json_incref as a static inline, and the very next line is
+        #   void json_delete(json_t *json);
+        # Statements split on `;`, so this one arrives as `} void json_delete(json_t *json)`
+        # and was discarded whole. jansson then had a handle it must free and NO destructor,
+        # every plan using json_loadb was dropped for leaking, and the benchmark reported
+        # "NO PLAN for the gold target" on a library whose entry point had parsed fine.
+        #
+        # Header-only helpers are everywhere, so this is not one library's quirk.
+        # THE BRACE STRIP RUNS FIRST, because the statement carries BOTH braces:
+        #   static JSON_INLINE json_t *json_incref(json_t *j) { ... } void json_delete(json_t *)
+        # Checking for `{` before taking the tail discarded it again, which is the version
+        # of this fix that did not work.
+        if "}" in st:
+            st = st.rsplit("}", 1)[1].strip()
+        if not st or "{" in st:
             continue
         split = _split_call(st)
         if not split:
@@ -884,12 +927,17 @@ def infer_contract(d: Decl, role: str, handle: Optional[str]) -> Contract:
 def to_api(d: Decl, handle: Optional[str]) -> Api:
     role = infer_role(d, handle)
     _ = d.macros                      # carried on the Decl; the binder reads it via _MACROS
+    def _tref(ty: str) -> TypeRef:
+        # base_type already follows a byte alias; record it when it changed anything, so a
+        # gate can judge the type rather than the spelling.
+        bare = " ".join(re.sub(r"\b(const|volatile|struct|enum|union)\b", " ", ty)
+                        .replace("*", " ").split())
+        res = base_type(ty)
+        return TypeRef(ty, "pointer" if _is_ptr(ty, d.ptr_types) else "scalar",
+                       const="const" in ty, resolved="" if res == bare else res)
+
     return Api(symbol=d.name, header=d.header, role=role,
-               params=[ParamDecl(nm, TypeRef(ty,
-                                             "pointer" if _is_ptr(ty, d.ptr_types)
-                                             else "scalar",
-                                             const="const" in ty))
-                       for ty, nm in d.params],
+               params=[ParamDecl(nm, _tref(ty)) for ty, nm in d.params],
                returns=TypeRef(d.ret, "void" if d.returns_void
                                else ("pointer" if d.returns_pointer else "scalar")),
                contract=infer_contract(d, role, handle))
@@ -922,6 +970,10 @@ def propose(headers: list, target: Target, *, platforms: Optional[list] = None,
     # typedefs yields no declarations and would otherwise contribute nothing.
     shared = frozenset().union(frozenset(),
                               *(header_typedefs(h, incs, cfl) for h in headers))
+    # Byte spellings, from every header the target names. Same argument as `shared` above:
+    # the alias may live in a file that declares no functions at all.
+    for h in headers:
+        _SCALAR_ALIASES.update(header_byte_aliases(h, incs, cfl))
     for d in decls:
         d.ptr_types = shared
 

@@ -74,13 +74,26 @@ class TypeRef:
     name: str                      # the C spelling, e.g. "cJSON *", "const char *"
     kind: str = "scalar"           # scalar | pointer | buffer | handle | callback | void
     const: bool = False
+    # What a typedef in `name` bottoms out in, when the header says so. Empty when the
+    # spelling IS the type.
+    #
+    # `const l_uint8 *` and `const unsigned char *` are the same type, and only leptonica's
+    # environ.h says so. The producer resolves it; without somewhere to record it, S2 saw a
+    # pointer to an unknown structured type, called binding fuzzer bytes to it type
+    # confusion, and refused the only correct harness for pixReadMem.
+    #
+    # It goes on the IR rather than being imported into the gate, because a gate must not
+    # depend on the thing it judges — and because the IR is the certifiable artifact, so a
+    # resolution recorded here is printed, diffed and auditable rather than assumed.
+    resolved: str = ""
 
     def to_json(self) -> dict: return asdict(self)
 
     @staticmethod
     def from_json(d: dict) -> "TypeRef":
         return TypeRef(name=d["name"], kind=d.get("kind", "scalar"),
-                       const=bool(d.get("const", False)))
+                       const=bool(d.get("const", False)),
+                       resolved=d.get("resolved", ""))
 
 
 @dataclass

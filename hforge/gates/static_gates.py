@@ -157,7 +157,7 @@ _BYTE_TYPEDEFS = frozenset({
 })
 
 
-def _points_to_bytes(type_name: str) -> bool:
+def _points_to_bytes(type_name: str, resolved: str = "") -> bool:
     """A single pointer to a byte-sized type, and nothing else.
 
     The star count matters. `char **` is not a buffer of bytes — it is a pointer to a
@@ -169,6 +169,12 @@ def _points_to_bytes(type_name: str) -> bool:
     if t.count("*") != 1:
         return False
     base = " ".join(t.replace("*", " ").split())
+    # The IR may state what a typedef bottoms out in. `const l_uint8 *` is a byte buffer and
+    # only leptonica's own header says so; without this the gate refuses the one correct
+    # harness for pixReadMem. Still independent: the gate reads a fact RECORDED IN THE
+    # ARTIFACT, which is printed and auditable, not a claim passed from the producer.
+    if resolved and resolved in _BYTE_TARGETS:
+        return True
     if base in _BYTE_TARGETS:
         return True
     # A library that typedefs its byte is still handing you bytes. zlib's `const Bytef *`
@@ -204,7 +210,7 @@ def s2_contract(ir: HarnessIR) -> GateResult:
             if pd is None or "*" not in pd.type.name:
                 continue
             checked += 1
-            if not _points_to_bytes(pd.type.name):
+            if not _points_to_bytes(pd.type.name, pd.type.resolved):
                 v.append(Violation(
                     "S2.TYPE_CONFUSION", BLOCK,
                     f"op {op.id}: parameter {a.param!r} of {api.symbol} has type "
