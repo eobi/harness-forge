@@ -57,15 +57,18 @@ reads 48.74% over the wrong file set and 70.47% over the right one.
 | zopfli/zopfli_deflate_fuzzer | **86.17** | 80.06 | 85.7 | 1.01x | 0.93x |
 | zlib/zlib_uncompress2_fuzzer | **53.93** | 51.74 | 53.1 | 1.02x | 0.97x |
 | lcms2/cmsOpenProfileFromMem | **5.14** | — | — |  |  |
-| libde265/stream_decode | *REFUSED by D3: valid input crashes the harness* | — | — |  |  |
-| jbig2dec/jbig2_data_in | *NOT MEASURED: the campaign wrote no coverage profile (run.profraw is empty), so 0.00% would be a failed measurement reported as a real one* | — | — |  |  |
+| libde265/stream_decode | **14.57** | — | 14.80† | 0.98x |  |
+| jbig2dec/jbig2_data_in | *NOT MEASURED: campaign ended on out-of-memory, so no coverage was flushed; 0.00% would be a failed measurement reported as a real one* | — | — |  |  |
 | leptonica/pixReadMem | **10.73** | — | — |  |  |
-| jansson/json_loadb | *build failed* | — | — |  |  |
+| jansson/json_loadb | **18.82** | — | — |  |  |
 | libwebp/WebPDecodeRGBA | **22.50** | — | — |  |  |
+| libpng/png_image_begin_read_from_memory | *build failed* | — | — |  |  |
 
-Measured cases with a gold baseline: **7**. Median ours/gold: **1.02x**. Ahead of the cited QuartetFuzz figure on **6 of the 7** cases it published one for.
+† gold MEASURED by this repository from the project's own in-tree harness, not cited. Same machine, same compiler, same 600 s, same file list, and a fresh corpus from the same seeds — so the comparison differs in the harness and in nothing else.
 
-Sources: run-009, run-010, run-013, run-016, run-017, run-018.
+Measured cases with a gold baseline: **8**. Median ours/gold: **1.02x**. Ahead of the cited QuartetFuzz figure on **6 of the 7** cases it published one for.
+
+Sources: run-009, run-010, run-013, run-016, run-017, run-018, run-019.
 
 <!-- TABLE:END -->
 

@@ -160,7 +160,11 @@ CASES = {
     # the library hung off it. Neither an opaque handle nor a plain out-parameter.
     hdr="/b/libpng/png.h", also=["/b/libpng/pngconf.h"],
     inc=["/b/libpng", "/b/zlib"],
-    src=[f for f in sorted(glob.glob("/b/libpng/*.c")) if "/example" not in f]
+    # pngtest.c and example.c each carry their own main(), which collides with
+    # libFuzzer's — the same shape as zopfli's zopfli_bin.c. Excluded from the link and
+    # from the denominator: a test program is not the library's attack surface.
+    src=[f for f in sorted(glob.glob("/b/libpng/*.c"))
+         if not f.endswith(("/example.c", "/pngtest.c"))]
         + sorted(glob.glob("/b/zlib/*.c")),
     fn="png_image_begin_read_from_memory", cflags=[], max_len=65536,
     # THE CANONICAL PNG TEST SUITE, 51 files, in the tree. A PNG has a magic number, a
@@ -171,7 +175,8 @@ CASES = {
     seeds=["/b/libpng/contrib/pngsuite"],
     # png's own sources only: zlib is a dependency this build links, not the surface under
     # test, and it already has two cases of its own.
-    cover=[f for f in sorted(glob.glob("/b/libpng/*.c")) if "/example" not in f]),
+    cover=[f for f in sorted(glob.glob("/b/libpng/*.c"))
+           if not f.endswith(("/example.c", "/pngtest.c"))]),
  "libwebp/WebPDecodeRGBA": dict(
     # THE MAP'S CANONICAL EXAMPLE: one heap overflow in libwebp reached Chrome, Firefox,
     # Safari, Electron, Signal, Slack, Android and iOS at the same time. It is also in

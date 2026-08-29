@@ -1,0 +1,1244 @@
+Dictionary: 193 entries
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1927355135
+INFO: Loaded 1 modules   (2413 inline 8-bit counters): 2413 [0xaaaadb2709f0, 0xaaaadb27135d), 
+INFO: Loaded 1 PC tables (2413 PCs): 2413 [0xaaaadb271360,0xaaaadb27aa30), 
+INFO:      107 files found in /b/runs/jbig2dec__jbig2_data_in/corpus
+INFO: seed corpus: files: 107 min: 2b max: 16385b total: 56362b rss: 43Mb
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: file header indicates use of colored region segments (NYI)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: file header indicates use of 12 adaptive template pixels (NYI)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment too short (segment 0x00)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: file header indicates use of 12 adaptive template pixels (NYI)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: file header indicates use of colored region segments (NYI)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: region segment flags indicate use of colored bitmap (NYI) (segment 0x7a53796d)
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: huffman table not found (0) (segment 0x7a53796d)
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: integer multiplication overflow (stride=536870912, height=2880479417)
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: integer multiplication overflow (stride=536870912, height=4294967117)
+jbig2 decoder FATAL ERROR: invalid HCHEIGHT value (segment 0x00)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: adaptive template pixel is out of field (segment 0x00)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment too short (segment 0x00)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment too short (segment 0x31450000)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: requested IAID arithmetic coding state size too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment too short (segment 0x00)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment too short (segment 0x00)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment too short (segment 0x7a53796d)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+#108	INITED cov: 280 ft: 578 corp: 89/51Kb exec/s: 108 rss: 1762Mb
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+#116	REDUCE cov: 280 ft: 578 corp: 89/51Kb lim: 16385 exec/s: 116 rss: 1762Mb L: 700/16385 MS: 3 ChangeASCIIInt-ManualDict-EraseBytes- DE: "end of Jbig2WordStream reached at offset "-
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+#117	NEW    cov: 280 ft: 580 corp: 90/51Kb lim: 16385 exec/s: 117 rss: 1762Mb L: 102/16385 MS: 1 ChangeBinInt-
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: adaptive template pixel is out of field (segment 0x00)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+#154	NEW    cov: 281 ft: 588 corp: 91/52Kb lim: 16385 exec/s: 154 rss: 1762Mb L: 174/16385 MS: 2 EraseBytes-CopyPart-
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: file header indicates use of 12 adaptive template pixels (NYI)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: file header indicates use of 12 adaptive template pixels (NYI)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: file header indicates use of 12 adaptive template pixels (NYI)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: file header indicates use of 12 adaptive template pixels (NYI)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: file header indicates use of 12 adaptive template pixels (NYI)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: huffman table not found (0) (segment 0x7a53796d)
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: huffman table not found (0) (segment 0x7a53796d)
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: huffman table not found (0) (segment 0x7a53796d)
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: huffman table not found (0) (segment 0x7a53796d)
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: huffman table not found (0) (segment 0x7a53796d)
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment too short (segment 0x7a53796d)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment too short (segment 0x7a53796d)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment too short (segment 0x7a53796d)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment too short (segment 0x7a53796d)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+#261	NEW    cov: 281 ft: 589 corp: 92/52Kb lim: 16385 exec/s: 261 rss: 1762Mb L: 384/16385 MS: 2 InsertRepeatedBytes-CopyPart-
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: region segment flags indicate use of colored bitmap (NYI) (segment 0x7a53796d)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment too short (segment 0x7a53796d)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+#305	NEW    cov: 281 ft: 591 corp: 93/53Kb lim: 16385 exec/s: 305 rss: 1762Mb L: 1387/16385 MS: 4 CopyPart-ShuffleBytes-InsertByte-EraseBytes-
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: file header indicates use of 12 adaptive template pixels (NYI)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: file header indicates use of 12 adaptive template pixels (NYI)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: adaptive template pixel is out of field (segment 0x00)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: adaptive template pixel is out of field (segment 0x00)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: adaptive template pixel is out of field (segment 0x00)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment too short (segment 0x31450000)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment too short (segment 0x31450000)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+#467	REDUCE cov: 281 ft: 591 corp: 93/53Kb lim: 16385 exec/s: 93 rss: 1827Mb L: 148/16385 MS: 2 InsertRepeatedBytes-EraseBytes-
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: integer multiplication overflow (stride=536870912, height=4294967117)
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: integer multiplication overflow (stride=536870912, height=4294967117)
+jbig2 decoder FATAL ERROR: segment too short (segment 0x7a53796d)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+#512	pulse  cov: 281 ft: 591 corp: 93/53Kb lim: 16385 exec/s: 102 rss: 1827Mb
+jbig2 decoder FATAL ERROR: segment too short (segment 0x00)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: file header indicates use of 12 adaptive template pixels (NYI)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: file header indicates use of 12 adaptive template pixels (NYI)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: invalid Huffman Table range (segment 0x20726567)
+	NEW_FUNC[1/2]: 0xaaaadb1b9e84 in jbig2_get_int32 /b/jbig2dec/jbig2.c:210
+	NEW_FUNC[2/2]: 0xaaaadb1d3780 in jbig2_table /b/jbig2dec/jbig2_huffman.c:550
+#548	NEW    cov: 286 ft: 596 corp: 94/53Kb lim: 16385 exec/s: 109 rss: 1827Mb L: 82/16385 MS: 1 EraseBytes-
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment too short (segment 0x7a53796d)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment too short (segment 0x7a53796d)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment too short (segment 0x7a53796d)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment too short (segment 0x7a53796d)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+#594	NEW    cov: 287 ft: 597 corp: 95/54Kb lim: 16385 exec/s: 118 rss: 1827Mb L: 136/16385 MS: 1 InsertRepeatedBytes-
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment too short (segment 0x31450000)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment too short (segment 0x31450000)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment too short (segment 0x7a53796d)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment too short (segment 0x7a53796d)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: adaptive template pixel is out of field (segment 0x00)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: adaptive template pixel is out of field (segment 0x00)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: integer multiplication overflow (stride=536870912, height=2880479417)
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: integer multiplication overflow (stride=536870912, height=2873532601)
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: segment uses 12 adaptive template pixels (NYI) (segment 0x20707265)
+#665	NEW    cov: 289 ft: 599 corp: 96/54Kb lim: 16385 exec/s: 133 rss: 1827Mb L: 83/16385 MS: 1 CopyPart-
+jbig2 decoder FATAL ERROR: adaptive template pixel is out of field (segment 0x00)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: adaptive template pixel is out of field (segment 0x00)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: adaptive template pixel is out of field (segment 0x00)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: adaptive template pixel is out of field (segment 0x00)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment too short (segment 0x31450000)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+	NEW_FUNC[1/1]: 0xaaaadb1cdb28 in jbig2_halftone_region /b/jbig2dec/jbig2_halftone.c:560
+#670	NEW    cov: 292 ft: 602 corp: 97/54Kb lim: 16385 exec/s: 134 rss: 1827Mb L: 215/16385 MS: 5 CopyPart-EraseBytes-ManualDict-EraseBytes-CrossOver- DE: "SDHUFF is zero, but contrary to spec SDHUFFDH is not."-
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+#679	REDUCE cov: 292 ft: 602 corp: 97/54Kb lim: 16385 exec/s: 135 rss: 1827Mb L: 51/16385 MS: 4 ChangeBit-ChangeBit-CopyPart-EraseBytes-
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment too short (segment 0x00)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+#696	REDUCE cov: 292 ft: 602 corp: 97/54Kb lim: 16385 exec/s: 139 rss: 1827Mb L: 317/16385 MS: 2 ShuffleBytes-EraseBytes-
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: huffman table not found (0) (segment 0x7a53796d)
+jbig2 decoder FATAL ERROR: file header indicates use of 12 adaptive template pixels (NYI)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: file header indicates use of 12 adaptive template pixels (NYI)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: file header indicates use of 12 adaptive template pixels (NYI)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: file header indicates use of 12 adaptive template pixels (NYI)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment too short (segment 0x00)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment too short (segment 0x00)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment too short (segment 0x00)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment too short (segment 0x00)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment too short (segment 0x70726567)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+#731	NEW    cov: 293 ft: 611 corp: 98/54Kb lim: 16385 exec/s: 146 rss: 1827Mb L: 258/16385 MS: 5 InsertRepeatedBytes-ManualDict-InsertByte-ManualDict-CrossOver- DE: "preguard of "-"Peak memory malloced = "-
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment too short (segment 0x70726567)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment too short (segment 0x70726567)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment too short (segment 0x70726567)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment too short (segment 0x70726567)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment too short (segment 0x70726567)
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+#806	REDUCE cov: 293 ft: 611 corp: 98/54Kb lim: 16385 exec/s: 161 rss: 1827Mb L: 189/16385 MS: 5 InsertByte-ShuffleBytes-InsertByte-ChangeBinInt-EraseBytes-
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+#816	NEW    cov: 293 ft: 612 corp: 99/56Kb lim: 16385 exec/s: 163 rss: 1827Mb L: 1709/16385 MS: 5 ChangeBit-ChangeByte-ChangeByte-CMP-CopyPart- DE: "\000\000\000\000\000\000\000\013"-
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: integer multiplication overflow (stride=536870912, height=4294967117)
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: integer multiplication overflow (stride=536870912, height=4294967117)
+jbig2 decoder FATAL ERROR: segment number too large
+jbig2 decoder FATAL ERROR: integer multiplication overflow (stride=536870912, height=4294967117)
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: requested IAID arithmetic coding state size too large
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot be completed
+jbig2 decoder FATAL ERROR: not a JBIG2 file header
+jbig2 decoder FATAL ERROR: page has no image, cannot 

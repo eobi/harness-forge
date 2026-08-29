@@ -1,0 +1,51 @@
+/b/zlib/gzlib.c:270:9: warning: implicit declaration of function 'lseek' is invalid in C99 [-Wimplicit-function-declaration]
+        LSEEK(state->fd, 0, SEEK_END);  /* so gzoffset() is correct */
+        ^
+/b/zlib/gzlib.c:15:17: note: expanded from macro 'LSEEK'
+#  define LSEEK lseek
+                ^
+/b/zlib/gzlib.c:276:24: warning: implicit declaration of function 'lseek' is invalid in C99 [-Wimplicit-function-declaration]
+        state->start = LSEEK(state->fd, 0, SEEK_CUR);
+                       ^
+/b/zlib/gzlib.c:15:17: note: expanded from macro 'LSEEK'
+#  define LSEEK lseek
+                ^
+/b/zlib/gzlib.c:360:9: warning: implicit declaration of function 'lseek' is invalid in C99 [-Wimplicit-function-declaration]
+    if (LSEEK(state->fd, state->start, SEEK_SET) == -1)
+        ^
+/b/zlib/gzlib.c:15:17: note: expanded from macro 'LSEEK'
+#  define LSEEK lseek
+                ^
+/b/zlib/gzlib.c:398:15: warning: implicit declaration of function 'lseek' is invalid in C99 [-Wimplicit-function-declaration]
+        ret = LSEEK(state->fd, offset - (z_off64_t)state->x.have, SEEK_CUR);
+              ^
+/b/zlib/gzlib.c:15:17: note: expanded from macro 'LSEEK'
+#  define LSEEK lseek
+                ^
+/b/zlib/gzlib.c:481:14: warning: implicit declaration of function 'lseek' is invalid in C99 [-Wimplicit-function-declaration]
+    offset = LSEEK(state->fd, 0, SEEK_CUR);
+             ^
+/b/zlib/gzlib.c:15:17: note: expanded from macro 'LSEEK'
+#  define LSEEK lseek
+                ^
+5 warnings generated.
+/b/zlib/gzread.c:30:20: warning: implicit declaration of function 'read' is invalid in C99 [-Wimplicit-function-declaration]
+        ret = (int)read(state->fd, buf + *have, get);
+                   ^
+/b/zlib/gzread.c:665:11: warning: implicit declaration of function 'close' is invalid in C99 [-Wimplicit-function-declaration]
+    ret = close(state->fd);
+          ^
+2 warnings generated.
+/b/zlib/gzwrite.c:80:25: warning: implicit declaration of function 'write' is invalid in C99 [-Wimplicit-function-declaration]
+            writ = (int)write(state->fd, strm->next_in, put);
+                        ^
+/b/zlib/gzwrite.c:115:29: warning: implicit declaration of function 'write' is invalid in C99 [-Wimplicit-function-declaration]
+                writ = (int)write(state->fd, state->x.next, put);
+                            ^
+/b/zlib/gzwrite.c:697:9: warning: implicit declaration of function 'close' is invalid in C99 [-Wimplicit-function-declaration]
+    if (close(state->fd) == -1)
+        ^
+3 warnings generated.
+/usr/bin/ld: /tmp/pngtest-b421c6.o: in function `main':
+/b/libpng/pngtest.c:1963: multiple definition of `main'; /usr/lib/llvm-14/lib/clang/14.0.6/lib/linux/libclang_rt.fuzzer-aarch64.a(FuzzerMain.cpp.o):(.text.main+0x0): first defined here
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
