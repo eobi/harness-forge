@@ -1,0 +1,8 @@
+### libyaml/libyaml_loader_fuzzer
+### libyaml/libyaml_scanner_fuzzer
+### brotli/decode_fuzzer
+### yajl-ruby/json_fuzzer
+### iperf/cjson_fuzzer
+### zopfli/zopfli_deflate_fuzzer
+### zlib/zlib_uncompress2_fuzzer
+### lcms2/cmsOpenProfileFromMem
