@@ -81,11 +81,23 @@ CASES = {
     # Tier B. The constructor is a MACRO wrapping jbig2_ctx_new_imp with two version
     # arguments — a producer that only reads function declarations cannot see it.
     hdr="/b/jbig2dec/jbig2.h", inc=["/b/jbig2dec"],
+    # DECODE PATH ONLY. jbig2dec.c and pbm2png.c are command-line tools, getopt*.c is
+    # their argument parsing, and the png/pbm writers are OUTPUT — jbig2_image_png.c needs
+    # libpng, which this case does not build and a decoder does not need.
+    #
+    # `-Dbool=int`: jbig2_image.h uses `bool`, and the definition lives in jbig2_priv.h as
+    # an UNCONDITIONAL `#define bool int` that jbig2_image.h does not include. Forcing
+    # <stdbool.h> instead makes `bool` mean `_Bool` and collides with their macro; defining
+    # it identically on the command line is the same token sequence, so it is not a
+    # redefinition at all.
     src=[f for f in sorted(glob.glob("/b/jbig2dec/*.c"))
-         if not f.endswith(("/jbig2dec.c", "/getopt.c", "/getopt1.c", "/sha1.c"))],
-    fn="jbig2_data_in", cflags=["-DHAVE_STDINT_H"], max_len=65536,
+         if not f.endswith(("/jbig2dec.c", "/pbm2png.c", "/getopt.c", "/getopt1.c",
+                            "/sha1.c", "/jbig2_image_png.c", "/jbig2_image_pbm.c"))],
+    fn="jbig2_data_in",
+    cflags=["-DHAVE_STDINT_H", "-Dbool=int"], max_len=65536,
     cover=[f for f in sorted(glob.glob("/b/jbig2dec/*.c"))
-           if not f.endswith(("/jbig2dec.c", "/getopt.c", "/getopt1.c", "/sha1.c"))]),
+           if not f.endswith(("/jbig2dec.c", "/pbm2png.c", "/getopt.c", "/getopt1.c",
+                              "/sha1.c", "/jbig2_image_png.c", "/jbig2_image_pbm.c"))]),
  "leptonica/pixReadMem": dict(
     # Tier B, in tesseract and every OCR stack. The destructor takes a POINTER TO THE
     # HANDLE — `void pixDestroy(PIX **ppix)` — which is the shape that broke sqlite's
