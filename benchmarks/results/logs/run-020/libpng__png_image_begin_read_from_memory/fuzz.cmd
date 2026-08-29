@@ -1,0 +1,1 @@
+/b/runs/libpng__png_image_begin_read_from_memory/fuzz /b/runs/libpng__png_image_begin_read_from_memory/corpus -dict=/b/runs/libpng__png_image_begin_read_from_memory/target.dict -max_total_time=600 -print_final_stats=1 -max_len=65536

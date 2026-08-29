@@ -1,0 +1,23 @@
+Dictionary: 512 entries
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 723519496
+INFO: Loaded 1 modules   (9386 inline 8-bit counters): 9386 [0xaaaab07e73c8, 0xaaaab07e9872), 
+INFO: Loaded 1 PC tables (9386 PCs): 9386 [0xaaaab07e9878,0xaaaab080e318), 
+INFO:       67 files found in /b/runs/libpng__png_image_begin_read_from_memory/corpus
+INFO: seed corpus: files: 67 min: 1b max: 4164b total: 56060b rss: 45Mb
+#68	INITED cov: 13 ft: 14 corp: 1/1b exec/s: 0 rss: 47Mb
+#1048576	pulse  cov: 13 ft: 14 corp: 1/1b lim: 10436 exec/s: 524288 rss: 127Mb
+#2097152	pulse  cov: 13 ft: 14 corp: 1/1b lim: 20884 exec/s: 419430 rss: 207Mb
+#4194304	pulse  cov: 13 ft: 14 corp: 1/1b lim: 41785 exec/s: 419430 rss: 369Mb
+#8388608	pulse  cov: 13 ft: 14 corp: 1/1b lim: 65536 exec/s: 381300 rss: 607Mb
+#16777216	pulse  cov: 13 ft: 14 corp: 1/1b lim: 65536 exec/s: 390167 rss: 609Mb
+#33554432	pulse  cov: 13 ft: 14 corp: 1/1b lim: 65536 exec/s: 390167 rss: 611Mb
+#67108864	pulse  cov: 13 ft: 14 corp: 1/1b lim: 65536 exec/s: 387912 rss: 614Mb
+#134217728	pulse  cov: 13 ft: 14 corp: 1/1b lim: 65536 exec/s: 391305 rss: 620Mb
+#220188298	DONE   cov: 13 ft: 14 corp: 1/1b lim: 65536 exec/s: 366369 rss: 620Mb
+Done 220188298 runs in 601 second(s)
+stat::number_of_executed_units: 220188298
+stat::average_exec_per_sec:     366369
+stat::new_units_added:          0
+stat::slowest_unit_time_sec:    0
+stat::peak_rss_mb:              620

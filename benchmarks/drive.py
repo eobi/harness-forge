@@ -473,6 +473,29 @@ def main():
     # harness that genuinely covered nothing — and jbig2dec published exactly that row while
     # its own d1_liveness and d3_valid_input both said pass. Two facts in one row
     # contradicting each other, and nothing noticed.
+    # COVERAGE IS MEASURED BY REPLAYING THE CORPUS, NOT BY THE CAMPAIGN.
+    #
+    # libFuzzer writes its profile at clean exit, so any campaign that DIES takes its
+    # measurement with it — jbig2dec at 1,761 MB and leptonica once real BMP seeds got it
+    # past the header check and into allocation. Both produced a corpus full of interesting
+    # inputs and no number.
+    #
+    # Replaying that corpus in a separate process with -runs=0 exits cleanly and profiles
+    # exactly the inputs the campaign found. It also separates two things that were tangled:
+    # how the campaign ENDED is a fact about the target's resource behaviour, and how much
+    # it REACHED is a fact about the harness. A campaign that dies still earns a number.
+    replay = wd/"replay.profraw"
+    rp = subprocess.run([str(binp), str(corp), "-runs=0", f"-max_len={mlen}"],
+                        capture_output=True, text=True, errors="replace",
+                        env=dict(os.environ, LLVM_PROFILE_FILE=str(replay)),
+                        timeout=600)
+    if replay.exists() and replay.stat().st_size > 0:
+        out["coverage_from"] = "corpus replay"
+        out["replay_exit"] = rp.returncode
+        prof = replay
+    elif prof.exists() and prof.stat().st_size > 0:
+        out["coverage_from"] = "campaign"
+
     if not prof.exists() or prof.stat().st_size == 0:
         # SAY WHAT KILLED IT, not merely that the profile is missing.
         #

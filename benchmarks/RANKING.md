@@ -59,16 +59,16 @@ reads 48.74% over the wrong file set and 70.47% over the right one.
 | lcms2/cmsOpenProfileFromMem | **5.14** | — | — |  |  |
 | libde265/stream_decode | **14.57** | — | 14.80† | 0.98x |  |
 | jbig2dec/jbig2_data_in | *NOT MEASURED: campaign ended on out-of-memory, so no coverage was flushed; 0.00% would be a failed measurement reported as a real one* | — | — |  |  |
-| leptonica/pixReadMem | **10.73** | — | — |  |  |
-| jansson/json_loadb | **18.82** | — | — |  |  |
+| leptonica/pixReadMem | **20.67** | — | — |  |  |
+| jansson/json_loadb | **18.98** | — | — |  |  |
 | libwebp/WebPDecodeRGBA | **22.50** | — | — |  |  |
-| libpng/png_image_begin_read_from_memory | *build failed* | — | — |  |  |
+| libpng/png_image_begin_read_from_memory | **0.15** | — | — |  |  |
 
 † gold MEASURED by this repository from the project's own in-tree harness, not cited. Same machine, same compiler, same 600 s, same file list, and a fresh corpus from the same seeds — so the comparison differs in the harness and in nothing else.
 
 Measured cases with a gold baseline: **8**. Median ours/gold: **1.02x**. Ahead of the cited QuartetFuzz figure on **6 of the 7** cases it published one for.
 
-Sources: run-009, run-010, run-013, run-016, run-017, run-018, run-019.
+Sources: run-009, run-010, run-013, run-016, run-017, run-018, run-019, run-020.
 
 <!-- TABLE:END -->
 

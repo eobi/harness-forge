@@ -21,7 +21,7 @@ A producer proposes a plan; the gates certify it; confidence decides nothing.
 |---|---|---|---|
 | `P1` | IR, static gates, C emitter | 6/6 | **done** |
 | `P2` | dynamic gates and positive control | 6/6 | **done** |
-| `P3` | producers: test-lift, LLM->IR, graph traversal | 50/59 | partial |
+| `P3` | producers: test-lift, LLM->IR, graph traversal | 52/62 | partial |
 | `PX` | cross-platform hardening: run the same way on every host | 5/5 | **done** |
 | `T0` | target choice, seeds and input size: the work that decides findings | 5/5 | **done** |
 | `TF` | findings: the half the engine was missing | 5/5 | **done** |
@@ -34,7 +34,7 @@ A producer proposes a plan; the gates certify it; confidence decides nothing.
 | `P8` | snapshot and scale | 0/2 | planned |
 | `P9` | exotic targets | 0/2 | planned |
 
-**95 of 119 deliverables done**, and `plancheck` refuses to let any of them say so without a module that imports and a test that exists.
+**97 of 122 deliverables done**, and `plancheck` refuses to let any of them say so without a module that imports and a test that exists.
 
 <!-- PHASES:END -->
 
@@ -254,16 +254,16 @@ confirmed reports — on its own 100-case benchmark with its gold OSS-Fuzz basel
 | lcms2/cmsOpenProfileFromMem | **5.14** | — | — |  |  |
 | libde265/stream_decode | **14.57** | — | 14.80† | 0.98x |  |
 | jbig2dec/jbig2_data_in | *NOT MEASURED: campaign ended on out-of-memory, so no coverage was flushed; 0.00% would be a failed measurement reported as a real one* | — | — |  |  |
-| leptonica/pixReadMem | **10.73** | — | — |  |  |
-| jansson/json_loadb | **18.82** | — | — |  |  |
+| leptonica/pixReadMem | **20.67** | — | — |  |  |
+| jansson/json_loadb | **18.98** | — | — |  |  |
 | libwebp/WebPDecodeRGBA | **22.50** | — | — |  |  |
-| libpng/png_image_begin_read_from_memory | *build failed* | — | — |  |  |
+| libpng/png_image_begin_read_from_memory | **0.15** | — | — |  |  |
 
 † gold MEASURED by this repository from the project's own in-tree harness, not cited. Same machine, same compiler, same 600 s, same file list, and a fresh corpus from the same seeds — so the comparison differs in the harness and in nothing else.
 
 Measured cases with a gold baseline: **8**. Median ours/gold: **1.02x**. Ahead of the cited QuartetFuzz figure on **6 of the 7** cases it published one for.
 
-Sources: run-009, run-010, run-013, run-016, run-017, run-018, run-019.
+Sources: run-009, run-010, run-013, run-016, run-017, run-018, run-019, run-020.
 
 <!-- BENCH:END -->
 

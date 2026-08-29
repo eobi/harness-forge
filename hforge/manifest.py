@@ -886,6 +886,61 @@ PHASES: tuple = (
                          "incompatible-pointer-types, implicit-function-declaration) and "
                          "attribute the failure to the PLAN, not to the target. A warning "
                          "about generated code is evidence about the generator."),
+        Deliverable("P3.REPLAY_COVERAGE",
+                    "coverage comes from replaying the corpus, not from the campaign", DONE,
+                    modules=("hforge.toolchain",),
+                    tests=("test_a_pointer_squeezed_into_a_byte_is_refused_before_the_campaign",),
+                    note="libFuzzer writes its profile at CLEAN EXIT, so a campaign that "
+                         "dies takes its measurement with it. Two targets lost one: jbig2dec "
+                         "at 1,761 MB, and leptonica once real BMP seeds got it past the "
+                         "header check and into allocation. Both left a corpus full of "
+                         "interesting inputs and no number. Replaying that corpus with "
+                         "-runs=0 exits cleanly and profiles exactly the inputs the campaign "
+                         "found. RECOVERED leptonica's lost run from its 651 surviving "
+                         "files: 20.67%. It also separates two things that were tangled — "
+                         "how a campaign ENDED is a fact about the target's resource "
+                         "behaviour, and how much it REACHED is a fact about the harness. "
+                         "The row records `coverage_from: corpus replay` rather than "
+                         "presenting it as the same kind of measurement as a clean run, "
+                         "because it covers the corpus and not the campaign's full history."),
+        Deliverable("P3.SEEDS_BY_FORMAT",
+                    "seeds matter in proportion to how unlikely valid input is by chance",
+                    DONE,
+                    modules=("hforge.analysis.seeds",),
+                    tests=("test_an_explicitly_named_seed_directory_is_trusted",),
+                    note="A CONTROLLED COMPARISON, one variable, same engine and same "
+                         "budget. I had claimed seeds were 'the single biggest score lever'. "
+                         "That is true for one of these and nearly false for the other. "
+                         "  jansson   18.82 -> 18.98  (+0.16)  243 seeds  JSON, TEXT "
+                         "  leptonica 10.73 -> 20.67  (+9.94)  243 seeds  BMP/PNM, BINARY "
+                         "A mutator reaches `{}` in two bytes, so a JSON parser is cheap to "
+                         "drive from nothing; it does not reach a BMP header, a PNG "
+                         "signature with a CRC per chunk, or a RIFF container by accident. "
+                         "So the rule is not 'seeds help' but 'seeds help in proportion to "
+                         "how unlikely valid input is by chance', and the corollary is that "
+                         "the round-trip synthesis on the roadmap should be prioritised by "
+                         "FORMAT, not by score: libwebp, libde265 and lcms2 first, because "
+                         "all three are binary containers and all three ship an encoder."),
+        Deliverable("P3.SIZED_FROM_STRUCT",
+                    "a buffer whose size the library computed into a struct it filled",
+                    PLANNED,
+                    note="MEASURED, and the number is honest rather than bad: libpng reads "
+                         "0.15% on 220,188,298 executions with 58 seeds. "
+                         "`png_image_begin_read_from_memory` ONLY PARSES THE HEADER — "
+                         "signature and IHDR — and libpng's simplified API is three steps: "
+                         "begin-read fills the caller's png_image, the caller allocates a "
+                         "buffer of PNG_IMAGE_SIZE(image) bytes from the width, height and "
+                         "format the library just wrote there, and png_image_finish_read "
+                         "does the decoding. Our plan calls step one and stops, so it is "
+                         "very fast and reaches almost nothing. The harness is CORRECT and "
+                         "the entry point is SHALLOW, which are different problems and only "
+                         "the second is interesting. What it needs: a scratch buffer sized "
+                         "from FIELDS OF A RESOURCE THE PLAN ALREADY HOLDS, evaluated after "
+                         "the call that fills them. Every other scratch in this engine has a "
+                         "size known before the first call — a constant, a knob, or the "
+                         "length of an input slice. This one does not exist until the "
+                         "library has run. Common well beyond libpng: any decode-into-"
+                         "caller-memory API has it, which is most image and audio codecs."),
         Deliverable("P3.VOID_TYPEDEF_HANDLE",
                     "a typedef to void is an opaque handle, not a byte buffer", DONE,
                     modules=("hforge.producers.header_graph",),
