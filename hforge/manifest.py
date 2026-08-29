@@ -510,6 +510,27 @@ PHASES: tuple = (
                          "Object-like integer macros are collected from the raw text before "
                          "preprocessing, since making them disappear is what the "
                          "preprocessor is for."),
+        Deliverable("P3.PARSER_CONSTRUCTORS",
+                    "one plan per input-consuming constructor, not just the top-ranked one",
+                    PLANNED,
+                    note="DIAGNOSED, not guessed, and deliberately not fixed while run-016 "
+                         "is in flight: its twelve cases run as separate processes importing "
+                         "hforge fresh, so changing the producer mid-run changes what the "
+                         "later cases measure. jansson parses fully now — json_loadb IS "
+                         "recognised as a creator and json_delete IS recognised as the "
+                         "destroyer — and it still proposes no plan for its own entry point. "
+                         "The reason: jansson has 23 constructors returning json_t* "
+                         "(json_object, json_array, json_string, json_integer, ...), "
+                         "_creator_rank selects ONE for every plan, and it selects "
+                         "json_object_set_new. The 'constructor is the entry point' path "
+                         "that makes cJSON_Parse work only ever applies to the creator that "
+                         "won. cJSON gets away with it because cJSON_Parse is close to the "
+                         "only constructor there. The fix is not a better ranking — it is "
+                         "that a constructor which CONSUMES FUZZER BYTES deserves its own "
+                         "plan regardless of rank, because for a parser library the creation "
+                         "IS the consumption. json_loadb, json_loads, cJSON_Parse and "
+                         "pixReadMem are all this shape; pixReadMem only works today because "
+                         "leptonica has no rival constructor for PIX."),
         Deliverable("P3.INLINE_BODY_DECL",
                     "a declaration after a static inline body is not discarded", DONE,
                     modules=("hforge.producers.header_graph",),
