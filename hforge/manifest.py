@@ -1583,7 +1583,17 @@ PHASES: tuple = (
                          "unavailable for this target and that is a property of eog, not a "
                          "limitation of the harness. Dismissal still matters for genuinely "
                          "MODAL dialogs — overwrite prompts, crash reporters — which is why "
-                         "this stays PARTIAL rather than done."),
+                         "this stays PARTIAL rather than done. "
+                         "GENERALISED to a second app and format before being believed: "
+                         "evince on three PDFs gives the same discrimination — the valid "
+                         "file reads 102 nodes with no error element, truncated and garbage "
+                         "each carry one, and all three stay responsive to a real action. "
+                         "But evince spells it `alert 'dialog-error-symbolic'` where eog "
+                         "spells it `info bar 'Error'`, so a detector must match a FAMILY of "
+                         "roles (info bar, alert, dialog) and not one spelling. That is the "
+                         "same shape as BYTE_BASES in the C producer — a hand-maintained "
+                         "list of spellings that grew once per library until we read the "
+                         "header instead. Here it would grow once per toolkit."),
     )),
 
     Phase("P7", "mobile: Android and iOS", PARTIAL, (
