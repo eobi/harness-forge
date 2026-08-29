@@ -244,20 +244,23 @@ confirmed reports — on its own 100-case benchmark with its gold OSS-Fuzz basel
 
 | case | ours | QuartetFuzz | gold | ours/gold | QF/gold |
 |---|---|---|---|---|---|
-| libyaml/libyaml_loader_fuzzer | *not yet run* | 73.89 | 77.7 |  | 0.95x |
-| libyaml/libyaml_scanner_fuzzer | *not yet run* | 67.30 | 70.6 |  | 0.95x |
-| brotli/decode_fuzzer | *not yet run* | 84.15 | 77.2 |  | 1.09x |
-| yajl-ruby/json_fuzzer | *not yet run* | 79.87 | 69.1 |  | 1.16x |
-| iperf/cjson_fuzzer | *not yet run* | 0.00 | 24.5 |  | 0.00x |
-| zopfli/zopfli_deflate_fuzzer | *not yet run* | 80.06 | 85.7 |  | 0.93x |
-| zlib/zlib_uncompress2_fuzzer | *not yet run* | 51.74 | 53.1 |  | 0.97x |
-| lcms2/cmsOpenProfileFromMem | *not yet run* | — | — |  |  |
-| jbig2dec/jbig2_data_in | *NOT MEASURED: the campaign wrote no coverage profile (run.profraw is empty), so 0.00% would be a failed measurement reported as a real one* | — | — |  |  |
-| leptonica/pixReadMem | *build failed* | — | — |  |  |
-| jansson/json_loadb | *build failed* | — | — |  |  |
+| libyaml/libyaml_loader_fuzzer | **77.77** | 73.89 | 77.7 | 1.00x | 0.95x |
+| libyaml/libyaml_scanner_fuzzer | **70.47** | 67.30 | 70.6 | 1.00x | 0.95x |
+| brotli/decode_fuzzer | **85.50** | 84.15 | 77.2 | 1.11x | 1.09x |
+| yajl-ruby/json_fuzzer | **72.80** | 79.87 | 69.1 | 1.05x | 1.16x |
+| iperf/cjson_fuzzer | **25.10** | 0.00 | 24.5 | 1.02x | 0.00x |
+| zopfli/zopfli_deflate_fuzzer | **86.17** | 80.06 | 85.7 | 1.01x | 0.93x |
+| zlib/zlib_uncompress2_fuzzer | **53.93** | 51.74 | 53.1 | 1.02x | 0.97x |
+| lcms2/cmsOpenProfileFromMem | **5.14** | — | — |  |  |
 | libde265/stream_decode | *REFUSED by D3: valid input crashes the harness* | — | — |  |  |
+| jbig2dec/jbig2_data_in | *NOT MEASURED: the campaign wrote no coverage profile (run.profraw is empty), so 0.00% would be a failed measurement reported as a real one* | — | — |  |  |
+| leptonica/pixReadMem | **10.73** | — | — |  |  |
+| jansson/json_loadb | *build failed* | — | — |  |  |
+| libwebp/WebPDecodeRGBA | **22.50** | — | — |  |  |
 
-Sources: run-017.
+Measured cases with a gold baseline: **7**. Median ours/gold: **1.02x**. Ahead of the cited QuartetFuzz figure on **6 of the 7** cases it published one for.
+
+Sources: run-009, run-010, run-013, run-016, run-017, run-018.
 
 <!-- BENCH:END -->
 

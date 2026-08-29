@@ -1,0 +1,60 @@
+In file included from /b/jansson/src/utf.c:8:
+/b/jansson/src/utf.h:20:17: error: unknown type name 'int32_t'
+int utf8_encode(int32_t codepoint, char *buffer, size_t *size);
+                ^
+/b/jansson/src/utf.h:23:57: error: unknown type name 'int32_t'
+size_t utf8_check_full(const char *buffer, size_t size, int32_t *codepoint);
+                                                        ^
+/b/jansson/src/utf.h:24:59: error: unknown type name 'int32_t'
+const char *utf8_iterate(const char *buffer, size_t size, int32_t *codepoint);
+                                                          ^
+/b/jansson/src/utf.c:11:17: error: unknown type name 'int32_t'
+int utf8_encode(int32_t codepoint, char *buffer, size_t *size) {
+                ^
+/b/jansson/src/utf.c:69:57: error: unknown type name 'int32_t'
+size_t utf8_check_full(const char *buffer, size_t size, int32_t *codepoint) {
+                                                        ^
+/b/jansson/src/utf.c:71:5: error: use of undeclared identifier 'int32_t'
+    int32_t value = 0;
+    ^
+/b/jansson/src/utf.c:75:9: error: use of undeclared identifier 'value'
+        value = u & 0x1F;
+        ^
+/b/jansson/src/utf.c:77:9: error: use of undeclared identifier 'value'
+        value = u & 0xF;
+        ^
+/b/jansson/src/utf.c:79:9: error: use of undeclared identifier 'value'
+        value = u & 0x7;
+        ^
+/b/jansson/src/utf.c:91:9: error: use of undeclared identifier 'value'
+        value = (value << 6) + (u & 0x3F);
+        ^
+/b/jansson/src/utf.c:91:18: error: use of undeclared identifier 'value'
+        value = (value << 6) + (u & 0x3F);
+                 ^
+/b/jansson/src/utf.c:94:9: error: use of undeclared identifier 'value'
+    if (value > 0x10FFFF) {
+        ^
+/b/jansson/src/utf.c:99:24: error: use of undeclared identifier 'value'
+    else if (0xD800 <= value && value <= 0xDFFF) {
+                       ^
+/b/jansson/src/utf.c:99:33: error: use of undeclared identifier 'value'
+    else if (0xD800 <= value && value <= 0xDFFF) {
+                                ^
+/b/jansson/src/utf.c:104:28: error: use of undeclared identifier 'value'
+    else if ((size == 2 && value < 0x80) || (size == 3 && value < 0x800) ||
+                           ^
+/b/jansson/src/utf.c:104:59: error: use of undeclared identifier 'value'
+    else if ((size == 2 && value < 0x80) || (size == 3 && value < 0x800) ||
+                                                          ^
+/b/jansson/src/utf.c:105:28: error: use of undeclared identifier 'value'
+             (size == 4 && value < 0x10000)) {
+                           ^
+/b/jansson/src/utf.c:111:22: error: use of undeclared identifier 'value'
+        *codepoint = value;
+                     ^
+/b/jansson/src/utf.c:116:62: error: unknown type name 'int32_t'
+const char *utf8_iterate(const char *buffer, size_t bufsize, int32_t *codepoint) {
+                                                             ^
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+20 errors generated.

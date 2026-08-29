@@ -1,0 +1,1187 @@
+in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid pnm file
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pixReadMem: size < 12
+Error in freadHeaderPnm: invalid pnm file
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: error in 5
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: error in 5
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pnmReadNextNumber: char read is not a digit
+Error in freadHeaderPnm: invalid read for maxval (2,5)
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextNumber: char read is not a digit
+Error in freadHeaderPnm: invalid read for maxval (2,5)
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextNumber: char read is not a digit
+Error in freadHeaderPnm: invalid read for maxval (2,5)
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextNumber: char read is not a digit
+Error in freadHeaderPnm: invalid read for maxval (2,5)
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextNumber: char read is not a digit
+Error in freadHeaderPnm: invalid read for maxval (2,5)
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextNumber: char read is not a digit
+Error in freadHeaderPnm: invalid read for maxval (2,5)
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextNumber: char read is not a digit
+Error in freadHeaderPnm: invalid read for maxval (2,5)
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pixDeserializeFromMemory: invalid height
+Error in pixReadMem: spix: no pix returned
+Error in pixDeserializeFromMemory: invalid height
+Error in pixReadMem: spix: no pix returned
+Error in pixDeserializeFromMemory: invalid width
+Error in pixReadMem: spix: no pix returned
+Error in pixDeserializeFromMemory: invalid width
+Error in pixReadMem: spix: no pix returned
+Error in pixDeserializeFromMemory: invalid width
+Error in pixReadMem: spix: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pnmReadNextNumber: char read is not a digit
+Error in freadHeaderPnm: failed reading maxval
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextString: end of file reached
+Error in freadHeaderPnm: found no next tag
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextString: end of file reached
+Error in freadHeaderPnm: found no next tag
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Info in freadHeaderPnm: invalid size: w = 0, h = 0
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Info in freadHeaderPnm: invalid size: w = 0, h = 0
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in freadDataPnm: read error in 4
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read error in 4
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read error in 4
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read error in 4
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read error in 4
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read abend
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextNumber: char read is not a digit
+Error in freadHeaderPnm: invalid read for maxval (2,5)
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextNumber: char read is not a digit
+Error in freadHeaderPnm: invalid read for maxval (2,5)
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextNumber: char read is not a digit
+Error in freadHeaderPnm: invalid read for maxval (2,5)
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextNumber: char read is not a digit
+Error in freadHeaderPnm: invalid read for maxval (2,5)
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in freadDataPnm: error in 5
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in freadDataPnm: read abend
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read abend
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read abend
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read abend
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read abend
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pixDeserializeFromMemory: invalid width
+Error in pixReadMem: spix: no pix returned
+Error in pixDeserializeFromMemory: invalid width
+Error in pixReadMem: spix: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in freadDataPnm: read abend
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read abend
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read abend
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pnmReadNextString: end of file reached
+Error in freadHeaderPnm: found no next tag
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextString: end of file reached
+Error in freadHeaderPnm: found no next tag
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextString: end of file reached
+Error in freadHeaderPnm: found no next tag
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextString: end of file reached
+Error in freadHeaderPnm: found no next tag
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextString: end of file reached
+Error in freadHeaderPnm: found no next tag
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextNumber: char read is not a digit
+Error in freadHeaderPnm: invalid read for maxval (2,5)
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextNumber: char read is not a digit
+Error in freadHeaderPnm: invalid read for maxval (2,5)
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextNumber: char read is not a digit
+Error in freadHeaderPnm: invalid read for maxval (2,5)
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read abend
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read abend
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read abend
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read abend
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read abend
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read abend
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read abend
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: error in 5
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: error in 5
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextNumber: char read is not a digit
+Error in freadHeaderPnm: invalid read for maxval (2,5)
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextNumber: char read is not a digit
+Error in freadHeaderPnm: invalid read for maxval (2,5)
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextNumber: char read is not a digit
+Error in freadHeaderPnm: invalid read for maxval (2,5)
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in freadDataPnm: read abend
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read abend
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read abend
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read abend
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read abend
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pnmReadNextNumber: char read is not a digit
+Error in freadHeaderPnm: invalid read for maxval (2,5)
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextNumber: char read is not a digit
+Error in freadHeaderPnm: invalid read for maxval (2,5)
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read error in 4
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read error in 4
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read error in 4
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read error in 4
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read abend
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read abend
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read abend
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read abend
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextString: end of file reached
+Error in freadHeaderPnm: found no next tag
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextString: end of file reached
+Error in freadHeaderPnm: found no next tag
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextString: end of file reached
+Error in freadHeaderPnm: found no next tag
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextString: end of file reached
+Error in freadHeaderPnm: found no next tag
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextString: end of file reached
+Error in freadHeaderPnm: found no next tag
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read abend
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read abend
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read abend
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read abend
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read abend
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextNumber: char read is not a digit
+Error in freadHeaderPnm: invalid read for maxval (2,5)
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextNumber: char read is not a digit
+Error in freadHeaderPnm: invalid read for maxval (2,5)
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextNumber: char read is not a digit
+Error in freadHeaderPnm: invalid read for maxval (2,5)
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in freadDataPnm: error in 5
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: error in 5
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: error in 5
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: error in 5
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: error in 5
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextNumber: char read is not a digit
+Error in freadHeaderPnm: invalid read for maxval (3,6)
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextString: end of file reached
+Error in freadHeaderPnm: found no next tag
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextString: end of file reached
+Error in freadHeaderPnm: found no next tag
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextString: end of file reached
+Error in freadHeaderPnm: found no next tag
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Info in freadHeaderPnm: invalid size: w = 0, h = 0
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Info in freadHeaderPnm: invalid size: w = 0, h = 0
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pnmReadNextNumber: end of file reached
+Error in freadHeaderPnm: invalid read for maxval (2,5)
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextNumber: char read is not a digit
+Error in freadHeaderPnm: invalid read for maxval (2,5)
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextNumber: char read is not a digit
+Error in freadHeaderPnm: invalid read for maxval (2,5)
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextNumber: char read is not a digit
+Error in freadHeaderPnm: invalid read for maxval (2,5)
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextNumber: char read is not a digit
+Error in freadHeaderPnm: invalid read for maxval (2,5)
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in freadDataPnm: error in 5
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: error in 5
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: error in 5
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: error in 5
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: error in 5
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read error in 4
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextNumber: char read is not a digit
+Error in freadHeaderPnm: invalid read for maxval (2,5)
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextNumber: char read is not a digit
+Error in freadHeaderPnm: invalid read for maxval (2,5)
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextNumber: char read is not a digit
+Error in freadHeaderPnm: invalid read for maxval (2,5)
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextNumber: char read is not a digit
+Error in freadHeaderPnm: invalid read for maxval (2,5)
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read abend
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read abend
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read abend
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read abend
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in freadDataPnm: error in 5
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: error in 5
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: error in 5
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: error in 5
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: error in 5
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid pnm file
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in freadHeaderPnm: invalid pnm file
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid pnm file
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read error in 4
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in freadHeaderPnm: invalid pnm file
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: error in 5
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: error in 5
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: error in 5
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: error in 5
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: error in 5
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Info in freadHeaderPnm: invalid size: w = 0, h = 8
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Info in freadHeaderPnm: invalid size: w = 0, h = 8
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextString: end of file reached
+Error in freadHeaderPnm: found no next tag
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextString: end of file reached
+Error in freadHeaderPnm: found no next tag
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextString: end of file reached
+Error in freadHeaderPnm: found no next tag
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: error in 5
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: error in 5
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: error in 5
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextNumber: char read is not a digit
+Error in freadHeaderPnm: invalid read for maxval (2,5)
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextNumber: char read is not a digit
+Error in freadHeaderPnm: invalid read for maxval (2,5)
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextNumber: char read is not a digit
+Error in freadHeaderPnm: invalid read for maxval (2,5)
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in freadDataPnm: error in 5
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextNumber: char read is not a digit
+Error in freadHeaderPnm: invalid read for maxval (2,5)
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextNumber: char read is not a digit
+Error in freadHeaderPnm: invalid read for maxval (2,5)
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextNumber: char read is not a digit
+Error in freadHeaderPnm: invalid read for maxval (2,5)
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read abend
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read abend
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read abend
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read abend
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read abend
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: error in 5
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: error in 5
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: error in 5
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: error in 5
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: error in 5
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in freadDataPnm: read abend
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read abend
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read abend
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read abend
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read abend
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read error in 4
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read error in 4
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read error in 4
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read error in 4
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadHeaderPnm: invalid read for w,h
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read abend
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in freadDataPnm: read abend
+Error in pixReadStreamPnm: read data fails
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextNumber: char read is not a digit
+Error in freadHeaderPnm: invalid read for maxval (2,5)
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextNumber: char read is not a digit
+Error in freadHeaderPnm: invalid read for maxval (2,5)
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+Error in pnmReadNextNumber: char read is not a digit
+Error in freadHeaderPnm: invalid read for maxval (2,5)
+Error in pixReadStreamPnm: header read failed
+Error in pixReadMemPnm: pix not read
+Error in pixReadMem: pnm: no pix returned
+#5242682	DONE   cov: 259 ft: 574 corp: 232/10642b lim: 44815 exec/s: 8723 rss: 729Mb
+###### Recommended dictionary. ######
+"\000\000\000\000" # Uses: 3720
+"\377O\377Q" # Uses: 3757
+"\001\000" # Uses: 3701
+"\000\000\000\014jP  \015\012\207\012" # Uses: 3601
+"\377\377\377\377" # Uses: 3766
+"\001\003DD" # Uses: 3574
+"\000\000\000\000\000\000\000\000" # Uses: 3612
+"\014\000\000\000\000\000\000\000" # Uses: 3494
+"MAXVAL" # Uses: 3509
+"\013/" # Uses: 3474
+"iy" # Uses: 3590
+"\371D\003\000" # Uses: 3542
+"\000\000\000\000\000\000\000\014" # Uses: 3536
+"\001\000\000\000\000\000\000B" # Uses: 3469
+"\011\000\000\000\000\000\000\000" # Uses: 3529
+"ENDHDR" # Uses: 3514
+"\242\000\000\000" # Uses: 3509
+"M\000\000\000\000\000\000\000" # Uses: 3575
+"\001\000\000\000" # Uses: 3504
+"DEPTH" # Uses: 3448
+"HEIGHT" # Uses: 3614
+"WI" # Uses: 3427
+"\015\000\000\000\000\000\000\000" # Uses: 3384
+"TUPLTY" # Uses: 3370
+"\0002" # Uses: 3513
+"*\000" # Uses: 3469
+"\001\000\000\004" # Uses: 3339
+"\000\000\0001" # Uses: 3465
+"\000\000\000\000\000\000\000$" # Uses: 3528
+"\377\002" # Uses: 3438
+"xs" # Uses: 3258
+"\001\000\000\000\000\000\0005" # Uses: 3347
+"WIDTH" # Uses: 3455
+"\377\377\377\377\377\377\377\377" # Uses: 3220
+"`\000\000\000\000\000\000\000" # Uses: 3341
+"\004\000" # Uses: 3366
+"pixd" # Uses: 3214
+"TUPLTYPE" # Uses: 3194
+"\000\000\000\003" # Uses: 3212
+"te" # Uses: 3176
+"%\000\000\000\000\000\000\000" # Uses: 3179
+"HEIG" # Uses: 3126
+"WID" # Uses: 3057
+"'\000\000\000\000\000\000\000" # Uses: 3222
+"\010\000\000\000" # Uses: 3070
+"HEI" # Uses: 3074
+"END" # Uses: 3178
+"\0057bppt" # Uses: 3036
+"2o" # Uses: 2998
+"TUPLTYP" # Uses: 3005
+"\000\002" # Uses: 3001
+"\002\000" # Uses: 2962
+"\004\000\000\000\000\000\000\000" # Uses: 3068
+"\021\000\000\000" # Uses: 2980
+"\001\000\000w" # Uses: 2949
+"\225\002\000\000\000\000\000\000" # Uses: 2756
+"MA\032\032\032\032" # Uses: 2874
+"\001\011" # Uses: 2736
+"\000\000\000\000\000\000\000(" # Uses: 2634
+"%!P7" # Uses: 2606
+"\001\000\000\000\000\000\000i" # Uses: 2594
+"EN" # Uses: 2483
+"dz5" # Uses: 2613
+"\004\000\000\000" # Uses: 2553
+"out" # Uses: 2446
+".\000" # Uses: 2257
+"WIDT" # Uses: 2289
+"\034\000\000\000\000\000\000\000" # Uses: 2177
+"DEPT" # Uses: 1875
+"\003\000\000\000" # Uses: 1854
+"\002\000\000\000" # Uses: 1175
+"\001\000\000 " # Uses: 1000
+"\027\000" # Uses: 857
+###### End of recommended dictionary. ######
+Done 5242682 runs in 601 second(s)
+stat::number_of_executed_units: 5242682
+stat::average_exec_per_sec:     8723
+stat::new_units_added:          1754
+stat::slowest_unit_time_sec:    0
+stat::peak_rss_mb:              729

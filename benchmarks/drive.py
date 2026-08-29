@@ -133,7 +133,13 @@ CASES = {
     # There is also an out-parameter that is NOT a handle: `json_error_t *error`.
     hdr="/b/jansson/src/jansson.h", inc=["/b/jansson/src", "/b/jansson"],
     src=sorted(glob.glob("/b/jansson/src/*.c")),
-    fn="json_loadb", cflags=[], max_len=65536,
+    fn="json_loadb",
+    # `-include stdint.h` on the command line, not in jansson_config.h. utf.c uses int32_t
+    # and does not include the config header, so putting the include there fixed
+    # hashtable.c and left utf.c failing with `unknown type name 'int32_t'` — and the
+    # cascading parse errors after it pointed at a phantom identifier rather than the real
+    # cause. configure normally settles this per translation unit.
+    cflags=["-include", "stdint.h"], max_len=65536,
     cover=sorted(glob.glob("/b/jansson/src/*.c"))),
  "libpng/png_image_begin_read_from_memory": dict(
     # Android platform library, and in every browser and toolkit. Run

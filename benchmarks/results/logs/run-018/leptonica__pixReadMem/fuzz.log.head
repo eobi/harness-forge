@@ -1,0 +1,2495 @@
+Dictionary: 512 entries
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 973445180
+INFO: Loaded 1 modules   (59962 inline 8-bit counters): 59962 [0xaaaad2ea4610, 0xaaaad2eb304a), 
+INFO: Loaded 1 PC tables (59962 PCs): 59962 [0xaaaad2eb3050,0xaaaad2f9d3f0), 
+INFO:        0 files found in /b/runs/leptonica__pixReadMem/corpus
+INFO: A corpus is not provided, starting from an empty corpus
+Error in pixReadMem: size < 12
+#2	INITED cov: 9 ft: 10 corp: 1/1b exec/s: 0 rss: 52Mb
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+	NEW_FUNC[1/2]: 0xaaaad2acf854 in findFileFormatBuffer /b/leptonica/src/readfile.c:658
+	NEW_FUNC[2/2]: 0xaaaad2bc2bcc in convertOnBigEnd16 /b/leptonica/src/utils1.c:480
+#1018	NEW    cov: 26 ft: 27 corp: 2/15b lim: 14 exec/s: 0 rss: 52Mb L: 14/14 MS: 1 ManualDict- DE: "pixs not made"-
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+#1037	REDUCE cov: 26 ft: 27 corp: 2/13b lim: 14 exec/s: 0 rss: 52Mb L: 12/12 MS: 4 EraseBytes-ChangeBit-ShuffleBytes-CrossOver-
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+#1293	NEW    cov: 27 ft: 28 corp: 3/25b lim: 14 exec/s: 0 rss: 52Mb L: 12/12 MS: 1 ManualDict- DE: "sa not made"-
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+#1513	NEW    cov: 28 ft: 29 corp: 4/37b lim: 14 exec/s: 0 rss: 52Mb L: 12/12 MS: 5 ChangeByte-ShuffleBytes-ChangeBit-InsertByte-InsertRepeatedBytes-
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+#1939	NEW    cov: 29 ft: 30 corp: 5/49b lim: 17 exec/s: 0 rss: 52Mb L: 12/12 MS: 1 CrossOver-
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+#2020	NEW    cov: 30 ft: 31 corp: 6/61b lim: 17 exec/s: 0 rss: 52Mb L: 12/12 MS: 1 CMP- DE: "\000\000\000\000"-
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMemJp2k: function not present
+Error in pixReadMem: jp2k: no pix returned
+	NEW_FUNC[1/1]: 0xaaaad28797ec in pixReadMemJp2k /b/leptonica/src/jp2kiostub.c:82
+#2419	NEW    cov: 34 ft: 40 corp: 7/76b lim: 17 exec/s: 0 rss: 52Mb L: 15/15 MS: 4 ChangeBinInt-CopyPart-InsertByte-CMP- DE: "\377O\377Q"-
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error in pixReadMem: size < 12
+Error in pixReadMem: Unknown format: no pix returned
+Error in pixReadMem: size < 12
+Error
