@@ -83,14 +83,21 @@ CASES = {
     cxx=True, std="c++11",
     hdr="/b/libde265/libde265/de265.h",
     inc=["/b/libde265", "/b/libde265/libde265"],
-    src=sorted(glob.glob("/b/libde265/libde265/*.cc")),
+    # en265.cc is the ENCODER's public API and it sits in the same directory as the
+    # decoder. It pulls encoder_context and config_parameters out of encoder/, which is a
+    # separate library this case does not build, so linking it fails on a dozen undefined
+    # references that have nothing to do with decoding. Excluding it is the same argument
+    # as the coverage denominator below, applied to the link line.
+    src=[f for f in sorted(glob.glob("/b/libde265/libde265/*.cc"))
+         if not f.endswith("/en265.cc")],
     fn="de265_push_data", cflags=["-DHAVE_CONFIG_H"], max_len=65536,
     # The library's own harness, built and measured exactly as ours is. This is a gold
     # figure this repository PRODUCES, not one it quotes.
     gold_harness="/b/libde265/fuzzing/stream_fuzzer.cc",
     # DECODE PATH ONLY. encoder/ is a separate library, the x86 and arm32 SIMD directories
     # are not compiled on aarch64, and sherlock265/dec265 are applications.
-    cover=sorted(glob.glob("/b/libde265/libde265/*.cc"))),
+    cover=[f for f in sorted(glob.glob("/b/libde265/libde265/*.cc"))
+           if not f.endswith("/en265.cc")]),
 }
 
 def main():

@@ -1,0 +1,409 @@
+{
+  "schema_version": "1.0",
+  "name": "libde265_de265_push_data",
+  "producer": "header_graph",
+  "notes": "proposed from de265.h by signature inference; handle type inferred as 'de265_decoder_context*'. Every inference here is checked by a static gate, and the producer certifies nothing.",
+  "target": {
+    "name": "libde265",
+    "version": "",
+    "commit": "",
+    "public_headers": [
+      "/b/libde265/libde265/de265.h"
+    ],
+    "include_dirs": [
+      "/b/libde265",
+      "/b/libde265/libde265"
+    ],
+    "sources": [
+      "/b/libde265/libde265/alloc_pool.cc",
+      "/b/libde265/libde265/bitstream.cc",
+      "/b/libde265/libde265/cabac.cc",
+      "/b/libde265/libde265/contextmodel.cc",
+      "/b/libde265/libde265/de265.cc",
+      "/b/libde265/libde265/deblock.cc",
+      "/b/libde265/libde265/decctx.cc",
+      "/b/libde265/libde265/dpb.cc",
+      "/b/libde265/libde265/en265.cc",
+      "/b/libde265/libde265/fallback-dct.cc",
+      "/b/libde265/libde265/fallback-deblk.cc",
+      "/b/libde265/libde265/fallback-intrapred.cc",
+      "/b/libde265/libde265/fallback-motion.cc",
+      "/b/libde265/libde265/fallback.cc",
+      "/b/libde265/libde265/image-io.cc",
+      "/b/libde265/libde265/image.cc",
+      "/b/libde265/libde265/intrapred.cc",
+      "/b/libde265/libde265/md5.cc",
+      "/b/libde265/libde265/motion.cc",
+      "/b/libde265/libde265/nal-parser.cc",
+      "/b/libde265/libde265/nal.cc",
+      "/b/libde265/libde265/pps.cc",
+      "/b/libde265/libde265/quality.cc",
+      "/b/libde265/libde265/refpic.cc",
+      "/b/libde265/libde265/sao.cc",
+      "/b/libde265/libde265/scan.cc",
+      "/b/libde265/libde265/sei.cc",
+      "/b/libde265/libde265/slice.cc",
+      "/b/libde265/libde265/sps.cc",
+      "/b/libde265/libde265/threads.cc",
+      "/b/libde265/libde265/transform.cc",
+      "/b/libde265/libde265/util.cc",
+      "/b/libde265/libde265/visualize.cc",
+      "/b/libde265/libde265/vps.cc",
+      "/b/libde265/libde265/vui.cc"
+    ],
+    "link_libs": [],
+    "cflags": [
+      "-DHAVE_CONFIG_H"
+    ],
+    "seed_dirs": [],
+    "language": "c"
+  },
+  "platforms": [
+    "linux-aarch64-glibc"
+  ],
+  "apis": {
+    "de265_decode": {
+      "symbol": "de265_decode",
+      "header": "de265.h",
+      "params": [
+        {
+          "name": "arg0",
+          "type": {
+            "name": "de265_decoder_context*",
+            "kind": "pointer",
+            "const": false
+          }
+        },
+        {
+          "name": "more",
+          "type": {
+            "name": "int*",
+            "kind": "pointer",
+            "const": false
+          }
+        }
+      ],
+      "returns": {
+        "name": "de265_error",
+        "kind": "scalar",
+        "const": false
+      },
+      "role": "consume",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [],
+        "transfers_ownership": [],
+        "requires_nonnull": [
+          "arg0"
+        ],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    },
+    "de265_flush_data": {
+      "symbol": "de265_flush_data",
+      "header": "de265.h",
+      "params": [
+        {
+          "name": "arg0",
+          "type": {
+            "name": "de265_decoder_context*",
+            "kind": "pointer",
+            "const": false
+          }
+        }
+      ],
+      "returns": {
+        "name": "de265_error",
+        "kind": "scalar",
+        "const": false
+      },
+      "role": "query",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [],
+        "transfers_ownership": [],
+        "requires_nonnull": [
+          "arg0"
+        ],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    },
+    "de265_free_decoder": {
+      "symbol": "de265_free_decoder",
+      "header": "de265.h",
+      "params": [
+        {
+          "name": "arg0",
+          "type": {
+            "name": "de265_decoder_context*",
+            "kind": "pointer",
+            "const": false
+          }
+        }
+      ],
+      "returns": {
+        "name": "de265_error",
+        "kind": "scalar",
+        "const": false
+      },
+      "role": "destroy",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [],
+        "transfers_ownership": [],
+        "requires_nonnull": [],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    },
+    "de265_new_decoder": {
+      "symbol": "de265_new_decoder",
+      "header": "de265.h",
+      "params": [],
+      "returns": {
+        "name": "de265_decoder_context*",
+        "kind": "pointer",
+        "const": false
+      },
+      "role": "create",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [],
+        "transfers_ownership": [],
+        "requires_nonnull": [],
+        "error_return": "null",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    },
+    "de265_push_data": {
+      "symbol": "de265_push_data",
+      "header": "de265.h",
+      "params": [
+        {
+          "name": "arg0",
+          "type": {
+            "name": "de265_decoder_context*",
+            "kind": "pointer",
+            "const": false
+          }
+        },
+        {
+          "name": "data",
+          "type": {
+            "name": "const void*",
+            "kind": "pointer",
+            "const": true
+          }
+        },
+        {
+          "name": "length",
+          "type": {
+            "name": "int",
+            "kind": "scalar",
+            "const": false
+          }
+        },
+        {
+          "name": "pts",
+          "type": {
+            "name": "de265_PTS",
+            "kind": "scalar",
+            "const": false
+          }
+        },
+        {
+          "name": "user_data",
+          "type": {
+            "name": "void*",
+            "kind": "pointer",
+            "const": false
+          }
+        }
+      ],
+      "returns": {
+        "name": "de265_error",
+        "kind": "scalar",
+        "const": false
+      },
+      "role": "consume",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [
+          [
+            "data",
+            "length"
+          ]
+        ],
+        "transfers_ownership": [],
+        "requires_nonnull": [
+          "arg0"
+        ],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    }
+  },
+  "slices": [
+    {
+      "id": "data",
+      "kind": "bytes",
+      "remainder": true,
+      "min_len": 1,
+      "max_len": 0
+    }
+  ],
+  "resources": [
+    {
+      "id": "h",
+      "type": {
+        "name": "de265_decoder_context*",
+        "kind": "pointer",
+        "const": false
+      },
+      "storage": "handle"
+    }
+  ],
+  "scratch": [],
+  "sequence": [
+    {
+      "id": "o_create",
+      "api": "de265_new_decoder",
+      "args": [],
+      "binds": "h",
+      "targets": "",
+      "repeat": 0,
+      "guarded_by": []
+    },
+    {
+      "id": "o_consume",
+      "api": "de265_push_data",
+      "args": [
+        {
+          "param": "arg0",
+          "source": "resource",
+          "ref": "h",
+          "value": null
+        },
+        {
+          "param": "data",
+          "source": "input",
+          "ref": "data",
+          "value": null
+        },
+        {
+          "param": "length",
+          "source": "length_of",
+          "ref": "data",
+          "value": null
+        },
+        {
+          "param": "pts",
+          "source": "literal",
+          "ref": "",
+          "value": 0
+        },
+        {
+          "param": "user_data",
+          "source": "literal",
+          "ref": "",
+          "value": 0
+        }
+      ],
+      "binds": "",
+      "targets": "",
+      "repeat": 0,
+      "guarded_by": [
+        "h"
+      ]
+    },
+    {
+      "id": "o_finish",
+      "api": "de265_flush_data",
+      "args": [
+        {
+          "param": "arg0",
+          "source": "resource",
+          "ref": "h",
+          "value": null
+        }
+      ],
+      "binds": "",
+      "targets": "",
+      "repeat": 0,
+      "guarded_by": [
+        "h"
+      ]
+    },
+    {
+      "id": "o_drive",
+      "api": "de265_decode",
+      "args": [
+        {
+          "param": "arg0",
+          "source": "resource",
+          "ref": "h",
+          "value": null
+        },
+        {
+          "param": "more",
+          "source": "out",
+          "ref": "",
+          "value": null
+        }
+      ],
+      "binds": "",
+      "targets": "",
+      "repeat": 0,
+      "guarded_by": [
+        "h"
+      ]
+    },
+    {
+      "id": "o_destroy",
+      "api": "de265_free_decoder",
+      "args": [
+        {
+          "param": "arg0",
+          "source": "resource",
+          "ref": "h",
+          "value": null
+        }
+      ],
+      "binds": "",
+      "targets": "h",
+      "repeat": 0,
+      "guarded_by": []
+    }
+  ],
+  "knobs": {
+    "max_len": 65536,
+    "min_len": 0,
+    "timeout_s": 25,
+    "rss_limit_mb": 2048,
+    "malloc_limit_mb": 0,
+    "sanitizers": [
+      "address"
+    ],
+    "detect_leaks": false,
+    "optimisation": "-O1"
+  },
+  "format_model": null,
+  "raw_blocks": []
+}

@@ -599,7 +599,33 @@ PHASES: tuple = (
                          "IR cannot express: a caller-allocated SCRATCH OUTPUT buffer with "
                          "an in/out size. Recorded as a gap rather than rushed."),
         Deliverable("P3.ERROR_ACCESSOR",
-                    "error accessors are finishers on the FAILURE branch", PLANNED,
+                    "the harness asks the library why it failed, and frees the answer", DONE,
+                    modules=("hforge.producers.header_graph",),
+                    tests=("test_the_harness_asks_the_library_why_it_failed",
+                           "test_the_error_string_is_freed_by_its_own_pair",
+                           "test_an_error_accessor_with_no_freer_is_not_called_at_all",
+                           "test_a_verbose_flag_is_not_bound_to_the_input_length"),
+                    note="v1 SHIPPED. The plan for yajl now runs alloc -> parse -> "
+                         "complete_parse -> get_error(h, 1, data, len) -> free_error -> "
+                         "free, all static gates pass, and the emitted C guards the release "
+                         "on both the handle and the string. NOT gated on failure, "
+                         "deliberately: that needs a new Op field AND a rule for what counts "
+                         "as non-OK, and the convention is library-specific (yajl_status_ok "
+                         "is 0), so assuming 'non-zero is failure' would be inventing a "
+                         "contract. Calling the accessor after a SUCCESSFUL parse is legal "
+                         "and still reaches the renderer. The freer is MANDATORY: with no "
+                         "matching release the accessor is left out entirely, because half "
+                         "the pair leaks on every input and LeakSanitizer would then report "
+                         "the harness's own defect as a finding. One bug found by reading "
+                         "the emitted output rather than trusting it: `int verbose` was "
+                         "bound to length_of(jsonText), because a scalar beside a buffer "
+                         "looks like a length until you use the DECLARED "
+                         "contract.length_delimited pairing instead of the type. Whether "
+                         "this moves 65.12 toward gold's 69.1 is unmeasured as of this "
+                         "entry — the claim here is that the harness is right, not that the "
+                         "number moved."),
+        Deliverable("P3.ERROR_ACCESSOR_GATED",
+                    "run the error accessor only on the failure branch", PLANNED,
                     note="found by measurement, not by reading a header. yajl is the one "
                          "run-009 case behind gold (65.12 vs 69.1, 0.94x), and the deficit "
                          "is almost entirely one file: yajl.c at 45.26% while the lexer is "

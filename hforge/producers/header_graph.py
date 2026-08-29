@@ -1427,6 +1427,119 @@ def _finisher_for(handle, cons, apis: dict, pm: dict, used: set):
     return best
 
 
+_ERROR_ACCESSOR_ISH = re.compile(
+    r"(?:_|(?<=[a-z]))(get_error|last_error|error_string|errorstring|geterror|"
+    r"lasterror|strerror|error_message|errmsg)\w*$", re.I)
+_ERROR_FREE_ISH = re.compile(
+    r"(?:_|(?<=[a-z]))(free_error|error_free|free_errmsg|release_error)\w*$", re.I)
+
+
+def _error_accessor_for(handle, cons, apis: dict, pm: dict, used: set, slice_id: str):
+    """The accessor that renders WHY the last call failed, and the call that frees it.
+
+    MEASURED, not guessed. yajl is the one case in run-009 behind gold — 65.12 against
+    69.1 — and the deficit is almost entirely one file: yajl.c at 45.26% while the lexer
+    sits at 77%. The uncovered functions are `yajl_render_error_string` (72 lines),
+    `yajl_status_to_string`, `yajl_get_bytes_consumed` and `yajl_get_error` itself. Roughly
+    a hundred lines that are reachable ONLY when the caller asks why a parse failed.
+
+    A fuzzer drives the failure path constantly. The harness simply never asks.
+
+    The emitted lifecycle — alloc, parse, complete, free — is CORRECT, and every gate passes
+    on it. The coverage it misses is coverage no correct lifecycle reaches, which is why no
+    amount of campaign time closed the gap.
+
+    THE PAIRING IS NOT OPTIONAL. `yajl_get_error` returns owned memory and `yajl_free_error`
+    releases it. Without the free, the harness leaks on every failing input, and under
+    LeakSanitizer every finding would be the harness's own — exactly what S1 exists to
+    block. So this returns BOTH calls or neither.
+
+    NOT GATED ON FAILURE, deliberately. Running the accessor only when the target reports an
+    error would need a new Op field and a rule for what counts as non-OK — and that
+    convention is library-specific (`yajl_status_ok` is 0). Assuming "non-zero is failure"
+    would be inventing a contract rather than reading one, which is the thing this engine
+    refuses to do. Calling the accessor after a SUCCESSFUL parse is legal and still reaches
+    the renderer, so the unconditional form costs nothing and assumes nothing.
+
+    Returns (accessor, accessor_args, freer, freer_args) or None.
+    """
+    if not handle:
+        return None
+    hk = hkey(handle, pm)
+
+    def _binds(a):
+        """Every parameter but the handle must come from something the plan ALREADY has.
+
+        No inventing values. The input slice and its length are already bound at the
+        consuming call; a plain scalar gets 1, which for a `verbose` flag selects the
+        longer message and therefore more of the renderer. A parameter that is neither is
+        a parameter we would have to guess, and the candidate is dropped instead.
+        """
+        # The (ptr,len) pairing comes from the DECLARED contract, not from the type.
+        # Binding by "is it an integer" put `int verbose` on the length of the input slice,
+        # because a scalar next to a buffer looks like a length until you read which
+        # parameter the contract actually pairs.
+        lens = {ln: buf for buf, ln in a.contract.length_delimited}
+        out, seen_handle = [], False
+        for pd in a.params:
+            if not seen_handle and hkey(pd.type.name, pm) == hk:
+                out.append(Arg(pd.name, "resource", "h"))
+                seen_handle = True
+            elif slice_id and pd.name in lens:
+                out.append(Arg(pd.name, "length_of", slice_id))
+            elif slice_id and _byte_carrying(pd) and not _path_like(pd.name):
+                out.append(Arg(pd.name, "input", slice_id))
+            elif pd.type.kind != "pointer":
+                # A plain scalar gets 1. For the `verbose` flag every one of these
+                # accessors carries, that selects the LONGER message and therefore more of
+                # the renderer — which is the code this whole call exists to reach.
+                out.append(Arg(pd.name, "literal", value=1))
+            else:
+                return None
+        return out if seen_handle else None
+
+    best = None
+    for a in apis.values():
+        if a.symbol == cons.symbol or a.symbol in used or a.role == ROLE_DESTROY:
+            continue
+        if not _ERROR_ACCESSOR_ISH.search(a.symbol):
+            continue
+        if a.returns.kind != "pointer" or a.returns.name.strip() in ("void", ""):
+            continue
+        args = _binds(a)
+        if args is None:
+            continue
+        if best is None or a.symbol < best[0].symbol:
+            best = (a, args)
+    if best is None:
+        return None
+    acc, acc_args = best
+
+    # The freer. It must take the handle and the accessor's return type, and it must be
+    # named as a release of an error. Without it there is no plan: see the docstring.
+    rk = hkey(acc.returns.name, pm)
+    for f in apis.values():
+        if f.symbol in (acc.symbol, cons.symbol) or f.symbol in used:
+            continue
+        if not _ERROR_FREE_ISH.search(f.symbol):
+            continue
+        if not any(hkey(q.type.name, pm) == rk for q in f.params):
+            continue
+        fargs, ok = [], False
+        for pd in f.params:
+            if hkey(pd.type.name, pm) == hk and not ok:
+                fargs.append(Arg(pd.name, "resource", "h"))
+            elif hkey(pd.type.name, pm) == rk and not ok:
+                fargs.append(Arg(pd.name, "resource", "err"))
+                ok = True
+            else:
+                fargs = None
+                break
+        if fargs and ok:
+            return acc, acc_args, f, fargs
+    return None
+
+
 def _producer_of(base: str, apis: dict, pm: dict):
     """What creates a resource of this type, and how.
 
@@ -1969,6 +2082,22 @@ def _plans_for_handle(decls, target, handle, inline_base, init_name, fini_name,
                           [Arg(fin.params[0].name, "resource", "h")],
                           guarded_by=["h"] if (create and handle) else []))
             used.add(fin.symbol)
+
+        # ASK THE LIBRARY WHY IT FAILED. See `_error_accessor_for`: for yajl this is about a
+        # hundred lines that a correct lifecycle cannot otherwise reach, and the pairing
+        # with the freer is mandatory or the harness leaks on every failing input.
+        _in_slice = next((sl.id for sl in slices), "")
+        err = _error_accessor_for(handle, cons, apis, pm, used, _in_slice)
+        if err is not None:
+            acc, acc_args, freer, freer_args = err
+            resources.append(Resource("err", TypeRef(hkey(acc.returns.name, pm), "pointer"),
+                                      storage="handle"))
+            seq.append(Op("o_error", acc.symbol, acc_args, binds="err",
+                          guarded_by=["h"] if (create and handle) else []))
+            seq.append(Op("o_error_free", freer.symbol, freer_args, targets="err",
+                          guarded_by=(["h", "err"] if (create and handle) else ["err"])))
+            used.add(acc.symbol)
+            used.add(freer.symbol)
         for rid, d in extra_drop:
             # Without this the target fills a structure every iteration and nothing frees
             # it: LeakSanitizer then reports a finding on EVERY input, which is the libcue

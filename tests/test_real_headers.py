@@ -1351,3 +1351,77 @@ def test_a_reuse_verb_is_still_used_when_a_library_offers_nothing_else():
     assert any(o.api == "ctx_reset" and o.targets
                for p in consuming for o in p.sequence), (
         "with no alternative, the reuse verb should still be chosen")
+
+
+YAJL_ERR = """
+typedef struct yajl_handle_t * yajl_handle;
+typedef struct { int dummy; } yajl_callbacks;
+typedef int yajl_status;
+yajl_handle yajl_alloc(const yajl_callbacks *callbacks, void *afs, void *ctx);
+yajl_status yajl_parse(yajl_handle hand, const unsigned char *jsonText, size_t jsonTextLen);
+yajl_status yajl_complete_parse(yajl_handle hand);
+unsigned char * yajl_get_error(yajl_handle hand, int verbose, const unsigned char *jsonText, size_t jsonTextLen);
+void yajl_free_error(yajl_handle hand, unsigned char * str);
+void yajl_free(yajl_handle handle);
+"""
+
+
+def _yajl_plan(src=YAJL_ERR, api="yajl_parse"):
+    return next((p for p in _plans_for(src)
+                 if any(o.api == api for o in p.sequence)), None)
+
+
+def test_the_harness_asks_the_library_why_it_failed():
+    """Roughly a hundred lines of yajl are reachable only through this call.
+
+    MEASURED in run-009: yajl is the one case behind gold, 65.12 against 69.1, and the
+    deficit is almost entirely yajl.c at 45.26% while the lexer sits at 77%. The uncovered
+    functions are yajl_render_error_string (72 lines), yajl_status_to_string,
+    yajl_get_bytes_consumed and yajl_get_error itself — all of them behind "the caller
+    asked what went wrong". A fuzzer drives the failure path constantly and the harness
+    never asked.
+    """
+    p = _yajl_plan()
+    assert p is not None, "no plan drives yajl_parse"
+    acc = [o for o in p.sequence if o.api == "yajl_get_error"]
+    assert acc, f"error accessor never called: {[o.api for o in p.sequence]}"
+    assert acc[0].binds, "the returned string is owned and must bind a resource"
+
+
+def test_the_error_string_is_freed_by_its_own_pair():
+    """yajl_get_error returns OWNED memory. Without yajl_free_error the harness leaks on
+    every failing input, and under LeakSanitizer every finding is the harness's own —
+    which is exactly what S1 exists to block."""
+    p = _yajl_plan()
+    acc = next(o for o in p.sequence if o.api == "yajl_get_error")
+    freed = [o for o in p.sequence if o.targets == acc.binds]
+    assert freed, f"{acc.binds!r} is bound and never released"
+    assert freed[0].api == "yajl_free_error", f"released by {freed[0].api!r}"
+    assert p.sequence.index(freed[0]) > p.sequence.index(acc), "freed before it is acquired"
+
+
+def test_an_error_accessor_with_no_freer_is_not_called_at_all():
+    """Half the pair is worse than neither half.
+
+    Calling an owned-return accessor without its release is a leak on every input. When a
+    library offers no matching freer the accessor must be left out, not called anyway.
+    """
+    src = YAJL_ERR.replace("void yajl_free_error(yajl_handle hand, unsigned char * str);", "")
+    p = _yajl_plan(src)
+    assert p is not None
+    assert not [o for o in p.sequence if o.api == "yajl_get_error"], (
+        "accessor called with nothing to free its result: every input leaks")
+
+
+def test_a_verbose_flag_is_not_bound_to_the_input_length():
+    """A scalar beside a buffer looks like a length until you read the contract.
+
+    Binding by 'is this an integer' put `int verbose` on length_of(jsonText). It is a
+    flag, and the pairing that matters is the one the DECLARED contract records.
+    """
+    p = _yajl_plan()
+    acc = next(o for o in p.sequence if o.api == "yajl_get_error")
+    by = {a.param: a for a in acc.args}
+    assert by["verbose"].source == "literal", (
+        f"verbose bound as {by['verbose'].source!r}, not a literal")
+    assert by["jsonTextLen"].source == "length_of", "the real length lost its binding"

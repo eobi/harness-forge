@@ -1,0 +1,40 @@
+clang: warning: treating 'c' input as 'c++' when in C++ mode, this behavior is deprecated [-Wdeprecated]
+/b/libde265/libde265/deblock.cc:594:14: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+          if constexpr (sizeof(pixel_t)==1) {
+             ^
+/b/libde265/libde265/deblock.cc:735:16: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+            if constexpr (sizeof(pixel_t)==1) {
+               ^
+/b/libde265/libde265/deblock.cc:751:16: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+            if constexpr (sizeof(pixel_t)==1) {
+               ^
+3 warnings generated.
+/usr/bin/ld: /tmp/en265-154748.o: in function `en265_new_encoder':
+/b/libde265/libde265/en265.cc:34: undefined reference to `encoder_context::encoder_context()'
+/usr/bin/ld: /tmp/en265-154748.o: in function `en265_parse_command_line_parameters':
+/b/libde265/libde265/en265.cc:75: undefined reference to `config_parameters::parse_command_line_params(int*, char**, int*, bool)'
+/usr/bin/ld: /tmp/en265-154748.o: in function `en265_show_parameters':
+/b/libde265/libde265/en265.cc:90: undefined reference to `config_parameters::print_params() const'
+/usr/bin/ld: /tmp/en265-154748.o: in function `en265_list_parameters':
+/b/libde265/libde265/en265.cc:99: undefined reference to `config_parameters::get_parameter_string_table() const'
+/usr/bin/ld: /tmp/en265-154748.o: in function `en265_get_parameter_type':
+/b/libde265/libde265/en265.cc:109: undefined reference to `config_parameters::get_parameter_type(char const*) const'
+/usr/bin/ld: /tmp/en265-154748.o: in function `en265_set_parameter_bool':
+/b/libde265/libde265/en265.cc:119: undefined reference to `config_parameters::set_bool(char const*, bool)'
+/usr/bin/ld: /tmp/en265-154748.o: in function `en265_set_parameter_int':
+/b/libde265/libde265/en265.cc:129: undefined reference to `config_parameters::set_int(char const*, int)'
+/usr/bin/ld: /tmp/en265-154748.o: in function `en265_set_parameter_string':
+/b/libde265/libde265/en265.cc:138: undefined reference to `config_parameters::set_string(char const*, char const*)'
+/usr/bin/ld: /tmp/en265-154748.o: in function `en265_set_parameter_choice':
+/b/libde265/libde265/en265.cc:147: undefined reference to `config_parameters::set_choice(char const*, char const*)'
+/usr/bin/ld: /tmp/en265-154748.o: in function `en265_list_parameter_choices':
+/b/libde265/libde265/en265.cc:157: undefined reference to `config_parameters::get_parameter_choices_table(char const*) const'
+/usr/bin/ld: /tmp/en265-154748.o: in function `en265_start_encoder':
+/b/libde265/libde265/en265.cc:170: undefined reference to `encoder_context::start_encoder()'
+/usr/bin/ld: /tmp/en265-154748.o: in function `en265_encode':
+/b/libde265/libde265/en265.cc:263: undefined reference to `encoder_picture_buffer::have_more_frames_to_encode() const'
+/usr/bin/ld: /b/libde265/libde265/en265.cc:265: undefined reference to `encoder_context::encode_picture_from_input_buffer()'
+/usr/bin/ld: /tmp/en265-154748.o: in function `en265_free_packet':
+/b/libde265/libde265/encoder/encoder-context.h:169: undefined reference to `encoder_picture_buffer::mark_image_is_outputted(int)'
+/usr/bin/ld: /b/libde265/libde265/encoder/encoder-context.h:167: undefined reference to `encoder_picture_buffer::release_input_image(int)'
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
