@@ -404,6 +404,14 @@ def _emit_ops(ir: HarnessIR) -> tuple[list[str], list[str]]:
                 body.append(f"{indent}{_res_ok(op.binds)} = (int)({call});")
         elif op.binds:
             body.append(f"{indent}{_res_var(op.binds)} = {call};")
+        elif op.repeat and op.repeat_while:
+            # The library SAYS when it is finished, through an out-parameter it writes.
+            # Nothing is assumed about what its return value means — which is the whole
+            # point, because DE265_OK is 0 and the result-based rule below would stop after
+            # the first SUCCESSFUL call.
+            sink_used = True
+            body.append(f"{indent}{P}sink += (long)({call});")
+            body.append(f"{indent}if (!{P}out_{op.id}_{op.repeat_while}) break;")
         elif op.repeat and api.returns.kind != "void" and api.returns.name != "void":
             # The call's own result is the termination condition: stop when the library
             # stops making progress. Anything else needs library-specific knowledge the

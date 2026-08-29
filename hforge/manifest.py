@@ -886,6 +886,46 @@ PHASES: tuple = (
                          "incompatible-pointer-types, implicit-function-declaration) and "
                          "attribute the failure to the PLAN, not to the target. A warning "
                          "about generated code is evidence about the generator."),
+        Deliverable("P3.VOID_TYPEDEF_HANDLE",
+                    "a typedef to void is an opaque handle, not a byte buffer", DONE,
+                    modules=("hforge.producers.header_graph",),
+                    tests=("test_a_typedef_to_void_is_an_opaque_handle_not_a_byte_buffer",),
+                    note="A REGRESSION I INTRODUCED TODAY, and the worst kind this engine "
+                         "can produce. `typedef void de265_decoder_context;` is the opaque "
+                         "handle idiom — libcurl spells it `typedef void CURL;`. Byte-alias "
+                         "resolution keeps aliases bottoming out in BYTE_BASES and `void` is "
+                         "in that list for the sake of `const void *data` buffers, so the "
+                         "handle resolved to void and lost its identity. _returned_handles "
+                         "then found nothing, _free_function_plans stopped skipping "
+                         "de265_push_data because its first parameter no longer looked like "
+                         "a handle, and the stream binder bound a SCRATCH BUFFER cast to "
+                         "`de265_decoder_context *` as the decoder. EVERY STATIC GATE PASSED "
+                         "AND THE EMITTED C COMPILED: a type-confused harness carrying a "
+                         "clean certificate. It was caught only because libde265 had a known "
+                         "good plan to compare against — which is the argument for keeping "
+                         "measured baselines rather than trusting a green suite. Same "
+                         "principle as P3.NOMINAL, broken hours after that fix by the alias "
+                         "resolution added for leptonica."),
+        Deliverable("P3.DRIVE_LOOP",
+                    "loop a drive call on the continuation flag the library writes", DONE,
+                    modules=("hforge.ir", "hforge.emit.c_libfuzzer",
+                             "hforge.producers.header_graph"),
+                    tests=("test_a_driver_loops_on_the_flag_the_library_writes",),
+                    note="`de265_error de265_decode(de265_decoder_context*, int* more)` sets "
+                         "`more` to 0 when the decoder is finished. Calling it ONCE left NAL "
+                         "units queued that de265_free_decoder does not release, so D3 "
+                         "refused the plan for leaking on valid input — the missing pump did "
+                         "not merely cost coverage, IT CAUSED THE LEAK. The existing loop "
+                         "exit cannot serve: it stops when the call's own result is falsy, "
+                         "which encodes 'non-zero means progress', true for yaml_parser_scan "
+                         "and backwards here because DE265_OK is 0. Op.repeat_while names an "
+                         "out-parameter instead, so the LIBRARY says when it is done and "
+                         "nothing is assumed about its return convention. Only POSITIVELY "
+                         "named flags are honoured — more, again, has_more, pending — "
+                         "because `done` and `eof` mean the opposite and inverting on a name "
+                         "is a guess. Still bounded by max_len: an unbounded loop steered by "
+                         "fuzzer input is a hang, and a hang is indistinguishable from a "
+                         "finding until a human looks."),
         Deliverable("P3.OUT_SLOT_DESTRUCTOR",
                     "a callee-filled struct is freed when the library offers a free",
                     DONE,
@@ -1057,8 +1097,14 @@ PHASES: tuple = (
                          "flag. Pair it with a drain loop for the output accessor."),
         Deliverable("P3.LOOP_TERMINATION",
                     "the repeat loop's exit condition assumes non-zero means progress",
-                    PLANNED,
-                    note="READ THE EMITTER, do not trust its comment. c_libfuzzer emits "
+                    PARTIAL,
+                    note="P3.DRIVE_LOOP now gives an op the option of exiting on a "
+                         "continuation flag the library writes, which sidesteps the "
+                         "convention entirely for drive calls. The result-based rule below "
+                         "still governs every other repeat op and both criticisms of it "
+                         "stand: `sink` accumulates so the test is on the running total, and "
+                         "non-zero-means-progress is backwards wherever OK is zero. "
+                         "ORIGINAL FINDING: READ THE EMITTER, do not trust its comment. c_libfuzzer emits "
                          "`sink += (long)(call); if (!sink) break;` and the comment says "
                          "'stop when the library stops making progress'. Two things are "
                          "wrong with that. (1) `sink` ACCUMULATES, so the test is not on "

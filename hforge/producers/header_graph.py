@@ -268,6 +268,19 @@ def _is_ptr(ty: str, ptr_types: frozenset = frozenset()) -> bool:
 
 
 # `int (*cb)(void *, int)` and `void (*)(void *)` — a parameter that is a function pointer.
+# A CONTINUATION FLAG THE CALLEE WRITES, and only one whose polarity is unambiguous.
+#
+# `de265_error de265_decode(de265_decoder_context*, int* more)` sets `more` to 0 when the
+# decoder has nothing left. Looping on it is the difference between one step of a
+# multi-frame pipeline and the whole stream — and, for libde265, between a plan D3 refuses
+# for leaking queued NAL units and one that does not.
+#
+# POSITIVE NAMES ONLY. `done` and `eof` mean the opposite, and a wrong polarity is either an
+# instant exit or a loop that runs to its bound doing nothing. Inverting on a name is a
+# guess; refusing to guess costs one loop and no correctness.
+_CONTINUE_FLAG = re.compile(r"^(more|again|has_more|more_data|pending|continue|"
+                            r"has_next|remaining)$", re.I)
+
 _IS_FUNC_PTR = re.compile(r"\(\s*\*")
 
 # The pointee recorded for a function-pointer typedef. It deliberately matches no handle.
@@ -1341,7 +1354,21 @@ def _scalar_typedefs(stmts: list) -> dict:
         seen, cur = 0, under
         while cur in raw and seen < 8:
             cur, seen = raw[cur], seen + 1
-        if cur in BYTE_BASES:
+        # NEVER `void`, even though `void` is in BYTE_BASES for the sake of
+        # `const void *data` buffers.
+        #
+        # `typedef void de265_decoder_context;` is the OPAQUE HANDLE idiom — libcurl spells
+        # it `typedef void CURL;` — and resolving it stripped the handle's identity. The
+        # returned-handle scan then found nothing, _free_function_plans stopped skipping
+        # de265_push_data because its first parameter no longer looked like a handle, and
+        # the stream binder bound a SCRATCH BUFFER cast to de265_decoder_context* as the
+        # decoder. Every static gate passed and the emitted C compiled: a type-confused
+        # harness with a clean certificate, which is the worst outcome this engine can
+        # produce.
+        #
+        # This is P3.NOMINAL again — a void typedef is nominal, not structural — broken by
+        # my own alias resolution hours after it was fixed.
+        if cur in BYTE_BASES and cur != "void":
             out[alias] = cur
     return out
 
@@ -2510,7 +2537,19 @@ def _plans_for_handle(decls, target, handle, inline_base, init_name, fini_name,
                         # off six static gates, with every dynamic gate reading NOT_RUN
                         # "the binary was not built".
                         dargs.append(Arg(pd.name, "literal", value=0))
-                seq.append(Op("o_drive", driver.symbol, dargs, guarded_by=["h"]))
+                # PUMP THE DRIVER WHEN IT TELLS US THERE IS MORE.
+                #
+                # Bounded by max_len for the same reason every other loop here is: an
+                # unbounded loop steered by fuzzer input is a hang, and a hang is
+                # indistinguishable from a finding until a human looks. The flag only
+                # shortens it.
+                _flag = next((a.param for a in dargs
+                              if a.source == "out" and _CONTINUE_FLAG.match(a.param or "")),
+                             "")
+                seq.append(Op("o_drive", driver.symbol, dargs, guarded_by=["h"],
+                              repeat=((knobs.max_len if knobs and knobs.max_len else 4096)
+                                      if _flag else 0),
+                              repeat_while=_flag))
                 used.add(driver.symbol)
 
         # A consumer that RETURNS an owned object must destroy it.

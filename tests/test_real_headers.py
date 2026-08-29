@@ -1803,3 +1803,62 @@ def test_a_callee_filled_struct_is_freed_when_the_library_offers_a_free():
     assert "png_image_free(&" in src, "the struct was not passed by address"
     assert "hf_r_out_image = NULL" not in src, (
         "a caller-allocated struct was assigned NULL, which does not compile")
+
+
+def test_a_typedef_to_void_is_an_opaque_handle_not_a_byte_buffer():
+    """`typedef void de265_decoder_context;` is the opaque handle idiom.
+
+    libcurl spells it `typedef void CURL;`. Byte-alias resolution keeps aliases that bottom
+    out in BYTE_BASES, and `void` is in that list for the sake of `const void *data`
+    buffers — so the handle resolved to void, lost its identity, stopped being found as a
+    returned handle, and the stream binder bound a SCRATCH BUFFER cast to
+    `de265_decoder_context *` as the decoder.
+
+    Every static gate passed and the emitted C compiled: a type-confused harness with a
+    clean certificate, which is the worst outcome this engine can produce. Same principle
+    as P3.NOMINAL, broken by the alias resolution added hours after it.
+    """
+    src = """
+        typedef void de265_decoder_context;
+        typedef int de265_error;
+        de265_decoder_context* de265_new_decoder(void);
+        de265_error de265_push_data(de265_decoder_context*, const void* data, int length);
+        de265_error de265_decode(de265_decoder_context*, int* more);
+        de265_error de265_free_decoder(de265_decoder_context*);
+    """
+    plans = _plans_for(src)
+    assert hg.base_type("de265_decoder_context *") == "de265_decoder_context", (
+        "an opaque void typedef was resolved away and the handle lost its identity")
+    hit = [p for p in plans if any(o.api == "de265_push_data" for o in p.sequence)]
+    assert hit, "no plan drives the entry point"
+    seq = [o.api for o in hit[0].sequence]
+    assert "de265_new_decoder" in seq and "de265_free_decoder" in seq, (
+        f"the lifecycle collapsed to a free function: {seq}")
+
+
+def test_a_driver_loops_on_the_flag_the_library_writes():
+    """`de265_decode(ctx, int *more)` sets `more` to 0 when the decoder is finished.
+
+    Calling it once left NAL units queued that de265_free_decoder does not release, so D3
+    refused the plan for leaking on valid input — the missing pump did not merely cost
+    coverage, it caused the leak.
+
+    The loop cannot use the call's own result: the existing rule stops when the result is
+    falsy, and DE265_OK is 0, so it would exit after the first SUCCESSFUL call. Only a
+    POSITIVELY named flag is honoured — `done` and `eof` mean the opposite and inverting on
+    a name is a guess.
+    """
+    plans = _plans_for("""
+        typedef void de265_decoder_context;
+        typedef int de265_error;
+        de265_decoder_context* de265_new_decoder(void);
+        de265_error de265_push_data(de265_decoder_context*, const void* data, int length);
+        de265_error de265_decode(de265_decoder_context*, int* more);
+        de265_error de265_free_decoder(de265_decoder_context*);
+    """)
+    p = next(x for x in plans if any(o.api == "de265_decode" for o in x.sequence))
+    drive = next(o for o in p.sequence if o.api == "de265_decode")
+    assert drive.repeat > 0, "the driver is called once and the queue is never drained"
+    assert drive.repeat_while == "more", (
+        f"loop exit is {drive.repeat_while!r}; the call's own result cannot be used because "
+        f"DE265_OK is 0")

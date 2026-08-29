@@ -240,12 +240,21 @@ class Op:
     # BOUNDED, always. An unbounded loop driven by fuzzer input is a hang, and a hang is
     # indistinguishable from a finding until a human looks.
     repeat: int = 0
+    # The out-parameter whose value decides whether to go round again, by PARAMETER NAME.
+    #
+    # `de265_error de265_decode(de265_decoder_context*, int* more)` sets `more` to 0 when
+    # the decoder is finished. The existing loop exit — stop when the call's own result is
+    # falsy — encodes "non-zero means progress", which holds for yaml_parser_scan and is
+    # BACKWARDS here, because DE265_OK is 0. Calling decode once left NAL units queued that
+    # de265_free_decoder does not release, so D3 refused the plan for leaking on valid
+    # input: the missing pump did not merely cost coverage, it caused the leak.
+    repeat_while: str = ""
     guarded_by: list[str] = field(default_factory=list)  # resource ids checked non-null first
 
     def to_json(self) -> dict:
         return {"id": self.id, "api": self.api, "args": [a.to_json() for a in self.args],
                 "binds": self.binds, "targets": self.targets, "repeat": self.repeat,
-                "guarded_by": list(self.guarded_by)}
+                "repeat_while": self.repeat_while, "guarded_by": list(self.guarded_by)}
 
     @staticmethod
     def from_json(d: dict) -> "Op":
@@ -253,6 +262,7 @@ class Op:
                   args=[Arg.from_json(a) for a in d.get("args", [])],
                   binds=d.get("binds", ""), targets=d.get("targets", ""),
                   repeat=int(d.get("repeat", 0)),
+                  repeat_while=d.get("repeat_while", ""),
                   guarded_by=list(d.get("guarded_by", [])))
 
 
