@@ -13,7 +13,37 @@ A producer proposes a plan; the gates certify it; confidence decides nothing.
 
 ---
 
-## Working today: phases 1, 2, and half of 3
+## Where this stands
+
+<!-- PHASES:BEGIN -->
+
+| phase | | done | |
+|---|---|---|---|
+| `P1` | IR, static gates, C emitter | 6/6 | **done** |
+| `P2` | dynamic gates and positive control | 6/6 | **done** |
+| `P3` | producers: test-lift, LLM->IR, graph traversal | 28/33 | partial |
+| `PX` | cross-platform hardening: run the same way on every host | 5/5 | **done** |
+| `T0` | target choice, seeds and input size: the work that decides findings | 5/5 | **done** |
+| `TF` | findings: the half the engine was missing | 5/5 | **done** |
+| `M` | the model gets hands on the engine, never on the arbiter | 7/7 | **done** |
+| `L` | language coverage beyond C | 8/10 | partial |
+| `P4` | lift-and-grade third-party harnesses | 3/4 | partial |
+| `P5` | Windows and closed binary | 0/2 | planned |
+| `P6` | GUI track | 0/3 | planned |
+| `P7` | mobile: Android and iOS | 0/3 | partial |
+| `P8` | snapshot and scale | 0/2 | planned |
+| `P9` | exotic targets | 0/2 | planned |
+
+**73 of 93 deliverables done**, and `plancheck` refuses to let any of them say so without a module that imports and a test that exists.
+
+<!-- PHASES:END -->
+
+Regenerate with `python3 tools/phase_table.py --write`. It is generated because the heading
+here used to read "phases 1, 2, and half of 3" and stayed that way long after P3 reached 28
+of 33 and five other phases had finished — a hand-maintained status drifts in whichever
+direction flatters whoever touched it last, and this one drifted *downward*.
+
+The single check that makes the rest of this page worth reading:
 
 ```
 $ python3 -m hforge validate examples/hf_demo.broken.hir.json
@@ -106,7 +136,7 @@ flowchart LR
         A7["seed mining from the<br/>target's own test data"]
         A8["target-written dictionaries"]
         A9["findings gates F1–F8<br/>+ ladder rungs 0–6"]
-        A10["plancheck — 85 DONE claims,<br/>each backed by a test that runs"]
+        A10["plancheck — 73 DONE claims,<br/>each backed by a test that runs"]
     end
 
     subgraph PART["partly built"]
