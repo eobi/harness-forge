@@ -725,6 +725,58 @@ def main():
         f = tot[0].split()
         out["regions_pct"] = f[3].rstrip('%'); out["functions_pct"] = f[6].rstrip('%')
         out["lines_pct"] = f[9].rstrip('%'); out["branches_pct"] = f[12].rstrip('%')
+
+    # ── THE SAME CAMPAIGN, MEASURED THE WAY QUARTETFUZZ MEASURES ─────────────────
+    #
+    # Everything above is scoped to the files this entry point can actually reach, and the
+    # argument for that is in RANKING.md. It is not the scoping dataset_v2 uses. Theirs is
+    # every source file belonging to the project, taken from the build's own srcmap prefix,
+    # which for us is simply /b/<library>/. A harness that reads an ICC profile is then
+    # divided by the whole of Little-CMS, and the figure comes out far lower.
+    #
+    # Neither number is the honest one and the other a fudge. They answer different
+    # questions: ours asks how much of what this entry point CAN reach it did reach, theirs
+    # asks how much of the project it touched. What is not defensible is comparing a figure
+    # computed one way against a figure computed the other, and libyaml is the reason this
+    # block exists -- our five-file denominator came to 3,658 lines and dataset_v2's
+    # eight-file denominator also came to 3,658, so the two looked interchangeable. Our own
+    # measurement of those same eight files is 5,444. The totals agreed by coincidence.
+    #
+    # -summary-only is deliberate: the full export reached hundreds of MB on the larger
+    # targets and was OOM-killed, which is the same reason their report gives for using it.
+    try:
+        px = subprocess.run(["llvm-cov-14", "export", "-summary-only", str(binp),
+                             f"-instr-profile={wd}/run.profdata"],
+                            capture_output=True, text=True, timeout=600)
+        if px.returncode == 0 and px.stdout.strip():
+            cov_json = json.loads(px.stdout)
+            # The project prefix, from the paths the case itself names -- not from the case
+            # title, which does not always match the directory (iperf/cjson lives in cjson).
+            srcs = [x for x in (c.get("src") or []) if isinstance(x, str)]
+            srcs += [c["hdr"]] if isinstance(c.get("hdr"), str) else []
+            dirs = [x.split("/")[2] for x in srcs if x.startswith("/b/") and x.count("/") >= 3]
+            # /b/inc holds a copied header, not a project tree; it must not become the scope.
+            dirs = [d for d in dirs if d != "inc"]
+            prefix = f"/b/{max(set(dirs), key=dirs.count)}/" if dirs else None
+            if prefix:
+                lc = cv = nf = 0
+                for fentry in cov_json["data"][0]["files"]:
+                    if not fentry["filename"].startswith(prefix):
+                        continue
+                    nf += 1
+                    lc += fentry["summary"]["lines"]["count"]
+                    cv += fentry["summary"]["lines"]["covered"]
+                if lc:
+                    out["projectwide"] = {
+                        "scope": prefix, "files": nf, "lines_covered": cv,
+                        "lines_count": lc, "lines_pct": round(100.0 * cv / lc, 3),
+                        "method": "llvm-cov export -summary-only, summed over the project's "
+                                  "own sources -- dataset_v2's scoping, for comparison only",
+                    }
+    except Exception as ex:
+        # A missing second opinion is not a reason to discard a good first one.
+        out["projectwide_error"] = str(ex)[:200]
+
     out["result"] = "measured"
 
     # ── the gold harness, when the project ships one ──────────────────────────────

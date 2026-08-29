@@ -59,16 +59,19 @@ reads 48.74% over the wrong file set and 70.47% over the right one.
 | lcms2/cmsOpenProfileFromMem | **5.14** | — | — |  |  |
 | libde265/stream_decode | **14.57** | — | 14.80† | 0.98x |  |
 | jbig2dec/jbig2_data_in | *NOT MEASURED: campaign ended on out-of-memory, so no coverage was flushed; 0.00% would be a failed measurement reported as a real one* | — | — |  |  |
-| leptonica/pixReadMem | **17.24** | — | — |  |  |
+| leptonica/pixReadMem | **17.96** | — | — |  |  |
 | jansson/json_loadb | **18.98** | — | — |  |  |
 | libwebp/WebPDecodeRGBA | **50.33** | — | — |  |  |
 | libpng/png_image_begin_read_from_memory | **0.15** | — | — |  |  |
+| expat/XML_Parse | *NO PLAN for the gold target* | — | — |  |  |
+| zstd/ZSTD_decompress | **29.71** | — | — |  |  |
+| mbedtls/mbedtls_x509_crt_parse | *NO PLAN for the gold target* | — | — |  |  |
 
 † gold MEASURED by this repository from the project's own in-tree harness, not cited. Same machine, same compiler, same 600 s, same file list, and a fresh corpus from the same seeds — so the comparison differs in the harness and in nothing else.
 
 Measured cases with a gold baseline: **8**. Median ours/gold: **1.02x**. Ahead of the cited QuartetFuzz figure on **6 of the 7** cases it published one for.
 
-Sources: run-009, run-010, run-013, run-016, run-017, run-018, run-019, run-020, run-021, run-022.
+Sources: run-001-quartetfuzz-6case, run-005-partial, run-007-partial-4of7, run-009, run-010, run-011, run-012, run-013, run-014, run-015, run-016, run-017, run-018, run-019, run-020, run-021, run-022, run-023, run-024.
 
 <!-- TABLE:END -->
 
@@ -87,11 +90,16 @@ put a number in a column beside figures we measured.
 `iperf/cjson_fuzzer` is worth reading twice. The cited QuartetFuzz figure is **0.00** — it
 did not produce a working harness for that case at all.
 
-`lcms2/cmsOpenProfileFromMem` measured **5.14%** with 42.9 million executions, and it has no
-gold and no QuartetFuzz figure because **there is no public OSS-Fuzz harness for it**. It is Tier B of the native attack-surface map, and it is
-in the table precisely because it is the case a language model cannot have memorised. The
-claim there is that the harness is correct, not that the number is good — and 5.14% is not
-a good number. What it is worth is stated plainly: pointing the engine at lcms2 found five
+`lcms2/cmsOpenProfileFromMem` measured **5.14%** with 42.9 million executions, and has no
+gold or QuartetFuzz figure because **it is not in QuartetFuzz's evaluation set**. Earlier
+revisions of this file said instead that no public OSS-Fuzz harness existed for the entry
+point, and that it was a case a language model could not have memorised. Both statements
+were wrong and are withdrawn: OSS-Fuzz's lcms project ships `cms_md5_fuzzer`, which calls
+`cmsOpenProfileFromMem`. Per dataset_v2 that harness replays its official corpus to
+**5.107%** (871/17,056 lines, scoped to `/src/lcms/`). That is NOT comparable cell-to-cell
+with our 5.14% — different denominator, different protocol — but it does retire the reading
+that 5.14% is a bad number. Roughly 5% appears to be what one entry point reading an ICC
+profile reaches, for a hand-written harness as much as for this one. What it is worth is stated plainly: pointing the engine at lcms2 found five
 defects IN THE ENGINE that seven benchmark cases never exposed, and the number went from
 0.79% to 5.14% as those were fixed. The remaining gap is the engine's, not the target's:
 one entry point reading an ICC profile does not reach the tag-type handlers that hold most

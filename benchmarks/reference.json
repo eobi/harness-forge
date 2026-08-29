@@ -14,7 +14,7 @@
     "that survives comparison across libraries."
   ],
   "_source": "github.com/OwenSanzas/QuartetFuzz \u2014 published artifact, no LICENSE, not vendored",
-  "_protocol": "10 x 600s libFuzzer, empty corpus, ASan, per-case median (their protocol)",
+  "_protocol": "QuartetFuzz figures: 10 x 600s libFuzzer, empty corpus, ASan, per-case median (their protocol). GOLD figures in this file come from dataset/gold_baseline_100.jsonl, whose protocol the artifact does not document. Their newer dataset_v2 re-measures gold by REPLAYING each project's official OSS-Fuzz corpus (-merge=1, scoped to the project's own sources) and disagrees with the older file where the two overlap -- libyaml scanner 70.6 -> 53.2, loader 77.7 -> 78.2, zlib 53.1 -> 55.4. Our 600s from-scratch campaigns are therefore NOT protocol-matched to either gold column; see RANKING.md.",
   "cases": {
     "libyaml/libyaml_loader_fuzzer": {
       "quartetfuzz": 73.89,
@@ -34,7 +34,9 @@
     },
     "iperf/cjson_fuzzer": {
       "quartetfuzz": 0.0,
-      "gold": 24.5
+      "gold": 24.5,
+      "quartetfuzz_status": "no harness produced",
+      "note": "The 0.00 is not a low score. The artifact records success:false with an empty harness_code for this case, i.e. their pipeline emitted no harness at all. Rendering it as a number in a coverage column overstates what happened, so the table prints the status instead and leaves the ratio blank."
     },
     "zopfli/zopfli_deflate_fuzzer": {
       "quartetfuzz": 80.06,
@@ -47,7 +49,7 @@
     "lcms2/cmsOpenProfileFromMem": {
       "quartetfuzz": null,
       "gold": null,
-      "note": "UNFUZZED. Tier B of the native attack-surface map: no public OSS-Fuzz harness for this entry point, so there is no gold and no QuartetFuzz figure. That is the point of including it \u2014 it is the case a language model cannot have memorised."
+      "note": "NOT IN QUARTETFUZZ'S EVALUATION SET, which is why there is no gold or QuartetFuzz figure in this row. An earlier version of this file called the entry point UNFUZZED and said a language model could not have memorised it. Both claims were false and are withdrawn: OSS-Fuzz's lcms project ships cms_md5_fuzzer, which calls cmsOpenProfileFromMem directly. For context only, and NOT comparable cell-to-cell because the denominators differ, that harness replays its official corpus to 5.107% (871/17056 lines, scoped to /src/lcms/) per dataset_v2 -- close to the 5.14% measured here, which suggests roughly 5% is what one entry point reading an ICC profile reaches, rather than a defect in either harness."
     }
   },
   "_context": [

@@ -254,18 +254,51 @@ confirmed reports — on its own 100-case benchmark with its gold OSS-Fuzz basel
 | lcms2/cmsOpenProfileFromMem | **5.14** | — | — |  |  |
 | libde265/stream_decode | **14.57** | — | 14.80† | 0.98x |  |
 | jbig2dec/jbig2_data_in | *NOT MEASURED: campaign ended on out-of-memory, so no coverage was flushed; 0.00% would be a failed measurement reported as a real one* | — | — |  |  |
-| leptonica/pixReadMem | **17.24** | — | — |  |  |
+| leptonica/pixReadMem | **17.96** | — | — |  |  |
 | jansson/json_loadb | **18.98** | — | — |  |  |
 | libwebp/WebPDecodeRGBA | **50.33** | — | — |  |  |
 | libpng/png_image_begin_read_from_memory | **0.15** | — | — |  |  |
+| expat/XML_Parse | *NO PLAN for the gold target* | — | — |  |  |
+| zstd/ZSTD_decompress | **29.71** | — | — |  |  |
+| mbedtls/mbedtls_x509_crt_parse | *NO PLAN for the gold target* | — | — |  |  |
 
 † gold MEASURED by this repository from the project's own in-tree harness, not cited. Same machine, same compiler, same 600 s, same file list, and a fresh corpus from the same seeds — so the comparison differs in the harness and in nothing else.
 
 Measured cases with a gold baseline: **8**. Median ours/gold: **1.02x**. Ahead of the cited QuartetFuzz figure on **6 of the 7** cases it published one for.
 
-Sources: run-009, run-010, run-013, run-016, run-017, run-018, run-019, run-020, run-021, run-022.
+Sources: run-001-quartetfuzz-6case, run-005-partial, run-007-partial-4of7, run-009, run-010, run-011, run-012, run-013, run-014, run-015, run-016, run-017, run-018, run-019, run-020, run-021, run-022, run-023, run-024.
 
 <!-- BENCH:END -->
+
+### What this table does not establish
+
+Four limits, stated because the numbers above are easy to over-read.
+
+**It shows parity, not superiority.** The median is 1.02x across seven cases. Six of those
+seven sit between 1.00x and 1.05x, which is inside the run-to-run spread of a libFuzzer
+campaign; only brotli at 1.11x is plausibly outside it. The defensible claim is that an
+engine with no model in the loop reaches roughly what the hand-written harness reaches, and
+that is worth something on its own. It is not a claim of beating gold.
+
+**Our figures are single runs; theirs are medians of ten.** That asymmetry is stated above,
+but its size was not measured until run-025 re-ran the suite against pinned sources:
+`libyaml/libyaml_loader_fuzzer` moved from 77.77 to 73.16, 4.6 points, on a case that had
+looked stable. Whether that is the version pin or ordinary campaign variance is not yet
+separated. Until this repository runs repetitions, ratios here should not be read to two
+decimal places.
+
+**The seven head-to-head cases are not a representative sample.** Their gold coverage
+averages 62.3%. Across QuartetFuzz's full 100-case set the gold median is 18.06%, ranging
+from 0.20% to 87.32%. These seven are the targets where a harness can get deep, and a
+parser-shaped engine looks better on them than it would on a hundred.
+
+**The gold column has been superseded for three of the seven.** These figures come from the
+artifact's `dataset/gold_baseline_100.jsonl`, whose protocol is not documented there. The
+authors' newer `dataset_v2` re-measures gold by replaying each project's official OSS-Fuzz
+corpus, scoped to the project's own sources, and disagrees where the two overlap: libyaml
+scanner 70.6 -> 53.2, libyaml loader 77.7 -> 78.2, zlib 53.1 -> 55.4. The remaining four
+cases are not in that set, so switching columns piecemeal would mix two protocols in one
+table. The honest resolution is to run the newer set, not to relabel these rows.
 
 **`ours/gold` is the number that matters.** Absolute coverage is a property of the target —
 85% on brotli and 53% on zlib say nothing about each other. For scale, QuartetFuzz's own
@@ -275,9 +308,14 @@ behind the hand-written harness it is replacing.
 **`iperf/cjson_fuzzer`, QuartetFuzz 0.00** — not a low score, no working harness at all. That
 is the failure mode the gate bank exists to make visible.
 
-**`lcms2` has no baseline** because no public OSS-Fuzz harness exists for that entry point.
-It is here because it is the case a language model cannot have memorised, and pointing the
-engine at it found **five defects in this engine** that seven benchmark cases never exposed.
+**`lcms2` has no baseline in this table** because it is not in QuartetFuzz's evaluation
+set. An earlier draft said no public OSS-Fuzz harness existed for the entry point and that a
+model could not have memorised it. Both were false: OSS-Fuzz ships `cms_md5_fuzzer`, which
+calls `cmsOpenProfileFromMem` directly. That harness replays its official corpus to
+**5.107%** against a denominator of its own, beside the **5.14%** measured here — not a
+cell-to-cell comparison, but close enough to suggest ~5% is simply what one entry point
+reading an ICC profile reaches. The row earns its place a different way: pointing the engine
+at lcms2 found **five defects in this engine** that seven benchmark cases never exposed.
 
 **`libde265`'s gold figure is one we measured**, marked †: the project ships its own harness,
 so we built theirs and ran it here under identical conditions. It disproved what we expected.

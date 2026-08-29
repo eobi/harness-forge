@@ -1,0 +1,9 @@
+/b/expat/expat/lib/random_rand_s.c:80:9: warning: implicit declaration of function 'rand_s' is invalid in C99 [-Wimplicit-function-declaration]
+    if (rand_s(&random32))
+        ^
+1 warning generated.
+/usr/bin/ld: /tmp/random_rand_s-fb0533.o: in function `writeRandomBytes_rand_s':
+/b/expat/expat/lib/random_rand_s.c:80: undefined reference to `rand_s'
+/usr/bin/ld: /b/expat/expat/lib/random_rand_s.c:80: undefined reference to `rand_s'
+/usr/bin/ld: /b/expat/expat/lib/random_rand_s.c:80: undefined reference to `rand_s'
+clang: error: linker command failed with exit code 1 (use -v to see invocation)

@@ -78,5 +78,9 @@ docker run --rm --name "hf-$RUN_ID" \
 cp "$RESULTS" "$REPO/benchmarks/results/$RUN_ID.jsonl"
 mkdir -p "$REPO/benchmarks/results/logs"
 cp -r "$WORK/logs/$RUN_ID" "$REPO/benchmarks/results/logs/" 2>/dev/null || true
-python3 "$REPO/benchmarks/rank.py" "$REPO/benchmarks/results/$RUN_ID.jsonl" --write
+# EVERY results file, not just this one. rank.py merges with later-wins, so handing it a
+# single run regenerates the published table from that run ALONE and every case the run did
+# not cover is rewritten as "not yet run". run-023 and run-024 both did exactly that to the
+# README before anyone noticed.
+python3 "$REPO/benchmarks/rank.py" "$REPO"/benchmarks/results/run-*.jsonl --write
 echo "run $RUN_ID: results and logs collected, tables regenerated"
