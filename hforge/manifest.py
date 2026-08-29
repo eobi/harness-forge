@@ -425,6 +425,29 @@ PHASES: tuple = (
                          "71.3% branches vs 66.4%, and vs QuartetFuzz's own published run on "
                          "the same case, 73.89% lines / 57.74% branches. `uint8_t` was not "
                          "in the byte-type set, which our own tests caught and I did not."),
+        Deliverable("P3.REUSE_VERB",
+                    "a reuse verb does not win the destructor slot", DONE,
+                    modules=("hforge.producers.header_graph",),
+                    tests=("test_a_reuse_verb_does_not_win_the_destructor_slot",
+                           "test_a_reuse_verb_is_still_used_when_a_library_offers_nothing_else"),
+                    note="the THIRD defect libde265 exposed before it ran an execution. "
+                         "`de265_reset(ctx)` clears the decoder's state so the SAME context "
+                         "can decode another stream — the context is still alive and still "
+                         "has to be freed — but it returns void, takes only the handle, and "
+                         "ends in a verb _FINI_ISH matches, so it ranked as the best "
+                         "destructor and beat `de265_free_decoder`, which returns a "
+                         "de265_error status and therefore only matched the weaker "
+                         "any-position pattern. The harness would have leaked the whole "
+                         "decoder context on EVERY input, and under LeakSanitizer every "
+                         "finding would be the harness's own. Same shape as expat's "
+                         "XML_DefaultCurrent and Brotli's HasMoreOutput, a third time "
+                         "through a different door. _FINI_ISH is deliberately left ALONE: "
+                         "it is load-bearing in role inference in five other places and "
+                         "narrowing it there would change targets that are currently "
+                         "correct. A new _REUSE_ISH demotes reset/clear/rewind/reinit in "
+                         "the destroyer ranking only, and only below a real candidate — a "
+                         "library whose only teardown call is _reset still gets it, which "
+                         "the second test pins."),
         Deliverable("P3.CXX_LINKAGE",
                     "a C harness keeps an unmangled entry point under a C++ compiler", DONE,
                     modules=("hforge.emit.c_libfuzzer",),

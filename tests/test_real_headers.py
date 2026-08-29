@@ -1296,3 +1296,58 @@ if __name__ == "__main__":
         check(name, fn)
     print(f"\n{_pass}/{_pass + _fail} passed")
     raise SystemExit(1 if _fail else 0)
+
+
+def test_a_reuse_verb_does_not_win_the_destructor_slot():
+    """`reset` clears a resource for reuse; it does not release it.
+
+    libde265 declares both:
+
+        void       de265_reset(de265_decoder_context*);
+        de265_error de265_free_decoder(de265_decoder_context*);
+
+    `de265_reset` returns void, takes only the handle, and ends in a verb `_FINI_ISH`
+    matches — so it ranked as the best destructor and beat the real one, which returns a
+    status and therefore only matched the weaker any-position pattern.
+
+    The harness would then never free the decoder: every input leaks the whole context,
+    and under LeakSanitizer every finding is the harness's own. Same shape as expat's
+    XML_DefaultCurrent and Brotli's HasMoreOutput, a third time.
+    """
+    plans = _plans_for("""
+        typedef struct de265_decoder_context de265_decoder_context;
+        typedef int de265_error;
+        de265_decoder_context* de265_new_decoder(void);
+        de265_error de265_push_data(de265_decoder_context*, const void* data, int length);
+        void de265_reset(de265_decoder_context*);
+        de265_error de265_free_decoder(de265_decoder_context*);
+    """)
+    consuming = [p for p in plans if any(o.api == "de265_push_data" for o in p.sequence)]
+    assert consuming, "no plan drives de265_push_data"
+
+    for p in consuming:
+        destroy = [o for o in p.sequence if o.targets]
+        assert destroy, f"{p.name}: nothing destroys the decoder"
+        assert destroy[0].api == "de265_free_decoder", (
+            f"{p.name}: destroyed with {destroy[0].api!r}. A reuse verb is not a "
+            f"destructor, and the decoder is left leaked on every input.")
+
+
+def test_a_reuse_verb_is_still_used_when_a_library_offers_nothing_else():
+    """The demotion is a RANKING change, not an exclusion.
+
+    A library whose only teardown call is `_reset` should still get it. Demoting reuse
+    verbs below real candidates must not turn 'the weaker choice' into 'no choice', which
+    would refuse plans that are as good as that library allows.
+    """
+    plans = _plans_for("""
+        typedef struct ctx ctx;
+        ctx* ctx_new(void);
+        int ctx_parse(ctx*, const char* data, int n);
+        void ctx_reset(ctx*);
+    """)
+    consuming = [p for p in plans if any(o.api == "ctx_parse" for o in p.sequence)]
+    assert consuming, "no plan drives ctx_parse"
+    assert any(o.api == "ctx_reset" and o.targets
+               for p in consuming for o in p.sequence), (
+        "with no alternative, the reuse verb should still be chosen")

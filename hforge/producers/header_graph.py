@@ -585,6 +585,26 @@ _FINI_ISH = re.compile(r"(?:_|(?<=[a-z]))(delete|destroy|free|close|cleanup|clea
                        r"finalize|finalise|finish|fini|release|dispose|reset|discard|"
                        r"unref|put)_?$", re.I)
 
+# A REUSE VERB IS NOT A DESTROY VERB, and `reset` sits in _FINI_ISH above.
+#
+# `de265_reset(ctx)` clears the decoder's state so the SAME context can decode another
+# stream. The context is still alive and still has to be freed. But it returns void, takes
+# only the handle, and ends in a verb _FINI_ISH matches — so it ranked as the best
+# destructor and beat `de265_free_decoder`, which returns a `de265_error` status and
+# therefore only matched the weaker any-position pattern.
+#
+# The result would have been a harness that never frees the decoder: every input leaks the
+# whole context, and under LeakSanitizer every finding is the harness's own. That is the
+# expat XML_DefaultCurrent mistake and the Brotli one, arriving a third time through a
+# different door.
+#
+# _FINI_ISH is left ALONE — it is load-bearing in role inference in five other places, and
+# narrowing it there would change targets that are currently correct. This demotes reuse
+# verbs in the destroyer ranking only, and only below a real candidate: if a library offers
+# nothing else, a reuse verb is still chosen, exactly as before.
+_REUSE_ISH = re.compile(r"(?:_|(?<=[a-z]))(reset|clear|rewind|reinit|reinitialise|"
+                        r"reinitialize)_?$", re.I)
+
 
 def _outparam_handles(decls: list) -> list:
     """Constructors that hand the handle back through a POINTER-TO-POINTER parameter.
@@ -1588,7 +1608,8 @@ def _plans_for_handle(decls, target, handle, inline_base, init_name, fini_name,
         alphabetical order. The decoder state was never freed, LeakSanitizer reported the
         harness's own leak on the 4th input, and the campaign stopped there.
         """
-        return (0 if _FINI_ISH.search(a.symbol) else
+        return (3 if _REUSE_ISH.search(a.symbol) else
+                0 if _FINI_ISH.search(a.symbol) else
                 1 if _DESTROY_ANYWHERE.search(a.symbol) else 2, a.symbol)
     destroyers.sort(key=_destroyer_rank)
 
