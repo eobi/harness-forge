@@ -886,6 +886,42 @@ PHASES: tuple = (
                          "incompatible-pointer-types, implicit-function-declaration) and "
                          "attribute the failure to the PLAN, not to the target. A warning "
                          "about generated code is evidence about the generator."),
+        Deliverable("P3.ADDR_DESTRUCTOR",
+                    "a destructor declared T** gets the address of the T* handle", DONE,
+                    modules=("hforge.emit.c_libfuzzer",),
+                    tests=("test_a_destructor_taking_the_address_of_the_handle_gets_it",),
+                    note="`void pixDestroy(PIX **ppix)` takes the address so it can NULL the "
+                         "caller's variable. `by_address` fired only on the CREATE call, so "
+                         "the destroy passed PIX * where PIX ** was declared. EVERY STATIC "
+                         "GATE PASSED — the plan is right — and the generated C did not "
+                         "compile. run-016 refused it, which is the emitter-defect gate "
+                         "added the same day doing exactly its job; before that it was a "
+                         "warning and a garbage number. The emitter now decides from the "
+                         "DECLARED PARAMETER rather than from which op it is, and takes the "
+                         "address when the parameter has exactly one more star than the "
+                         "resource. Two stars apart is something else and gets no guess. "
+                         "I had called leptonica ready an hour earlier on the strength of "
+                         "its static gates alone — the same mistake drive.py was fixed for."),
+        Deliverable("P3.CALLEE_FILLED_SLOT",
+                    "a struct the callee fills is declared, not refused", DONE,
+                    modules=("hforge.producers.header_graph", "hforge.ir",
+                             "hforge.gates.static_gates"),
+                    tests=("test_a_callee_filled_struct_is_declared_not_refused",
+                           "test_a_const_config_struct_still_needs_its_initialiser"),
+                    note="`json_t *json_loadb(const char *buf, size_t n, size_t flags, "
+                         "json_error_t *error)` — the caller owns an error struct and the "
+                         "LIBRARY fills it with why the parse failed. A complete struct "
+                         "pointer was only understood as a CONFIG needing an initialiser "
+                         "(ZopfliInitOptions), so one with no initialiser refused the whole "
+                         "plan and jansson's entry point produced nothing across three runs. "
+                         "`const` separates them: a `const T *` is an input the library "
+                         "READS and handing it a zeroed struct is a guess about a contract "
+                         "we cannot see, so that still refuses; a bare `T *` is a slot for "
+                         "the callee to WRITE. Storage kind 'out' is explicit in the IR "
+                         "because the gate needs to tell them apart and must not infer it: "
+                         "an out slot has no creating call and is alive from its "
+                         "declaration, and scoring it unborn reported S1.USE_BEFORE_CREATE "
+                         "against a correct plan."),
         Deliverable("P3.EMPTY_PROFILE",
                     "an empty coverage profile is a failed measurement, not a zero", DONE,
                     modules=("hforge.toolchain",),

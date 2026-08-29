@@ -1541,7 +1541,26 @@ def _stream_bind(api, handle, pm, slices, scratch, out_capacity=65536,
                          and hkey(x.params[0].type.name, pm) == base_t
                          and _CONFIG_INIT.search(x.symbol)), None)
             if init is None:
-                return None
+                # NO INITIALISER MEANS IT IS AN OUT-PARAMETER, NOT A CONFIG.
+                #
+                # `json_t *json_loadb(const char *buf, size_t n, size_t flags,
+                #  json_error_t *error)` — the caller owns an error struct and the LIBRARY
+                # fills it with why the parse failed. There is nothing to initialise, so
+                # requiring an initialiser refused the whole plan and jansson's entry point
+                # produced nothing at all.
+                #
+                # `const` is what separates the two. A `const T *` is an INPUT the library
+                # reads, and handing it a zeroed struct is a guess about a contract we
+                # cannot see — ZopfliDeflate needs ZopfliInitOptions first, and that case
+                # must keep refusing. A non-const `T *` is a slot for the callee to write,
+                # and declaring it and passing its address is exactly what a caller does.
+                if "const" in ty:
+                    return None
+                rid = f"out_{nm}"
+                resources.append(Resource(rid, TypeRef(base_t, "struct"), storage="out"))
+                args.append(Arg(nm, "resource", rid))
+                last_buf = None
+                continue
             rid = f"cfg_{nm}"
             resources.append(Resource(rid, TypeRef(base_t, "struct"), storage="inline"))
             setup.append(Op(f"o_cfg_{nm}", init.symbol,

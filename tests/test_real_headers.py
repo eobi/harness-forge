@@ -1674,3 +1674,73 @@ def test_the_ir_records_what_a_typedef_resolves_to():
     blocks = {v.code for r in run_static_gates(p) for v in r.violations if v.severity == BLOCK}
     assert "S2.TYPE_CONFUSION" not in blocks, (
         "the gate still refuses a byte buffer it cannot spell")
+
+
+def test_a_destructor_taking_the_address_of_the_handle_gets_it():
+    """`void pixDestroy(PIX **ppix)` takes the ADDRESS so it can NULL the caller's variable.
+
+    `by_address` only fired on the CREATE call, so the destroy passed `PIX *` where `PIX **`
+    was declared. Every static gate passed — the plan is right — and the generated C did not
+    compile. run-016 caught it only because the emitter-defect gate exists; before that it
+    was a warning and a garbage number.
+    """
+    from hforge.emit import emit
+    plans = _plans_for("""
+        typedef unsigned char l_uint8;
+        typedef struct Pix PIX;
+        PIX * pixReadMem(const l_uint8 *data, size_t size);
+        void pixDestroy(PIX **ppix);
+    """)
+    p = next(x for x in plans if any(o.api == "pixReadMem" for o in x.sequence))
+    line = next(l for l in emit(p).source.splitlines() if "pixDestroy" in l and "(" in l)
+    assert "&" in line, f"destructor did not get the address: {line.strip()}"
+
+
+def test_a_callee_filled_struct_is_declared_not_refused():
+    """`json_loadb(buf, n, flags, json_error_t *error)` — the library fills the error.
+
+    A complete struct pointer was only understood as a CONFIG needing an initialiser, so a
+    parameter with no initialiser refused the whole plan and jansson's entry point produced
+    nothing. `const` separates the two: `const T *` is an input the library reads and still
+    needs its initialiser, a bare `T *` is a slot for the callee to write.
+    """
+    from hforge.emit import emit
+    plans = _plans_for("""
+        typedef struct json_t json_t;
+        typedef struct { int line; int column; char text[160]; } json_error_t;
+        json_t *json_loadb(const char *buffer, size_t buflen, size_t flags, json_error_t *error);
+        void json_delete(json_t *json);
+    """)
+    hit = [p for p in plans if any(o.api == "json_loadb" for o in p.sequence)]
+    assert hit, "the entry point was refused for a slot the callee fills"
+    p = hit[0]
+    res = next(r for r in p.resources if r.id.startswith("out_"))
+    assert res.storage == "out", f"storage is {res.storage!r}, so S1 will call it unborn"
+    src = emit(p).source
+    assert "memset(&" in src, "the slot is not zeroed before the library writes to it"
+    call = next(l for l in src.splitlines() if "json_loadb(" in l and "=" in l)
+    assert "&" in call, f"the slot was not passed by address: {call.strip()}"
+
+
+def test_a_const_config_struct_still_needs_its_initialiser():
+    """The guard on the fix above.
+
+    `ZopfliDeflate(const ZopfliOptions *options, ...)` reads that struct. Handing it a
+    zeroed one is a guess about a contract we cannot see, so a const struct pointer with no
+    initialiser must still refuse.
+    """
+    plans = _plans_for("""
+        typedef struct { int numiterations; int blocksplitting; } ZopfliOptions;
+        void ZopfliDeflate(const ZopfliOptions *options, int btype, int final,
+                           const unsigned char *in, size_t insize,
+                           unsigned char **out, size_t *outsize);
+    """)
+    for p in plans:
+        for o in p.sequence:
+            if o.api != "ZopfliDeflate":
+                continue
+            arg = next((a for a in o.args if a.param == "options"), None)
+            if arg is not None and arg.source == "resource":
+                res = next(r for r in p.resources if r.id == arg.ref)
+                assert res.storage != "out", (
+                    "a const config was treated as a callee-filled slot and passed zeroed")

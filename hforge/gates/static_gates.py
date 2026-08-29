@@ -43,7 +43,14 @@ def s1_lifetime(ir: HarnessIR) -> GateResult:
     the crash it produces belongs to us, not to the target."""
     v: list[Violation] = []
     UNBORN, ALIVE, DEAD = 0, 1, 2
-    state = {r.id: UNBORN for r in ir.resources}
+    # A CALLER-DECLARED OUT SLOT IS ALIVE FROM ITS DECLARATION.
+    #
+    # `json_error_t err; json_loadb(buf, n, 0, &err);` — the harness declares and zeroes it
+    # and the LIBRARY fills it. No call creates it, so scoring it UNBORN reported
+    # S1.USE_BEFORE_CREATE against a correct plan, and jansson's only entry point was
+    # refused. There is also nothing to destroy: it is storage, not a lifetime the library
+    # manages. The IR says which kind it is; the gate reads that rather than inferring it.
+    state = {r.id: (ALIVE if r.storage == "out" else UNBORN) for r in ir.resources}
     born_at: dict[str, str] = {}
 
     for op in ir.sequence:

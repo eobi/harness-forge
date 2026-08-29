@@ -310,6 +310,13 @@ class Resource:
       "inline"  the CALLER allocates the object and passes its address to an initialiser
                     yaml_parser_t p; yaml_parser_initialize(&p); ... yaml_parser_delete(&p);
 
+      "out"     the caller allocates it and the CALLEE fills it. No library call creates
+                it, so it is alive from its declaration.
+                    json_error_t err; json_loadb(buf, n, 0, &err);
+                It is not a lifetime the library manages and there is nothing to destroy;
+                treating it as unborn made S1 refuse the only plan jansson's entry point
+                has.
+
     The second form is everywhere — libyaml, zlib's z_stream, most C APIs with a context
     struct — and modelling only the first made those libraries unreachable. It is not a
     parser problem: the plan genuinely could not be expressed.
@@ -331,7 +338,14 @@ class Resource:
 
     @property
     def inline(self) -> bool:
-        return self.storage == "inline"
+        """The harness owns the storage and declares it.
+
+        Both kinds are caller-allocated and differ only in WHO WRITES THEM: "inline" is
+        filled by an initialiser the plan calls, "out" is filled by the callee. The emitter
+        declares and zeroes them identically; only S1 needs to tell them apart, because an
+        out slot has no creating call and is alive from its declaration.
+        """
+        return self.storage in ("inline", "out")
 
     def to_json(self) -> dict:
         return {"id": self.id, "type": self.type.to_json(), "storage": self.storage}

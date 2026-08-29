@@ -264,8 +264,23 @@ def _arg_expr(ir: HarnessIR, api: Api, op: Op, param: str) -> str:
             # Only the CREATE call takes the address; every later use passes the object or
             # pointer itself.
             return f"&{_res_var(a.ref)}"
-        if r is not None and r.storage == "inline":
+        if r is not None and r.storage in ("inline", "out"):
             return f"&{_res_var(a.ref)}"      # caller-allocated: always by address
+        # THE DECLARED PARAMETER DECIDES, NOT WHICH OP THIS IS.
+        #
+        # `void pixDestroy(PIX **ppix)` takes the ADDRESS of the handle so it can NULL the
+        # caller's variable. `by_address` above only fires on the create call, so the
+        # destroy passed `PIX *` where `PIX **` was declared. Every static gate passed —
+        # the plan is right — and the generated C did not compile, which is what the
+        # emitter-defect gate caught in run-016 and what would previously have been a
+        # warning and a garbage number.
+        #
+        # One extra star and no more: `char **` where the resource is `char *` is this
+        # shape, but two stars apart is something else and gets no guess.
+        pd = ir.param_decl(api, param)
+        if (pd is not None and r is not None
+                and pd.type.name.count("*") == r.type.name.count("*") + 1):
+            return f"&{_res_var(a.ref)}"
         return _res_var(a.ref)
     if a.source == SRC_SCRATCH:
         sc = next((x for x in ir.scratch if x.id == a.ref), None)
