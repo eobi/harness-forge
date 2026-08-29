@@ -342,3 +342,48 @@ def inventory() -> Toolchain:
         Tool("xcrun", find_xcrun(), "the iOS Simulator, which is the practical iOS path",
              "iOS discovery is unavailable; device runs were never the discovery path"),
     ])
+
+
+# ── the emitted C is OUR code, and a warning about it is evidence about us ────────────
+#
+# `unsigned char hf_r_err = NULL;` followed by `hf_r_err = yajl_get_error(...)` is an
+# incompatible pointer-to-integer conversion. clang said so. The build succeeded. Nobody
+# read it, two 600-second campaigns were spent, and three diagnoses were wrong before
+# somebody read the generated declaration.
+#
+# That is S2.TYPE_CONFUSION — a gate this engine already has — occurring at the C level
+# AFTER emission, which is the one place no gate was looking.
+EMITTER_DEFECT_WARNINGS = (
+    "int-conversion",                  # a pointer squeezed into an integer, or the reverse
+    "incompatible-pointer-types",      # the wrong pointer type passed to a parameter
+    "implicit-function-declaration",   # a call to something never declared: a missing header
+    "return-type",                     # a value returned from a function declared void
+)
+
+
+def check_emitted_c(cc: str, source, include_dirs=(), cflags=(), is_cxx: bool = False):
+    """Compile the harness ALONE with the emitter-defect warnings as errors.
+
+    Returns [] when the emitted code is clean, or a list of diagnostics when it is not.
+
+    Compiled ALONE, to an object, and deliberately not as part of the real build. The
+    target's own sources routinely carry warnings of exactly these classes — that is the
+    target's business and not a reason to refuse a harness. Attributing somebody else's
+    warning to our plan would be the same error in the opposite direction.
+    """
+    import subprocess
+    import tempfile
+    from pathlib import Path
+
+    src = Path(source)
+    with tempfile.TemporaryDirectory() as td:
+        cmd = [cc, "-fsyntax-only"]
+        if is_cxx:
+            cmd.append("-std=c++11")
+        cmd += [f"-Werror={w}" for w in EMITTER_DEFECT_WARNINGS]
+        cmd += [f"-I{d}" for d in include_dirs] + list(cflags) + [str(src)]
+        r = subprocess.run(cmd, capture_output=True, text=True, errors="replace")
+        if r.returncode == 0:
+            return []
+        return [l for l in (r.stderr or "").splitlines()
+                if "error:" in l or "warning:" in l][:8]

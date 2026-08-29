@@ -652,7 +652,21 @@ PHASES: tuple = (
                          "number moved."),
         Deliverable("P3.WARNINGS_ARE_EVIDENCE",
                     "a compiler warning about the harness is a gate signal, not noise",
-                    PLANNED,
+                    DONE,
+                    modules=("hforge.toolchain",),
+                    tests=("test_a_pointer_squeezed_into_a_byte_is_refused_before_the_campaign",),
+                    note="SHIPPED. toolchain.check_emitted_c compiles the harness ALONE with "
+                         "-fsyntax-only and -Werror on four classes that can only mean an "
+                         "emitter defect: int-conversion, incompatible-pointer-types, "
+                         "implicit-function-declaration, return-type. benchmarks/drive.py "
+                         "runs it after emit and REFUSES the plan before building or "
+                         "campaigning, writing the diagnostic to emitter-defect.log. "
+                         "Compiled ALONE and deliberately not as part of the real build: the "
+                         "target's own sources routinely carry warnings of exactly these "
+                         "classes, and attributing somebody else's warning to our plan would "
+                         "be the same error in the opposite direction. Verified against the "
+                         "defect that shipped — it refuses the truncated pointer and passes "
+                         "the fix. ORIGINAL NOTE: 
                     note="`unsigned char hf_r_err = NULL;` then "
                          "`hf_r_err = yajl_get_error(...)` is an incompatible "
                          "pointer-to-integer conversion. clang says so, the build succeeds, "
@@ -663,7 +677,7 @@ PHASES: tuple = (
                          "indicate an emitter defect (int-conversion, "
                          "incompatible-pointer-types, implicit-function-declaration) and "
                          "attribute the failure to the PLAN, not to the target. A warning "
-                         "about generated code is evidence about the generator."),
+                         "about generated code is evidence about the generator.'"),
         Deliverable("P3.BENCH_NO_DYNAMIC_GATES",
                     "the benchmark driver runs static gates only", PLANNED,
                     note="benchmarks/drive.py calls run_static_gates and nothing else, so "

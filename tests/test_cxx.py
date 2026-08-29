@@ -227,3 +227,39 @@ def test_a_c_harness_still_exports_an_unmangled_entry_point_under_cxx():
         before = text[:i]
         assert "#ifdef __cplusplus" in before, f"{what}: entry point is not guarded"
         assert 'extern "C"' in before, f"{what}: no extern \"C\" for a C++ build"
+
+
+def test_a_pointer_squeezed_into_a_byte_is_refused_before_the_campaign():
+    """The compiler already knew, in milliseconds, what two campaigns spent 20 minutes on.
+
+    `unsigned char hf_r_err = NULL;` for a function returning `unsigned char *` is an
+    incompatible pointer-to-integer conversion. clang warned, the build succeeded, the
+    harness segfaulted on its third execution, and the case measured 0.00% where it had
+    been 65.12%.
+
+    That is S2.TYPE_CONFUSION occurring at the C level AFTER emission, which was the one
+    place no gate looked.
+    """
+    import shutil
+    import tempfile
+    from hforge.toolchain import check_emitted_c
+
+    cc = shutil.which("clang") or shutil.which("cc")
+    if cc is None:
+        return  # no compiler here; the gate reports NOT RUN rather than passing
+
+    d = Path(tempfile.mkdtemp())
+    decl = ("#include <stddef.h>\n"
+            "unsigned char *get_error(void);\nvoid free_error(unsigned char *);\n"
+            "int LLVMFuzzerTestOneInput(const unsigned char *d, size_t n) {\n"
+            "    unsigned char %s e = 0;\n"
+            "    e = get_error();\n    if (e) free_error(e);\n"
+            "    (void)d; (void)n; return 0;\n}\n")
+
+    bad = d / "bad.c"
+    bad.write_text(decl % "")
+    assert check_emitted_c(cc, bad), "the shipped defect compiled clean; the gate is inert"
+
+    good = d / "good.c"
+    good.write_text(decl % "*")
+    assert not check_emitted_c(cc, good), "a correct harness must not be refused"

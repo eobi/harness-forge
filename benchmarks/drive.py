@@ -7,6 +7,7 @@ from hforge.emit.c_libfuzzer import EmitError
 from hforge.gates.static_gates import run_static_gates
 from hforge.gates.result import BLOCK
 from hforge.ir import Knobs, Target
+from hforge.toolchain import check_emitted_c
 
 CASES = {
  "libyaml/libyaml_loader_fuzzer": dict(
@@ -193,11 +194,27 @@ def main():
                                                        "sequence": [o.api for o in p.sequence]},
                                                  indent=2, default=str))
     out["logs"] = str(logs)
-    binp = wd/"fuzz"
     # C++ targets build with clang++ and an explicit standard. Everything else about the
     # build is identical, on purpose: a gold harness and ours must differ in the harness
     # and in nothing else, or the comparison measures the build.
     cc = ["clang++", f"-std={c.get('std','c++11')}"] if c.get("cxx") else ["clang"]
+
+    # ── the emitted C is ours; a warning about it is evidence about the producer ──
+    #
+    # This case cost two 600-second campaigns and three wrong diagnoses. The emitter
+    # declared `unsigned char hf_r_err` for a function returning `unsigned char *`, clang
+    # warned, the build succeeded, and the harness segfaulted on its third execution for a
+    # measured 0.00% where the case had been 65.12%. The compiler knew in milliseconds.
+    diag = check_emitted_c(cc[0], wd/"harness.c", c["inc"], c["cflags"],
+                           is_cxx=bool(c.get("cxx")))
+    if diag:
+        (logs/"emitter-defect.log").write_text("\n".join(diag) + "\n")
+        out["result"] = "REFUSED: the emitted harness has an emitter defect"
+        out["emitter_defect"] = diag[:3]
+        print(json.dumps(out))
+        return
+
+    binp = wd/"fuzz"
     cmd = cc + ["-g","-O1","-fno-omit-frame-pointer",
            "-fprofile-instr-generate","-fcoverage-mapping"]
     cmd += [f"-I{i}" for i in c["inc"]] + c["cflags"]
