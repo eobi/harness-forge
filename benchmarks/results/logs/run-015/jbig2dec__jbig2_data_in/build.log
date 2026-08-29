@@ -1,0 +1,12 @@
+/b/jbig2dec/jbig2_image_png.c:27:10: fatal error: 'png.h' file not found
+#include <png.h>
+         ^~~~~~~
+1 error generated.
+In file included from /b/jbig2dec/pbm2png.c:35:
+/b/jbig2dec/jbig2_image.h:40:69: error: unknown type name 'bool'
+void jbig2_image_set_pixel(Jbig2Image *image, int64_t x, int64_t y, bool value);
+                                                                    ^
+/b/jbig2dec/pbm2png.c:61:12: warning: implicit declaration of function 'jbig2_image_write_png_file' is invalid in C99 [-Wimplicit-function-declaration]
+    code = jbig2_image_write_png_file(image, argv[2]);
+           ^
+1 warning and 1 error generated.

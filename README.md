@@ -21,7 +21,7 @@ A producer proposes a plan; the gates certify it; confidence decides nothing.
 |---|---|---|---|
 | `P1` | IR, static gates, C emitter | 6/6 | **done** |
 | `P2` | dynamic gates and positive control | 6/6 | **done** |
-| `P3` | producers: test-lift, LLM->IR, graph traversal | 37/45 | partial |
+| `P3` | producers: test-lift, LLM->IR, graph traversal | 38/45 | partial |
 | `PX` | cross-platform hardening: run the same way on every host | 5/5 | **done** |
 | `T0` | target choice, seeds and input size: the work that decides findings | 5/5 | **done** |
 | `TF` | findings: the half the engine was missing | 5/5 | **done** |
@@ -34,7 +34,7 @@ A producer proposes a plan; the gates certify it; confidence decides nothing.
 | `P8` | snapshot and scale | 0/2 | planned |
 | `P9` | exotic targets | 0/2 | planned |
 
-**82 of 105 deliverables done**, and `plancheck` refuses to let any of them say so without a module that imports and a test that exists.
+**83 of 105 deliverables done**, and `plancheck` refuses to let any of them say so without a module that imports and a test that exists.
 
 <!-- PHASES:END -->
 
@@ -252,11 +252,11 @@ confirmed reports — on its own 100-case benchmark with its gold OSS-Fuzz basel
 | zopfli/zopfli_deflate_fuzzer | *not yet run* | 80.06 | 85.7 |  | 0.93x |
 | zlib/zlib_uncompress2_fuzzer | *not yet run* | 51.74 | 53.1 |  | 0.97x |
 | lcms2/cmsOpenProfileFromMem | *not yet run* | — | — |  |  |
-| jbig2dec/jbig2_data_in | *NO PLAN for the gold target* | — | — |  |  |
-| leptonica/pixReadMem | *NO PLAN for the gold target* | — | — |  |  |
+| jbig2dec/jbig2_data_in | *build failed* | — | — |  |  |
+| leptonica/pixReadMem | *all plans for the gold target were refused by a static gate* | — | — |  |  |
 | jansson/json_loadb | *NO PLAN for the gold target* | — | — |  |  |
 
-Sources: run-014.
+Sources: run-015.
 
 <!-- BENCH:END -->
 

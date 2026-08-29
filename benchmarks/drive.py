@@ -300,6 +300,41 @@ def main():
         n_seeds = seedmod.write(mined, corp)
     out["dictionary"] = bool(dict_args)
     out["seeds"] = n_seeds
+    # ── D1 and D3, before the campaign ────────────────────────────────────────────
+    #
+    # drive.py ran the STATIC gates and nothing else, so every case was campaigned on a
+    # plan D1-D11 had never seen. The cost was two 600-second runs proving a harness that
+    # segfaulted on its third execution — which is precisely what D3 exists to catch.
+    #
+    # Not the full gate bank: those build their own binary and this one is already built.
+    # These are the two that are nearly free once it exists.
+    #
+    # D1, LIVENESS: the target call must survive the optimiser. A call clang proved dead
+    # and deleted leaves a harness that runs and reaches nothing, and coverage cannot tell
+    # that apart from a hard target.
+    nm = subprocess.run(["nm", "-C", str(binp)], capture_output=True, text=True,
+                        errors="replace")
+    if nm.returncode == 0 and c["fn"] not in nm.stdout:
+        out["result"] = f"REFUSED by D1: {c['fn']} is not in the built binary"
+        print(json.dumps(out)); return
+    out["d1_liveness"] = "pass"
+
+    # D3, VALID INPUT MUST NOT CRASH: a short run over the mined seeds. A harness that
+    # faults on input the library ACCEPTS is reporting its own defect, and every finding
+    # from it would be the harness's own.
+    smoke = subprocess.run([str(binp), str(corp), "-runs=400", f"-max_len={mlen}"],
+                           capture_output=True, text=True, errors="replace",
+                           timeout=300)
+    if smoke.returncode != 0:
+        log = smoke.stdout + smoke.stderr
+        (logs/"d3-refused.log").write_text(log)
+        first = next((l for l in log.splitlines()
+                      if "ERROR:" in l or "SUMMARY:" in l), "").strip()
+        out["result"] = "REFUSED by D3: valid input crashes the harness"
+        out["d3_evidence"] = first[:220]
+        print(json.dumps(out)); return
+    out["d3_valid_input"] = "pass"
+
     prof = wd/"run.profraw"
     env = dict(os.environ, LLVM_PROFILE_FILE=str(prof))
     fr = subprocess.run([str(binp), str(corp), *dict_args, f"-max_total_time={seconds}",

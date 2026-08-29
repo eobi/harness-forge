@@ -57,11 +57,11 @@ reads 48.74% over the wrong file set and 70.47% over the right one.
 | zopfli/zopfli_deflate_fuzzer | *not yet run* | 80.06 | 85.7 |  | 0.93x |
 | zlib/zlib_uncompress2_fuzzer | *not yet run* | 51.74 | 53.1 |  | 0.97x |
 | lcms2/cmsOpenProfileFromMem | *not yet run* | — | — |  |  |
-| jbig2dec/jbig2_data_in | *NO PLAN for the gold target* | — | — |  |  |
-| leptonica/pixReadMem | *NO PLAN for the gold target* | — | — |  |  |
+| jbig2dec/jbig2_data_in | *build failed* | — | — |  |  |
+| leptonica/pixReadMem | *all plans for the gold target were refused by a static gate* | — | — |  |  |
 | jansson/json_loadb | *NO PLAN for the gold target* | — | — |  |  |
 
-Sources: run-014.
+Sources: run-015.
 
 <!-- TABLE:END -->
 

@@ -765,8 +765,26 @@ PHASES: tuple = (
                          "attribute the failure to the PLAN, not to the target. A warning "
                          "about generated code is evidence about the generator."),
         Deliverable("P3.BENCH_NO_DYNAMIC_GATES",
-                    "the benchmark driver runs static gates only", PLANNED,
-                    note="benchmarks/drive.py calls run_static_gates and nothing else, so "
+                    "the benchmark driver runs static gates only", DONE,
+                    modules=("hforge.toolchain",),
+                    tests=("test_a_pointer_squeezed_into_a_byte_is_refused_before_the_campaign",),
+                    note="FIXED. drive.py now runs D1 and D3 after the build and before the "
+                         "campaign. D1: the target symbol must be in the binary, because a "
+                         "call clang proved dead and deleted leaves a harness that runs and "
+                         "reaches nothing, and coverage cannot tell that apart from a hard "
+                         "target. D3: a 400-execution run over the mined seeds, because a "
+                         "harness that faults on input the library ACCEPTS is reporting its "
+                         "own defect. Not the whole gate bank — those build their own binary "
+                         "and this one already exists; these two are nearly free once it "
+                         "does. VERIFIED AGAINST THE ARTIFACT: the harness that shipped this "
+                         "morning, declaring `unsigned char hf_r_err = NULL;`, was rebuilt "
+                         "and the smoke test refuses it with exit 1. That defect cost two "
+                         "600-second campaigns and three wrong diagnoses; the check costs "
+                         "400 executions. A refused plan is now reported as REFUSED with the "
+                         "sanitizer's own first line, rather than measured as 0.00% — which "
+                         "is the difference between an engine that failed and an engine that "
+                         "said why. WHAT IT REPLACED: "
+                         "benchmarks/drive.py called run_static_gates and nothing else, so "
                          "every case is built and campaigned on a plan that passed S1-S6 and "
                          "was never checked by D1-D11. The cost is not theoretical: the "
                          "error-accessor harness crashed on its third execution with a "
@@ -777,7 +795,7 @@ PHASES: tuple = (
                          "project argues is not the bottleneck. Fix: run the dynamic gates "
                          "in drive.py before the campaign and record their verdicts on the "
                          "row, so a refused plan is reported as refused rather than measured "
-                         "as zero."),
+                         "as zero.'"),
         Deliverable("P3.DRIVE_LOOP",
                     "loop a drive call on its continuation out-parameter", PLANNED,
                     note="libde265's gold harness loops `while (more) { de265_decode(ctx, "
