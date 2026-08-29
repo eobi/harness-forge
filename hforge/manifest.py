@@ -886,6 +886,23 @@ PHASES: tuple = (
                          "incompatible-pointer-types, implicit-function-declaration) and "
                          "attribute the failure to the PLAN, not to the target. A warning "
                          "about generated code is evidence about the generator."),
+        Deliverable("P3.OUT_SLOT_DESTRUCTOR",
+                    "a callee-filled struct is freed when the library offers a free",
+                    PLANNED,
+                    note="DIAGNOSED, and deliberately not applied while run-018 is in "
+                         "flight: jansson and libwebp have not started and import hforge "
+                         "fresh, so changing the producer now changes what they measure. "
+                         "`int png_image_begin_read_from_memory(png_imagep image, "
+                         "png_const_voidp memory, size_t size)` — the caller declares a "
+                         "png_image and the library hangs an opaque control block off it "
+                         "that `png_image_free(png_imagep)` must release. The out-slot path "
+                         "added today declares the struct and looks for NO destructor, "
+                         "which is right for jansson's json_error_t (there is none) and "
+                         "wrong here (there is one), so libpng gate-passes, compiles, and "
+                         "LEAKS ON EVERY INPUT. Same rule as the error accessor: half the "
+                         "pair is worse than neither half. Fix: in the out-slot branch look "
+                         "for a destroyer taking that struct and emit the drop, exactly as "
+                         "the config-struct branch beside it already does."),
         Deliverable("P3.GENERIC_FREE",
                     "a generic free(void *) can release a typed owned return", DONE,
                     modules=("hforge.producers.header_graph",),

@@ -135,6 +135,22 @@ CASES = {
     src=sorted(glob.glob("/b/jansson/src/*.c")),
     fn="json_loadb", cflags=[], max_len=65536,
     cover=sorted(glob.glob("/b/jansson/src/*.c"))),
+ "libpng/png_image_begin_read_from_memory": dict(
+    # Android platform library, and in every browser and toolkit. Run
+    # benchmarks/targets/libpng.sh first for pnglibconf.h.
+    #
+    # The SHAPE this adds: a caller-allocated struct the library INITIALISES and FREES.
+    # `int png_image_begin_read_from_memory(png_imagep image, png_const_voidp memory,
+    # size_t size)` where the caller declares a png_image, and png_image_free releases what
+    # the library hung off it. Neither an opaque handle nor a plain out-parameter.
+    hdr="/b/libpng/png.h", also=["/b/libpng/pngconf.h"],
+    inc=["/b/libpng", "/b/zlib"],
+    src=[f for f in sorted(glob.glob("/b/libpng/*.c")) if "/example" not in f]
+        + sorted(glob.glob("/b/zlib/*.c")),
+    fn="png_image_begin_read_from_memory", cflags=[], max_len=65536,
+    # png's own sources only: zlib is a dependency this build links, not the surface under
+    # test, and it already has two cases of its own.
+    cover=[f for f in sorted(glob.glob("/b/libpng/*.c")) if "/example" not in f]),
  "libwebp/WebPDecodeRGBA": dict(
     # THE MAP'S CANONICAL EXAMPLE: one heap overflow in libwebp reached Chrome, Firefox,
     # Safari, Electron, Signal, Slack, Android and iOS at the same time. It is also in
