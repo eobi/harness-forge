@@ -666,8 +666,8 @@ PHASES: tuple = (
                          "classes, and attributing somebody else's warning to our plan would "
                          "be the same error in the opposite direction. Verified against the "
                          "defect that shipped — it refuses the truncated pointer and passes "
-                         "the fix. ORIGINAL NOTE: 
-                    note="`unsigned char hf_r_err = NULL;` then "
+                         "the fix. WHAT IT CATCHES: "
+                         "`unsigned char hf_r_err = NULL;` then "
                          "`hf_r_err = yajl_get_error(...)` is an incompatible "
                          "pointer-to-integer conversion. clang says so, the build succeeds, "
                          "nobody reads it, and the campaign spends 600 seconds proving it. "
@@ -677,7 +677,7 @@ PHASES: tuple = (
                          "indicate an emitter defect (int-conversion, "
                          "incompatible-pointer-types, implicit-function-declaration) and "
                          "attribute the failure to the PLAN, not to the target. A warning "
-                         "about generated code is evidence about the generator.'"),
+                         "about generated code is evidence about the generator."),
         Deliverable("P3.BENCH_NO_DYNAMIC_GATES",
                     "the benchmark driver runs static gates only", PLANNED,
                     note="benchmarks/drive.py calls run_static_gates and nothing else, so "
