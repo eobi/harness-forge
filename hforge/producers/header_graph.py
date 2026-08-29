@@ -230,9 +230,14 @@ def _clean_return(ret: str) -> str:
 
 def base_type(ty: str) -> str:
     """The type with qualifiers and pointer stars removed, so `const hd_ctx *` and
-    `hd_ctx *` compare equal when deciding what the library's handle is."""
+    `hd_ctx *` compare equal when deciding what the library's handle is.
+
+    A scalar typedef is followed to what it aliases, so `l_uint8` answers as
+    `unsigned char` and every byte check gets it without another entry in BYTE_BASES.
+    """
     t = re.sub(r"\b(const|volatile|struct|enum|union|static|extern|inline)\b", " ", ty)
-    return " ".join(t.replace("*", " ").split())
+    bare = " ".join(t.replace("*", " ").split())
+    return _resolve_alias(bare)
 
 
 def hkey(ty: str, ptr_map: dict) -> str:
@@ -532,6 +537,7 @@ def parse_header(path: str, include_dirs=(), cflags=()) -> list:
                       else Path(path).read_text(errors="replace"))
     stmts = _statements(src)
     macros = _int_defines(path)
+    _SCALAR_ALIASES.update(_scalar_typedefs(stmts))
     ptr_map = _typedef_map(stmts)
     ptr_types = frozenset(ptr_map)
     complete = _complete_types(src)
@@ -1197,6 +1203,30 @@ def _chain_plans(decls, target, platforms, knobs, seen_consumers) -> list:
 # Every spelling of "a byte" a C API uses for a buffer. Restricting this to char/void/
 # unsigned char silently excluded `const uint8_t *`, which is what the demo library and a
 # great many real ones use — the plan then bound nothing and the entry point was dropped.
+# ALIASES ARE READ FROM THE HEADER, NOT GUESSED FROM A LIST.
+#
+# BYTE_BASES below is a list of SPELLINGS, and it grew every time a library used its own:
+# Bytef for zlib, guchar for glib, xmlChar for libxml2, png_byte for libpng. leptonica
+# spells a byte `l_uint8`, and because that spelling was missing, `pixReadMem(const l_uint8
+# *, size_t)` did not look like it takes bytes at all. The producer concluded the entry
+# point had no input, went looking for a SETTER to feed the handle, and found
+# `boxaPlotSides` — a plotting function. S1 and S2 refused the result, correctly, and the
+# case reported "all plans refused by a static gate".
+#
+# The header already says `typedef unsigned char l_uint8;`. Reading that is not a guess,
+# and it retires the list rather than extending it once per library.
+_SCALAR_ALIASES: dict = {}
+
+
+def _resolve_alias(name: str) -> str:
+    """Follow a scalar typedef to the type it really is, with a depth cap for cycles."""
+    seen = 0
+    while name in _SCALAR_ALIASES and seen < 8:
+        name = _SCALAR_ALIASES[name]
+        seen += 1
+    return name
+
+
 BYTE_BASES = ("char", "void", "unsigned char", "signed char", "uint8_t", "int8_t",
               "u_char", "uchar", "byte", "BYTE", "guchar",
               # Library typedefs for "a byte". zlib spells it `Bytef`, and without this
@@ -1205,6 +1235,41 @@ BYTE_BASES = ("char", "void", "unsigned char", "signed char", "uint8_t", "int8_t
               # supported.
               "Bytef", "Byte", "uch", "Bytefp", "u8", "U8", "UInt8", "uint8", "guint8",
               "gchar", "xmlChar", "JOCTET", "png_byte", "Uint8")
+
+
+def _scalar_typedefs(stmts: list) -> dict:
+    """`typedef unsigned char l_uint8;` -> {"l_uint8": "unsigned char"}.
+
+    Pointer typedefs are _typedef_map's job and function pointers are is_callback's; this
+    is only the plain aliases, which is where byte spellings live.
+    """
+    raw: dict = {}
+    for st in stmts:
+        if not st.startswith("typedef ") or "(" in st or "*" in st or "{" in st:
+            continue
+        m = re.match(r"^typedef\s+(.+?)\s+([A-Za-z_]\w*)$", st.strip())
+        if not m:
+            continue
+        under = " ".join(m.group(1).split())
+        if under and under != m.group(2):
+            raw[m.group(2)] = under
+
+    # ONLY BYTE ALIASES ARE KEPT, and the first attempt at this taught the reason.
+    #
+    # Resolving every scalar typedef put `typedef struct _Jbig2Ctx Jbig2Ctx;` in the table,
+    # so base_type("Jbig2Ctx") answered "struct _Jbig2Ctx" — after the qualifier strip had
+    # already run — and handles stopped comparing equal to themselves. Nine tests failed,
+    # which is what those tests are for.
+    #
+    # The problem this solves is byte SPELLINGS, so nothing else needs to be in the table.
+    out: dict = {}
+    for alias, under in raw.items():
+        seen, cur = 0, under
+        while cur in raw and seen < 8:
+            cur, seen = raw[cur], seen + 1
+        if cur in BYTE_BASES:
+            out[alias] = cur
+    return out
 
 
 def _byte_carrying(q) -> bool:

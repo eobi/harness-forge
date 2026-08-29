@@ -510,6 +510,41 @@ PHASES: tuple = (
                          "Object-like integer macros are collected from the raw text before "
                          "preprocessing, since making them disappear is what the "
                          "preprocessor is for."),
+        Deliverable("P3.BYTE_ALIAS",
+                    "a library's own byte spelling is read from the header, not guessed",
+                    DONE,
+                    modules=("hforge.producers.header_graph",),
+                    tests=("test_a_librarys_own_byte_spelling_is_read_not_guessed",
+                           "test_an_opaque_struct_typedef_is_not_followed"),
+                    note="BYTE_BASES was a list of SPELLINGS that grew once per library — "
+                         "Bytef for zlib, guchar for glib, xmlChar for libxml2, png_byte for "
+                         "libpng. leptonica spells a byte `l_uint8`, so `pixReadMem(const "
+                         "l_uint8 *, size_t)` did not look like it takes bytes at all: the "
+                         "producer concluded the entry point had no input, went looking for a "
+                         "SETTER to feed the handle, and chose `boxaPlotSides` — a plotting "
+                         "function. S1 and S2 refused the result, correctly, which is why "
+                         "run-015 reported 'all plans refused by a static gate'. Scalar "
+                         "typedefs are now followed, so the header's own `typedef unsigned "
+                         "char l_uint8;` answers the question. GUARD, learned the hard way: "
+                         "the first version resolved EVERY scalar typedef, which put "
+                         "`typedef struct _Jbig2Ctx Jbig2Ctx;` in the table and made handles "
+                         "stop comparing equal to themselves — nine tests failed. Only "
+                         "aliases bottoming out in a byte type are kept."),
+        Deliverable("P3.CROSS_HEADER_ALIASES",
+                    "collect scalar aliases across headers, as pointer typedefs already are",
+                    PLANNED,
+                    note="P3.BYTE_ALIAS is correct and INERT for leptonica, which is the "
+                         "target that motivated it. `typedef unsigned char l_uint8;` lives in "
+                         "environ.h and the case parses allheaders.h; the alias table is "
+                         "filled per FILE. header_typedefs() already solves exactly this for "
+                         "POINTER typedefs, and the comment there says why: libxml2 declares "
+                         "xmlReadMemory in parser.h and typedefs xmlDocPtr in tree.h. "
+                         "VERIFIED, not assumed: _preprocess returns None for leptonica both "
+                         "on the host AND in the benchmark container, so the include is never "
+                         "inlined and the fallback reads allheaders.h as raw text. Two things "
+                         "to do and they are separable — find out why the preprocessor "
+                         "declines this header, and collect scalar aliases across all of a "
+                         "target's headers the way pointer typedefs already are."),
         Deliverable("P3.CAPS_TYPE",
                     "an all-caps type is not an export macro", DONE,
                     modules=("hforge.producers.header_graph",),

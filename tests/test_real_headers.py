@@ -1572,3 +1572,49 @@ def test_a_version_parameter_takes_the_constant_it_is_named_after():
         f"version minor bound to {by['jbig2_version_minor']}; the header says 20 and the "
         f"library returns NULL for anything else")
     assert by["jbig2_version_major"] == 0
+
+
+def test_a_librarys_own_byte_spelling_is_read_not_guessed():
+    """BYTE_BASES was a list of SPELLINGS and it grew once per library.
+
+    Bytef for zlib, guchar for glib, xmlChar for libxml2, png_byte for libpng. leptonica
+    spells a byte `l_uint8`, and without that spelling `pixReadMem(const l_uint8 *,
+    size_t)` does not look like it takes bytes: the producer concludes the entry point has
+    no input and goes looking for a setter to feed the handle.
+
+    The header says `typedef unsigned char l_uint8;`. Reading it retires the list instead
+    of extending it.
+    """
+    plans = _plans_for("""
+        typedef unsigned char l_uint8;
+        typedef struct Pix PIX;
+        PIX * pixReadMem(const l_uint8 *data, size_t size);
+        void pixDestroy(PIX **ppix);
+    """)
+    assert hg.base_type("const l_uint8 *") == "unsigned char", (
+        "the alias was not followed; every byte check still depends on the spelling")
+    consuming = [p for p in plans if any(o.api == "pixReadMem" for o in p.sequence)]
+    assert consuming, "no plan drives an entry point that plainly takes (bytes, len)"
+    for p in consuming:
+        op = next(o for o in p.sequence if o.api == "pixReadMem")
+        assert any(a.source == "input" for a in op.args), (
+            f"{p.name}: fuzzer bytes never reach the call")
+
+
+def test_an_opaque_struct_typedef_is_not_followed():
+    """The guard on the fix above, and it is not hypothetical.
+
+    Resolving EVERY scalar typedef put `typedef struct _Jbig2Ctx Jbig2Ctx;` in the table,
+    so base_type("Jbig2Ctx") answered "struct _Jbig2Ctx" after the qualifier strip had
+    already run, and handles stopped comparing equal to themselves. Nine tests failed.
+    Only aliases that bottom out in a byte type belong in that table.
+    """
+    _plans_for("""
+        typedef struct _Jbig2Ctx Jbig2Ctx;
+        typedef unsigned char jb_byte;
+        Jbig2Ctx *jb_new(void);
+        int jb_data_in(Jbig2Ctx *ctx, const jb_byte *data, size_t size);
+        void jb_free(Jbig2Ctx *ctx);
+    """)
+    assert hg.base_type("Jbig2Ctx") == "Jbig2Ctx", "an opaque handle typedef was followed"
+    assert hg.base_type("const jb_byte *") == "unsigned char", "the byte alias was not"
