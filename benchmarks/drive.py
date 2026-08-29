@@ -334,6 +334,38 @@ CASES = {
            if not f.endswith("/en265.cc")]),
 }
 
+
+_VERSIONS_CACHE = {}
+
+
+def _libraries_for(c):
+    """Revisions of every fetched source tree this case reads.
+
+    benchmarks/fetch.sh writes /b/versions.json when it clones. A case that was built from
+    a hand-cloned tree has no entry there, and gets no `libraries` key rather than a
+    guessed one -- an absent pin is honest, an invented pin is not.
+    """
+    if not _VERSIONS_CACHE:
+        try:
+            with open("/b/versions.json") as fh:
+                _VERSIONS_CACHE.update(json.load(fh))
+        except Exception:
+            _VERSIONS_CACHE["__missing__"] = True
+    paths = []
+    for k in ("hdr", "fn", "src", "inc", "cover", "seeds"):
+        v = c.get(k)
+        if isinstance(v, str):
+            paths.append(v)
+        elif isinstance(v, (list, tuple)):
+            paths.extend(x for x in v if isinstance(x, str))
+    dirs = {p.split("/")[2] for p in paths if p.startswith("/b/") and p.count("/") >= 3}
+    out = {}
+    for d in sorted(dirs):
+        rec = _VERSIONS_CACHE.get(d)
+        if isinstance(rec, dict) and rec.get("sha"):
+            out[d] = {"sha": rec["sha"][:12], "described": rec.get("described")}
+    return out
+
 def main():
     case = sys.argv[1]; seconds = int(sys.argv[2]) if len(sys.argv) > 2 else 600
     c = CASES[case]
@@ -385,6 +417,17 @@ def main():
     out = {"case": case, "engine": os.environ.get("HF_ENGINE_SHA", "unknown"),
            "target": c["fn"], "proposed": len(plans),
            "plans_for_target": len(cands)}
+    # WHICH SOURCE THIS ROW DESCRIBES.
+    #
+    # Runs 016-023 measured trees cloned by hand from whatever upstream's default branch
+    # was that afternoon; the work directory was later cleared, and nothing anywhere
+    # recorded which libpng "0.15%" was about. A coverage figure against an unnamed
+    # revision cannot be rechecked by anyone, so every row now carries the revisions it
+    # was measured against. Derived from the paths the case actually names rather than
+    # from its title: leptonica links libpng and zlib, and all three belong in the row.
+    lib = _libraries_for(c)
+    if lib:
+        out["libraries"] = lib
     if not cands:
         out["result"] = "NO PLAN for the gold target"
         print(json.dumps(out)); return

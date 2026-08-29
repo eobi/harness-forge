@@ -9,5 +9,15 @@
 # system would have produced.
 set -eu
 SRC="${1:-/b/libpng}"
-cp "$SRC/pnglibconf.h.prebuilt" "$SRC/pnglibconf.h"
-echo "libpng: staged pnglibconf.h from pnglibconf.h.prebuilt"
+# The prebuilt lives in scripts/ in the git tree and at the root in some release tarballs.
+# Look in both rather than assume, because guessing wrong here does not fail loudly: png.h
+# still parses badly and the producer just sees a smaller API.
+for cand in "$SRC/scripts/pnglibconf.h.prebuilt" "$SRC/pnglibconf.h.prebuilt"; do
+  if [ -f "$cand" ]; then
+    cp "$cand" "$SRC/pnglibconf.h"
+    echo "libpng: staged pnglibconf.h from $cand"
+    exit 0
+  fi
+done
+echo "libpng: no pnglibconf.h.prebuilt found under $SRC" >&2
+exit 1
