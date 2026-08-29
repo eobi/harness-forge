@@ -516,8 +516,8 @@ lcms2 parses ICC colour profiles inside the JDK, Skia, Pillow and libvips. Point
 engine at it found **five defects in this engine** that seven benchmark cases never
 exposed, because the benchmark libraries do not spell things the way older C does: `void *`
 handle typedefs, a destroy verb in the middle of a name, `dwSize` Hungarian length
-parameters. Details in
-[`README` § defects found in this engine](#defects-found-in-this-engine-while-building-it-kept-on-the-record).
+parameters. Those five are pinned by
+tests and recorded in [`hforge/manifest.py`](hforge/manifest.py) under `P3.NOMINAL`.
 
 Full protocol, the denominator rule and its ceiling argument, and what is deliberately not
 measured: [`benchmarks/RANKING.md`](benchmarks/RANKING.md).
@@ -621,7 +621,7 @@ win, which is why D8 reports the number instead of the engine claiming one.
 Selection is conservative — de-duplicated by content hash, size-bounded, source files
 excluded, deterministic across machines, and a truncated corpus **says** it was truncated.
 
-## Scale, and four wrong diagnoses
+## Scale
 
 sqlite (243,646 lines, 4,368 functions, 8,116 sinks) is where every performance assumption
 broke. Ordering 524 candidates by reachable sink surface took **29 minutes at one core** before
@@ -646,10 +646,8 @@ propose 648 plans       0.2s
 pre-rank ALL 648       55.5s   -> 86ms each     (was ~29 minutes)
 ```
 
-**A note on how those numbers were got wrong.** A "14.6x speedup" was reported here earlier
-from a 40-plan benchmark that happened to be mostly cache hits. The full 648 plans contain
-315 distinct entry sets; the sample had 20. Measure the workload, not a slice of it — the
-same discipline the engine applies to a harness, applied to claims about the engine.
+Those figures are from the full 648-plan workload, not a sample of it: 315 distinct entry
+sets, where a 40-plan slice contains 20 and is mostly cache hits.
 
 ## Real targets
 
@@ -704,11 +702,12 @@ and libxml2's is the upstream one: `xmlReadMemory(buffer, len, NULL, NULL, 0)`.
 should accept caused the harness to fault* — so every finding it produced would be its own.
 Nothing about that plan is shippable, and no campaign had to run to learn it.
 
-### What real libraries broke
+### What real libraries require
 
-Four of the eight parsed to **nothing** by text alone. The fix was to stop guessing and run
-the actual C preprocessor, keeping only what came from the target header so the producer does
-not propose harnesses for libc. That, plus:
+Four of the eight parse to **nothing** by text alone, so the producer runs the actual C
+preprocessor and keeps only what came from the target header — otherwise it proposes
+harnesses for libc. Beyond that, each of these is a real shape a header producer has to
+model, and each was found by a library that uses it:
 
 - **Typedef aliases.** libpng declares `png_structp`, `png_structrp` and `png_const_structp`
   for one `png_struct`; the constructor returns one and every consumer takes another.
@@ -819,18 +818,8 @@ every increment; a status field nobody checks is a status field that lies.
 
 ## Producers propose, gates rank
 
-```
-$ python3 -m hforge propose examples/lib/hf_demo.h --source examples/lib/hf_demo.c --dynamic
-
-RANK  PLAN                  PRODUCER       BLOCK    KILL   SINKS  N/RUN  WARN
- 1    hf_demo_hd_parse_n    header_graph       0   100%    67%      2     1
- 2    hf_demo_hd_parse      header_graph       0    50%   100%      2     1
-
-Winner: hf_demo_hd_parse_n. Selected by gate evidence. No producer supplied a score,
-a confidence or a preference.
-```
-
-No model involved. The header-graph producer parses declarations, infers roles and
+The ranking [shown above](#1-propose-harnesses-from-a-header-and-rank-them-by-evidence)
+involves no model. The header-graph producer parses declarations, infers roles and
 contracts from signatures, and emits candidate IR. The ranking is by gate evidence only:
 blocking violations, then positive-control kill rate, then sink surface, then gates that
 did not run.
@@ -838,111 +827,3 @@ did not run.
 The winner is correct for a real reason. On the `cstring` plan the off-by-one mutant reads
 the NUL terminator, which is in bounds, so that mutant survives; the length-delimited plan
 has no such cover and kills both.
-
----
-
-## Defects found in this engine while building it, kept on the record
-
-The first replay driver read inputs into `static uint8_t buf[1 << 22]`. libFuzzer hands a
-harness an *exactly-sized heap* allocation, so a read one byte past `size` lands in an ASan
-redzone and faults. Read the same byte out of a large static buffer and it lands in valid
-memory, ASan says nothing, and a harness that over-reads every input is certified clean.
-
-Gate **D3 passed a plan that gate S2 had already rejected.** The static gate was right and
-the dynamic gate was lying, because the driver was not equivalent to the thing it claimed to
-model. It is fixed, `test_driver_uses_an_exactly_sized_heap_buffer` pins it, and the reason
-is written into the generated driver so nobody reintroduces it.
-
-**2. The mutation operator could not count parentheses.** `_op_shrink_alloc` used a
-non-greedy regex, so `calloc(1, sizeof(hd_ctx))` matched only to the *inner* `)`. Every
-mutant of every allocation using `sizeof` left a stray paren, failed to compile, and was
-silently counted as unbuildable — gate D2 reported a smaller denominator instead of an
-error. Pinned by `test_shrink_alloc_balances_parentheses` and `test_mutants_compile`.
-
-**3. The producer's declaration regex dropped every constructor.** It required whitespace
-between the return type and the function name, so `hd_ctx *hd_open(void);` never matched —
-and that shape is every constructor in every C library with an opaque handle. The producer
-found no handle type, inferred every role as `query`, and proposed **zero plans while
-reporting no error at all**. Pinned by
-`test_producer_parses_pointer_returning_declarations`.
-
-**4. Fault detection was POSIX-only, so on Windows every crash would have read as a clean
-run.** The check was `rc < 0 or rc >= 128 or rc == 1`. On Windows a crash returns an NTSTATUS
-such as `0xC0000005`, which matches none of those. D2 would have reported a 0% kill rate
-against a working harness, D3 would have passed a harness that crashes on valid input, and
-the engine would have certified harnesses that detect nothing — while printing that
-everything passed. Classification now lives in `toolchain.classify_exit`, which is pure and
-therefore tested for all three platforms from any one of them.
-
-**5. The Android detector was chosen from the CPU, not from the device.** `build_android`
-selected HWASan whenever the target was arm64 at API ≥ 29. HWASan binaries need a HWASan
-*system image*; on a stock image they SIGSEGV on startup, every input, every time — a 100%
-false-positive rate that looks exactly like a working campaign. Found by running it on a real
-emulator, not by reading it.
-
-The fix that generalises is not the capability check but the **differential**: every device
-run now executes an uninstrumented baseline alongside the instrumented one.
-
-| instrumented | baseline | sanitizer report | verdict |
-|---|---|---|---|
-| fault | fault | — | real fault in the target |
-| fault | clean | yes | real defect the detector caught |
-| fault | clean | no | **instrumentation artifact — refuse to report** |
-| fault | not run | — | fault, explicitly *undistinguishable* from an artifact |
-
-Verified adversarially: forcing HWASan back on produces a SIGSEGV that the differential
-classifies as non-reportable.
-
-### Then it met real software, and found seven more
-
-The producer worked flawlessly on the demo header and proposed **zero plans** for libmagic,
-libyaml and libxml2 — reporting no error at all. Seven distinct defects, each pinned by a
-test in `tests/test_real_headers.py` that reproduces the shape inline, so they run without
-Docker:
-
-**6. A `#define` continued with a backslash leaked into the statement stream.** The leaked
-text carried unbalanced parentheses, so the depth counter never returned to zero and no `;`
-ever split a statement again. `yaml.h` — 54KB — parsed to **nothing**.
-
-**7. `extern "C" {` swallowed entire headers.** Comments and strings are blanked before
-parsing, so the text is really `extern     {`, and a pattern looking for the literal `"C"`
-misses it. Every declaration then sat at depth 1. `magic.h` parsed as ONE statement.
-
-**8. Typedef'd pointer handles were invisible.** `typedef struct magic_set *magic_t` is a
-pointer, but not textually. `const char *` won as libmagic's handle instead, every role was
-inferred wrongly, and no plan formed. This shape is `magic_t`, `xmlDocPtr`, `sqlite3`, `FILE`
-— most real C libraries.
-
-**9. A refused emit printed `CERTIFIED`.** When emission failed, the pipeline added no
-dynamic gate results *at all* — and a certificate with six passing static gates and nothing
-else read as success. The engine certified a harness whose C had never been generated.
-`NOT_RUN is a distinct verdict` has to hold for a whole stage, not just for a gate that
-chooses to report it.
-
-**10. Ranking rewarded plans that failed to build.** Same root cause, worse consequence: a
-plan that could not be emitted contributed zero not-run gates, while every plan that built
-and ran contributed several. **Failing scored better than working**, and a broken plan
-ranked first. An emit refusal is now a blocking defect.
-
-**11. The sink scanner could not see BSD-style definitions** — return type on its own line,
-name on the next. `file`, OpenSSH and much of BSD-derived C are written that way, so D4
-reported *"reaches 0 of 19 sinks"* on real software. That reads like a finding. It was a
-parser artifact.
-
-**12. A typedef-only header contributed nothing.** Typedefs were gathered from parsed
-declarations, so a header with only typedefs — `forward.h`, `types.h` — dropped all of them.
-libxml2 happened to put both in `tree.h` and hid it; a test written from the fixture caught
-it.
-
-**13. The handle was paired as a fuzzable buffer.** Type-based `(ptr, len)` inference saw
-`magic_setparam(magic_t, int, const void *)`, noticed a pointer followed by a size-shaped
-int, and paired the *handle* with it. The plan then bound an argument to a slice that did
-not exist.
-
-All thirteen share a shape worth naming: **the failure was silent**. Nothing crashed, nothing
-warned, and the output looked like a clean result. Three were found by writing an adversarial test, one by moving to another platform, one only
-by plugging in a real device, and seven only by pointing the engine at software somebody else
-wrote. That is precisely the class of defect this engine exists to catch in other people's
-harnesses, and it has now found thirteen of them in itself.
-
-An engine that only ever confirms is not an engine.
