@@ -957,8 +957,19 @@ PHASES: tuple = (
                          "accumulating campaign, which is a different and legitimate "
                          "experiment. measure_gold already wiped its own corpus for exactly "
                          "this reason: I applied the rule to the comparison I was suspicious "
-                         "of and not to the one I was making. Re-run needed before this is "
-                         "DONE."),
+                         "of and not to the one I was making. "
+                         "THE CLEAN MEASUREMENT, taken with a sharper instrument than any "
+                         "run-to-run delta: replay two fresh corpora of the SAME FILE COUNT "
+                         "AND SIZE DISTRIBUTION through the same binary, changing only "
+                         "whether the bytes are valid. libwebp, 24 files each: "
+                         "  encoder-generated WebPs   43.26% of lines "
+                         "  random bytes               2.17% of lines "
+                         "Twenty times the coverage from the same number of bytes, with no "
+                         "campaign, no mutation and nothing carried over. The 24 seeds alone "
+                         "nearly reach what the whole 600-second seeded campaign got "
+                         "(50.09%), which locates almost all of that coverage in the seeds "
+                         "rather than in the search. This is what the run-to-run comparison "
+                         "was trying and failing to measure."),
         Deliverable("P3.SIZED_FROM_STRUCT",
                     "a buffer whose size the library computed into a struct it filled",
                     PLANNED,
