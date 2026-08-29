@@ -605,7 +605,12 @@ PHASES: tuple = (
                            "test_the_error_string_is_freed_by_its_own_pair",
                            "test_an_error_accessor_with_no_freer_is_not_called_at_all",
                            "test_a_verbose_flag_is_not_bound_to_the_input_length"),
-                    note="CORRECTED TWICE, BOTH TIMES BY MEASUREMENT. The real cause was a "
+                    note="MEASURED AND IT WORKS: yajl 65.12 -> 72.80, which is 1.05x gold "
+                         "(69.1) where it had been 0.94x — the case flips from this suite's "
+                         "only loss against a hand-written harness to a win, and the "
+                         "~100 lines of error rendering are now reached. Still behind the "
+                         "cited QuartetFuzz 79.87 on this case. It took three runs and two "
+                         "wrong diagnoses to get here. CORRECTED TWICE, BOTH TIMES BY MEASUREMENT. The real cause was a "
                          "LOST POINTER: the owned return was given the type hkey() "
                          "resolves, and hkey() resolves to a BASE type, so `unsigned char *` "
                          "was declared `unsigned char`. The returned pointer was truncated "
