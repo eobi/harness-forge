@@ -1770,3 +1770,36 @@ def test_a_generic_void_free_releases_an_owned_return():
     src = emit(p).source
     assert "WebPFree(" in src and "(long)WebPDecodeRGBA" not in src, (
         "the return was discarded into the sink instead of being held and freed")
+
+
+def test_a_callee_filled_struct_is_freed_when_the_library_offers_a_free():
+    """`png_image_begin_read_from_memory(png_imagep image, ...)` hangs an opaque control
+    block off the caller's struct, and `png_image_free` releases it.
+
+    The out-slot path declared the struct and looked for no destructor — right for
+    jansson's json_error_t, where none exists, and wrong here, so libpng gate-passed,
+    compiled and leaked on every input. Same rule as the error accessor: half the pair is
+    worse than neither half.
+
+    Three things had to be right and the gates caught each: the free goes in TEARDOWN, not
+    setup, or S1 reports USE_AFTER_DESTROY; its API must be registered, or S2 reports
+    UNKNOWN_API; and a caller-allocated struct is marked dead rather than assigned NULL,
+    which does not compile.
+    """
+    from hforge.emit import emit
+    plans = _plans_for("""
+        typedef struct { int version; int width; int height; void *opaque; } png_image;
+        int png_image_begin_read_from_memory(png_image *image, const void *memory, size_t size);
+        void png_image_free(png_image *image);
+    """)
+    p = next((x for x in plans
+              if any(o.api == "png_image_begin_read_from_memory" for o in x.sequence)), None)
+    assert p is not None, "no plan for an entry point that takes (bytes, len)"
+    apis = [o.api for o in p.sequence]
+    assert "png_image_free" in apis, f"the control block is never released: {apis}"
+    assert apis.index("png_image_free") > apis.index("png_image_begin_read_from_memory"), (
+        f"freed before it is filled: {apis}")
+    src = emit(p).source
+    assert "png_image_free(&" in src, "the struct was not passed by address"
+    assert "hf_r_out_image = NULL" not in src, (
+        "a caller-allocated struct was assigned NULL, which does not compile")

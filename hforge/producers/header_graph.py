@@ -1071,15 +1071,20 @@ def _free_function_plans(decls, target, platforms, knobs, seen) -> list:
         scratch: list = []
         resources: list = []
         setup: list = []
+        teardown: list = []
         args = _stream_bind(a, None, pm, slices, scratch,
                             out_capacity=(knobs.max_len or 4096) * 16,
+                            teardown=teardown,
                             complete=complete, apis=apis, resources=resources,
                             setup=setup)
         if args is None or not slices:
             continue
 
         used_apis = {a.symbol: a}
-        for op in setup:
+        for op in setup + teardown:
+            # Teardown too. Registering only the setup ops left png_image_free out of the
+            # plan's API table, and S2.UNKNOWN_API refused the plan — the gate catching a
+            # half-finished change of mine, which is the second time in five minutes.
             if op.api in apis:
                 used_apis[op.api] = apis[op.api]
 
@@ -1120,7 +1125,8 @@ def _free_function_plans(decls, target, platforms, knobs, seen) -> list:
             name=f"{target.name}_{a.symbol}", target=target, apis=used_apis,
             slices=slices, scratch=scratch, resources=resources + ret_res,
             sequence=setup + [Op("o_consume", a.symbol, args,
-                                 binds=(ret_res[0].id if ret_res else ""))] + drop_ops,
+                                 binds=(ret_res[0].id if ret_res else ""))]
+                     + teardown + drop_ops,
             knobs=knobs or Knobs(), platforms=platforms, producer="header_graph",
             notes="free function: no handle, caller-owned buffers")
         out.append(ir)
@@ -1403,7 +1409,7 @@ def _is_size_param(pd) -> bool:
                     and "*" not in pd.type.name))
 
 
-def _stream_bind(api, handle, pm, slices, scratch, out_capacity=65536,
+def _stream_bind(api, handle, pm, slices, scratch, out_capacity=65536, teardown=None,
                  complete=frozenset(), apis=None, resources=None, setup=None):
     """Bind a CALLER-OWNS-THE-BUFFERS entry point, or return None.
 
@@ -1576,6 +1582,25 @@ def _stream_bind(api, handle, pm, slices, scratch, out_capacity=65536,
                 resources.append(Resource(rid, TypeRef(base_t, "struct"), storage="out"))
                 args.append(Arg(nm, "resource", rid))
                 last_buf = None
+                # AND FREE IT WHEN THE LIBRARY OFFERS A FREE.
+                #
+                # `png_image_begin_read_from_memory(png_imagep image, ...)` — the caller
+                # declares a png_image and the library hangs an opaque control block off it
+                # that `png_image_free(png_imagep)` releases. jansson's json_error_t has no
+                # such call and needs none, so looking for one and finding nothing is the
+                # correct outcome there; skipping the search entirely made libpng gate-pass,
+                # compile, and leak on every input.
+                #
+                # Same rule as the error accessor: half the pair is worse than neither half.
+                # TEARDOWN, not setup. Appending to `setup` put png_image_free BEFORE
+                # png_image_begin_read_from_memory — S1.USE_AFTER_DESTROY caught it at once,
+                # which is the gate doing precisely its job on my mistake.
+                if teardown is not None:
+                    d = _destroyer_of(base_t, apis, pm)
+                    if d is not None and len(d.params) == 1:
+                        teardown.append(Op(f"o_drop_{rid}", d.symbol,
+                                           [Arg(d.params[0].name, "resource", rid)],
+                                           targets=rid))
                 continue
             rid = f"cfg_{nm}"
             resources.append(Resource(rid, TypeRef(base_t, "struct"), storage="inline"))

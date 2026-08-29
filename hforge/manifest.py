@@ -888,10 +888,15 @@ PHASES: tuple = (
                          "about generated code is evidence about the generator."),
         Deliverable("P3.OUT_SLOT_DESTRUCTOR",
                     "a callee-filled struct is freed when the library offers a free",
-                    PLANNED,
-                    note="DIAGNOSED, and deliberately not applied while run-018 is in "
-                         "flight: jansson and libwebp have not started and import hforge "
-                         "fresh, so changing the producer now changes what they measure. "
+                    DONE,
+                    modules=("hforge.producers.header_graph", "hforge.emit.c_libfuzzer"),
+                    tests=("test_a_callee_filled_struct_is_freed_when_the_library_offers_a_free",),
+                    note="SHIPPED, after three corrections the gates caught in a row: the "
+                         "free belongs in TEARDOWN not setup (S1.USE_AFTER_DESTROY), its API "
+                         "must be registered on the plan (S2.UNKNOWN_API), and a "
+                         "caller-allocated struct is marked dead rather than assigned NULL "
+                         "(which does not compile). Every one was a half-finished change of "
+                         "mine stopped before it could become a number. WHAT IT FIXES: "
                          "`int png_image_begin_read_from_memory(png_imagep image, "
                          "png_const_voidp memory, size_t size)` — the caller declares a "
                          "png_image and the library hangs an opaque control block off it "

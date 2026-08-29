@@ -420,7 +420,18 @@ def _emit_ops(ir: HarnessIR) -> tuple[list[str], list[str]]:
         if op.targets and op.targets in inline_ids:
             body.append(f"{indent}{_res_ok(op.targets)} = 0;")
         elif op.targets:
-            body.append(f"{indent}{_res_var(op.targets)} = NULL;")
+            # A CALLER-ALLOCATED STRUCT IS NOT A POINTER AND CANNOT BE NULLED.
+            #
+            # `png_image_free(&image)` releases what the library hung off the caller's
+            # struct; the struct itself is storage on our stack. Emitting
+            # `hf_r_out_image = NULL;` after it does not compile — assigning void * to a
+            # png_image — and `inline_ids` keys off by_address, which an out slot does not
+            # set. Marking it dead is what is meant, and that is the ok flag.
+            tgt = next((r for r in ir.resources if r.id == op.targets), None)
+            if tgt is not None and tgt.inline:
+                body.append(f"{indent}{_res_ok(op.targets)} = 0;")
+            else:
+                body.append(f"{indent}{_res_var(op.targets)} = NULL;")
 
         if op.guarded_by:
             body.append(f"{'        ' if op.repeat else '    '}}}")
