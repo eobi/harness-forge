@@ -377,7 +377,27 @@ def main():
         (logs/"build.log").write_text(r.stdout + r.stderr)
         out["result"] = "build failed"; out["error"] = r.stderr[-400:]
         print(json.dumps(out)); return
-    corp = wd/"corpus"; corp.mkdir(exist_ok=True)
+    # A FRESH CORPUS EVERY RUN, unless the operator asks otherwise.
+    #
+    # This directory persisted across runs 009-021, so every campaign started from whatever
+    # its predecessors had found. For the seven saturated cases that changed nothing —
+    # run-016 reproduced run-009 to the hundredth with a corpus that had grown for four runs
+    # — but it CONFOUNDS ANY BEFORE-AND-AFTER on the same case, which is exactly what the
+    # seed comparison was: leptonica's 10.73 -> 20.67 cannot be attributed to seeds rather
+    # than to carry-over from the previous run's corpus.
+    #
+    # measure_gold already wipes its own corpus for this reason, with a comment saying that
+    # handing gold OUR grown corpus would measure our corpus and not their harness. The same
+    # argument applies to comparing our own runs to each other; I applied it to the
+    # comparison I was suspicious of and not to the one I was making.
+    #
+    # HF_KEEP_CORPUS=1 restores the old behaviour for anyone who wants a long-running
+    # accumulating campaign, which is a legitimate thing to want and a different experiment.
+    corp = wd/"corpus"
+    if corp.exists() and not os.environ.get("HF_KEEP_CORPUS"):
+        shutil.rmtree(corp)
+    corp.mkdir(exist_ok=True)
+    out["corpus_policy"] = ("kept" if os.environ.get("HF_KEEP_CORPUS") else "fresh")
 
     # THE ENGINE ALREADY MINES BOTH OF THESE AND THE BENCHMARK WAS USING NEITHER.
     # Measured on sqlite, the dictionary alone took one harness from 867 to 5,441 edges

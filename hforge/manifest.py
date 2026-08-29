@@ -929,7 +929,7 @@ PHASES: tuple = (
                          "by the same format argument."),
         Deliverable("P3.SEEDS_BY_FORMAT",
                     "seeds matter in proportion to how unlikely valid input is by chance",
-                    DONE,
+                    PARTIAL,
                     modules=("hforge.analysis.seeds",),
                     tests=("test_an_explicitly_named_seed_directory_is_trusted",),
                     note="A CONTROLLED COMPARISON, one variable, same engine and same "
@@ -944,7 +944,21 @@ PHASES: tuple = (
                          "how unlikely valid input is by chance', and the corollary is that "
                          "the round-trip synthesis on the roadmap should be prioritised by "
                          "FORMAT, not by score: libwebp, libde265 and lcms2 first, because "
-                         "all three are binary containers and all three ship an encoder."),
+                         "all three are binary containers and all three ship an encoder. "
+                         "DOWNGRADED TO PARTIAL — THE COMPARISON WAS CONFOUNDED. The "
+                         "benchmark's corpus directory persisted across runs 009-021, so the "
+                         "seeded leptonica campaign started from the unseeded one's corpus "
+                         "PLUS the new seeds, and +9.94 cannot be attributed to seeds rather "
+                         "than to carry-over. The direction is still supported by the "
+                         "asymmetry — both cases carried over equally and only the binary "
+                         "one moved — but the magnitude is not established and neither "
+                         "number should be quoted as a seed effect. drive.py now uses a "
+                         "fresh corpus per run, with HF_KEEP_CORPUS for anyone who wants an "
+                         "accumulating campaign, which is a different and legitimate "
+                         "experiment. measure_gold already wiped its own corpus for exactly "
+                         "this reason: I applied the rule to the comparison I was suspicious "
+                         "of and not to the one I was making. Re-run needed before this is "
+                         "DONE."),
         Deliverable("P3.SIZED_FROM_STRUCT",
                     "a buffer whose size the library computed into a struct it filled",
                     PLANNED,
