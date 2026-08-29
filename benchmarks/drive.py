@@ -109,12 +109,24 @@ CASES = {
     # takes bytes — five steps to a gate verdict about something else entirely.
     hdr="/b/leptonica/src/allheaders.h", inc=["/b/leptonica/src"],
     src=sorted(glob.glob("/b/leptonica/src/*.c")),
-    fn="pixReadMem", cflags=[], max_len=65536,
-    cover=["/b/leptonica/src/readfile.c", "/b/leptonica/src/pngio.c",
-           "/b/leptonica/src/jpegio.c", "/b/leptonica/src/gifio.c",
-           "/b/leptonica/src/bmpio.c", "/b/leptonica/src/pnmio.c",
-           "/b/leptonica/src/webpio.c", "/b/leptonica/src/tiffio.c",
-           "/b/leptonica/src/spixio.c", "/b/leptonica/src/pix1.c"]),
+    fn="pixReadMem",
+    # The image I/O modules compile against libjpeg, libpng, libtiff, libwebp and giflib,
+    # none of which this image carries. leptonica guards each behind a HAVE_LIB macro that
+    # its configure sets; without configure they default on and the build fails on
+    # jpeglib.h. Turned off explicitly, which narrows pixReadMem to the formats leptonica
+    # decodes itself — BMP, PNM, SPIX — and that is stated rather than silently accepted:
+    # the denominator below is the files those formats can reach.
+    cflags=["-DHAVE_LIBJPEG=0", "-DHAVE_LIBPNG=0", "-DHAVE_LIBTIFF=0",
+            "-DHAVE_LIBWEBP=0", "-DHAVE_LIBGIF=0", "-DHAVE_LIBZ=0",
+            "-DHAVE_LIBJP2K=0", "-DHAVE_LIBWEBP_ANIM=0"],
+    max_len=65536,
+    # ONLY THE FORMATS THIS BUILD CAN DECODE. png, jpeg, tiff, webp and gif are compiled
+    # out above, so counting their readers would cap any harness far below what it can
+    # reach and make the figure meaningless.
+    cover=["/b/leptonica/src/readfile.c", "/b/leptonica/src/bmpio.c",
+           "/b/leptonica/src/pnmio.c", "/b/leptonica/src/spixio.c",
+           "/b/leptonica/src/pix1.c", "/b/leptonica/src/pix2.c",
+           "/b/leptonica/src/colormap.c"]),
  "jansson/json_loadb": dict(
     # The destructor is a STATIC INLINE in the header — `json_decref` calls json_delete —
     # so a producer reading declarations sees no destroyer for a handle it must free.
@@ -123,6 +135,32 @@ CASES = {
     src=sorted(glob.glob("/b/jansson/src/*.c")),
     fn="json_loadb", cflags=[], max_len=65536,
     cover=sorted(glob.glob("/b/jansson/src/*.c"))),
+ "libwebp/WebPDecodeRGBA": dict(
+    # THE MAP'S CANONICAL EXAMPLE: one heap overflow in libwebp reached Chrome, Firefox,
+    # Safari, Electron, Signal, Slack, Android and iOS at the same time. It is also in
+    # Android's platform image stack, so it belongs to the mobile surface as much as the
+    # desktop one.
+    #
+    # The SHAPE this adds: a free function with an owned return AND two scalar
+    # out-parameters. `uint8_t *WebPDecodeRGBA(const uint8_t *data, size_t data_size,
+    # int *width, int *height)` freed by `WebPFree(void *)`. Nothing else in the suite
+    # combines a caller-freed return with out-params the callee writes.
+    hdr="/b/libwebp/src/webp/decode.h",
+    # types.h, because `void WebPFree(void *)` is declared THERE and decode.h only includes
+    # it. The per-header filter in _preprocess keeps declarations from the named file only —
+    # rightly, or the producer proposes harnesses for stdio — so without this the destructor
+    # is invisible, no cleanup is planned, and a decoded image leaks on every input.
+    also=["/b/libwebp/src/webp/types.h"],
+    inc=["/b/libwebp", "/b/libwebp/src"],
+    src=(sorted(glob.glob("/b/libwebp/src/dec/*.c"))
+         + sorted(glob.glob("/b/libwebp/src/dsp/*.c"))
+         + sorted(glob.glob("/b/libwebp/src/utils/*.c"))),
+    fn="WebPDecodeRGBA", cflags=[], max_len=65536,
+    # DECODE PATH ONLY. enc/, mux/ and demux/ are separate libraries a decode entry point
+    # cannot reach; dsp/ carries both, but its encode kernels are unreachable from here and
+    # excluding the directory wholesale would drop the decode kernels with them.
+    cover=(sorted(glob.glob("/b/libwebp/src/dec/*.c"))
+           + sorted(glob.glob("/b/libwebp/src/utils/*.c")))),
  # ── C++ targets ───────────────────────────────────────────────────────────
  # First C++ case in the suite. libde265 is C++ behind an `extern "C"` API, which is the
  # common shape for codecs and the one that matters most: the header producer can read the
@@ -388,9 +426,29 @@ def main():
     # its own d1_liveness and d3_valid_input both said pass. Two facts in one row
     # contradicting each other, and nothing noticed.
     if not prof.exists() or prof.stat().st_size == 0:
-        out["result"] = ("NOT MEASURED: the campaign wrote no coverage profile "
-                         "(run.profraw is empty), so 0.00% would be a failed measurement "
-                         "reported as a real one")
+        # SAY WHAT KILLED IT, not merely that the profile is missing.
+        #
+        # jbig2dec reached 1,761 MB of RSS on a ~200-byte input and libFuzzer killed the
+        # process at its limit, so nothing flushed. Reporting that as "no profile" describes
+        # the symptom and hides the cause. An OOM or a crash that ends the campaign is a
+        # RESOURCE-POLICY outcome — the certificate already states that allocations beyond
+        # the limit are the campaign's policy and not a target defect — and it is a
+        # candidate for triage, which is a human act, not a finding this driver may declare.
+        why, artifact = "the campaign wrote no coverage profile", ""
+        for line in log.splitlines():
+            if line.startswith("SUMMARY: libFuzzer:"):
+                why = line.split("SUMMARY: libFuzzer:", 1)[1].strip()
+            elif "Test unit written to" in line:
+                artifact = line.rsplit(" ", 1)[-1].strip()
+        out["result"] = (f"NOT MEASURED: campaign ended on {why}, so no coverage was "
+                         f"flushed; 0.00% would be a failed measurement reported as a real "
+                         f"one")
+        out["campaign_end"] = why
+        if artifact:
+            out["reproducer"] = artifact
+            out["triage_note"] = ("A reproducer was written. Whether this is a target defect "
+                                  "or this harness's resource policy needs triage; the "
+                                  "engine does not decide that.")
         out["profraw_bytes"] = prof.stat().st_size if prof.exists() else -1
         print(json.dumps(out)); return
     mg = subprocess.run(["llvm-profdata-14","merge","-sparse",str(prof),

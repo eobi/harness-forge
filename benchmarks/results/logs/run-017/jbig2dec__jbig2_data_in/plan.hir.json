@@ -1,0 +1,420 @@
+{
+  "schema_version": "1.0",
+  "name": "jbig2dec_jbig2_data_in",
+  "producer": "header_graph",
+  "notes": "proposed from jbig2.h by signature inference; handle type inferred as 'Jbig2Ctx *'. Every inference here is checked by a static gate, and the producer certifies nothing.",
+  "target": {
+    "name": "jbig2dec",
+    "version": "",
+    "commit": "",
+    "public_headers": [
+      "/b/jbig2dec/jbig2.h"
+    ],
+    "include_dirs": [
+      "/b/jbig2dec"
+    ],
+    "sources": [
+      "/b/jbig2dec/jbig2.c",
+      "/b/jbig2dec/jbig2_arith.c",
+      "/b/jbig2dec/jbig2_arith_iaid.c",
+      "/b/jbig2dec/jbig2_arith_int.c",
+      "/b/jbig2dec/jbig2_generic.c",
+      "/b/jbig2dec/jbig2_halftone.c",
+      "/b/jbig2dec/jbig2_huffman.c",
+      "/b/jbig2dec/jbig2_hufftab.c",
+      "/b/jbig2dec/jbig2_image.c",
+      "/b/jbig2dec/jbig2_mmr.c",
+      "/b/jbig2dec/jbig2_page.c",
+      "/b/jbig2dec/jbig2_refinement.c",
+      "/b/jbig2dec/jbig2_segment.c",
+      "/b/jbig2dec/jbig2_symbol_dict.c",
+      "/b/jbig2dec/jbig2_text.c",
+      "/b/jbig2dec/memcmp.c",
+      "/b/jbig2dec/memento.c"
+    ],
+    "link_libs": [],
+    "cflags": [
+      "-DHAVE_STDINT_H",
+      "-Dbool=int"
+    ],
+    "seed_dirs": [],
+    "language": "c"
+  },
+  "platforms": [
+    "linux-aarch64-glibc"
+  ],
+  "apis": {
+    "jbig2_complete_page": {
+      "symbol": "jbig2_complete_page",
+      "header": "jbig2.h",
+      "params": [
+        {
+          "name": "ctx",
+          "type": {
+            "name": "Jbig2Ctx *",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        }
+      ],
+      "returns": {
+        "name": "int",
+        "kind": "scalar",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "query",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [],
+        "transfers_ownership": [],
+        "requires_nonnull": [
+          "ctx"
+        ],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    },
+    "jbig2_ctx_free": {
+      "symbol": "jbig2_ctx_free",
+      "header": "jbig2.h",
+      "params": [
+        {
+          "name": "ctx",
+          "type": {
+            "name": "Jbig2Ctx *",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        }
+      ],
+      "returns": {
+        "name": "Jbig2Allocator *",
+        "kind": "pointer",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "destroy",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [],
+        "transfers_ownership": [],
+        "requires_nonnull": [],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    },
+    "jbig2_ctx_new_imp": {
+      "symbol": "jbig2_ctx_new_imp",
+      "header": "jbig2.h",
+      "params": [
+        {
+          "name": "allocator",
+          "type": {
+            "name": "Jbig2Allocator *",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "options",
+          "type": {
+            "name": "Jbig2Options",
+            "kind": "scalar",
+            "const": false,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "global_ctx",
+          "type": {
+            "name": "Jbig2GlobalCtx *",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "error_callback",
+          "type": {
+            "name": "Jbig2ErrorCallback",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "error_callback_data",
+          "type": {
+            "name": "void *",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "jbig2_version_major",
+          "type": {
+            "name": "int",
+            "kind": "scalar",
+            "const": false,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "jbig2_version_minor",
+          "type": {
+            "name": "int",
+            "kind": "scalar",
+            "const": false,
+            "resolved": ""
+          }
+        }
+      ],
+      "returns": {
+        "name": "Jbig2Ctx *",
+        "kind": "pointer",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "create",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [
+          [
+            "error_callback_data",
+            "jbig2_version_major"
+          ]
+        ],
+        "transfers_ownership": [],
+        "requires_nonnull": [],
+        "error_return": "null",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    },
+    "jbig2_data_in": {
+      "symbol": "jbig2_data_in",
+      "header": "jbig2.h",
+      "params": [
+        {
+          "name": "ctx",
+          "type": {
+            "name": "Jbig2Ctx *",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "data",
+          "type": {
+            "name": "const unsigned char *",
+            "kind": "pointer",
+            "const": true,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "size",
+          "type": {
+            "name": "size_t",
+            "kind": "scalar",
+            "const": false,
+            "resolved": ""
+          }
+        }
+      ],
+      "returns": {
+        "name": "int",
+        "kind": "scalar",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "consume",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [
+          [
+            "data",
+            "size"
+          ]
+        ],
+        "transfers_ownership": [],
+        "requires_nonnull": [
+          "ctx"
+        ],
+        "error_return": "negative",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    }
+  },
+  "slices": [
+    {
+      "id": "data",
+      "kind": "bytes",
+      "remainder": true,
+      "min_len": 1,
+      "max_len": 0
+    }
+  ],
+  "resources": [
+    {
+      "id": "h",
+      "type": {
+        "name": "Jbig2Ctx *",
+        "kind": "pointer",
+        "const": false,
+        "resolved": ""
+      },
+      "storage": "handle"
+    }
+  ],
+  "scratch": [],
+  "sequence": [
+    {
+      "id": "o_create",
+      "api": "jbig2_ctx_new_imp",
+      "args": [
+        {
+          "param": "allocator",
+          "source": "literal",
+          "ref": "",
+          "value": 0
+        },
+        {
+          "param": "options",
+          "source": "literal",
+          "ref": "",
+          "value": 0
+        },
+        {
+          "param": "global_ctx",
+          "source": "literal",
+          "ref": "",
+          "value": 0
+        },
+        {
+          "param": "error_callback",
+          "source": "literal",
+          "ref": "",
+          "value": 0
+        },
+        {
+          "param": "error_callback_data",
+          "source": "literal",
+          "ref": "",
+          "value": 0
+        },
+        {
+          "param": "jbig2_version_major",
+          "source": "literal",
+          "ref": "",
+          "value": 0
+        },
+        {
+          "param": "jbig2_version_minor",
+          "source": "literal",
+          "ref": "",
+          "value": 20
+        }
+      ],
+      "binds": "h",
+      "targets": "",
+      "repeat": 0,
+      "guarded_by": []
+    },
+    {
+      "id": "o_consume",
+      "api": "jbig2_data_in",
+      "args": [
+        {
+          "param": "ctx",
+          "source": "resource",
+          "ref": "h",
+          "value": null
+        },
+        {
+          "param": "data",
+          "source": "input",
+          "ref": "data",
+          "value": null
+        },
+        {
+          "param": "size",
+          "source": "length_of",
+          "ref": "data",
+          "value": null
+        }
+      ],
+      "binds": "",
+      "targets": "",
+      "repeat": 0,
+      "guarded_by": [
+        "h"
+      ]
+    },
+    {
+      "id": "o_finish",
+      "api": "jbig2_complete_page",
+      "args": [
+        {
+          "param": "ctx",
+          "source": "resource",
+          "ref": "h",
+          "value": null
+        }
+      ],
+      "binds": "",
+      "targets": "",
+      "repeat": 0,
+      "guarded_by": [
+        "h"
+      ]
+    },
+    {
+      "id": "o_destroy",
+      "api": "jbig2_ctx_free",
+      "args": [
+        {
+          "param": "ctx",
+          "source": "resource",
+          "ref": "h",
+          "value": null
+        }
+      ],
+      "binds": "",
+      "targets": "h",
+      "repeat": 0,
+      "guarded_by": []
+    }
+  ],
+  "knobs": {
+    "max_len": 65536,
+    "min_len": 0,
+    "timeout_s": 25,
+    "rss_limit_mb": 2048,
+    "malloc_limit_mb": 0,
+    "sanitizers": [
+      "address"
+    ],
+    "detect_leaks": false,
+    "optimisation": "-O1"
+  },
+  "format_model": null,
+  "raw_blocks": []
+}

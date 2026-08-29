@@ -886,6 +886,44 @@ PHASES: tuple = (
                          "incompatible-pointer-types, implicit-function-declaration) and "
                          "attribute the failure to the PLAN, not to the target. A warning "
                          "about generated code is evidence about the generator."),
+        Deliverable("P3.GENERIC_FREE",
+                    "a generic free(void *) can release a typed owned return", DONE,
+                    modules=("hforge.producers.header_graph",),
+                    tests=("test_a_generic_void_free_releases_an_owned_return",),
+                    note="`uint8_t *WebPDecodeRGBA(const uint8_t *, size_t, int *, int *)` "
+                         "returns a decoded image released by `void WebPFree(void *)`. Three "
+                         "separate things had to be true and only the third was the reason "
+                         "the free was missing — I changed the first two on a wrong theory "
+                         "before checking, which is the mistake this engine exists to make "
+                         "expensive. (1) matching by type finds nothing, because void is not "
+                         "uint8_t, so a generic named free is now a LAST-RESORT destructor — "
+                         "typed always wins, and it must be named as a free or a void*-taking "
+                         "callback registrar would qualify. (2) _FINI_ISH needs the verb after "
+                         "`_` or a lowercase letter and WebPFree has an uppercase P, the same "
+                         "shape as BrotliDecoderDestroyInstance, so _DESTROY_ANYWHERE is used. "
+                         "(3) THE ACTUAL CAUSE: WebPFree is declared in types.h and the case "
+                         "named only decode.h. The per-header filter keeps declarations from "
+                         "the named file — rightly, or the producer proposes harnesses for "
+                         "stdio — so the destructor was invisible. The case now names both, "
+                         "as zopfli already did for deflate.h and zopfli.h. "
+                         "PROPOSING A FREE IS SAFE BECAUSE THE GATES CHECK IT: if the pointer "
+                         "were interior rather than owned, freeing it aborts under ASan on the "
+                         "first valid input and D3 refuses the plan before any campaign."),
+        Deliverable("P3.CAMPAIGN_END_REASON",
+                    "say what ended the campaign, not just that a profile is missing", DONE,
+                    modules=("hforge.toolchain",),
+                    tests=("test_a_pointer_squeezed_into_a_byte_is_refused_before_the_campaign",),
+                    note="run-017 reported jbig2dec as NOT MEASURED, which was the "
+                         "P3.EMPTY_PROFILE guard working — but it described the symptom. The "
+                         "log cap had fixed the 2.5 GB problem (80 KB this time) and the "
+                         "campaign still wrote nothing, after 813 executions: `SUMMARY: "
+                         "libFuzzer: out-of-memory`, peak RSS 1,761 MB from a ~200-byte "
+                         "input. libFuzzer kills the process, so nothing flushes. The driver "
+                         "now reads the summary line, reports the reason, and keeps the "
+                         "reproducer path with an explicit note that whether this is a target "
+                         "defect or this harness's resource policy needs TRIAGE — a human "
+                         "act. The certificate already says allocations beyond the limit are "
+                         "the campaign's policy and not a target defect."),
         Deliverable("P3.ADDR_DESTRUCTOR",
                     "a destructor declared T** gets the address of the T* handle", DONE,
                     modules=("hforge.emit.c_libfuzzer",),

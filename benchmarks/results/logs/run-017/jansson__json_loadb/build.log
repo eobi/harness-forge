@@ -1,0 +1,201 @@
+/b/jansson/src/hashtable.c:31:17: error: unknown type name 'uint32_t'
+extern volatile uint32_t hashtable_seed;
+                ^
+In file included from /b/jansson/src/hashtable.c:34:
+/b/jansson/src/lookup3.h:197:8: error: unknown type name 'uint32_t'
+static uint32_t hashlittle(const void *key, size_t length, uint32_t initval)
+       ^
+/b/jansson/src/lookup3.h:197:60: error: unknown type name 'uint32_t'
+static uint32_t hashlittle(const void *key, size_t length, uint32_t initval)
+                                                           ^
+/b/jansson/src/lookup3.h:199:11: error: expected ';' after expression
+  uint32_t a,b,c;                                          /* internal state */
+          ^
+          ;
+/b/jansson/src/lookup3.h:199:3: error: use of undeclared identifier 'uint32_t'
+  uint32_t a,b,c;                                          /* internal state */
+  ^
+/b/jansson/src/lookup3.h:199:12: error: use of undeclared identifier 'a'
+  uint32_t a,b,c;                                          /* internal state */
+           ^
+/b/jansson/src/lookup3.h:199:14: error: use of undeclared identifier 'b'
+  uint32_t a,b,c;                                          /* internal state */
+             ^
+/b/jansson/src/lookup3.h:199:16: error: use of undeclared identifier 'c'
+  uint32_t a,b,c;                                          /* internal state */
+               ^
+/b/jansson/src/lookup3.h:203:3: error: use of undeclared identifier 'a'
+  a = b = c = 0xdeadbeef + ((uint32_t)length) + initval;
+  ^
+/b/jansson/src/lookup3.h:203:30: error: use of undeclared identifier 'uint32_t'
+  a = b = c = 0xdeadbeef + ((uint32_t)length) + initval;
+                             ^
+/b/jansson/src/lookup3.h:203:11: error: use of undeclared identifier 'c'
+  a = b = c = 0xdeadbeef + ((uint32_t)length) + initval;
+          ^
+/b/jansson/src/lookup3.h:203:7: error: use of undeclared identifier 'b'
+  a = b = c = 0xdeadbeef + ((uint32_t)length) + initval;
+      ^
+/b/jansson/src/lookup3.h:207:11: error: unknown type name 'uint32_t'
+    const uint32_t *k = (const uint32_t *)key;         /* read 32-bit chunks */
+          ^
+/b/jansson/src/lookup3.h:207:32: error: unknown type name 'uint32_t'
+    const uint32_t *k = (const uint32_t *)key;         /* read 32-bit chunks */
+                               ^
+/b/jansson/src/lookup3.h:225:11: error: unknown type name 'uint8_t'
+    const uint8_t  *k8;
+          ^
+/b/jansson/src/lookup3.h:231:7: error: use of undeclared identifier 'a'
+      a += k[0];
+      ^
+/b/jansson/src/lookup3.h:232:7: error: use of undeclared identifier 'b'
+      b += k[1];
+      ^
+/b/jansson/src/lookup3.h:233:7: error: use of undeclared identifier 'c'
+      c += k[2];
+      ^
+/b/jansson/src/lookup3.h:234:11: error: use of undeclared identifier 'a'
+      mix(a,b,c);
+          ^
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+20 errors generated.
+/b/jansson/src/hashtable_seed.c:47:8: error: unknown type name 'uint32_t'
+static uint32_t buf_to_uint32(char *data) {
+       ^
+/b/jansson/src/hashtable_seed.c:49:13: error: expected ';' after expression
+    uint32_t result = 0;
+            ^
+            ;
+/b/jansson/src/hashtable_seed.c:49:5: error: use of undeclared identifier 'uint32_t'
+    uint32_t result = 0;
+    ^
+/b/jansson/src/hashtable_seed.c:49:14: error: use of undeclared identifier 'result'
+    uint32_t result = 0;
+             ^
+/b/jansson/src/hashtable_seed.c:51:28: error: use of undeclared identifier 'uint32_t'
+    for (i = 0; i < sizeof(uint32_t); i++)
+                           ^
+/b/jansson/src/hashtable_seed.c:52:9: error: use of undeclared identifier 'result'
+        result = (result << 8) | (unsigned char)data[i];
+        ^
+/b/jansson/src/hashtable_seed.c:52:19: error: use of undeclared identifier 'result'
+        result = (result << 8) | (unsigned char)data[i];
+                  ^
+/b/jansson/src/hashtable_seed.c:54:12: error: use of undeclared identifier 'result'
+    return result;
+           ^
+/b/jansson/src/hashtable_seed.c:146:40: error: unknown type name 'uint32_t'
+static int seed_from_timestamp_and_pid(uint32_t *seed) {
+                                       ^
+/b/jansson/src/hashtable_seed.c:154:14: error: use of undeclared identifier 'uint32_t'
+    *seed = (uint32_t)time(NULL);
+             ^
+/b/jansson/src/hashtable_seed.c:167:8: error: unknown type name 'uint32_t'
+static uint32_t generate_seed() {
+       ^
+/b/jansson/src/hashtable_seed.c:168:13: error: expected ';' after expression
+    uint32_t seed = 0;
+            ^
+            ;
+/b/jansson/src/hashtable_seed.c:168:5: error: use of undeclared identifier 'uint32_t'
+    uint32_t seed = 0;
+    ^
+/b/jansson/src/hashtable_seed.c:168:14: error: use of undeclared identifier 'seed'
+    uint32_t seed = 0;
+             ^
+/b/jansson/src/hashtable_seed.c:184:38: error: use of undeclared identifier 'seed'; did you mean 'fseek'?
+        seed_from_timestamp_and_pid(&seed);
+                                     ^~~~
+                                     fseek
+/usr/include/stdio.h:713:12: note: 'fseek' declared here
+extern int fseek (FILE *__stream, long int __off, int __whence);
+           ^
+/b/jansson/src/hashtable_seed.c:188:9: error: use of undeclared identifier 'seed'; did you mean 'fseek'?
+    if (seed == 0)
+        ^~~~
+        fseek
+/usr/include/stdio.h:713:12: note: 'fseek' declared here
+extern int fseek (FILE *__stream, long int __off, int __whence);
+           ^
+/b/jansson/src/hashtable_seed.c:189:9: error: use of undeclared identifier 'seed'
+        seed = 1;
+        ^
+/b/jansson/src/hashtable_seed.c:191:12: error: use of undeclared identifier 'seed'; did you mean 'fseek'?
+    return seed;
+           ^~~~
+           fseek
+/usr/include/stdio.h:713:12: note: 'fseek' declared here
+extern int fseek (FILE *__stream, long int __off, int __whence);
+           ^
+/b/jansson/src/hashtable_seed.c:191:12: warning: incompatible pointer to integer conversion returning 'int (FILE *, long, int)' (aka 'int (struct _IO_FILE *, long, int)') from a function with result type 'int' [-Wint-conversion]
+    return seed;
+           ^~~~
+/b/jansson/src/hashtable_seed.c:194:10: error: unknown type name 'uint32_t'
+volatile uint32_t hashtable_seed = 0;
+         ^
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+1 warning and 20 errors generated.
+In file included from /b/jansson/src/utf.c:8:
+/b/jansson/src/utf.h:20:17: error: unknown type name 'int32_t'
+int utf8_encode(int32_t codepoint, char *buffer, size_t *size);
+                ^
+/b/jansson/src/utf.h:23:57: error: unknown type name 'int32_t'
+size_t utf8_check_full(const char *buffer, size_t size, int32_t *codepoint);
+                                                        ^
+/b/jansson/src/utf.h:24:59: error: unknown type name 'int32_t'
+const char *utf8_iterate(const char *buffer, size_t size, int32_t *codepoint);
+                                                          ^
+/b/jansson/src/utf.c:11:17: error: unknown type name 'int32_t'
+int utf8_encode(int32_t codepoint, char *buffer, size_t *size) {
+                ^
+/b/jansson/src/utf.c:69:57: error: unknown type name 'int32_t'
+size_t utf8_check_full(const char *buffer, size_t size, int32_t *codepoint) {
+                                                        ^
+/b/jansson/src/utf.c:71:5: error: use of undeclared identifier 'int32_t'
+    int32_t value = 0;
+    ^
+/b/jansson/src/utf.c:75:9: error: use of undeclared identifier 'value'
+        value = u & 0x1F;
+        ^
+/b/jansson/src/utf.c:77:9: error: use of undeclared identifier 'value'
+        value = u & 0xF;
+        ^
+/b/jansson/src/utf.c:79:9: error: use of undeclared identifier 'value'
+        value = u & 0x7;
+        ^
+/b/jansson/src/utf.c:91:9: error: use of undeclared identifier 'value'
+        value = (value << 6) + (u & 0x3F);
+        ^
+/b/jansson/src/utf.c:91:18: error: use of undeclared identifier 'value'
+        value = (value << 6) + (u & 0x3F);
+                 ^
+/b/jansson/src/utf.c:94:9: error: use of undeclared identifier 'value'
+    if (value > 0x10FFFF) {
+        ^
+/b/jansson/src/utf.c:99:24: error: use of undeclared identifier 'value'
+    else if (0xD800 <= value && value <= 0xDFFF) {
+                       ^
+/b/jansson/src/utf.c:99:33: error: use of undeclared identifier 'value'
+    else if (0xD800 <= value && value <= 0xDFFF) {
+                                ^
+/b/jansson/src/utf.c:104:28: error: use of undeclared identifier 'value'
+    else if ((size == 2 && value < 0x80) || (size == 3 && value < 0x800) ||
+                           ^
+/b/jansson/src/utf.c:104:59: error: use of undeclared identifier 'value'
+    else if ((size == 2 && value < 0x80) || (size == 3 && value < 0x800) ||
+                                                          ^
+/b/jansson/src/utf.c:105:28: error: use of undeclared identifier 'value'
+             (size == 4 && value < 0x10000)) {
+                           ^
+/b/jansson/src/utf.c:111:22: error: use of undeclared identifier 'value'
+        *codepoint = value;
+                     ^
+/b/jansson/src/utf.c:116:62: error: unknown type name 'int32_t'
+const char *utf8_iterate(const char *buffer, size_t bufsize, int32_t *codepoint) {
+                                                             ^
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+20 errors generated.
+/b/jansson/src/value.c:63:17: error: unknown type name 'uint32_t'
+extern volatile uint32_t hashtable_seed;
+                ^
+1 error generated.

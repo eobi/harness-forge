@@ -10,6 +10,8 @@ SRC="${1:-/b/jansson}"
 cat > "$SRC/src/jansson_config.h" <<'HDR'
 #ifndef JANSSON_CONFIG_H
 #define JANSSON_CONFIG_H
+/* hashtable.c and lookup3.h use uint32_t; configure arranges this include. */
+#include <stdint.h>
 #define JSON_INLINE inline
 #define JSON_INTEGER_IS_LONG_LONG 1
 #define JSON_HAVE_LOCALECONV 1

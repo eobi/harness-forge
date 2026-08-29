@@ -1744,3 +1744,29 @@ def test_a_const_config_struct_still_needs_its_initialiser():
                 res = next(r for r in p.resources if r.id == arg.ref)
                 assert res.storage != "out", (
                     "a const config was treated as a callee-filled slot and passed zeroed")
+
+
+def test_a_generic_void_free_releases_an_owned_return():
+    """`uint8_t *WebPDecodeRGBA(...)` is released by `void WebPFree(void *)`.
+
+    Matching by type finds nothing, because void is not uint8_t, so the harness cast the
+    returned pointer to long, added it to the sink, and leaked a decoded image on every
+    input. A generic named free is a LAST-RESORT destructor: a typed one always wins, and
+    it must be named as a free or a void*-taking callback registrar would qualify.
+
+    Proposing it is safe because the gates check it — freeing an interior pointer aborts
+    under ASan on the first valid input and D3 refuses the plan before any campaign.
+    """
+    from hforge.emit import emit
+    plans = _plans_for("""
+        typedef unsigned char uint8_t;
+        uint8_t *WebPDecodeRGBA(const uint8_t *data, size_t data_size, int *width, int *height);
+        void WebPFree(void *ptr);
+    """)
+    p = next((x for x in plans if any(o.api == "WebPDecodeRGBA" for o in x.sequence)), None)
+    assert p is not None, "no plan for an entry point that plainly takes (bytes, len)"
+    assert any(o.api == "WebPFree" for o in p.sequence), (
+        f"the decoded image is never released: {[o.api for o in p.sequence]}")
+    src = emit(p).source
+    assert "WebPFree(" in src and "(long)WebPDecodeRGBA" not in src, (
+        "the return was discarded into the sink instead of being held and freed")

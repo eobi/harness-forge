@@ -1,0 +1,32 @@
+/b/leptonica/src/boxbasic.c:1055:17: warning: using the result of an assignment as a condition without parentheses [-Wparentheses]
+        if (box = boxaGetValidBox(boxas, i, copyflag)) {
+            ~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/b/leptonica/src/boxbasic.c:1055:17: note: place parentheses around the assignment to silence this warning
+        if (box = boxaGetValidBox(boxas, i, copyflag)) {
+                ^
+            (                                        )
+/b/leptonica/src/boxbasic.c:1055:17: note: use '==' to turn this assignment into an equality comparison
+        if (box = boxaGetValidBox(boxas, i, copyflag)) {
+                ^
+                ==
+1 warning generated.
+/b/leptonica/src/jpegio.c:144:10: fatal error: 'jpeglib.h' file not found
+#include "jpeglib.h"
+         ^~~~~~~~~~~
+1 error generated.
+/b/leptonica/src/libversions.c:53:10: fatal error: 'jpeglib.h' file not found
+#include "jpeglib.h"
+         ^~~~~~~~~~~
+1 error generated.
+/b/leptonica/src/pngio.c:132:10: fatal error: 'png.h' file not found
+#include "png.h"
+         ^~~~~~~
+1 error generated.
+/b/leptonica/src/tiffio.c:137:10: fatal error: 'tiff.h' file not found
+#include "tiff.h"
+         ^~~~~~~~
+1 error generated.
+/b/leptonica/src/zlibmem.c:60:10: fatal error: 'zlib.h' file not found
+#include "zlib.h"
+         ^~~~~~~~
+1 error generated.

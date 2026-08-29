@@ -1091,7 +1091,23 @@ def _free_function_plans(decls, target, platforms, knobs, seen) -> list:
         ret_key = hkey(a.returns.name, pm)
         drop_ops: list = []
         ret_res: list = []
-        if ret_key in known and a.returns.name.strip() not in ("void", ""):
+        # AN OWNED RETURN IS NOT ALWAYS A "HANDLE".
+        #
+        # `uint8_t *WebPDecodeRGBA(const uint8_t *data, size_t size, int *w, int *h)`
+        # returns a decoded image the caller must release with `WebPFree(void *)`. uint8_t
+        # is not in `known` — nothing treats a byte pointer as a handle — so no destructor
+        # was even looked for, and the harness cast the return to long, added it to the
+        # sink, and LEAKED A DECODED IMAGE ON EVERY INPUT.
+        #
+        # Proposing the free is safe BECAUSE THE GATES CHECK IT. If the pointer is interior
+        # rather than owned, freeing it aborts under ASan on the first valid input and D3
+        # refuses the plan before any campaign runs. That is the trade this engine is built
+        # to make: propose what the evidence suggests, and let a gate that runs decide.
+        owned_return = (a.returns.kind == "pointer"
+                        and a.returns.name.strip() not in ("void", "")
+                        and (ret_key in known
+                             or _destroyer_of(ret_key, apis, pm) is not None))
+        if owned_return:
             d = _destroyer_of(ret_key, apis, pm)
             if d is not None:
                 rid = f"ret_{ret_key}"
@@ -1839,7 +1855,27 @@ def _destroyer_of(base: str, apis: dict, pm: dict):
               # role nor the end-anchored pattern, so every lcms2 profile leaked.
               if _DESTROY_ANYWHERE.search(a.symbol) and len(a.params) == 1
               and "const" not in a.params[0].type.name
-              and hkey(a.params[0].type.name, pm) == base), None)
+              and hkey(a.params[0].type.name, pm) == base), None) or \
+        next((a for a in apis.values()
+              # A GENERIC `free(void *)` FREES ANY POINTER THIS LIBRARY RETURNED.
+              #
+              # `void WebPFree(void *ptr)` releases what `uint8_t *WebPDecodeRGBA(...)`
+              # returned, and matching by type finds nothing because `void` is not
+              # `uint8_t`. The harness then cast the returned pointer to long, added it to
+              # the sink, and LEAKED A DECODED IMAGE ON EVERY INPUT — under LeakSanitizer
+              # every finding would be the harness's own, which is what S1 exists to stop.
+              #
+              # Deliberately last, so a typed destructor always wins: this only fires when
+              # the library offers nothing more specific. It must also be NAMED as a free,
+              # or `void *`-taking helpers like a callback registrar would qualify.
+              #
+              # _DESTROY_ANYWHERE, not _FINI_ISH: the end-anchored pattern needs the verb
+              # after `_` or a lowercase letter, and `WebPFree` has an uppercase P before
+              # it. Same shape as BrotliDecoderDestroyInstance.
+              if _DESTROY_ANYWHERE.search(a.symbol) and len(a.params) == 1
+              and a.params[0].type.name.count("*") == 1
+              and base_type(a.params[0].type.name) == "void"
+              and a.returns.name.strip() in ("void", "")), None)
 
 
 def _resource_chain(cons, apis: dict, pm: dict, known: set, depth: int = 3) -> Optional[dict]:
