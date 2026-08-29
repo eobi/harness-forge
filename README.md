@@ -121,49 +121,6 @@ passed.
 
 ---
 
-## Where the engine stands
-
-```mermaid
-flowchart LR
-    subgraph WORKS["running today"]
-        direction TB
-        A1["IR + 6 static gates"]
-        A2["9 dynamic gates<br/>against a real build"]
-        A3["C · C++ · Java backends<br/>behind one emitter router"]
-        A4["header-graph producer<br/>multi-resource lifecycles"]
-        A5["harness lifting<br/>grade someone else's C"]
-        A6["24-platform matrix<br/>with trust ceilings"]
-        A7["seed mining from the<br/>target's own test data"]
-        A8["target-written dictionaries"]
-        A9["findings gates F1–F8<br/>+ ladder rungs 0–6"]
-        A10["plancheck — 73 DONE claims,<br/>each backed by a test that runs"]
-    end
-
-    subgraph PART["partly built"]
-        direction TB
-        B1["suite coverage<br/>tool built, not yet run"]
-        B2["C++ targets<br/>libde265 measured, graphite2 refused"]
-    end
-
-    subgraph OPEN["not started"]
-        direction TB
-        C1["seed synthesis via the<br/>library's own encoder<br/>— now the top item"]
-        C2["measurement-driven<br/>repair loop"]
-        C3["Linux GUI"]
-    end
-
-    WORKS --> PART --> OPEN
-
-    classDef ok fill:#efe,stroke:#3a3,color:#060
-    classDef mid fill:#ffd,stroke:#ca0,color:#750
-    classDef no fill:#eee,stroke:#999,color:#555
-    class A1,A2,A3,A4,A5,A6,A7,A8,A9,A10 ok
-    class B1,B2 mid
-    class C1,C2,C3 no
-```
-
----
-
 ## Try it — five commands, and the output they actually print
 
 No installation, no build step, no dependencies beyond a C compiler. The first four blocks
