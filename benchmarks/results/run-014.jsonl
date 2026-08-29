@@ -1,0 +1,3 @@
+{"case": "jbig2dec/jbig2_data_in", "engine": "8ab15c6", "target": "jbig2_data_in", "proposed": 0, "plans_for_target": 0, "result": "NO PLAN for the gold target"}
+{"case": "leptonica/pixReadMem", "engine": "8ab15c6", "target": "pixReadMem", "proposed": 1043, "plans_for_target": 0, "result": "NO PLAN for the gold target"}
+{"case": "jansson/json_loadb", "engine": "8ab15c6", "target": "json_loadb", "proposed": 76, "plans_for_target": 0, "result": "NO PLAN for the gold target"}

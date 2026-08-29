@@ -464,6 +464,41 @@ PHASES: tuple = (
                          "it was written; the C backend never had it because no case "
                          "exercised the path until now. Guarded with #ifdef __cplusplus in "
                          "both the harness and the replay driver, so a C build is unchanged."),
+        Deliverable("P3.CAPS_TYPE",
+                    "an all-caps type is not an export macro", DONE,
+                    modules=("hforge.producers.header_graph",),
+                    tests=("test_an_all_caps_type_is_not_mistaken_for_an_export_macro",),
+                    note="found by pointing the engine at leptonica, Tier B of the "
+                         "attack-surface map and the OCR stack under tesseract. "
+                         "`LEPT_DLL extern PIX * pixReadMem(...)`: LEPT_DLL is an export "
+                         "macro and PIX is the RETURN TYPE, and case alone cannot tell them "
+                         "apart. Stripping both left the return type as a bare `*`, which "
+                         "has no identifier, so the declaration was dropped — and with it "
+                         "EVERY pointer-returning function in the library. Measured effect: "
+                         "1482 declarations parsed, no pixReadMem, and the handle "
+                         "mis-inferred as `l_uint8 *` from a parameter, so the benchmark "
+                         "reported NO PLAN for the gold target. After the fix: 2747 "
+                         "declarations, handle `PIX *`, and plans that call it. A decoration "
+                         "macro precedes the type, so when nothing else survives the last "
+                         "uppercase token is the one that has to be the type."),
+        Deliverable("P3.TRAILING_ATTR",
+                    "an attribute macro after the parameter list is not the declaration",
+                    DONE,
+                    modules=("hforge.producers.header_graph",),
+                    tests=("test_an_attribute_macro_after_the_parameter_list_is_not_the_declaration",
+                           "test_a_macro_wrapping_the_name_is_still_stripped"),
+                    note="jansson declares its entry point as `json_t *json_loadb(...) "
+                         "JANSSON_ATTRS((warn_unused_result));`. _split_call scans BACKWARDS "
+                         "for the parameter list — correctly, because a parameter may be a "
+                         "function pointer — and so found JANSSON_ATTRS's parentheses "
+                         "instead. The declaration parsed with name='JANSSON_ATTRS' and "
+                         "json_loadb was never seen, which is why the benchmark reported NO "
+                         "PLAN. __attribute__((...)), __declspec(...), WARN_UNUSED_RESULT "
+                         "and every project's own spelling have this shape. The guard that "
+                         "makes the fix safe: the text BEFORE the suffix must itself end in "
+                         "`)`, which is what keeps `BZ_API(BZ2_bzCompressInit)(bz_stream *)` "
+                         "and png's parenthesised name intact — there the macro wraps the "
+                         "NAME and the real parameter list is genuinely last."),
         Deliverable("P3.NOMINAL",
                     "opaque `void *` typedefs are distinct types, not all `void`", DONE,
                     modules=("hforge.producers.header_graph",),

@@ -1453,3 +1453,50 @@ def test_an_owned_return_keeps_its_pointer_type():
     decl = [l.strip() for l in emit(p).source.splitlines()
             if "hf_r_err" in l and "=" in l and "NULL" in l][0]
     assert "*" in decl, f"emitted a non-pointer declaration: {decl}"
+
+
+def test_an_all_caps_type_is_not_mistaken_for_an_export_macro():
+    """`LEPT_DLL extern PIX * pixReadMem(...)` — LEPT_DLL is a macro, PIX is the type.
+
+    Case alone cannot tell them apart, and stripping both left the return type as a bare
+    `*`, which has no identifier, so the declaration was dropped. With it went every
+    pointer-returning function in leptonica: 1482 declarations parsed, no pixReadMem, and
+    the handle mis-inferred as `l_uint8 *` from a parameter. PIX, FPIX, DPIX, PIXCMAP,
+    NUMA and SARRAY are all types spelled in capitals.
+    """
+    assert hg._clean_return("LEPT_DLL extern PIX *") == "PIX *"
+    assert hg._clean_return("LEPT_DLL extern l_ok") == "l_ok"
+    # a macro that really is only decoration still goes
+    assert hg._clean_return("XMLPUBFUN xmlDocPtr XMLCALL") == "xmlDocPtr"
+
+
+def test_an_attribute_macro_after_the_parameter_list_is_not_the_declaration():
+    """jansson declares its entry point with a trailing attribute macro.
+
+        json_t *json_loadb(const char *buf, size_t n, size_t flags, json_error_t *error)
+            JANSSON_ATTRS((warn_unused_result));
+
+    Scanning backwards for the parameter list finds JANSSON_ATTRS's parentheses, so the
+    declaration parsed as name='JANSSON_ATTRS' and json_loadb was never seen at all.
+    """
+    head, name, params = hg._split_call(
+        "json_t *json_loadb(const char *buffer, size_t buflen, size_t flags, "
+        "json_error_t *error) JANSSON_ATTRS((warn_unused_result))")
+    assert name == "json_loadb", f"parsed the attribute macro as the function: {name!r}"
+    assert hg._clean_return(head) == "json_t *"
+    assert "buflen" in params
+
+
+def test_a_macro_wrapping_the_name_is_still_stripped():
+    """The guard that makes the fix above safe.
+
+    `BZ_API(BZ2_bzCompressInit)(bz_stream *strm)` also ends in `)...)`, but the text
+    before the macro does NOT end in `)`, so it is a wrapped NAME and not a trailing
+    attribute. Treating the two alike would break bzip2 and png.
+    """
+    _, name, _ = hg._split_call("BZ_EXTERN int BZ_API(BZ2_bzCompressInit)(bz_stream *strm)")
+    assert name == "BZ2_bzCompressInit"
+    head, name, _ = hg._split_call(
+        "extern png_structp (png_create_read_struct)(png_const_charp ver)")
+    assert name == "png_create_read_struct"
+    assert hg._clean_return(head) == "png_structp"

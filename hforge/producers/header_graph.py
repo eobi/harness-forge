@@ -120,13 +120,41 @@ def _statements(src: str) -> list:
     return [s for s in out if s]
 
 
+_TRAILING_ATTR = re.compile(
+    r"^(?P<decl>.*\))\s*(?:__attribute__|__declspec|[A-Z][A-Z0-9_]{2,})\s*\(.*\)$",
+    re.S)
+
+
+def _strip_trailing_attribute(stmt: str) -> str:
+    """Remove an attribute macro that follows the parameter list.
+
+        json_t *json_loadb(const char *buf, size_t n, size_t flags, json_error_t *error)
+            JANSSON_ATTRS((warn_unused_result));
+
+    Scanning backwards for the parameter list finds JANSSON_ATTRS's parentheses instead,
+    so the declaration parsed with name='JANSSON_ATTRS' and json_loadb was never seen —
+    which is why jansson produced no plan for its own entry point. `__attribute__((...))`,
+    `WARN_UNUSED_RESULT` and every project's own spelling have this shape.
+
+    The guard is that the text BEFORE the suffix must itself end in `)`. That is what keeps
+    `BZ_EXTERN int BZ_API(BZ2_bzCompressInit)(bz_stream *strm)` intact, where the macro
+    wraps the NAME and the real parameter list is genuinely last.
+    """
+    for _ in range(4):                            # a declaration may carry several
+        m = _TRAILING_ATTR.match(stmt.strip())
+        if not m:
+            break
+        stmt = m.group("decl")
+    return stmt
+
+
 def _split_call(stmt: str):
     """Split `<return type> <name> ( <params> )` by finding the parameter list from the END.
 
     Scanning backwards matters: a parameter may itself be a function pointer, so the first
     `(` in the statement is often not the one that opens the parameter list.
     """
-    stmt = stmt.strip()
+    stmt = _strip_trailing_attribute(stmt.strip())
     if not stmt.endswith(")"):
         return None
     depth, i = 0, len(stmt) - 1
@@ -176,14 +204,27 @@ def _clean_return(ret: str) -> str:
     # `extern gzFile hf_r_h = NULL;` into the harness.
     ret = re.sub(r"\b(extern|static|inline|__inline|__inline__|register|auto|"
                  r"_Noreturn)\b", " ", ret)
-    kept = []
+    kept, dropped = [], []
     for tok in ret.split():
         bare = tok.replace("*", "")
         if bare and bare.isupper() and bare not in _TYPE_WORDS and len(bare) > 2:
+            dropped.append(bare)
             if "*" in tok:                       # keep the stars a macro was glued to
                 kept.append("*" * tok.count("*"))
             continue
         kept.append(tok)
+    # AN ALL-CAPS TYPE IS NOT AN EXPORT MACRO, and case alone cannot tell them apart.
+    #
+    # `LEPT_DLL extern PIX * pixReadMem(...)` reduced to `*`: LEPT_DLL is a macro and PIX
+    # is the RETURN TYPE, and both are uppercase. With no identifier left the declaration
+    # was dropped, and so was every other pointer-returning function in leptonica — 1482
+    # declarations parsed, no pixReadMem, and the handle mis-inferred as `l_uint8 *` from a
+    # parameter. PIX, FPIX, DPIX, PIXCMAP, NUMA, SARRAY are all types spelled in caps.
+    #
+    # A decoration macro precedes the type, so the LAST uppercase token is the one that has
+    # to be a type when nothing else survives. Put it back rather than return a bare star.
+    if dropped and not any(c.isalpha() for c in "".join(kept)):
+        kept.insert(0, dropped[-1])
     return " ".join(kept).strip()
 
 
