@@ -893,3 +893,70 @@ did not run.
 The winner is correct for a real reason. On the `cstring` plan the off-by-one mutant reads
 the NUL terminator, which is in bounds, so that mutant survives; the length-delimited plan
 has no such cover and kills both.
+
+---
+
+## Citing this work
+
+GitHub renders a **Cite this repository** button from [`CITATION.cff`](CITATION.cff).
+For a bibliography:
+
+```bibtex
+@software{obiebukadavid_harnessforge_2026,
+  author  = {{Obi Ebuka David}},
+  title   = {{Harness Forge}: a certification authority for fuzzing harnesses},
+  year    = {2026},
+  version = {0.1.0},
+  url     = {https://github.com/eobi/harness-forge},
+  license = {Apache-2.0},
+  note    = {Department of Computer Science, University of Dayton, Ohio, USA}
+}
+```
+
+The double braces around the name are deliberate: without them most BibTeX styles reorder
+it to "David, O. E."
+
+Plain text:
+
+> Obi Ebuka David (2026). *Harness Forge: a certification authority for fuzzing harnesses*
+> (version 0.1.0) [Computer software]. Department of Computer Science, University of
+> Dayton, Ohio, USA. https://github.com/eobi/harness-forge
+
+**Cite the commit, not the branch.** This engine produces measurements, and a measurement is
+only reproducible against a fixed version of the thing that produced it. That is not a
+formality here: three producer fixes landed within twenty minutes of run-009's last case
+finishing, and any one of them changes what a harness looks like. Every row in
+[`benchmarks/results/`](benchmarks/results/) carries the engine revision that emitted its
+harness for exactly this reason, with `-dirty` appended when the tree had uncommitted
+changes. Include the short SHA of the commit you ran:
+
+```bibtex
+  note = {Commit f2f55b7}
+```
+
+If you need a DOI for a journal that requires one, enable the Zenodo integration for this
+repository and cut a release; Zenodo mints a DOI per release and reads the metadata from
+`CITATION.cff` directly.
+
+## Citing a number this engine produced
+
+If you are citing a coverage figure rather than the software, cite the run and not just the
+repository. Every figure in [`benchmarks/RANKING.md`](benchmarks/RANKING.md) is reproducible
+from three things kept in the tree:
+
+| | |
+|---|---|
+| the row | `benchmarks/results/<run-id>.jsonl` — plan, sequence, seeds, dictionary, engine sha |
+| the evidence | `benchmarks/results/logs/<run-id>/<case>/` — the harness, both invocations, libFuzzer's full output, the per-file coverage table |
+| the command | `benchmarks/run.sh <run-id> <seconds> <case>` |
+
+And please carry the distinction the tables carry: a figure this repository **measured** and
+a figure someone else **published** are different kinds of evidence. The QuartetFuzz and
+gold columns are citations, keyed by case id, and
+[`THIRD-PARTY.md`](THIRD-PARTY.md) says where they come from. The one exception is marked
+with a dagger — libde265's gold figure, which this repository measured from the project's
+own in-tree harness.
+
+## Licence
+
+Apache-2.0. See [LICENSE](LICENSE).

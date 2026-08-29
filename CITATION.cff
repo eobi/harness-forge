@@ -1,0 +1,42 @@
+cff-version: 1.2.0
+title: "Harness Forge: a certification authority for fuzzing harnesses"
+message: >-
+  If you use this software in academic work, please cite it using the metadata
+  below. If you cite a number it produced, cite the commit that produced it:
+  every row in benchmarks/results/ carries the engine revision that emitted its
+  harness, and a coverage figure is only reproducible against a fixed version of
+  the thing that measured it.
+type: software
+authors:
+  - given-names: Obi Ebuka
+    family-names: David
+    alias: "Obi Ebuka David"
+    affiliation: "Department of Computer Science, University of Dayton, Ohio, USA"
+repository-code: "https://github.com/eobi/harness-forge"
+abstract: >-
+  A certification authority for fuzzing harnesses, in which generators are
+  replaceable plug-ins. The field builds generators, and the field's own numbers
+  say the generator is not the bottleneck: harness defects produce
+  false-positive crash rates as high as 94%, and an audit of 586 production
+  harnesses found 53 protocol violations. The bottleneck is that nobody can tell
+  whether a harness is any good until after it has wasted a campaign or produced
+  a false finding. This is not a generator but an intermediate representation, a
+  bank of static and dynamic gates, and an evidence record. A producer proposes
+  a plan, the gates certify it, and confidence decides nothing. A gate returns a
+  verdict with its evidence rather than a boolean, and NOT_RUN is a distinct
+  outcome from PASS, so a check that could not run never reads as one that
+  passed. Every certificate states what the harness cannot find, computed from
+  the sanitizers and knobs in force, so that a campaign reporting nothing has a
+  stated scope for its silence.
+keywords:
+  - fuzzing
+  - fuzz-driver-generation
+  - harness-synthesis
+  - libfuzzer
+  - static-analysis
+  - software-security
+  - memory-safety
+  - coordinated-disclosure
+license: Apache-2.0
+version: "0.1.0"
+date-released: "2026-08-29"
