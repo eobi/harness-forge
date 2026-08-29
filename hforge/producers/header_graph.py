@@ -2100,7 +2100,14 @@ def _plans_for_handle(decls, target, handle, inline_base, init_name, fini_name,
         err = _error_accessor_for(handle, cons, apis, pm, used, _in_slice)
         if err is not None:
             acc, acc_args, freer, freer_args = err
-            resources.append(Resource("err", TypeRef(hkey(acc.returns.name, pm), "pointer"),
+            # THE DECLARED RETURN TYPE, VERBATIM — not hkey(), which resolves a type to its
+            # BASE and so turns `unsigned char *` into `unsigned char`. The emitter takes
+            # the pointer from the type NAME, because a handle typedef like `yajl_handle`
+            # already carries its own star; a raw pointer return does not. Getting this
+            # wrong declared `unsigned char hf_r_err`, truncated the returned pointer to one
+            # byte, and made the paired free segfault on the third execution — measured as
+            # 0.00% where the case had been 65.12%.
+            resources.append(Resource("err", TypeRef(acc.returns.name.strip(), "pointer"),
                                       storage="handle"))
             seq.append(Op("o_error", acc.symbol, acc_args, binds="err",
                           guarded_by=["h"] if (create and handle) else []))

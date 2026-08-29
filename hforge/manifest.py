@@ -605,7 +605,20 @@ PHASES: tuple = (
                            "test_the_error_string_is_freed_by_its_own_pair",
                            "test_an_error_accessor_with_no_freer_is_not_called_at_all",
                            "test_a_verbose_flag_is_not_bound_to_the_input_length"),
-                    note="CORRECTED AFTER MEASUREMENT. The first version of this entry "
+                    note="CORRECTED TWICE, BOTH TIMES BY MEASUREMENT. The real cause was a "
+                         "LOST POINTER: the owned return was given the type hkey() "
+                         "resolves, and hkey() resolves to a BASE type, so `unsigned char *` "
+                         "was declared `unsigned char`. The returned pointer was truncated "
+                         "into one byte and the paired free segfaulted. The handle escaped "
+                         "only because `yajl_handle` is a typedef carrying its own star. "
+                         "The C compiler warned (incompatible pointer-to-integer conversion) "
+                         "and the build succeeded anyway — see P3.BENCH_NO_DYNAMIC_GATES and "
+                         "P3.WARNINGS_ARE_EVIDENCE. My FIRST diagnosis blamed the verbose "
+                         "flag and a genuine stack overflow in yajl_render_error_string; "
+                         "that code is real but it was not this crash, and re-measuring with "
+                         "verbose=0 returned 0.00% again. Reading the emitted declaration "
+                         "found it in a minute. verbose stays 0 on its own merits. "
+                         "EARLIER NOTE FOLLOWS. The first version of this entry "
                          "claimed the harness was right and said only that the coverage "
                          "effect was unmeasured. Measuring it (run-011) returned 0.00% "
                          "against 65.12% before: the harness SEGV'd on its third execution, "
@@ -637,6 +650,20 @@ PHASES: tuple = (
                          "this moves 65.12 toward gold's 69.1 is unmeasured as of this "
                          "entry — the claim here is that the harness is right, not that the "
                          "number moved."),
+        Deliverable("P3.WARNINGS_ARE_EVIDENCE",
+                    "a compiler warning about the harness is a gate signal, not noise",
+                    PLANNED,
+                    note="`unsigned char hf_r_err = NULL;` then "
+                         "`hf_r_err = yajl_get_error(...)` is an incompatible "
+                         "pointer-to-integer conversion. clang says so, the build succeeds, "
+                         "nobody reads it, and the campaign spends 600 seconds proving it. "
+                         "This is S2.TYPE_CONFUSION — the gate this engine already has — "
+                         "occurring at the C level after emission, where no gate looks. Fix: "
+                         "compile the harness with -Werror on the conversion classes that "
+                         "indicate an emitter defect (int-conversion, "
+                         "incompatible-pointer-types, implicit-function-declaration) and "
+                         "attribute the failure to the PLAN, not to the target. A warning "
+                         "about generated code is evidence about the generator."),
         Deliverable("P3.BENCH_NO_DYNAMIC_GATES",
                     "the benchmark driver runs static gates only", PLANNED,
                     note="benchmarks/drive.py calls run_static_gates and nothing else, so "

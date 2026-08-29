@@ -1,0 +1,41 @@
+Dictionary: 49 entries
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1130668268
+INFO: Loaded 1 modules   (1062 inline 8-bit counters): 1062 [0xaaaada5d8540, 0xaaaada5d8966), 
+INFO: Loaded 1 PC tables (1062 PCs): 1062 [0xaaaada5d8968,0xaaaada5dcbc8), 
+INFO:     3413 files found in /b/runs/yajl-ruby__json_fuzzer/corpus
+INFO: seed corpus: files: 3413 min: 1b max: 31760b total: 1927174b rss: 46Mb
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==25==ERROR: AddressSanitizer: SEGV on unknown address 0x0000000000c0 (pc 0xaaaada585c50 bp 0xfffffdb17d90 sp 0xfffffdb17540 T0)
+==25==The signal is caused by a READ memory access.
+==25==Hint: address points to the zero page.
+    #0 0xaaaada585c50 in __aarch64_cas1_acq_rel (/b/runs/yajl-ruby__json_fuzzer/fuzz+0x135c50) (BuildId: ca8febf4b36e45f9bdb9e358d91269efb434f629)
+    #1 0xaaaada4b8c04 in __asan::Allocator::Deallocate(void*, unsigned long, unsigned long, __sanitizer::BufferedStackTrace*, __asan::AllocType) (/b/runs/yajl-ruby__json_fuzzer/fuzz+0x68c04) (BuildId: ca8febf4b36e45f9bdb9e358d91269efb434f629)
+    #2 0xaaaada52e918 in __interceptor_free (/b/runs/yajl-ruby__json_fuzzer/fuzz+0xde918) (BuildId: ca8febf4b36e45f9bdb9e358d91269efb434f629)
+    #3 0xaaaada56702c in yajl_internal_free /b/yajl/src/yajl_alloc.c:42:5
+    #4 0xaaaada566e6c in yajl_free_error /b/yajl/src/yajl.c:172:5
+    #5 0xaaaada565c98 in LLVMFuzzerTestOneInput /b/runs/yajl-ruby__json_fuzzer/harness.c:54:9
+    #6 0xaaaada49fa04 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) (/b/runs/yajl-ruby__json_fuzzer/fuzz+0x4fa04) (BuildId: ca8febf4b36e45f9bdb9e358d91269efb434f629)
+    #7 0xaaaada49f1bc in fuzzer::Fuzzer::RunOne(unsigned char const*, unsigned long, bool, fuzzer::InputInfo*, bool, bool*) (/b/runs/yajl-ruby__json_fuzzer/fuzz+0x4f1bc) (BuildId: ca8febf4b36e45f9bdb9e358d91269efb434f629)
+    #8 0xaaaada4a0d78 in fuzzer::Fuzzer::ReadAndExecuteSeedCorpora(std::vector<fuzzer::SizedFile, std::allocator<fuzzer::SizedFile> >&) (/b/runs/yajl-ruby__json_fuzzer/fuzz+0x50d78) (BuildId: ca8febf4b36e45f9bdb9e358d91269efb434f629)
+    #9 0xaaaada4a1288 in fuzzer::Fuzzer::Loop(std::vector<fuzzer::SizedFile, std::allocator<fuzzer::SizedFile> >&) (/b/runs/yajl-ruby__json_fuzzer/fuzz+0x51288) (BuildId: ca8febf4b36e45f9bdb9e358d91269efb434f629)
+    #10 0xaaaada490764 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) (/b/runs/yajl-ruby__json_fuzzer/fuzz+0x40764) (BuildId: ca8febf4b36e45f9bdb9e358d91269efb434f629)
+    #11 0xaaaada4b7a68 in main (/b/runs/yajl-ruby__json_fuzzer/fuzz+0x67a68) (BuildId: ca8febf4b36e45f9bdb9e358d91269efb434f629)
+    #12 0xffff86417740  (/lib/aarch64-linux-gnu/libc.so.6+0x27740) (BuildId: 6f268ff546c56d7f14e9501a55698cc2d0ab4732)
+    #13 0xffff86417814 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x27814) (BuildId: 6f268ff546c56d7f14e9501a55698cc2d0ab4732)
+    #14 0xaaaada486aac in _start (/b/runs/yajl-ruby__json_fuzzer/fuzz+0x36aac) (BuildId: ca8febf4b36e45f9bdb9e358d91269efb434f629)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV (/b/runs/yajl-ruby__json_fuzzer/fuzz+0x135c50) (BuildId: ca8febf4b36e45f9bdb9e358d91269efb434f629) in __aarch64_cas1_acq_rel
+==25==ABORTING
+MS: 0 ; base unit: 0000000000000000000000000000000000000000
+0x66,
+f
+artifact_prefix='./'; Test unit written to ./crash-4a0a19218e082a343a1b17e5333409af9d98f0f5
+Base64: Zg==
+stat::number_of_executed_units: 2
+stat::average_exec_per_sec:     0
+stat::new_units_added:          0
+stat::slowest_unit_time_sec:    0
+stat::peak_rss_mb:              47

@@ -1429,3 +1429,27 @@ def test_a_verbose_flag_is_not_bound_to_the_input_length():
     assert by["verbose"].value == 0, (
         f"verbose is {by['verbose'].value}; a scalar we did not have to choose gets 0")
     assert by["jsonTextLen"].source == "length_of", "the real length lost its binding"
+
+
+def test_an_owned_return_keeps_its_pointer_type():
+    """`unsigned char *` must not be declared as `unsigned char`.
+
+    hkey() resolves a type to its BASE, which is right for matching handles across typedef
+    aliases and wrong for declaring a variable. It turned `unsigned char *` into
+    `unsigned char`, the emitter declared a one-byte variable, the returned pointer was
+    truncated into it, and the paired free segfaulted on the third execution. Measured as
+    0.00% on a case that had been 65.12%.
+
+    The handle escaped only because `yajl_handle` is a typedef that carries its own star.
+    """
+    p = _yajl_plan()
+    err = next(o for o in p.sequence if o.api == "yajl_get_error")
+    res = next(r for r in p.resources if r.id == err.binds)
+    assert "*" in res.type.name, (
+        f"resource {res.id!r} declared as {res.type.name!r}: the pointer is gone, and the "
+        f"emitter takes the star from the type name")
+
+    from hforge.emit import emit
+    decl = [l.strip() for l in emit(p).source.splitlines()
+            if "hf_r_err" in l and "=" in l and "NULL" in l][0]
+    assert "*" in decl, f"emitted a non-pointer declaration: {decl}"

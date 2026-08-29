@@ -60,7 +60,7 @@ reads 48.74% over the wrong file set and 70.47% over the right one.
 
 Measured cases with a gold baseline: **1**. Median ours/gold: **0.00x**. Ahead of the cited QuartetFuzz figure on **0 of the 1** cases it published one for.
 
-Sources: run-011.
+Sources: run-012.
 
 <!-- TABLE:END -->
 
