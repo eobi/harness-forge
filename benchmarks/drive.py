@@ -108,7 +108,10 @@ CASES = {
     # `typedef unsigned char l_uint8` is never seen, and pixReadMem stops looking like it
     # takes bytes — five steps to a gate verdict about something else entirely.
     hdr="/b/leptonica/src/allheaders.h", inc=["/b/leptonica/src"],
-    src=sorted(glob.glob("/b/leptonica/src/*.c")),
+    src=(sorted(glob.glob("/b/leptonica/src/*.c"))
+         + [f for f in sorted(glob.glob("/b/libpng/*.c"))
+            if not f.endswith(("/example.c", "/pngtest.c"))]
+         + sorted(glob.glob("/b/zlib/*.c"))),
     fn="pixReadMem",
     # The image I/O modules compile against libjpeg, libpng, libtiff, libwebp and giflib,
     # none of which this image carries. leptonica guards each behind a HAVE_LIB macro that
@@ -116,21 +119,31 @@ CASES = {
     # jpeglib.h. Turned off explicitly, which narrows pixReadMem to the formats leptonica
     # decodes itself — BMP, PNM, SPIX — and that is stated rather than silently accepted:
     # the denominator below is the files those formats can reach.
-    cflags=["-DHAVE_LIBJPEG=0", "-DHAVE_LIBPNG=0", "-DHAVE_LIBTIFF=0",
-            "-DHAVE_LIBWEBP=0", "-DHAVE_LIBGIF=0", "-DHAVE_LIBZ=0",
-            "-DHAVE_LIBJP2K=0", "-DHAVE_LIBWEBP_ANIM=0"],
-    # leptonica's prog/ directory, which carries its test images. Only a handful are in the
-    # formats this build can still decode — the external image libraries are compiled out
-    # above — but a real BMP header is worth more than any number of random bytes.
-    seeds=["/b/leptonica/prog"],
+    # PNG AND ZLIB ARE COMPILED IN, because both are already in this tree and leptonica
+    # guards each decoder behind a HAVE_LIB macro. Turning everything off to make the build
+    # work also cut the surface to BMP, PNM and SPIX — the formats leptonica implements
+    # itself — which is a large part of why it read 17.24%. jpeg, tiff, webp and gif stay
+    # off: their libraries are not here.
+    cflags=["-DHAVE_LIBJPEG=0", "-DHAVE_LIBPNG=1", "-DHAVE_LIBTIFF=0",
+            "-DHAVE_LIBWEBP=0", "-DHAVE_LIBGIF=0", "-DHAVE_LIBZ=1",
+            "-DHAVE_LIBJP2K=0", "-DHAVE_LIBWEBP_ANIM=0",
+            "-I/b/libpng", "-I/b/zlib"],
+    # prog/ for its own test images, AND pngsuite now that PNG decoding is compiled IN.
+    # 51 canonical PNGs are worth more than leptonica's handful of BMPs: measured on this
+    # very build, its own images read 8.32% of lines against 0.84% for random bytes of the
+    # same sizes, so the corpus is the lever and PNG is the format with the corpus.
+    seeds=["/b/leptonica/prog", "/b/libpng/contrib/pngsuite"],
     max_len=65536,
     # ONLY THE FORMATS THIS BUILD CAN DECODE. png, jpeg, tiff, webp and gif are compiled
     # out above, so counting their readers would cap any harness far below what it can
     # reach and make the figure meaningless.
+    # LEPTONICA'S OWN READERS ONLY. libpng and zlib are linked so that pngio.c has
+    # something to call, but they are their own cases with their own rows and counting them
+    # here would measure a dependency rather than this entry point.
     cover=["/b/leptonica/src/readfile.c", "/b/leptonica/src/bmpio.c",
            "/b/leptonica/src/pnmio.c", "/b/leptonica/src/spixio.c",
-           "/b/leptonica/src/pix1.c", "/b/leptonica/src/pix2.c",
-           "/b/leptonica/src/colormap.c"]),
+           "/b/leptonica/src/pngio.c", "/b/leptonica/src/pix1.c",
+           "/b/leptonica/src/pix2.c", "/b/leptonica/src/colormap.c"]),
  "jansson/json_loadb": dict(
     # The destructor is a STATIC INLINE in the header — `json_decref` calls json_delete —
     # so a producer reading declarations sees no destroyer for a handle it must free.
@@ -216,6 +229,80 @@ CASES = {
     # excluding the directory wholesale would drop the decode kernels with them.
     cover=(sorted(glob.glob("/b/libwebp/src/dec/*.c"))
            + sorted(glob.glob("/b/libwebp/src/utils/*.c")))),
+ # ── the internet's plumbing ───────────────────────────────────────────────
+ # Libraries that sit in the path of untrusted input on a very large fraction of the
+ # deployed internet. Two of them are heavily fuzzed already, which makes them CALIBRATION
+ # rather than discovery: if this engine cannot reach a decent fraction of expat, the
+ # number says something about the engine, not the library.
+ "expat/XML_Parse": dict(
+    # XML for Python's ElementTree, Perl, PHP, Firefox, and most C software that reads XML.
+    # A textbook lifecycle — XML_ParserCreate / XML_Parse / XML_ParserFree — which is the
+    # shape this producer was built around, so a low score here would be damning.
+    # Run benchmarks/targets/expat.sh first for the cmake-generated expat_config.h.
+    hdr="/b/expat/expat/lib/expat.h",
+    inc=["/b/expat/expat", "/b/expat/expat/lib"],
+    # A LIBRARY'S .c FILES ARE NOT ALL MEANT TO BE COMPILED, and expat is the third target
+    # in this suite to prove it — after jbig2dec's CLI tools and libpng's pngtest.c. Three
+    # distinct reasons here:
+    #   xmltok_impl.c, xmltok_ns.c, xcsinc.c   #included INTO another file, not compiled
+    #   random_*.c                             one PLATFORM ALTERNATE per entropy source,
+    #                                          and cmake picks exactly one. Compiling all
+    #                                          six pulls in rand_s (Windows) and
+    #                                          arc4random (BSD), neither of which links.
+    # random_getrandom.c is kept because expat_config.h declares HAVE_GETRANDOM, so the
+    # header and the source list have to agree — that is what a build system is for, and
+    # writing it out is the price of not having one.
+    src=[f for f in sorted(glob.glob("/b/expat/expat/lib/*.c"))
+         if not f.endswith(("/xmltok_impl.c", "/xmltok_ns.c", "/xcsinc.c"))
+         and not (f.rsplit("/", 1)[-1].startswith("random_")
+                  and not f.endswith("/random_getrandom.c"))],
+    fn="XML_Parse", cflags=["-DHAVE_EXPAT_CONFIG_H", "-DXML_GE=1"], max_len=65536,
+    seeds=["/b/expat/expat/tests"],
+    cover=[f for f in sorted(glob.glob("/b/expat/expat/lib/*.c"))
+           if not f.endswith(("/xmltok_impl.c", "/xmltok_ns.c", "/xcsinc.c"))
+           and not (f.rsplit("/", 1)[-1].startswith("random_")
+                    and not f.endswith("/random_getrandom.c"))]),
+ "mbedtls/mbedtls_x509_crt_parse": dict(
+    # X.509 CERTIFICATE PARSING — where untrusted bytes enter every TLS handshake, before
+    # any authentication has happened. mbedTLS is in routers, IoT firmware, embedded Linux
+    # and anything that needs TLS without OpenSSL's footprint.
+    #
+    # 3.6 LTS deliberately: mbedTLS 4.x moved its crypto into the tf_psa_crypto submodule,
+    # so a shallow clone of main cannot build at all, and 3.6 is what deployments run.
+    #
+    # A textbook lifecycle on a (bytes, len) entry point:
+    #   mbedtls_x509_crt_init -> mbedtls_x509_crt_parse(chain, buf, buflen)
+    #                         -> mbedtls_x509_crt_free
+    hdr="/b/mbedtls/include/mbedtls/x509_crt.h",
+    inc=["/b/mbedtls/include", "/b/mbedtls/library"],
+    src=sorted(glob.glob("/b/mbedtls/library/*.c")),
+    fn="mbedtls_x509_crt_parse", cflags=[], max_len=65536,
+    # mbedTLS ships DER and PEM certificates for its own test suite: real ASN.1, which a
+    # mutator does not reach by accident. Same argument as pngsuite for libpng.
+    seeds=["/b/mbedtls/tests/data_files"],
+    # THE X.509 SURFACE ONLY. The TLS state machine, the ciphersuites and the crypto
+    # primitives are linked because the parser calls into them, but a certificate-parsing
+    # entry point does not reach ssl_tls13_server.c, and counting it would cap the figure
+    # far below anything achievable.
+    cover=["/b/mbedtls/library/x509.c", "/b/mbedtls/library/x509_crt.c",
+           "/b/mbedtls/library/x509_crl.c", "/b/mbedtls/library/x509_csr.c",
+           "/b/mbedtls/library/asn1parse.c", "/b/mbedtls/library/oid.c",
+           "/b/mbedtls/library/pem.c", "/b/mbedtls/library/base64.c"]),
+ "zstd/ZSTD_decompress": dict(
+    # zstd is in the Linux kernel, btrfs, most package managers, and every large web stack
+    # that compresses anything. `size_t ZSTD_decompress(void *dst, size_t dstCapacity,
+    # const void *src, size_t compressedSize)` is the caller-owns-the-output-buffer shape:
+    # a scratch buffer sized by a knob, which the stream binder already models.
+    hdr="/b/zstd/lib/zstd.h", inc=["/b/zstd/lib", "/b/zstd/lib/common"],
+    src=[f for f in sorted(glob.glob("/b/zstd/lib/common/*.c")
+                           + glob.glob("/b/zstd/lib/decompress/*.c")
+                           + glob.glob("/b/zstd/lib/compress/*.c"))],
+    fn="ZSTD_decompress", cflags=["-DZSTD_DISABLE_ASM=1"], max_len=65536,
+    # DECOMPRESSION ONLY. compress/ is linked because the decoder references shared
+    # entropy code, but a decode entry point cannot reach the encoder and counting it
+    # would cap the figure for no reason.
+    cover=sorted(glob.glob("/b/zstd/lib/decompress/*.c")
+                 + glob.glob("/b/zstd/lib/common/*.c"))),
  # ── C++ targets ───────────────────────────────────────────────────────────
  # First C++ case in the suite. libde265 is C++ behind an `extern "C"` API, which is the
  # common shape for codecs and the one that matters most: the header producer can read the
