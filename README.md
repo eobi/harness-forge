@@ -142,12 +142,12 @@ flowchart LR
     subgraph PART["partly built"]
         direction TB
         B1["suite coverage<br/>tool built, not yet run"]
-        B2["C++ targets<br/>backend done, 2 recipes open"]
+        B2["C++ targets<br/>libde265 measured, graphite2 refused"]
     end
 
     subgraph OPEN["not started"]
         direction TB
-        C1["seed synthesis via the<br/>library's own encoder"]
+        C1["seed synthesis via the<br/>library's own encoder<br/>— now the top item"]
         C2["measurement-driven<br/>repair loop"]
         C3["Linux GUI"]
     end
@@ -518,7 +518,7 @@ Ground rules, because a benchmark whose rules are loose is not evidence:
 - **The protocol is theirs, and it favours them.** Gold and QuartetFuzz are the median of
   10 x 600 s runs. Ours is **one** 600 s run — a single sample against a median.
 
-### run-009, 600 s, Linux aarch64, clang 14
+### 600 s per case, Linux aarch64, clang 14
 
 <!-- BENCH:BEGIN -->
 
@@ -552,7 +552,7 @@ replace. (PromeFuzz's 1.40x headline is quoted in `reference.json` and kept out 
 table: we have not reproduced it and do not know its case selection, protocol or
 denominator.)
 
-Two rows deserve a second look.
+Three rows deserve a second look.
 
 **`iperf/cjson_fuzzer`, QuartetFuzz 0.00.** Not a low score — no working harness at all.
 This is the failure mode the gate bank exists to make visible: a generator with no
@@ -567,6 +567,26 @@ exposed, because the benchmark libraries do not spell things the way older C doe
 handle typedefs, a destroy verb in the middle of a name, `dwSize` Hungarian length
 parameters. Those five are pinned by
 tests and recorded in [`hforge/manifest.py`](hforge/manifest.py) under `P3.NOMINAL`.
+
+**`libde265/stream_decode` carries a gold figure we measured, marked †.** libde265 ships its
+own hand-written fuzz harness in tree, so instead of citing a number from someone's paper we
+built theirs, ran it here for the same 600 s over the same file list from a fresh corpus with
+the same seeds, and compared. **0.98x.**
+
+That case is worth reading for what it disproves. Our plan calls `de265_decode` once where
+the hand-written harness pumps it in a loop and drains decoded pictures — a real gap, and one
+we expected to cost dearly. It cost **0.25 points**, because the entire H.265 decode core
+(`cabac.cc`, `deblock.cc`, `intrapred.cc`, `motion.cc`, `transform.cc`) is at **0.00% for the
+hand-written harness too**, across 1.8 million executions each. libFuzzer cannot synthesise a
+valid HEVC bitstream from an empty corpus in ten minutes; both harnesses spend the whole
+budget in NAL parsing. **On that target the harness is not the bottleneck — the input is**,
+and no amount of harness quality changes it.
+
+A cited gold figure could not have established that: 14.80% would have read as a broken
+measurement or a bad denominator. Measuring it here made it a fact about the target, and it
+reordered the roadmap — seed synthesis before the decode loop, on evidence rather than
+intuition. Written up in
+[`benchmarks/results/logs/run-010/libde265__stream_decode/DIAGNOSIS.md`](benchmarks/results/logs/run-010/libde265__stream_decode/DIAGNOSIS.md).
 
 Full protocol, the denominator rule and its ceiling argument, and what is deliberately not
 measured: [`benchmarks/RANKING.md`](benchmarks/RANKING.md).
