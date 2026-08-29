@@ -1566,10 +1566,24 @@ PHASES: tuple = (
                          "apart from outside. A GUI target therefore needs a THIRD normal "
                          "outcome beside processed and crashed: rejected-with-an-error, "
                          "which is a pass, not a finding. "
-                         "STILL OPEN: Escape and ctrl+w do not dismiss the error state, so "
-                         "the session cannot be recycled and each input needs a fresh "
-                         "process. Dismissal needs the AT-SPI ACTION interface on the info "
-                         "bar's button rather than synthetic key events."),
+                         "DISMISSAL WAS THE WRONG GOAL, and measuring settled it. The "
+                         "AT-SPI action interface works — 18 buttons enumerated, "
+                         "doAction returns in 0 ms — but eog's error info bar carries no "
+                         "close button, because it is a STATUS INDICATOR and not a modal "
+                         "dialog. There is nothing to dismiss. "
+                         "THE LIVENESS ORACLE, which is what the driver actually needed: "
+                         "after clicking a control in the error state the tree re-enumerates "
+                         "to 76 nodes, so the app is SERVICING REQUESTS. That distinguishes "
+                         "'rejected this input' from 'hung' from outside the process, and it "
+                         "is independent of the window-and-close behaviour that produced the "
+                         "false reading — an oracle independent of the discovering "
+                         "mechanism, which is rung 3's rule applied to a GUI. "
+                         "So the driver's correct action for an error state is record the "
+                         "rejection, kill the process, next input. Session recycling is "
+                         "unavailable for this target and that is a property of eog, not a "
+                         "limitation of the harness. Dismissal still matters for genuinely "
+                         "MODAL dialogs — overwrite prompts, crash reporters — which is why "
+                         "this stays PARTIAL rather than done."),
     )),
 
     Phase("P7", "mobile: Android and iOS", PARTIAL, (
