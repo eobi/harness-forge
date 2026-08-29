@@ -23,7 +23,6 @@
       "/b/libde265/libde265/deblock.cc",
       "/b/libde265/libde265/decctx.cc",
       "/b/libde265/libde265/dpb.cc",
-      "/b/libde265/libde265/en265.cc",
       "/b/libde265/libde265/fallback-dct.cc",
       "/b/libde265/libde265/fallback-deblk.cc",
       "/b/libde265/libde265/fallback-intrapred.cc",

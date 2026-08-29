@@ -27,20 +27,29 @@ def _ratio(ours: float | None, gold: float | None) -> str:
     return f"{ours / gold:.2f}x"
 
 
-def main(results: str, write: bool = False) -> int:
-    rp = Path(results)
-    if not rp.exists():
-        print(f"no such results file: {rp}", file=sys.stderr)
+def main(results, write: bool = False) -> int:
+    # SEVERAL RESULTS FILES, LATER ONES WINNING PER CASE.
+    #
+    # The standing table is per CASE, not per run: run-009 measured eight cases and run-010
+    # measured one, and regenerating from run-010 alone would blank the other eight rather
+    # than update the one. A row is only ever replaced by a newer measurement of the SAME
+    # case, never by the absence of one.
+    paths = [Path(r) for r in ([results] if isinstance(results, str) else results)]
+    missing = [p for p in paths if not p.exists()]
+    if missing:
+        print(f"no such results file(s): {', '.join(str(m) for m in missing)}",
+              file=sys.stderr)
         return 1
     ref = json.loads((HERE / "reference.json").read_text())["cases"]
 
     measured: dict[str, dict] = {}
-    for line in rp.read_text().splitlines():
-        line = line.strip()
-        if not line:
-            continue
-        d = json.loads(line)
-        measured[d["case"]] = d
+    for rp in paths:
+        for line in rp.read_text().splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            d = json.loads(line)
+            measured[d["case"]] = d
 
     order = list(ref)
     for case in measured:                                  # cases with no reference at all
@@ -53,11 +62,20 @@ def main(results: str, write: bool = False) -> int:
 
     print("| case | ours | QuartetFuzz | gold | ours/gold | QF/gold |")
     print("|---|---|---|---|---|---|")
-    wins = comparable = 0
+    wins = comparable = head_to_head = 0
     for case in order:
         r = ref.get(case, {})
         m = measured.get(case)
         gold, qf = r.get("gold"), r.get("quartetfuzz")
+
+        # A gold figure THIS REPOSITORY MEASURED outranks a cited one: same machine, same
+        # compiler, same budget, same denominator. It goes in the gold column with a mark,
+        # never merged with a citation.
+        if m is not None and (m.get("gold_measured_here") or {}).get("lines_pct"):
+            gold = float(m["gold_measured_here"]["lines_pct"])
+            gold_measured = True
+        else:
+            gold_measured = False
 
         if m is None:
             ours_s, ours = "*not yet run*", None
@@ -71,13 +89,25 @@ def main(results: str, write: bool = False) -> int:
 
         if ours is not None and gold:
             comparable += 1
-            if qf is not None and ours > qf:
+        # The QuartetFuzz record needs its OWN denominator. libde265 has no QF figure at
+        # all, and counting it as a case we did not win understates the record just as
+        # surely as dropping a loss would overstate it.
+        if ours is not None and qf is not None:
+            head_to_head += 1
+            if ours > qf:
                 wins += 1
 
         print(f"| {case} | {ours_s} "
               f"| {'—' if qf is None else f'{qf:.2f}'} "
-              f"| {'—' if gold is None else f'{gold:.1f}'} "
+              f"| {'—' if gold is None else (f'{gold:.2f}†' if gold_measured else f'{gold:.1f}')} "
               f"| {_ratio(ours, gold)} | {_ratio(qf, gold)} |")
+
+    if any((m.get("gold_measured_here") or {}).get("lines_pct") for m in measured.values()):
+        print("")
+        print("† gold MEASURED by this repository from the project's own in-tree harness, "
+              "not cited. Same machine, same compiler, same 600 s, same file list, and a "
+              "fresh corpus from the same seeds — so the comparison differs in the harness "
+              "and in nothing else.")
 
     ours_r = [float(m["lines_pct"]) / ref[c]["gold"]
               for c, m in measured.items()
@@ -89,7 +119,10 @@ def main(results: str, write: bool = False) -> int:
         print()
         print(f"Measured cases with a gold baseline: **{comparable}**. "
               f"Median ours/gold: **{med:.2f}x**. "
-              f"Ahead of the cited QuartetFuzz figure on **{wins} of {comparable}**.")
+              f"Ahead of the cited QuartetFuzz figure on "
+              f"**{wins} of the {head_to_head}** cases it published one for.")
+    print("")
+    print("Sources: " + ", ".join(sorted(p.stem for p in paths)) + ".")
 
     table = "\n".join(lines)
     if not write:
@@ -111,11 +144,12 @@ def main(results: str, write: bool = False) -> int:
         head, rest = doc.split(a, 1)
         _, tail = rest.split(b, 1)
         md.write_text(f"{head}{a}\n\n{table}\n\n{b}{tail}")
-        sys.stderr.write(f"{md.name}: table regenerated from {rp.name}\n")
+        sys.stderr.write(f"{md.name}: table regenerated from "
+                         f"{', '.join(p.name for p in paths)}\n")
     return rc
 
 
 if __name__ == "__main__":
     argv = [a for a in sys.argv[1:] if a != "--write"]
-    raise SystemExit(main(argv[0] if argv else str(HERE / "results" / "run-009.jsonl"),
+    raise SystemExit(main(argv or sorted(str(p) for p in (HERE / "results").glob("run-*.jsonl")),
                           write="--write" in sys.argv))

@@ -532,8 +532,13 @@ Ground rules, because a benchmark whose rules are loose is not evidence:
 | zopfli/zopfli_deflate_fuzzer | **86.17** | 80.06 | 85.7 | 1.01x | 0.93x |
 | zlib/zlib_uncompress2_fuzzer | **53.93** | 51.74 | 53.1 | 1.02x | 0.97x |
 | lcms2/cmsOpenProfileFromMem | **5.14** | — | — |  |  |
+| libde265/stream_decode | **14.55** | — | 14.80† | 0.98x |  |
 
-Measured cases with a gold baseline: **7**. Median ours/gold: **1.01x**. Ahead of the cited QuartetFuzz figure on **6 of 7**.
+† gold MEASURED by this repository from the project's own in-tree harness, not cited. Same machine, same compiler, same 600 s, same file list, and a fresh corpus from the same seeds — so the comparison differs in the harness and in nothing else.
+
+Measured cases with a gold baseline: **8**. Median ours/gold: **1.01x**. Ahead of the cited QuartetFuzz figure on **6 of the 7** cases it published one for.
+
+Sources: run-009, run-010.
 
 <!-- BENCH:END -->
 
