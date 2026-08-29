@@ -1,0 +1,50 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  tests:
+    # The engine has no runtime dependencies, so the matrix is about the language floor
+    # rather than about a dependency resolver.
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.9", "3.11", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: pip install pytest
+      - run: python -m pytest -q
+
+  plancheck:
+    # A manifest that claims a deliverable is DONE must name a module that imports and a
+    # test that exists. This job is the reason those claims can be trusted, so it is a
+    # gate and not a report.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install pytest
+      - run: python tools/plancheck.py
+
+  selftest:
+    # The end-to-end pipeline against the demo library: static gates, emit, build with
+    # clang, run the dynamic gates, produce a certificate. selftest distinguishes SKIP
+    # from PASS, so a stage this runner cannot execute is never counted as one that did.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: sudo apt-get update && sudo apt-get install -y clang llvm
+      - run: python -m hforge doctor
+      - run: python -m hforge selftest
