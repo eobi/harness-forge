@@ -1,0 +1,10 @@
+The original fuzz.log was 2.5 GB and is not kept.
+
+jbig2dec prints an error message to stderr for EVERY rejected input, through the
+default handler that a NULL error_callback selects. 25,353,303 executions produced
+2.5 GB of "jbig2 decoder FATAL ERROR: page has no image" and "not a JBIG2 file
+header". The driver captured all of it in memory, the process did not survive to
+flush its coverage profile, run.profraw was 0 bytes, and llvm-cov reported 0.00%
+for a harness that had just run 25 million times and passed D1 and D3.
+
+fuzz.log.head and fuzz.log.tail hold the first 200 KB and last 100 KB.

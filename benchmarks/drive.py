@@ -342,12 +342,37 @@ def main():
 
     prof = wd/"run.profraw"
     env = dict(os.environ, LLVM_PROFILE_FILE=str(prof))
-    fr = subprocess.run([str(binp), str(corp), *dict_args, f"-max_total_time={seconds}",
-                         "-print_final_stats=1", f"-max_len={mlen}"],
-                        capture_output=True, text=True, errors="replace",
-                        env=env, timeout=seconds+300)
-    log = fr.stdout + fr.stderr
-    (logs/"fuzz.log").write_text(log)
+    # THE CAMPAIGN'S OUTPUT GOES TO A FILE, NOT INTO MEMORY.
+    #
+    # jbig2dec prints an error to stderr for every rejected input, through the default
+    # handler a NULL error_callback selects. 25,353,303 executions produced 2.5 GB of
+    # "jbig2 decoder FATAL ERROR: page has no image". capture_output=True held all of it
+    # in this process, the campaign did not survive to flush its coverage profile,
+    # run.profraw came out 0 bytes, and llvm-cov reported 0.00% for a harness that had
+    # just run 25 million times and passed D1 and D3.
+    #
+    # A talkative library is not a defect. Reading its output into memory is.
+    logf = logs/"fuzz.log"
+    with open(logf, "w", errors="replace") as fh:
+        fr = subprocess.run([str(binp), str(corp), *dict_args, f"-max_total_time={seconds}",
+                             "-print_final_stats=1", f"-max_len={mlen}"],
+                            stdout=fh, stderr=subprocess.STDOUT,
+                            env=env, timeout=seconds+300)
+    size = logf.stat().st_size
+    out["campaign_log_bytes"] = size
+    CAP = 8 << 20
+    if size > CAP:
+        # Keep both ends: the header carries the seed and the dictionary, the tail carries
+        # the final stats. Everything between is the same line several million times.
+        with open(logf, "rb") as fh:
+            head = fh.read(CAP // 2)
+            fh.seek(-(CAP // 2), 2)
+            tail = fh.read()
+        logf.write_bytes(head + b"\n\n[... " + str(size - CAP).encode() +
+                         b" bytes elided: the target writes to stderr on every input ...]\n\n"
+                         + tail)
+        out["campaign_log_truncated"] = True
+    log = logf.read_text(errors="replace")
     (logs/"fuzz.cmd").write_text(
         " ".join([str(binp), str(corp), *dict_args, f"-max_total_time={seconds}",
                   "-print_final_stats=1", f"-max_len={mlen}"]) + "\n")
@@ -355,8 +380,25 @@ def main():
         (logs/"target.dict").write_text(dpath.read_text(errors="replace"))
     out["executions"] = int(next((x for x in __import__("re").findall(
         r"stat::number_of_executed_units:\s*(\d+)", log)), 0) or 0)
-    subprocess.run(["llvm-profdata-14","merge","-sparse",str(prof),"-o",str(wd/"run.profdata")],
-                   capture_output=True)
+    # AN EMPTY PROFILE IS A FAILED MEASUREMENT, NOT A ZERO.
+    #
+    # `llvm-profdata merge` SUCCEEDS on an empty .profraw and produces a valid, empty
+    # profile; llvm-cov then reports 0.00% for every file. That is indistinguishable from a
+    # harness that genuinely covered nothing — and jbig2dec published exactly that row while
+    # its own d1_liveness and d3_valid_input both said pass. Two facts in one row
+    # contradicting each other, and nothing noticed.
+    if not prof.exists() or prof.stat().st_size == 0:
+        out["result"] = ("NOT MEASURED: the campaign wrote no coverage profile "
+                         "(run.profraw is empty), so 0.00% would be a failed measurement "
+                         "reported as a real one")
+        out["profraw_bytes"] = prof.stat().st_size if prof.exists() else -1
+        print(json.dumps(out)); return
+    mg = subprocess.run(["llvm-profdata-14","merge","-sparse",str(prof),
+                         "-o",str(wd/"run.profdata")], capture_output=True, text=True)
+    if mg.returncode != 0:
+        (logs/"profdata.log").write_text(mg.stdout + mg.stderr)
+        out["result"] = f"NOT MEASURED: llvm-profdata merge failed: {mg.stderr[-200:]}"
+        print(json.dumps(out)); return
     # THE DENOMINATOR IS DERIVED, NOT HAND-LISTED.
     #
     # I hand-listed cover files three times and was wrong three times: libyaml's loader

@@ -886,6 +886,28 @@ PHASES: tuple = (
                          "incompatible-pointer-types, implicit-function-declaration) and "
                          "attribute the failure to the PLAN, not to the target. A warning "
                          "about generated code is evidence about the generator."),
+        Deliverable("P3.EMPTY_PROFILE",
+                    "an empty coverage profile is a failed measurement, not a zero", DONE,
+                    modules=("hforge.toolchain",),
+                    tests=("test_a_pointer_squeezed_into_a_byte_is_refused_before_the_campaign",),
+                    note="jbig2dec published 0.00% on 25,353,303 executions in run-016, in a "
+                         "row whose own d1_liveness and d3_valid_input both said pass. Two "
+                         "facts contradicting each other and nothing noticed. THE CAUSE was "
+                         "not the harness, which is correct: jbig2dec prints an error to "
+                         "stderr for EVERY rejected input, through the default handler that "
+                         "a NULL error_callback selects, and 25 million executions produced "
+                         "a 2.5 GB log. drive.py captured it with capture_output=True, so it "
+                         "was held in memory; the campaign did not survive to flush its "
+                         "coverage profile; run.profraw came out 0 bytes; and llvm-profdata "
+                         "merge SUCCEEDS on an empty profile, yielding a valid empty one that "
+                         "llvm-cov reports as 0.00% for every file. Indistinguishable from a "
+                         "harness that genuinely covered nothing. TWO FIXES: campaign output "
+                         "goes to a FILE and is capped at 8 MB keeping both ends — a "
+                         "talkative library is not a defect, reading its output into memory "
+                         "is — and an empty or unmergeable profile is now reported as NOT "
+                         "MEASURED rather than as a coverage figure. Related shape worth "
+                         "naming: binding a callback to NULL is not free when the library's "
+                         "default is to print."),
         Deliverable("P3.BENCH_NO_DYNAMIC_GATES",
                     "the benchmark driver runs static gates only", DONE,
                     modules=("hforge.toolchain",),

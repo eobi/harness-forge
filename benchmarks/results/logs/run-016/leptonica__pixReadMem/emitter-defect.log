@@ -1,0 +1,1 @@
+/b/runs/leptonica__pixReadMem/harness.c:40:20: error: incompatible pointer types passing 'PIX *' (aka 'struct Pix *') to parameter of type 'PIX **' (aka 'struct Pix **'); take the address with & [-Werror,-Wincompatible-pointer-types]

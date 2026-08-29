@@ -21,7 +21,7 @@ A producer proposes a plan; the gates certify it; confidence decides nothing.
 |---|---|---|---|
 | `P1` | IR, static gates, C emitter | 6/6 | **done** |
 | `P2` | dynamic gates and positive control | 6/6 | **done** |
-| `P3` | producers: test-lift, LLM->IR, graph traversal | 42/51 | partial |
+| `P3` | producers: test-lift, LLM->IR, graph traversal | 43/52 | partial |
 | `PX` | cross-platform hardening: run the same way on every host | 5/5 | **done** |
 | `T0` | target choice, seeds and input size: the work that decides findings | 5/5 | **done** |
 | `TF` | findings: the half the engine was missing | 5/5 | **done** |
@@ -34,7 +34,7 @@ A producer proposes a plan; the gates certify it; confidence decides nothing.
 | `P8` | snapshot and scale | 0/2 | planned |
 | `P9` | exotic targets | 0/2 | planned |
 
-**87 of 111 deliverables done**, and `plancheck` refuses to let any of them say so without a module that imports and a test that exists.
+**88 of 112 deliverables done**, and `plancheck` refuses to let any of them say so without a module that imports and a test that exists.
 
 <!-- PHASES:END -->
 
@@ -244,19 +244,22 @@ confirmed reports — on its own 100-case benchmark with its gold OSS-Fuzz basel
 
 | case | ours | QuartetFuzz | gold | ours/gold | QF/gold |
 |---|---|---|---|---|---|
-| libyaml/libyaml_loader_fuzzer | *not yet run* | 73.89 | 77.7 |  | 0.95x |
-| libyaml/libyaml_scanner_fuzzer | *not yet run* | 67.30 | 70.6 |  | 0.95x |
-| brotli/decode_fuzzer | *not yet run* | 84.15 | 77.2 |  | 1.09x |
-| yajl-ruby/json_fuzzer | *not yet run* | 79.87 | 69.1 |  | 1.16x |
-| iperf/cjson_fuzzer | *not yet run* | 0.00 | 24.5 |  | 0.00x |
-| zopfli/zopfli_deflate_fuzzer | *not yet run* | 80.06 | 85.7 |  | 0.93x |
-| zlib/zlib_uncompress2_fuzzer | *not yet run* | 51.74 | 53.1 |  | 0.97x |
-| lcms2/cmsOpenProfileFromMem | *not yet run* | — | — |  |  |
-| jbig2dec/jbig2_data_in | *build failed* | — | — |  |  |
-| leptonica/pixReadMem | *all plans for the gold target were refused by a static gate* | — | — |  |  |
+| libyaml/libyaml_loader_fuzzer | **77.77** | 73.89 | 77.7 | 1.00x | 0.95x |
+| libyaml/libyaml_scanner_fuzzer | **70.47** | 67.30 | 70.6 | 1.00x | 0.95x |
+| brotli/decode_fuzzer | **85.50** | 84.15 | 77.2 | 1.11x | 1.09x |
+| yajl-ruby/json_fuzzer | **72.80** | 79.87 | 69.1 | 1.05x | 1.16x |
+| iperf/cjson_fuzzer | **25.10** | 0.00 | 24.5 | 1.02x | 0.00x |
+| zopfli/zopfli_deflate_fuzzer | **86.17** | 80.06 | 85.7 | 1.01x | 0.93x |
+| zlib/zlib_uncompress2_fuzzer | **53.93** | 51.74 | 53.1 | 1.02x | 0.97x |
+| lcms2/cmsOpenProfileFromMem | **5.14** | — | — |  |  |
+| jbig2dec/jbig2_data_in | **0.00** | — | — |  |  |
+| leptonica/pixReadMem | *REFUSED: the emitted harness has an emitter defect* | — | — |  |  |
 | jansson/json_loadb | *NO PLAN for the gold target* | — | — |  |  |
+| libde265/stream_decode | *REFUSED by D3: valid input crashes the harness* | — | — |  |  |
 
-Sources: run-015.
+Measured cases with a gold baseline: **7**. Median ours/gold: **1.02x**. Ahead of the cited QuartetFuzz figure on **6 of the 7** cases it published one for.
+
+Sources: run-016.
 
 <!-- BENCH:END -->
 

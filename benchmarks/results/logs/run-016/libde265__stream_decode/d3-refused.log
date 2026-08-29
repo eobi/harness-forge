@@ -1,0 +1,77 @@
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3319500840
+INFO: Loaded 1 modules   (9340 inline 8-bit counters): 9340 [0xaaaacd4d2838, 0xaaaacd4d4cb4), 
+INFO: Loaded 1 PC tables (9340 PCs): 9340 [0xaaaacd4d4cb8,0xaaaacd4f9478), 
+INFO:      603 files found in /b/runs/libde265__stream_decode/corpus
+INFO: seed corpus: files: 603 min: 1b max: 9190b total: 84275b rss: 44Mb
+
+=================================================================
+==372==ERROR: LeakSanitizer: detected memory leaks
+
+Direct leak of 64 byte(s) in 1 object(s) allocated from:
+    #0 0xaaaacd300198 in operator new(unsigned long) (/b/runs/libde265__stream_decode/fuzz+0x160198) (BuildId: 3709f728c0949446e2bcef913f99003593ca3043)
+    #1 0xaaaacd39daf8 in NAL_Parser::alloc_NAL_unit(int) /b/libde265/libde265/nal-parser.cc:211:11
+    #2 0xaaaacd39e32c in NAL_Parser::push_data(unsigned char const*, int, long, void*) /b/libde265/libde265/nal-parser.cc:264:25
+    #3 0xaaaacd312c40 in de265_push_data /b/libde265/libde265/de265.cc:361:26
+    #4 0xaaaacd3025bc in LLVMFuzzerTestOneInput /b/runs/libde265__stream_decode/harness.c:41:22
+    #5 0xaaaacd23a104 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) (/b/runs/libde265__stream_decode/fuzz+0x9a104) (BuildId: 3709f728c0949446e2bcef913f99003593ca3043)
+    #6 0xaaaacd2398bc in fuzzer::Fuzzer::RunOne(unsigned char const*, unsigned long, bool, fuzzer::InputInfo*, bool, bool*) (/b/runs/libde265__stream_decode/fuzz+0x998bc) (BuildId: 3709f728c0949446e2bcef913f99003593ca3043)
+    #7 0xaaaacd23b478 in fuzzer::Fuzzer::ReadAndExecuteSeedCorpora(std::vector<fuzzer::SizedFile, std::allocator<fuzzer::SizedFile> >&) (/b/runs/libde265__stream_decode/fuzz+0x9b478) (BuildId: 3709f728c0949446e2bcef913f99003593ca3043)
+    #8 0xaaaacd23b988 in fuzzer::Fuzzer::Loop(std::vector<fuzzer::SizedFile, std::allocator<fuzzer::SizedFile> >&) (/b/runs/libde265__stream_decode/fuzz+0x9b988) (BuildId: 3709f728c0949446e2bcef913f99003593ca3043)
+    #9 0xaaaacd22ae64 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) (/b/runs/libde265__stream_decode/fuzz+0x8ae64) (BuildId: 3709f728c0949446e2bcef913f99003593ca3043)
+    #10 0xaaaacd252168 in main (/b/runs/libde265__stream_decode/fuzz+0xb2168) (BuildId: 3709f728c0949446e2bcef913f99003593ca3043)
+    #11 0xffffb1427740  (/lib/aarch64-linux-gnu/libc.so.6+0x27740) (BuildId: 6f268ff546c56d7f14e9501a55698cc2d0ab4732)
+    #12 0xffffb1427814 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x27814) (BuildId: 6f268ff546c56d7f14e9501a55698cc2d0ab4732)
+    #13 0xaaaacd2211ac in _start (/b/runs/libde265__stream_decode/fuzz+0x811ac) (BuildId: 3709f728c0949446e2bcef913f99003593ca3043)
+
+Indirect leak of 64 byte(s) in 1 object(s) allocated from:
+    #0 0xaaaacd300198 in operator new(unsigned long) (/b/runs/libde265__stream_decode/fuzz+0x160198) (BuildId: 3709f728c0949446e2bcef913f99003593ca3043)
+    #1 0xaaaacd3a137c in std::__new_allocator<unsigned int>::allocate(unsigned long, void const*) /usr/lib/gcc/aarch64-linux-gnu/12/../../../../include/c++/12/bits/new_allocator.h:137:27
+    #2 0xaaaacd3a137c in std::allocator_traits<std::allocator<unsigned int> >::allocate(std::allocator<unsigned int>&, unsigned long) /usr/lib/gcc/aarch64-linux-gnu/12/../../../../include/c++/12/bits/alloc_traits.h:464:20
+    #3 0xaaaacd3a137c in std::_Vector_base<unsigned int, std::allocator<unsigned int> >::_M_allocate(unsigned long) /usr/lib/gcc/aarch64-linux-gnu/12/../../../../include/c++/12/bits/stl_vector.h:378:20
+    #4 0xaaaacd3a137c in std::_Vector_base<unsigned int, std::allocator<unsigned int> >::_M_create_storage(unsigned long) /usr/lib/gcc/aarch64-linux-gnu/12/../../../../include/c++/12/bits/stl_vector.h:395:33
+    #5 0xaaaacd39b73c in std::_Vector_base<unsigned int, std::allocator<unsigned int> >::_Vector_base(unsigned long, std::allocator<unsigned int> const&) /usr/lib/gcc/aarch64-linux-gnu/12/../../../../include/c++/12/bits/stl_vector.h:332:9
+    #6 0xaaaacd39b73c in std::vector<unsigned int, std::allocator<unsigned int> >::vector(unsigned long, std::allocator<unsigned int> const&) /usr/lib/gcc/aarch64-linux-gnu/12/../../../../include/c++/12/bits/stl_vector.h:552:9
+    #7 0xaaaacd39dba8 in NAL_unit::NAL_unit() /b/libde265/libde265/nal-parser.cc:36:5
+    #8 0xaaaacd39dba8 in NAL_Parser::alloc_NAL_unit(int) /b/libde265/libde265/nal-parser.cc:211:15
+    #9 0xaaaacd39e32c in NAL_Parser::push_data(unsigned char const*, int, long, void*) /b/libde265/libde265/nal-parser.cc:264:25
+    #10 0xaaaacd312c40 in de265_push_data /b/libde265/libde265/de265.cc:361:26
+    #11 0xaaaacd3025bc in LLVMFuzzerTestOneInput /b/runs/libde265__stream_decode/harness.c:41:22
+    #12 0xaaaacd23a104 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) (/b/runs/libde265__stream_decode/fuzz+0x9a104) (BuildId: 3709f728c0949446e2bcef913f99003593ca3043)
+    #13 0xaaaacd2398bc in fuzzer::Fuzzer::RunOne(unsigned char const*, unsigned long, bool, fuzzer::InputInfo*, bool, bool*) (/b/runs/libde265__stream_decode/fuzz+0x998bc) (BuildId: 3709f728c0949446e2bcef913f99003593ca3043)
+    #14 0xaaaacd23b478 in fuzzer::Fuzzer::ReadAndExecuteSeedCorpora(std::vector<fuzzer::SizedFile, std::allocator<fuzzer::SizedFile> >&) (/b/runs/libde265__stream_decode/fuzz+0x9b478) (BuildId: 3709f728c0949446e2bcef913f99003593ca3043)
+    #15 0xaaaacd23b988 in fuzzer::Fuzzer::Loop(std::vector<fuzzer::SizedFile, std::allocator<fuzzer::SizedFile> >&) (/b/runs/libde265__stream_decode/fuzz+0x9b988) (BuildId: 3709f728c0949446e2bcef913f99003593ca3043)
+    #16 0xaaaacd22ae64 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) (/b/runs/libde265__stream_decode/fuzz+0x8ae64) (BuildId: 3709f728c0949446e2bcef913f99003593ca3043)
+    #17 0xaaaacd252168 in main (/b/runs/libde265__stream_decode/fuzz+0xb2168) (BuildId: 3709f728c0949446e2bcef913f99003593ca3043)
+    #18 0xffffb1427740  (/lib/aarch64-linux-gnu/libc.so.6+0x27740) (BuildId: 6f268ff546c56d7f14e9501a55698cc2d0ab4732)
+    #19 0xffffb1427814 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x27814) (BuildId: 6f268ff546c56d7f14e9501a55698cc2d0ab4732)
+    #20 0xaaaacd2211ac in _start (/b/runs/libde265__stream_decode/fuzz+0x811ac) (BuildId: 3709f728c0949446e2bcef913f99003593ca3043)
+
+Indirect leak of 4 byte(s) in 1 object(s) allocated from:
+    #0 0xaaaacd2c9244 in malloc (/b/runs/libde265__stream_decode/fuzz+0x129244) (BuildId: 3709f728c0949446e2bcef913f99003593ca3043)
+    #1 0xaaaacd39bc8c in NAL_unit::resize(int) /b/libde265/libde265/nal-parser.cc:74:60
+    #2 0xaaaacd39dd34 in NAL_Parser::alloc_NAL_unit(int) /b/libde265/libde265/nal-parser.cc:215:13
+    #3 0xaaaacd39e32c in NAL_Parser::push_data(unsigned char const*, int, long, void*) /b/libde265/libde265/nal-parser.cc:264:25
+    #4 0xaaaacd312c40 in de265_push_data /b/libde265/libde265/de265.cc:361:26
+    #5 0xaaaacd3025bc in LLVMFuzzerTestOneInput /b/runs/libde265__stream_decode/harness.c:41:22
+    #6 0xaaaacd23a104 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) (/b/runs/libde265__stream_decode/fuzz+0x9a104) (BuildId: 3709f728c0949446e2bcef913f99003593ca3043)
+    #7 0xaaaacd2398bc in fuzzer::Fuzzer::RunOne(unsigned char const*, unsigned long, bool, fuzzer::InputInfo*, bool, bool*) (/b/runs/libde265__stream_decode/fuzz+0x998bc) (BuildId: 3709f728c0949446e2bcef913f99003593ca3043)
+    #8 0xaaaacd23b478 in fuzzer::Fuzzer::ReadAndExecuteSeedCorpora(std::vector<fuzzer::SizedFile, std::allocator<fuzzer::SizedFile> >&) (/b/runs/libde265__stream_decode/fuzz+0x9b478) (BuildId: 3709f728c0949446e2bcef913f99003593ca3043)
+    #9 0xaaaacd23b988 in fuzzer::Fuzzer::Loop(std::vector<fuzzer::SizedFile, std::allocator<fuzzer::SizedFile> >&) (/b/runs/libde265__stream_decode/fuzz+0x9b988) (BuildId: 3709f728c0949446e2bcef913f99003593ca3043)
+    #10 0xaaaacd22ae64 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) (/b/runs/libde265__stream_decode/fuzz+0x8ae64) (BuildId: 3709f728c0949446e2bcef913f99003593ca3043)
+    #11 0xaaaacd252168 in main (/b/runs/libde265__stream_decode/fuzz+0xb2168) (BuildId: 3709f728c0949446e2bcef913f99003593ca3043)
+    #12 0xffffb1427740  (/lib/aarch64-linux-gnu/libc.so.6+0x27740) (BuildId: 6f268ff546c56d7f14e9501a55698cc2d0ab4732)
+    #13 0xffffb1427814 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x27814) (BuildId: 6f268ff546c56d7f14e9501a55698cc2d0ab4732)
+    #14 0xaaaacd2211ac in _start (/b/runs/libde265__stream_decode/fuzz+0x811ac) (BuildId: 3709f728c0949446e2bcef913f99003593ca3043)
+
+SUMMARY: AddressSanitizer: 132 byte(s) leaked in 3 allocation(s).
+
+INFO: a leak has been found in the initial corpus.
+
+INFO: to ignore leaks on libFuzzer side use -detect_leaks=0.
+
+MS: 0 ; base unit: 0000000000000000000000000000000000000000
+0x0,
+\000
+artifact_prefix='./'; Test unit written to ./leak-5ba93c9db0cff93f52b521d7420e43f6eda2784f
+Base64: AA==

@@ -1,0 +1,291 @@
+{
+  "schema_version": "1.0",
+  "name": "lcms2_cmsOpenProfileFromMem",
+  "producer": "header_graph",
+  "notes": "proposed from lcms2.h by signature inference; handle type inferred as 'cmsHANDLE'. Every inference here is checked by a static gate, and the producer certifies nothing.",
+  "target": {
+    "name": "lcms2",
+    "version": "",
+    "commit": "",
+    "public_headers": [
+      "/b/lcms2/include/lcms2.h"
+    ],
+    "include_dirs": [
+      "/b/lcms2/include",
+      "/b/lcms2/src"
+    ],
+    "sources": [
+      "/b/lcms2/src/cmsalpha.c",
+      "/b/lcms2/src/cmscam02.c",
+      "/b/lcms2/src/cmscgats.c",
+      "/b/lcms2/src/cmscnvrt.c",
+      "/b/lcms2/src/cmserr.c",
+      "/b/lcms2/src/cmsgamma.c",
+      "/b/lcms2/src/cmsgmt.c",
+      "/b/lcms2/src/cmshalf.c",
+      "/b/lcms2/src/cmsintrp.c",
+      "/b/lcms2/src/cmsio0.c",
+      "/b/lcms2/src/cmsio1.c",
+      "/b/lcms2/src/cmslut.c",
+      "/b/lcms2/src/cmsmd5.c",
+      "/b/lcms2/src/cmsmtrx.c",
+      "/b/lcms2/src/cmsnamed.c",
+      "/b/lcms2/src/cmsopt.c",
+      "/b/lcms2/src/cmspack.c",
+      "/b/lcms2/src/cmspcs.c",
+      "/b/lcms2/src/cmsplugin.c",
+      "/b/lcms2/src/cmsps2.c",
+      "/b/lcms2/src/cmssamp.c",
+      "/b/lcms2/src/cmssm.c",
+      "/b/lcms2/src/cmstypes.c",
+      "/b/lcms2/src/cmsvirt.c",
+      "/b/lcms2/src/cmswtpnt.c",
+      "/b/lcms2/src/cmsxform.c"
+    ],
+    "link_libs": [],
+    "cflags": [],
+    "seed_dirs": [],
+    "language": "c"
+  },
+  "platforms": [
+    "linux-aarch64-glibc"
+  ],
+  "apis": {
+    "cmsCloseProfile": {
+      "symbol": "cmsCloseProfile",
+      "header": "lcms2.h",
+      "params": [
+        {
+          "name": "hProfile",
+          "type": {
+            "name": "cmsHPROFILE",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        }
+      ],
+      "returns": {
+        "name": "cmsBool",
+        "kind": "scalar",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "query",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [],
+        "transfers_ownership": [],
+        "requires_nonnull": [],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    },
+    "cmsDictFree": {
+      "symbol": "cmsDictFree",
+      "header": "lcms2.h",
+      "params": [
+        {
+          "name": "hDict",
+          "type": {
+            "name": "cmsHANDLE",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        }
+      ],
+      "returns": {
+        "name": "void",
+        "kind": "void",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "destroy",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [],
+        "transfers_ownership": [],
+        "requires_nonnull": [],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    },
+    "cmsIT8LoadFromFile": {
+      "symbol": "cmsIT8LoadFromFile",
+      "header": "lcms2.h",
+      "params": [
+        {
+          "name": "ContextID",
+          "type": {
+            "name": "cmsContext",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "cFileName",
+          "type": {
+            "name": "const char*",
+            "kind": "pointer",
+            "const": true,
+            "resolved": ""
+          }
+        }
+      ],
+      "returns": {
+        "name": "cmsHANDLE",
+        "kind": "pointer",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "create",
+      "contract": {
+        "nul_terminated": [
+          "ContextID",
+          "cFileName"
+        ],
+        "length_delimited": [],
+        "transfers_ownership": [],
+        "requires_nonnull": [],
+        "error_return": "null",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    },
+    "cmsOpenProfileFromMem": {
+      "symbol": "cmsOpenProfileFromMem",
+      "header": "lcms2.h",
+      "params": [
+        {
+          "name": "MemPtr",
+          "type": {
+            "name": "const void *",
+            "kind": "pointer",
+            "const": true,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "dwSize",
+          "type": {
+            "name": "cmsUInt32Number",
+            "kind": "scalar",
+            "const": false,
+            "resolved": ""
+          }
+        }
+      ],
+      "returns": {
+        "name": "cmsHPROFILE",
+        "kind": "pointer",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "consume",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [
+          [
+            "MemPtr",
+            "dwSize"
+          ]
+        ],
+        "transfers_ownership": [],
+        "requires_nonnull": [],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    }
+  },
+  "slices": [
+    {
+      "id": "MemPtr",
+      "kind": "bytes",
+      "remainder": true,
+      "min_len": 1,
+      "max_len": 0
+    }
+  ],
+  "resources": [
+    {
+      "id": "owned",
+      "type": {
+        "name": "cmsHPROFILE",
+        "kind": "pointer",
+        "const": false,
+        "resolved": ""
+      },
+      "storage": "handle"
+    }
+  ],
+  "scratch": [],
+  "sequence": [
+    {
+      "id": "o_consume",
+      "api": "cmsOpenProfileFromMem",
+      "args": [
+        {
+          "param": "MemPtr",
+          "source": "input",
+          "ref": "MemPtr",
+          "value": null
+        },
+        {
+          "param": "dwSize",
+          "source": "length_of",
+          "ref": "MemPtr",
+          "value": null
+        }
+      ],
+      "binds": "owned",
+      "targets": "",
+      "repeat": 0,
+      "guarded_by": []
+    },
+    {
+      "id": "o_free_owned",
+      "api": "cmsCloseProfile",
+      "args": [
+        {
+          "param": "hProfile",
+          "source": "resource",
+          "ref": "owned",
+          "value": null
+        }
+      ],
+      "binds": "",
+      "targets": "owned",
+      "repeat": 0,
+      "guarded_by": [
+        "owned"
+      ]
+    }
+  ],
+  "knobs": {
+    "max_len": 65536,
+    "min_len": 0,
+    "timeout_s": 25,
+    "rss_limit_mb": 2048,
+    "malloc_limit_mb": 0,
+    "sanitizers": [
+      "address"
+    ],
+    "detect_leaks": false,
+    "optimisation": "-O1"
+  },
+  "format_model": null,
+  "raw_blocks": []
+}
