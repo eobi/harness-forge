@@ -1550,7 +1550,26 @@ PHASES: tuple = (
                          "launched via `env VAR=... setsid` reported no window and I could "
                          "NOT reproduce that under controlled conditions — recorded as "
                          "unexplained rather than given a third theory, after two wrong ones."),
-        Deliverable("P6.DIALOG", "dialog automation: UIAutomation / AX API / AT-SPI", PLANNED),
+        Deliverable("P6.DIALOG", "dialog automation: UIAutomation / AX API / AT-SPI", PARTIAL,
+                    note="DETECTION WORKS AND IS THE HALF THAT MATTERS; DISMISSAL DOES NOT. "
+                         "Measured on the VM over six inputs, one isolated session each: "
+                         "AT-SPI reports `info bar 'Error' [showing]` for all five malformed "
+                         "images and `ok` for the valid one. 100% discrimination, no false "
+                         "either way. "
+                         "WHY THAT IS THE POINT: without it, a GUI harness sees an app that "
+                         "opened a window and then would not close, and reports FIVE FALSE "
+                         "HANGS OUT OF SIX INPUTS. My first driver did exactly that, calling "
+                         "them UNRESPONSIVE — a harness defect wearing the costume of a "
+                         "finding, which is the thing this whole engine exists to refuse. "
+                         "The target was not hanging. It was correctly rejecting bad input "
+                         "and saying so, and only an accessibility oracle can tell those "
+                         "apart from outside. A GUI target therefore needs a THIRD normal "
+                         "outcome beside processed and crashed: rejected-with-an-error, "
+                         "which is a pass, not a finding. "
+                         "STILL OPEN: Escape and ctrl+w do not dismiss the error state, so "
+                         "the session cannot be recycled and each input needs a fresh "
+                         "process. Dismissal needs the AT-SPI ACTION interface on the info "
+                         "bar's button rather than synthetic key events."),
     )),
 
     Phase("P7", "mobile: Android and iOS", PARTIAL, (
