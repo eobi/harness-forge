@@ -265,6 +265,20 @@ def _is_ptr(ty: str, ptr_types: frozenset = frozenset()) -> bool:
 # `int (*cb)(void *, int)` and `void (*)(void *)` — a parameter that is a function pointer.
 _IS_FUNC_PTR = re.compile(r"\(\s*\*")
 
+# The pointee recorded for a function-pointer typedef. It deliberately matches no handle.
+FN_PTR = "__hf_function_pointer"
+
+
+def is_callback(ty: str, ptr_map: dict) -> bool:
+    """True for a callback written inline OR hidden behind a typedef.
+
+    `void (*cb)(void *)` and `Jbig2ErrorCallback cb` are the same thing to a caller, and
+    only the first has a star to find.
+    """
+    if _IS_FUNC_PTR.search(ty):
+        return True
+    return ptr_map.get(base_type(ty)) == FN_PTR
+
 _STRINGISH = re.compile(r"(str|json|text|name|path|url|utf8|cstr|filename)", re.I)
 # The optional short prefix is Hungarian notation, which older C APIs use
 # constantly: `cmsOpenProfileFromMem(const void *MemPtr, cmsUInt32Number dwSize)`
@@ -292,6 +306,10 @@ class Decl:
     header: str
     ptr_types: frozenset = frozenset()
     ptr_map: dict = field(default_factory=dict)      # ptr typedef -> pointee base type
+    # Integer object-like macros the header defines. A version or ABI parameter is usually
+    # named after the macro that supplies its value, and passing 0 instead makes the call
+    # fail a check the harness never sees.
+    macros: dict = field(default_factory=dict)
     # Type names whose struct has a BODY in the parsed headers. A caller-allocated handle
     # requires one: `typedef struct sqlite3_stmt sqlite3_stmt;` declares an OPAQUE type
     # whose size is unknown, so `sqlite3_stmt x;` does not compile. The producer treated it
@@ -361,7 +379,24 @@ def _typedef_map(stmts: list) -> dict:
     """
     out: dict = {}
     for st in stmts:
-        if not st.startswith("typedef ") or "(" in st:
+        if not st.startswith("typedef "):
+            continue
+        # A FUNCTION-POINTER TYPEDEF HIDES A CALLBACK BEHIND AN ORDINARY-LOOKING NAME.
+        #
+        # `typedef void (*Jbig2ErrorCallback)(void *data, const char *msg, ...);` — the
+        # parameter then reads `Jbig2ErrorCallback error_callback`, with no star anywhere,
+        # so the inline-callback check never fires. The producer could not map the type, and
+        # an unmappable parameter refuses the whole plan: jbig2dec parsed perfectly, eight
+        # declarations with the right handle, and proposed ZERO plans.
+        #
+        # Recorded here rather than in a new field so it travels through hkey() with
+        # everything else. The sentinel pointee matches no handle, which is correct — a
+        # callback is not a resource.
+        m_fp = re.match(r"^typedef\s+.*\(\s*\*+\s*([A-Za-z_]\w*)\s*\)\s*\(", st)
+        if m_fp:
+            out[m_fp.group(1)] = FN_PTR
+            continue
+        if "(" in st:
             continue
         m = re.match(r"^typedef\s+(.*?)([A-Za-z_]\w*)$", st)
         if not m:
@@ -467,6 +502,23 @@ def _preprocess(path: str, include_dirs=(), cflags=()) -> Optional[str]:
     return text if text.strip() else None
 
 
+_INT_DEFINE = re.compile(
+    r"^[ \t]*#[ \t]*define[ \t]+([A-Za-z_]\w*)[ \t]+\(?\s*(-?\d+)\s*\)?[ \t]*$", re.M)
+
+
+def _int_defines(path: str) -> dict:
+    """Integer object-like macros a header defines, by name.
+
+    Read from the RAW text, before preprocessing, because the preprocessor's whole job is
+    to make these disappear.
+    """
+    try:
+        text = Path(path).read_text(errors="replace")
+    except OSError:
+        return {}
+    return {m.group(1): int(m.group(2)) for m in _INT_DEFINE.finditer(text)}
+
+
 def parse_header(path: str, include_dirs=(), cflags=()) -> list:
     """Function declarations from one header.
 
@@ -479,6 +531,7 @@ def parse_header(path: str, include_dirs=(), cflags=()) -> list:
     src = strip_noise(pp if pp is not None
                       else Path(path).read_text(errors="replace"))
     stmts = _statements(src)
+    macros = _int_defines(path)
     ptr_map = _typedef_map(stmts)
     ptr_types = frozenset(ptr_map)
     complete = _complete_types(src)
@@ -500,7 +553,8 @@ def parse_header(path: str, include_dirs=(), cflags=()) -> list:
             continue
         out.append(Decl(ret=" ".join(ret.split()), name=name,
                         params=_split_params(params), header=Path(path).name,
-                        ptr_types=ptr_types, ptr_map=ptr_map, complete=complete))
+                        ptr_types=ptr_types, ptr_map=ptr_map, complete=complete,
+                        macros=macros))
     return out
 
 
@@ -823,6 +877,7 @@ def infer_contract(d: Decl, role: str, handle: Optional[str]) -> Contract:
 
 def to_api(d: Decl, handle: Optional[str]) -> Api:
     role = infer_role(d, handle)
+    _ = d.macros                      # carried on the Decl; the binder reads it via _MACROS
     return Api(symbol=d.name, header=d.header, role=role,
                params=[ParamDecl(nm, TypeRef(ty,
                                              "pointer" if _is_ptr(ty, d.ptr_types)
@@ -1061,7 +1116,7 @@ def _chain_plans(decls, target, platforms, knobs, seen_consumers) -> list:
                     cargs.append(Arg(q.name, "resource", rid))
                 elif inner and inner["rid"] != rid:
                     cargs.append(Arg(q.name, "resource", inner["rid"]))
-                elif _IS_FUNC_PTR.search(q.type.name) or q.type.name.count("*") >= 2:
+                elif is_callback(q.type.name, pm) or q.type.name.count("*") >= 2:
                     cargs.append(Arg(q.name, "literal", value=0))
                 elif q.name in lens:
                     cargs.append(Arg(q.name, "literal", value=0))   # may become length_of
@@ -1269,7 +1324,7 @@ def _stream_bind(api, handle, pm, slices, scratch, out_capacity=65536,
 
         if handle and hkey(ty, pm) == hkey(handle, pm):
             args.append(Arg(nm, "resource", "h")); last_buf = None; continue
-        if _IS_FUNC_PTR.search(ty):
+        if is_callback(ty, pm):
             args.append(Arg(nm, "literal", value=0)); last_buf = None; continue
 
         if is_byte and stars == 1 and const:
@@ -1777,6 +1832,27 @@ def _plans_for_handle(decls, target, handle, inline_base, init_name, fini_name,
                 1 if _DESTROY_ANYWHERE.search(a.symbol) else 2, a.symbol)
     destroyers.sort(key=_destroyer_rank)
 
+    # A VERSION PARAMETER IS NAMED AFTER THE MACRO THAT SUPPLIES ITS VALUE.
+    #
+    # jbig2dec's real constructor is a MACRO:
+    #   #define jbig2_ctx_new(a, o, g, cb, d) \
+    #           jbig2_ctx_new_imp((a),(o),(g),(cb),(d), JBIG2_VERSION_MAJOR, JBIG2_VERSION_MINOR)
+    # A producer reading declarations sees only jbig2_ctx_new_imp and binds its two trailing
+    # ints to 0 — and jbig2_ctx_new_imp RETURNS NULL when they do not match the library it
+    # was compiled against. The handle is NULL, every guarded call is skipped, and the
+    # campaign runs for ten minutes touching nothing.
+    #
+    # The parameter is named `jbig2_version_minor` and the header defines
+    # JBIG2_VERSION_MINOR as 20. That is read from the header, not guessed: the name
+    # uppercases to a macro the header actually defines as an integer.
+    macros: dict = {}
+    for _d in decls:
+        macros.update(_d.macros)
+
+    def _named_constant(pname: str):
+        """The integer a parameter is named after, if the header defines one."""
+        return macros.get(pname.upper())
+
     def _lifecycle_args(api, res_id: str = "h", claim_input: bool = False) -> list:
         """Bind EVERY parameter of a lifecycle op, not just the handle.
 
@@ -1814,7 +1890,9 @@ def _plans_for_handle(decls, target, handle, inline_base, init_name, fini_name,
             elif claim_input and pd.name in lens and lens[pd.name] in {sl.id for sl in slices}:
                 out.append(Arg(pd.name, "length_of", lens[pd.name]))
             else:
-                out.append(Arg(pd.name, "literal", value=0))
+                named = _named_constant(pd.name)
+                out.append(Arg(pd.name, "literal",
+                               value=0 if named is None else named))
         return out
 
     complete_types = _all_complete(decls)
@@ -1838,11 +1916,30 @@ def _plans_for_handle(decls, target, handle, inline_base, init_name, fini_name,
         so it emitted the partial one and claimed the consumer, which stopped the chain
         producer from ever building the real thing.
         """
+        # A HANDLE NOTHING CAN CONSTRUCT IS NOT AN UNSATISFIED ONE.
+        #
+        # `jbig2_ctx_new_imp(Jbig2Allocator *, Jbig2Options, Jbig2GlobalCtx *, ...)` was
+        # refused because both pointer parameters count as "returned handles" — and they
+        # count only because a DESTRUCTOR hands the allocator back: `Jbig2Allocator
+        # *jbig2_ctx_free(Jbig2Ctx *)`. Nothing in the library constructs either type, so
+        # refusing the constructor produced no plan at all for jbig2dec: eight declarations
+        # parsed perfectly, the right handle inferred, and zero proposals.
+        #
+        # Refusing is right when the library CAN build the thing and we would be passing
+        # NULL instead — that is sqlite3_blob_open, where a NULL connection crashes on every
+        # valid input. It is wrong when NULL is the only call anyone could make. jbig2dec
+        # documents exactly that: a NULL allocator selects the default malloc-based one.
+        #
+        # So the test is not "is this type a handle" but "can this library create one".
+        creatable = {hkey(a.returns.name, pm) for a in apis.values()
+                     if a.role == ROLE_CREATE and a.returns.kind == "pointer"}
+        creatable |= {b for _, b, i, _ in _outparam_handles(decls) if i}
+        creatable |= {b for _, b, i, _ in _inline_handles(decls) if i}
         for pd in api.params:
             k = hkey(pd.type.name, pm)
             if handle and k == hkey(handle, pm):
                 continue                   # the handle this lifecycle is about
-            if pd.type.name.count("*") == 1 and k in known_handles:
+            if pd.type.name.count("*") == 1 and k in known_handles and k in creatable:
                 return k
         return ""
 
@@ -1941,7 +2038,7 @@ def _plans_for_handle(decls, target, handle, inline_base, init_name, fini_name,
                 # the conventional call and the only safe binding — writing through an
                 # address taken from fuzzer input is the harness corrupting itself.
                 args.append(Arg(nm, "literal", value=0))
-            elif _IS_FUNC_PTR.search(ty):
+            elif is_callback(ty, pm):
                 # A CALLBACK. `sqlite3_exec(db, sql, callback, arg, errmsg)` takes one, and
                 # binding fuzzer bytes to it would have the library call an address made of
                 # input — arbitrary control flow, and every crash the harness's own. NULL is

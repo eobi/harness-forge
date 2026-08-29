@@ -21,7 +21,7 @@ A producer proposes a plan; the gates certify it; confidence decides nothing.
 |---|---|---|---|
 | `P1` | IR, static gates, C emitter | 6/6 | **done** |
 | `P2` | dynamic gates and positive control | 6/6 | **done** |
-| `P3` | producers: test-lift, LLM->IR, graph traversal | 34/42 | partial |
+| `P3` | producers: test-lift, LLM->IR, graph traversal | 37/45 | partial |
 | `PX` | cross-platform hardening: run the same way on every host | 5/5 | **done** |
 | `T0` | target choice, seeds and input size: the work that decides findings | 5/5 | **done** |
 | `TF` | findings: the half the engine was missing | 5/5 | **done** |
@@ -34,7 +34,7 @@ A producer proposes a plan; the gates certify it; confidence decides nothing.
 | `P8` | snapshot and scale | 0/2 | planned |
 | `P9` | exotic targets | 0/2 | planned |
 
-**79 of 102 deliverables done**, and `plancheck` refuses to let any of them say so without a module that imports and a test that exists.
+**82 of 105 deliverables done**, and `plancheck` refuses to let any of them say so without a module that imports and a test that exists.
 
 <!-- PHASES:END -->
 

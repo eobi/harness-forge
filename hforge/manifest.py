@@ -464,6 +464,52 @@ PHASES: tuple = (
                          "it was written; the C backend never had it because no case "
                          "exercised the path until now. Guarded with #ifdef __cplusplus in "
                          "both the harness and the replay driver, so a C build is unchanged."),
+        Deliverable("P3.UNCREATABLE_HANDLE",
+                    "a handle nothing can construct does not refuse the constructor", DONE,
+                    modules=("hforge.producers.header_graph",),
+                    tests=("test_a_handle_nothing_can_construct_does_not_refuse_the_constructor",),
+                    note="jbig2dec parsed PERFECTLY — eight declarations, right types, right "
+                         "handle, right roles — and proposed zero plans. "
+                         "`jbig2_ctx_new_imp(Jbig2Allocator *, ..., Jbig2GlobalCtx *, ...)` "
+                         "was refused by the _unsatisfied_handle guard, because both pointer "
+                         "parameters count as returned handles — and they count ONLY because "
+                         "a destructor hands one back: `Jbig2Allocator "
+                         "*jbig2_ctx_free(Jbig2Ctx *)`. Nothing in the library constructs "
+                         "either type. The guard is right for sqlite3_blob_open, where a "
+                         "NULL connection crashes on every valid input and 13 of 14 measured "
+                         "plans were that shape; it is wrong when NULL is the only call "
+                         "anyone could make, which jbig2dec documents. The test is now 'can "
+                         "this library create one', not 'is this a handle'."),
+        Deliverable("P3.TYPEDEF_CALLBACK",
+                    "a callback behind a typedef is still a callback", DONE,
+                    modules=("hforge.producers.header_graph",),
+                    tests=("test_a_typedef_hides_a_callback_and_it_still_binds_null",),
+                    note="`typedef void (*Jbig2ErrorCallback)(...)` then `Jbig2ErrorCallback "
+                         "error_callback` — no star at the use site, so the inline-callback "
+                         "check never fired and the type read as unmappable. Binding fuzzer "
+                         "bytes to a function pointer has the library call an address made "
+                         "of input, which is arbitrary control flow and every crash the "
+                         "harness's own. Function-pointer typedefs are now recorded in the "
+                         "pointer map under a sentinel pointee that matches no handle, so "
+                         "they travel through hkey() with everything else and bind NULL — "
+                         "the same treatment sqlite3_exec's inline callback already got."),
+        Deliverable("P3.NAMED_CONSTANT",
+                    "a version parameter takes the constant it is named after", DONE,
+                    modules=("hforge.producers.header_graph",),
+                    tests=("test_a_version_parameter_takes_the_constant_it_is_named_after",),
+                    note="jbig2dec's real constructor is a MACRO: jbig2_ctx_new(...) expands "
+                         "to jbig2_ctx_new_imp(..., JBIG2_VERSION_MAJOR, "
+                         "JBIG2_VERSION_MINOR). A producer reading declarations sees only "
+                         "the _imp function and binds its trailing ints to 0 — and "
+                         "jbig2_ctx_new_imp RETURNS NULL when they do not match the library "
+                         "it was compiled against. The handle is NULL, every guarded call is "
+                         "skipped, and a 600-second campaign touches nothing while every "
+                         "gate that reads the plan passes. The parameter is named "
+                         "`jbig2_version_minor` and the header defines JBIG2_VERSION_MINOR "
+                         "as 20, so the value is READ FROM THE HEADER rather than guessed. "
+                         "Object-like integer macros are collected from the raw text before "
+                         "preprocessing, since making them disappear is what the "
+                         "preprocessor is for."),
         Deliverable("P3.CAPS_TYPE",
                     "an all-caps type is not an export macro", DONE,
                     modules=("hforge.producers.header_graph",),

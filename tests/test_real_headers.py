@@ -1500,3 +1500,75 @@ def test_a_macro_wrapping_the_name_is_still_stripped():
         "extern png_structp (png_create_read_struct)(png_const_charp ver)")
     assert name == "png_create_read_struct"
     assert hg._clean_return(head) == "png_structp"
+
+
+JBIG2 = """
+typedef struct _Jbig2Ctx Jbig2Ctx;
+typedef struct _Jbig2Allocator Jbig2Allocator;
+typedef struct _Jbig2GlobalCtx Jbig2GlobalCtx;
+typedef struct _Jbig2Image Jbig2Image;
+typedef int Jbig2Options;
+typedef void (*Jbig2ErrorCallback)(void *data, const char *msg, int severity, int seg);
+#define JBIG2_VERSION_MAJOR (0)
+#define JBIG2_VERSION_MINOR (20)
+Jbig2Ctx *jbig2_ctx_new_imp(Jbig2Allocator *allocator, Jbig2Options options,
+                            Jbig2GlobalCtx *global_ctx, Jbig2ErrorCallback error_callback,
+                            void *error_callback_data,
+                            int jbig2_version_major, int jbig2_version_minor);
+Jbig2Allocator *jbig2_ctx_free(Jbig2Ctx *ctx);
+int jbig2_data_in(Jbig2Ctx *ctx, const unsigned char *data, size_t size);
+int jbig2_complete_page(Jbig2Ctx *ctx);
+"""
+
+
+def _jbig2_plan():
+    return next((p for p in _plans_for(JBIG2)
+                 if any(o.api == "jbig2_data_in" for o in p.sequence)), None)
+
+
+def test_a_handle_nothing_can_construct_does_not_refuse_the_constructor():
+    """jbig2dec parsed perfectly and proposed ZERO plans.
+
+    `jbig2_ctx_new_imp(Jbig2Allocator *, ..., Jbig2GlobalCtx *, ...)` was refused because
+    both pointer parameters count as returned handles — and they count only because a
+    DESTRUCTOR hands the allocator back: `Jbig2Allocator *jbig2_ctx_free(Jbig2Ctx *)`.
+    Nothing in the library constructs either type, so NULL is the only call anyone could
+    make, and refusing produced no harness at all.
+
+    Refusing is right when the library CAN build the thing — sqlite3_blob_open with a NULL
+    connection crashes on every valid input. The test is not "is this a handle" but "can
+    this library create one".
+    """
+    assert _jbig2_plan() is not None, "no plan for an API whose every role is correct"
+
+
+def test_a_typedef_hides_a_callback_and_it_still_binds_null():
+    """`typedef void (*Jbig2ErrorCallback)(...)` has no star at the use site.
+
+    The inline-callback check looks for `(*`, so a callback behind a typedef reads as an
+    ordinary unmappable type. Binding fuzzer bytes to it would have the library call an
+    address made of input.
+    """
+    p = _jbig2_plan()
+    create = next(o for o in p.sequence if o.api == "jbig2_ctx_new_imp")
+    cb = next(a for a in create.args if a.param == "error_callback")
+    assert cb.source == "literal" and not cb.value, f"callback bound as {cb.source}:{cb.value}"
+
+
+def test_a_version_parameter_takes_the_constant_it_is_named_after():
+    """jbig2_ctx_new_imp returns NULL when the version arguments do not match.
+
+    The real constructor is a macro passing JBIG2_VERSION_MAJOR/MINOR. A producer reading
+    declarations sees only the _imp function and binds 0, so the handle is NULL, every
+    guarded call is skipped, and the campaign runs for ten minutes touching nothing.
+
+    `jbig2_version_minor` uppercases to JBIG2_VERSION_MINOR, which the header defines as
+    20. Read from the header, not guessed.
+    """
+    p = _jbig2_plan()
+    create = next(o for o in p.sequence if o.api == "jbig2_ctx_new_imp")
+    by = {a.param: a.value for a in create.args}
+    assert by["jbig2_version_minor"] == 20, (
+        f"version minor bound to {by['jbig2_version_minor']}; the header says 20 and the "
+        f"library returns NULL for anything else")
+    assert by["jbig2_version_major"] == 0
