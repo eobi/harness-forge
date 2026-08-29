@@ -793,27 +793,67 @@ surfaced three more defects worth having:
 
 ```
 hforge/
-  ir.py                 the Harness IR
-  platform.py           OS x arch x variant, with trust ceilings
-  certificate.py        the shipped artifact
-  cli.py                validate | emit | certify | gates | platforms
-  emit/c_libfuzzer.py   the C backend
-  gates/static_gates.py S1..S6
-  gates/dynamic_gates.py D1..D11
+  ir.py                    the Harness IR — resources, lifetimes, ops, slices, scratch
+  platform.py              OS x arch x variant, with trust ceilings
+  certificate.py           the shipped artifact
+  manifest.py              every deliverable, its status and what backs it
+  cli.py                   validate | emit | certify | propose | batch | audit | triage | ...
+  producers/
+    header_graph.py        the C producer: declarations -> roles -> candidate plans
+    cxx_header.py          the C++ producer
+    java_api.py            the JVM producer
+    rank.py                ranking by gate evidence — producers supply no score
+  emit/
+    __init__.py            the language router; no caller names a backend
+    c_libfuzzer.py         C
+    cxx_libfuzzer.py       C++
+    java_jazzer.py         Java (Jazzer)
+  gates/
+    static_gates.py        S1..S6, on the plan, before a compiler exists
+    dynamic_gates.py       D1..D11, against a build
+  findings/
+    gates.py               F1..F8, on a crash
+    ladder.py              exploitability rungs 0..6
+    fprate.py              our own false-positive rate against constructed defects
+  java/                    the parallel JVM track: exceptions, ladder, sinks, gates
+  lift/                    somebody else's C harness -> IR, so it can be graded
+  analysis/                sink map, mined dictionaries, mined seeds
+  targets/ossfuzz.py       shortlist unfuzzed input-parsing dependencies
+benchmarks/
+  drive.py                 one case: propose -> gate -> build -> fuzz -> cover
+  rank.py                  regenerates the standing table into RANKING.md and README.md
+  reference.json           third-party figures, cited by case id, never measured here
+  run.sh                   the reproducible launcher
+  results/logs/            what each row was derived from
 examples/
-  lib/                  a tiny demo library so this runs on a clean clone
-  hf_demo.good.hir.json    contract-correct plan
+  lib/                     a tiny demo library, so this runs on a clean clone
+  hf_demo.good.hir.json    a contract-correct plan
   hf_demo.broken.hir.json  the cJSON mistake, reproduced
-tests/test_phase1.py    24 tests, each pinning a failure that really happened
 ```
 
+## Tests
+
+319 tests, and each one pins a failure that really happened rather than a function that
+exists.
+
+| file | tests | what it holds down |
+|---|---|---|
+| `test_real_headers.py` | 84 | shapes found by pointing the producer at real libraries |
+| `test_java.py` | 34 | the JVM track: exception classification, the parallel ladder |
+| `test_portability.py` | 30 | the platform matrix, exit codes, trust ceilings |
+| `test_mcp.py` | 28 | the MCP server surface |
+| `test_phase2.py` | 26 | dynamic gates against a real build |
+| `test_findings.py` | 25 | findings gates and the exploitability ladder |
+| `test_phase1.py` | 24 | the IR and the static gates |
+| `test_tier0.py` | 22 | the certificate and what it refuses to claim |
+| `test_phase3.py` | 20 | producers, ranking by evidence |
+| `test_cxx.py` | 14 | the C++ backend |
+| `test_lift.py` | 12 | lifting third-party harnesses |
+
 ```
-python3 tests/test_phase1.py    # 24/24
-python3 tests/test_phase2.py    # 21/21
-python3 tests/test_phase3.py    # 17/17
-python3 tests/test_portability.py  # 30/30
-python3 tests/test_real_headers.py # 22/22
-python3 tools/plancheck.py      # repository vs plan: no drift
+pip install pytest && python3 -m pytest -q     # 319 passed
+python3 tools/plancheck.py                     # repository vs manifest: no drift
+python3 -m hforge selftest                     # the pipeline, end to end, on this machine
 ```
 
 ## plancheck
