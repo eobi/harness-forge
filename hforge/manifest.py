@@ -1530,7 +1530,26 @@ PHASES: tuple = (
 
     Phase("P6", "GUI track", PLANNED, (
         Deliverable("P6.TERM", "coverage-guided termination", PLANNED),
-        Deliverable("P6.DROP", "file-drop driver", PLANNED),
+        Deliverable("P6.DROP", "file-drop driver", PARTIAL,
+                    note="THE CAPABILITY IS DEMONSTRATED, THE DRIVER IS NOT WRITTEN. On the "
+                         "Ubuntu VM: a real GTK application (eog) launched on a PRIVATE "
+                         "display and a PRIVATE session bus, opening a file the harness "
+                         "supplies, mapping a real window, with AT-SPI able to enumerate it "
+                         "down to its frame. Isolation and introspection together, which is "
+                         "what this deliverable and P6.DIALOG both need. "
+                         "WHAT WAS ACTUALLY BLOCKING IT: XDG_RUNTIME_DIR. GTK stalls before "
+                         "mapping without one and says NOTHING — the process stays alive, "
+                         "exits nothing, logs nothing — which reads as 'GTK apps do not work "
+                         "headlessly'. Accessibility can stay ON; it costs no window, and a "
+                         "harness that cannot see dialogs cannot dismiss them. "
+                         "THE DESIGN RULE THIS PRODUCED: poll for the window with a "
+                         "deadline, never sleep a fixed time. Measured over eight identical "
+                         "runs the window appears in 532-550 ms, so an 8-second sleep was "
+                         "both fifteen times too slow and, being a guess, unable to "
+                         "distinguish 'not yet' from 'never'. Two throwaway probes that "
+                         "launched via `env VAR=... setsid` reported no window and I could "
+                         "NOT reproduce that under controlled conditions — recorded as "
+                         "unexplained rather than given a third theory, after two wrong ones."),
         Deliverable("P6.DIALOG", "dialog automation: UIAutomation / AX API / AT-SPI", PLANNED),
     )),
 
