@@ -624,6 +624,38 @@ PHASES: tuple = (
                          "this moves 65.12 toward gold's 69.1 is unmeasured as of this "
                          "entry — the claim here is that the harness is right, not that the "
                          "number moved."),
+        Deliverable("P3.DRIVE_LOOP",
+                    "loop a drive call on its continuation out-parameter", PLANNED,
+                    note="libde265's gold harness loops `while (more) { de265_decode(ctx, "
+                         "&more); while (img = de265_get_next_picture(ctx)) {} }`. Ours "
+                         "calls de265_decode ONCE and never asks for output at all, so one "
+                         "step of a multi-frame pipeline is all it gets. Op.repeat exists "
+                         "and is what took the libyaml scanner from 9.6% to 70%, but its "
+                         "trigger keys off a caller-allocated out-STRUCT or advancing "
+                         "cursors, and `int *more` is neither. The shape to recognise: a "
+                         "call that fills a scalar out-parameter acting as a keep-going "
+                         "flag. Pair it with a drain loop for the output accessor."),
+        Deliverable("P3.LOOP_TERMINATION",
+                    "the repeat loop's exit condition assumes non-zero means progress",
+                    PLANNED,
+                    note="READ THE EMITTER, do not trust its comment. c_libfuzzer emits "
+                         "`sink += (long)(call); if (!sink) break;` and the comment says "
+                         "'stop when the library stops making progress'. Two things are "
+                         "wrong with that. (1) `sink` ACCUMULATES, so the test is not on "
+                         "this call's result but on the running total — once any iteration "
+                         "returns non-zero the loop can never break again and always runs "
+                         "the full bound. The real semantics are 'break only if the library "
+                         "has never once returned non-zero'. (2) It encodes a CONVENTION: "
+                         "non-zero means keep going. That holds for yaml_parser_scan (1 on "
+                         "success) and for BrotliDecoderDecompressStream, which are the "
+                         "cases that were measured. It is BACKWARDS for every library where "
+                         "OK is zero — de265_error DE265_OK is 0, yajl_status_ok is 0 — "
+                         "where the loop breaks after the first SUCCESSFUL call. Same "
+                         "library-specific convention problem as P3.ERROR_ACCESSOR_GATED, "
+                         "and it wants the same answer: read the contract or do not assume. "
+                         "NOT fixed here on purpose — changing loop termination moves every "
+                         "streaming case's number, and doing that in the middle of a "
+                         "benchmark comparison would make the comparison meaningless."),
         Deliverable("P3.ERROR_ACCESSOR_GATED",
                     "run the error accessor only on the failure branch", PLANNED,
                     note="found by measurement, not by reading a header. yajl is the one "
