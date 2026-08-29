@@ -1,0 +1,415 @@
+{
+  "schema_version": "1.0",
+  "name": "libwebp_WebPDecodeRGBA",
+  "producer": "header_graph",
+  "notes": "proposed from decode.h by signature inference; handle type inferred as 'WebPIDecoder*'. Every inference here is checked by a static gate, and the producer certifies nothing.",
+  "target": {
+    "name": "libwebp",
+    "version": "",
+    "commit": "",
+    "public_headers": [
+      "/b/libwebp/src/webp/decode.h",
+      "/b/libwebp/src/webp/types.h"
+    ],
+    "include_dirs": [
+      "/b/libwebp",
+      "/b/libwebp/src"
+    ],
+    "sources": [
+      "/b/libwebp/src/dec/alpha_dec.c",
+      "/b/libwebp/src/dec/buffer_dec.c",
+      "/b/libwebp/src/dec/frame_dec.c",
+      "/b/libwebp/src/dec/idec_dec.c",
+      "/b/libwebp/src/dec/io_dec.c",
+      "/b/libwebp/src/dec/quant_dec.c",
+      "/b/libwebp/src/dec/tree_dec.c",
+      "/b/libwebp/src/dec/vp8_dec.c",
+      "/b/libwebp/src/dec/vp8l_dec.c",
+      "/b/libwebp/src/dec/webp_dec.c",
+      "/b/libwebp/src/dsp/alpha_processing.c",
+      "/b/libwebp/src/dsp/alpha_processing_mips_dsp_r2.c",
+      "/b/libwebp/src/dsp/alpha_processing_neon.c",
+      "/b/libwebp/src/dsp/alpha_processing_sse2.c",
+      "/b/libwebp/src/dsp/alpha_processing_sse41.c",
+      "/b/libwebp/src/dsp/cost.c",
+      "/b/libwebp/src/dsp/cost_mips32.c",
+      "/b/libwebp/src/dsp/cost_mips_dsp_r2.c",
+      "/b/libwebp/src/dsp/cost_neon.c",
+      "/b/libwebp/src/dsp/cost_sse2.c",
+      "/b/libwebp/src/dsp/cpu.c",
+      "/b/libwebp/src/dsp/dec.c",
+      "/b/libwebp/src/dsp/dec_clip_tables.c",
+      "/b/libwebp/src/dsp/dec_mips32.c",
+      "/b/libwebp/src/dsp/dec_mips_dsp_r2.c",
+      "/b/libwebp/src/dsp/dec_msa.c",
+      "/b/libwebp/src/dsp/dec_neon.c",
+      "/b/libwebp/src/dsp/dec_sse2.c",
+      "/b/libwebp/src/dsp/dec_sse41.c",
+      "/b/libwebp/src/dsp/enc.c",
+      "/b/libwebp/src/dsp/enc_mips32.c",
+      "/b/libwebp/src/dsp/enc_mips_dsp_r2.c",
+      "/b/libwebp/src/dsp/enc_msa.c",
+      "/b/libwebp/src/dsp/enc_neon.c",
+      "/b/libwebp/src/dsp/enc_sse2.c",
+      "/b/libwebp/src/dsp/enc_sse41.c",
+      "/b/libwebp/src/dsp/filters.c",
+      "/b/libwebp/src/dsp/filters_mips_dsp_r2.c",
+      "/b/libwebp/src/dsp/filters_msa.c",
+      "/b/libwebp/src/dsp/filters_neon.c",
+      "/b/libwebp/src/dsp/filters_sse2.c",
+      "/b/libwebp/src/dsp/lossless.c",
+      "/b/libwebp/src/dsp/lossless_avx2.c",
+      "/b/libwebp/src/dsp/lossless_enc.c",
+      "/b/libwebp/src/dsp/lossless_enc_avx2.c",
+      "/b/libwebp/src/dsp/lossless_enc_mips32.c",
+      "/b/libwebp/src/dsp/lossless_enc_mips_dsp_r2.c",
+      "/b/libwebp/src/dsp/lossless_enc_msa.c",
+      "/b/libwebp/src/dsp/lossless_enc_neon.c",
+      "/b/libwebp/src/dsp/lossless_enc_sse2.c",
+      "/b/libwebp/src/dsp/lossless_enc_sse41.c",
+      "/b/libwebp/src/dsp/lossless_mips_dsp_r2.c",
+      "/b/libwebp/src/dsp/lossless_msa.c",
+      "/b/libwebp/src/dsp/lossless_neon.c",
+      "/b/libwebp/src/dsp/lossless_sse2.c",
+      "/b/libwebp/src/dsp/lossless_sse41.c",
+      "/b/libwebp/src/dsp/rescaler.c",
+      "/b/libwebp/src/dsp/rescaler_mips32.c",
+      "/b/libwebp/src/dsp/rescaler_mips_dsp_r2.c",
+      "/b/libwebp/src/dsp/rescaler_msa.c",
+      "/b/libwebp/src/dsp/rescaler_neon.c",
+      "/b/libwebp/src/dsp/rescaler_sse2.c",
+      "/b/libwebp/src/dsp/ssim.c",
+      "/b/libwebp/src/dsp/ssim_sse2.c",
+      "/b/libwebp/src/dsp/upsampling.c",
+      "/b/libwebp/src/dsp/upsampling_mips_dsp_r2.c",
+      "/b/libwebp/src/dsp/upsampling_msa.c",
+      "/b/libwebp/src/dsp/upsampling_neon.c",
+      "/b/libwebp/src/dsp/upsampling_sse2.c",
+      "/b/libwebp/src/dsp/upsampling_sse41.c",
+      "/b/libwebp/src/dsp/yuv.c",
+      "/b/libwebp/src/dsp/yuv_mips32.c",
+      "/b/libwebp/src/dsp/yuv_mips_dsp_r2.c",
+      "/b/libwebp/src/dsp/yuv_neon.c",
+      "/b/libwebp/src/dsp/yuv_sse2.c",
+      "/b/libwebp/src/dsp/yuv_sse41.c",
+      "/b/libwebp/src/utils/bit_reader_utils.c",
+      "/b/libwebp/src/utils/bit_writer_utils.c",
+      "/b/libwebp/src/utils/color_cache_utils.c",
+      "/b/libwebp/src/utils/filters_utils.c",
+      "/b/libwebp/src/utils/huffman_encode_utils.c",
+      "/b/libwebp/src/utils/huffman_utils.c",
+      "/b/libwebp/src/utils/palette.c",
+      "/b/libwebp/src/utils/quant_levels_dec_utils.c",
+      "/b/libwebp/src/utils/quant_levels_utils.c",
+      "/b/libwebp/src/utils/random_utils.c",
+      "/b/libwebp/src/utils/rescaler_utils.c",
+      "/b/libwebp/src/utils/thread_utils.c",
+      "/b/libwebp/src/utils/utils.c"
+    ],
+    "link_libs": [],
+    "cflags": [],
+    "seed_dirs": [],
+    "language": "c"
+  },
+  "platforms": [
+    "linux-aarch64-glibc"
+  ],
+  "apis": {
+    "WebPDecodeRGBA": {
+      "symbol": "WebPDecodeRGBA",
+      "header": "decode.h",
+      "params": [
+        {
+          "name": "data",
+          "type": {
+            "name": "const uint8_t*",
+            "kind": "pointer",
+            "const": true,
+            "resolved": "unsigned char"
+          }
+        },
+        {
+          "name": "data_size",
+          "type": {
+            "name": "size_t",
+            "kind": "scalar",
+            "const": false,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "width",
+          "type": {
+            "name": "int*",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "height",
+          "type": {
+            "name": "int*",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        }
+      ],
+      "returns": {
+        "name": "uint8_t*",
+        "kind": "pointer",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "consume",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [
+          [
+            "data",
+            "data_size"
+          ]
+        ],
+        "transfers_ownership": [],
+        "requires_nonnull": [],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    },
+    "WebPFree": {
+      "symbol": "WebPFree",
+      "header": "types.h",
+      "params": [
+        {
+          "name": "ptr",
+          "type": {
+            "name": "void*",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        }
+      ],
+      "returns": {
+        "name": "void",
+        "kind": "void",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "query",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [],
+        "transfers_ownership": [],
+        "requires_nonnull": [],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    },
+    "WebPIDecode": {
+      "symbol": "WebPIDecode",
+      "header": "decode.h",
+      "params": [
+        {
+          "name": "data",
+          "type": {
+            "name": "const uint8_t*",
+            "kind": "pointer",
+            "const": true,
+            "resolved": "unsigned char"
+          }
+        },
+        {
+          "name": "data_size",
+          "type": {
+            "name": "size_t",
+            "kind": "scalar",
+            "const": false,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "config",
+          "type": {
+            "name": "WebPDecoderConfig*",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        }
+      ],
+      "returns": {
+        "name": "WebPIDecoder*",
+        "kind": "pointer",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "create",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [
+          [
+            "data",
+            "data_size"
+          ]
+        ],
+        "transfers_ownership": [],
+        "requires_nonnull": [],
+        "error_return": "null",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    },
+    "WebPIDelete": {
+      "symbol": "WebPIDelete",
+      "header": "decode.h",
+      "params": [
+        {
+          "name": "idec",
+          "type": {
+            "name": "WebPIDecoder*",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        }
+      ],
+      "returns": {
+        "name": "void",
+        "kind": "void",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "destroy",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [],
+        "transfers_ownership": [],
+        "requires_nonnull": [],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    }
+  },
+  "slices": [
+    {
+      "id": "data",
+      "kind": "bytes",
+      "remainder": true,
+      "min_len": 1,
+      "max_len": 0
+    }
+  ],
+  "resources": [
+    {
+      "id": "owned",
+      "type": {
+        "name": "uint8_t*",
+        "kind": "pointer",
+        "const": false,
+        "resolved": ""
+      },
+      "storage": "handle"
+    }
+  ],
+  "scratch": [
+    {
+      "id": "len_width",
+      "kind": "size",
+      "capacity": 0,
+      "c_type": "int",
+      "init_from": "",
+      "owns": false
+    },
+    {
+      "id": "len_height",
+      "kind": "size",
+      "capacity": 0,
+      "c_type": "int",
+      "init_from": "",
+      "owns": false
+    }
+  ],
+  "sequence": [
+    {
+      "id": "o_consume",
+      "api": "WebPDecodeRGBA",
+      "args": [
+        {
+          "param": "data",
+          "source": "input",
+          "ref": "data",
+          "value": null
+        },
+        {
+          "param": "data_size",
+          "source": "length_of",
+          "ref": "data",
+          "value": null
+        },
+        {
+          "param": "width",
+          "source": "scratch_addr",
+          "ref": "len_width",
+          "value": null
+        },
+        {
+          "param": "height",
+          "source": "scratch_addr",
+          "ref": "len_height",
+          "value": null
+        }
+      ],
+      "binds": "owned",
+      "targets": "",
+      "repeat": 0,
+      "repeat_while": "",
+      "guarded_by": []
+    },
+    {
+      "id": "o_free_owned",
+      "api": "WebPFree",
+      "args": [
+        {
+          "param": "ptr",
+          "source": "resource",
+          "ref": "owned",
+          "value": null
+        }
+      ],
+      "binds": "",
+      "targets": "owned",
+      "repeat": 0,
+      "repeat_while": "",
+      "guarded_by": [
+        "owned"
+      ]
+    }
+  ],
+  "knobs": {
+    "max_len": 65536,
+    "min_len": 0,
+    "timeout_s": 25,
+    "rss_limit_mb": 2048,
+    "malloc_limit_mb": 0,
+    "sanitizers": [
+      "address"
+    ],
+    "detect_leaks": false,
+    "optimisation": "-O1"
+  },
+  "format_model": null,
+  "raw_blocks": []
+}
