@@ -136,9 +136,12 @@ flowchart LR
 
 ## Try it — five commands, and the output they actually print
 
-No installation, no build step, no dependencies beyond a C compiler. Every block below is
-copied from a real run against the demo library in [`examples/lib/`](examples/lib/), so
-`git clone` and paste gets you the same thing.
+No installation, no build step, no dependencies beyond a C compiler. The first four blocks
+are captured from real runs against the demo library in [`examples/lib/`](examples/lib/), so
+`git clone` and paste gets you the same thing. Nothing in them is invented; the certificate
+in block 3 is the only one shortened, by cutting two whole sections (the platform list and
+the reachability hypotheses) and wrapping the long gate warnings. The fifth block needs a
+library you supply, so it is described rather than transcribed.
 
 ### 1. Propose harnesses from a header, and rank them by evidence
 
@@ -278,17 +281,25 @@ understood must not be scored as a harness that is wrong.
 
 ### 5. Run the whole thing against a real library
 
-```console
-$ python3 -m hforge batch --target libmagic --source /path/to/file-5.44 --top 32
-
-36 plan(s) proposed, 2 rejected before a compiler ran
-26 reach >= 8 edges — shipped
-10 reach < 8 edges — REFUSED: a harness that cannot get past the library's
-   error path finds nothing
+```
+python3 -m hforge batch --target libmagic --source /path/to/file-5.44 --top 32
 ```
 
-Each shipped harness lands in `out/` as `harness.c`, `driver.c`, `build.sh` and
-`certificate.json` — enough to reproduce the result without this tool.
+`batch` proposes every plan for a target, gates them all, runs a short campaign on the ones
+that survive, and ships only those a real campaign shows reach into the code. Against
+libmagic (`file` 5.44, from source) that produced:
+
+| | |
+|---|---|
+| plans proposed | 36 |
+| rejected before a compiler ran | 2 |
+| **reach ≥ 8 edges — shipped** | **26** |
+| **reach < 8 edges — refused** | **10** |
+
+**28% of what a conventional generator would ship reaches essentially nothing** — and the
+engine says which, in under a minute, before any campaign budget is spent. Each shipped
+harness lands in `out/` as `harness.c`, `driver.c`, `build.sh` and `certificate.json`,
+enough to reproduce the result without this tool.
 
 ---
 
