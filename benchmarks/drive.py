@@ -119,6 +119,10 @@ CASES = {
     cflags=["-DHAVE_LIBJPEG=0", "-DHAVE_LIBPNG=0", "-DHAVE_LIBTIFF=0",
             "-DHAVE_LIBWEBP=0", "-DHAVE_LIBGIF=0", "-DHAVE_LIBZ=0",
             "-DHAVE_LIBJP2K=0", "-DHAVE_LIBWEBP_ANIM=0"],
+    # leptonica's prog/ directory, which carries its test images. Only a handful are in the
+    # formats this build can still decode — the external image libraries are compiled out
+    # above — but a real BMP header is worth more than any number of random bytes.
+    seeds=["/b/leptonica/prog"],
     max_len=65536,
     # ONLY THE FORMATS THIS BUILD CAN DECODE. png, jpeg, tiff, webp and gif are compiled
     # out above, so counting their readers would cap any harness far below what it can
@@ -134,6 +138,11 @@ CASES = {
     hdr="/b/jansson/src/jansson.h", inc=["/b/jansson/src", "/b/jansson"],
     src=sorted(glob.glob("/b/jansson/src/*.c")),
     fn="json_loadb",
+    # 115 valid documents from jansson's own conformance suite, plus the invalid ones —
+    # both are useful, and the invalid set is arguably more so for a parser: they are
+    # hand-written near-misses, which is exactly the neighbourhood a mutator explores badly
+    # from scratch.
+    seeds=["/b/jansson/test/suites"],
     # `-include stdint.h` on the command line, not in jansson_config.h. utf.c uses int32_t
     # and does not include the config header, so putting the include there fixed
     # hashtable.c and left utf.c failing with `unknown type name 'int32_t'` — and the
@@ -154,6 +163,12 @@ CASES = {
     src=[f for f in sorted(glob.glob("/b/libpng/*.c")) if "/example" not in f]
         + sorted(glob.glob("/b/zlib/*.c")),
     fn="png_image_begin_read_from_memory", cflags=[], max_len=65536,
+    # THE CANONICAL PNG TEST SUITE, 51 files, in the tree. A PNG has a magic number, a
+    # chunk structure and a CRC per chunk; libFuzzer will not synthesise one from an empty
+    # corpus inside 600 seconds, so without seeds the campaign spends its whole budget
+    # being rejected at the signature check. brotli is the control: it mines 50 seeds from
+    # its own testdata and reaches 85%.
+    seeds=["/b/libpng/contrib/pngsuite"],
     # png's own sources only: zlib is a dependency this build links, not the surface under
     # test, and it already has two cases of its own.
     cover=[f for f in sorted(glob.glob("/b/libpng/*.c")) if "/example" not in f]),
@@ -178,6 +193,12 @@ CASES = {
          + sorted(glob.glob("/b/libwebp/src/dsp/*.c"))
          + sorted(glob.glob("/b/libwebp/src/utils/*.c"))),
     fn="WebPDecodeRGBA", cflags=[], max_len=65536,
+    # NO SEEDS, and that is a finding rather than an oversight: libwebp's tests/ directory
+    # holds a fuzzer harness and a README, not .webp files — the project keeps its corpus
+    # outside the repository. A WebP is a RIFF container wrapping a VP8 bitstream, so an
+    # empty corpus means the campaign spends most of its budget failing the container
+    # check. This is the case that most needs the round-trip synthesis on the roadmap:
+    # libwebp ships its own ENCODER, and an encoder is a seed generator.
     # DECODE PATH ONLY. enc/, mux/ and demux/ are separate libraries a decode entry point
     # cannot reach; dsp/ carries both, but its encode kernels are unreachable from here and
     # excluding the directory wholesale would drop the decode kernels with them.
