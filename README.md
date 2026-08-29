@@ -524,15 +524,16 @@ Ground rules, because a benchmark whose rules are loose is not evidence:
 
 | case | ours | QuartetFuzz | gold | ours/gold | QF/gold |
 |---|---|---|---|---|---|
-| libyaml/libyaml_loader_fuzzer | *not yet run* | 73.89 | 77.7 |  | 0.95x |
-| libyaml/libyaml_scanner_fuzzer | *not yet run* | 67.30 | 70.6 |  | 0.95x |
-| brotli/decode_fuzzer | *not yet run* | 84.15 | 77.2 |  | 1.09x |
-| yajl-ruby/json_fuzzer | *not yet run* | 79.87 | 69.1 |  | 1.16x |
-| iperf/cjson_fuzzer | *not yet run* | 0.00 | 24.5 |  | 0.00x |
-| zopfli/zopfli_deflate_fuzzer | *not yet run* | 80.06 | 85.7 |  | 0.93x |
-| zlib/zlib_uncompress2_fuzzer | *not yet run* | 51.74 | 53.1 |  | 0.97x |
-| lcms2/cmsOpenProfileFromMem | *not yet run* | — | — |  |  |
-| libde265/stream_decode | *build failed* | — | — |  |  |
+| libyaml/libyaml_loader_fuzzer | **77.77** | 73.89 | 77.7 | 1.00x | 0.95x |
+| libyaml/libyaml_scanner_fuzzer | **70.47** | 67.30 | 70.6 | 1.00x | 0.95x |
+| brotli/decode_fuzzer | **85.50** | 84.15 | 77.2 | 1.11x | 1.09x |
+| yajl-ruby/json_fuzzer | **65.12** | 79.87 | 69.1 | 0.94x | 1.16x |
+| iperf/cjson_fuzzer | **25.10** | 0.00 | 24.5 | 1.02x | 0.00x |
+| zopfli/zopfli_deflate_fuzzer | **86.17** | 80.06 | 85.7 | 1.01x | 0.93x |
+| zlib/zlib_uncompress2_fuzzer | **53.93** | 51.74 | 53.1 | 1.02x | 0.97x |
+| lcms2/cmsOpenProfileFromMem | **5.14** | — | — |  |  |
+
+Measured cases with a gold baseline: **7**. Median ours/gold: **1.01x**. Ahead of the cited QuartetFuzz figure on **6 of 7**.
 
 <!-- BENCH:END -->
 

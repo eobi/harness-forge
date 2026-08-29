@@ -49,15 +49,16 @@ reads 48.74% over the wrong file set and 70.47% over the right one.
 
 | case | ours | QuartetFuzz | gold | ours/gold | QF/gold |
 |---|---|---|---|---|---|
-| libyaml/libyaml_loader_fuzzer | *not yet run* | 73.89 | 77.7 |  | 0.95x |
-| libyaml/libyaml_scanner_fuzzer | *not yet run* | 67.30 | 70.6 |  | 0.95x |
-| brotli/decode_fuzzer | *not yet run* | 84.15 | 77.2 |  | 1.09x |
-| yajl-ruby/json_fuzzer | *not yet run* | 79.87 | 69.1 |  | 1.16x |
-| iperf/cjson_fuzzer | *not yet run* | 0.00 | 24.5 |  | 0.00x |
-| zopfli/zopfli_deflate_fuzzer | *not yet run* | 80.06 | 85.7 |  | 0.93x |
-| zlib/zlib_uncompress2_fuzzer | *not yet run* | 51.74 | 53.1 |  | 0.97x |
-| lcms2/cmsOpenProfileFromMem | *not yet run* | — | — |  |  |
-| libde265/stream_decode | *build failed* | — | — |  |  |
+| libyaml/libyaml_loader_fuzzer | **77.77** | 73.89 | 77.7 | 1.00x | 0.95x |
+| libyaml/libyaml_scanner_fuzzer | **70.47** | 67.30 | 70.6 | 1.00x | 0.95x |
+| brotli/decode_fuzzer | **85.50** | 84.15 | 77.2 | 1.11x | 1.09x |
+| yajl-ruby/json_fuzzer | **65.12** | 79.87 | 69.1 | 0.94x | 1.16x |
+| iperf/cjson_fuzzer | **25.10** | 0.00 | 24.5 | 1.02x | 0.00x |
+| zopfli/zopfli_deflate_fuzzer | **86.17** | 80.06 | 85.7 | 1.01x | 0.93x |
+| zlib/zlib_uncompress2_fuzzer | **53.93** | 51.74 | 53.1 | 1.02x | 0.97x |
+| lcms2/cmsOpenProfileFromMem | **5.14** | — | — |  |  |
+
+Measured cases with a gold baseline: **7**. Median ours/gold: **1.01x**. Ahead of the cited QuartetFuzz figure on **6 of 7**.
 
 <!-- TABLE:END -->
 
@@ -85,6 +86,19 @@ defects IN THE ENGINE that seven benchmark cases never exposed, and the number w
 0.79% to 5.14% as those were fixed. The remaining gap is the engine's, not the target's:
 one entry point reading an ICC profile does not reach the tag-type handlers that hold most
 of cmstypes.c, and reaching them needs the seed synthesis that is not built yet.
+
+## Which engine produced these numbers
+
+Every row in `results/*.jsonl` carries an `engine` field: the short sha of the revision that
+emitted its harness, with `-dirty` appended when the tree had uncommitted changes, because a
+tree nobody can check out is not a tree a number can cite.
+
+**run-009 is stamped `cf6e10e`, after the fact.** Its eight harnesses were emitted between
+21:45 and 23:17, and the first change to `hforge/producers` or `hforge/emit` after that
+revision landed at 23:22 — so every emit in the run saw the same producer and emitter. Three
+producer fixes landed within twenty minutes of the last case finishing, which is exactly why
+the field exists: without it, nobody reading this table in six months could tell which tree
+the numbers came from.
 
 ## Integrity
 

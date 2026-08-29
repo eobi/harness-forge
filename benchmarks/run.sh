@@ -44,6 +44,20 @@ print(' '.join(ns['CASES']))
 ")
 fi
 
+# WHICH ENGINE PRODUCED THIS ROW.
+#
+# A results file without it is not reproducible: run-009's eight harnesses were emitted
+# against one revision, and three producer fixes landed within twenty minutes of the last
+# one finishing. Six months on, nobody can tell which tree a number came from unless the
+# number says. The host has git; the image does not need it.
+ENGINE_SHA=$(git -C "$REPO" rev-parse --short HEAD 2>/dev/null || echo unknown)
+if ! git -C "$REPO" diff --quiet HEAD 2>/dev/null; then
+  # An uncommitted tree is a tree nobody else can check out. Say so in the row rather than
+  # recording a sha that does not describe what actually ran.
+  ENGINE_SHA="$ENGINE_SHA-dirty"
+fi
+echo "engine: $ENGINE_SHA"
+
 RESULTS="$WORK/results-$RUN_ID.jsonl"
 : > "$RESULTS"
 echo "run $RUN_ID: ${SECONDS_PER_CASE}s per case"
@@ -51,7 +65,7 @@ echo "cases: $CASES"
 
 docker run --rm --name "hf-$RUN_ID" \
   -v "$REPO:/hf:ro" -v "$WORK:/b" \
-  -e HF_LOGDIR="/b/logs/$RUN_ID" \
+  -e HF_LOGDIR="/b/logs/$RUN_ID" -e HF_ENGINE_SHA="$ENGINE_SHA" \
   "$IMAGE" sh -c "
     mkdir -p /b/logs/$RUN_ID
     for c in $CASES; do

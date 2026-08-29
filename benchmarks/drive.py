@@ -148,7 +148,8 @@ def main():
 
     cands.sort(key=lambda x: (-_is_entry(x), -_driven(x), _plain(x),
                               -len(x.sequence), len(x.name)))
-    out = {"case": case, "target": c["fn"], "proposed": len(plans),
+    out = {"case": case, "engine": os.environ.get("HF_ENGINE_SHA", "unknown"),
+           "target": c["fn"], "proposed": len(plans),
            "plans_for_target": len(cands)}
     if not cands:
         out["result"] = "NO PLAN for the gold target"
