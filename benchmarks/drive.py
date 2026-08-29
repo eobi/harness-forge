@@ -204,6 +204,11 @@ def main():
     cmd += ["-fsanitize=fuzzer,address", str(wd/"harness.c")] + c["src"] + ["-o", str(binp)]
     r = subprocess.run(cmd, capture_output=True, text=True)
     (logs/"build.cmd").write_text(" ".join(cmd) + "\n")
+    # A build.log left over from an EARLIER failed attempt sits next to a successful build
+    # and reads as if this run failed. run-010's first attempt failed to link en265.cc; the
+    # retry succeeded into the same directory and the stale log stayed. Evidence that
+    # describes a different run is worse than no evidence.
+    (logs/"build.log").unlink(missing_ok=True)
     if r.returncode != 0:
         # The truncated field in the JSON row is for reading; the file is for fixing.
         (logs/"build.log").write_text(r.stdout + r.stderr)
@@ -310,6 +315,7 @@ def measure_gold(c, wd, logs, corp, dict_args, seconds, mlen, cover):
     cmd += [f"-I{i}" for i in c["inc"]] + c["cflags"]
     cmd += ["-fsanitize=fuzzer,address", gsrc] + c["src"] + ["-o", str(gbin)]
     (glogs/"build.cmd").write_text(" ".join(cmd) + "\n")
+    (glogs/"build.log").unlink(missing_ok=True)
     r = subprocess.run(cmd, capture_output=True, text=True)
     if r.returncode != 0:
         (glogs/"build.log").write_text(r.stdout + r.stderr)
