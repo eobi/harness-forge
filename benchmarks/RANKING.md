@@ -63,10 +63,16 @@ Measured cases with a gold baseline: **3**. Median ours/gold: **1.00x**. Ahead o
 <!-- TABLE:END -->
 
 `ratio` is the metric that survives across libraries, because absolute coverage is set by
-the target rather than by harness quality. For scale: **PromeFuzz's headline claim is 1.40x
-over hand-written harnesses**, and **QuartetFuzz's own median across its 25 C cases is
-0.95x** — that is, the state of the art in LLM harness generation is still, on median,
-slightly behind the hand-written harness it is trying to replace.
+the target rather than by harness quality. For scale, **QuartetFuzz's own median across
+its 25 C cases is 0.95x** — computed from the same published artifact this table cites, so
+it is the one external number here on comparable footing. That is, the state of the art in
+LLM harness generation is still, on median, slightly behind the hand-written harness it is
+trying to replace.
+
+PromeFuzz's headline claim of **1.40x** is quoted in `reference.json` for scale and is
+deliberately kept out of this table. We have not reproduced it, and we do not know its case
+selection, its protocol or its coverage denominator — which is three unknowns too many to
+put a number in a column beside figures we measured.
 
 `iperf/cjson_fuzzer` is worth reading twice. The cited QuartetFuzz figure is **0.00** — it
 did not produce a working harness for that case at all.

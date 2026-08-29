@@ -540,9 +540,12 @@ Measured cases with a gold baseline: **3**. Median ours/gold: **1.00x**. Ahead o
 **`ours/gold` is the number that matters.** Absolute coverage is a property of the target,
 not of the harness — 85% on brotli and 53% on zlib say nothing about each other. The ratio
 to the hand-written OSS-Fuzz harness is the only quantity that survives comparison across
-libraries. For scale: **PromeFuzz claims 1.40x**, and **QuartetFuzz's own median across its
-25 C cases is 0.95x** — the state of the art is still, on median, slightly behind the
-hand-written harness it is trying to replace.
+libraries. For scale, **QuartetFuzz's own median across its 25 C
+cases is 0.95x**, computed from the same published artifact this table cites — the state of
+the art is still, on median, slightly behind the hand-written harness it is trying to
+replace. (PromeFuzz's 1.40x headline is quoted in `reference.json` and kept out of this
+table: we have not reproduced it and do not know its case selection, protocol or
+denominator.)
 
 Two rows deserve a second look.
 
