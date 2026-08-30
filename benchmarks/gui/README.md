@@ -94,6 +94,38 @@ For a library harness the process is the isolation boundary. **For a GUI target 
 filesystem around the input is part of the input**, and nothing about process, session or
 home isolation implies it.
 
+## Structure-aware mutation, measured against byte flips
+
+A PNG is a signature then chunks of (length, type, payload, CRC32). Random byte flips break
+the signature or the header, so every input is refused at the parser's first check and the
+campaign measures that check over and over.
+
+| mutator | past the front door |
+|---|---|
+| byte flips | **0 / 10** |
+| structure-aware | **8 / 24 (33%)** |
+
+By mutation kind, over 24 inputs:
+
+| mutation | n | accepted |
+|---|---:|---:|
+| payload noise, CRC recomputed | 4 | 75% |
+| duplicate chunk | 7 | 57% |
+| extreme width/height | 8 | 12% |
+| stale CRC · drop chunk · truncate IDAT | 5 | 0% |
+
+Keeping the skeleton and **recomputing the CRC** is what gets through: it produces a
+well-formed file with strange contents, which is what the decoder actually processes. A
+stale CRC or a missing chunk is refused immediately, because libpng checks structure before
+content — those mutations only ever re-measure the front door.
+
+`dims` earns its place despite 12%: extreme width and height are the classic
+integer-overflow surface in an image decoder. **The per-kind rates are weak estimates** —
+n=8 at best, n=1 for two of them — and are a steer for weighting, not a result.
+
+This is the same wall the library side hit and the same fix. On an X.509 parser,
+structurally valid seeds moved coverage from 12.22% to 32.10% at an identical budget.
+
 ## The campaign refuses to start without a positive control
 
 If the unmodified seed does not open cleanly, the run stops. A campaign that reports nothing

@@ -149,7 +149,9 @@ def run_one(app: str, path: str, budget: float):
     return v
 
 
-def mutate(seed: bytes, rng: random.Random) -> bytes:
+def mutate_naive(seed: bytes, rng: random.Random) -> tuple:
+    """Byte flips. Almost always breaks the signature or the header, so the campaign
+    measures the parser's first check over and over."""
     b = bytearray(seed)
     for _ in range(rng.randint(1, 8)):
         if not b:
@@ -157,7 +159,18 @@ def mutate(seed: bytes, rng: random.Random) -> bytes:
         b[rng.randrange(len(b))] = rng.randrange(256)
     if rng.random() < 0.25 and len(b) > 32:
         b = b[: rng.randrange(16, len(b))]
-    return bytes(b)
+    return bytes(b), "flip"
+
+
+def mutate(seed: bytes, rng: random.Random, aware: bool = True) -> tuple:
+    if not aware:
+        return mutate_naive(seed, rng)
+    try:
+        sys.path.insert(0, str(Path(__file__).resolve().parent))
+        from mutate_png import mutate as png_mutate
+        return png_mutate(seed, rng)
+    except Exception:                                              # noqa: BLE001
+        return mutate_naive(seed, rng)
 
 
 def main() -> int:
@@ -167,6 +180,8 @@ def main() -> int:
     ap.add_argument("--n", type=int, default=10)
     ap.add_argument("--budget", type=float, default=8.0)
     ap.add_argument("--rng", type=int, default=1337)
+    ap.add_argument("--naive", action="store_true",
+                    help="byte flips instead of the structure-aware mutator, for comparison")
     a = ap.parse_args()
 
     seed_path = a.seed_file
@@ -214,14 +229,18 @@ def main() -> int:
     tally: dict = {}
     for i in range(a.n):
         f = slot(i) / f"input{ext}"
-        f.write_bytes(mutate(seed, rng))
+        data, what = mutate(seed, rng, aware=not a.naive)
+        f.write_bytes(data)
         v = run_one(a.app, str(f), a.budget)
         tally[v.outcome.value] = tally.get(v.outcome.value, 0) + 1
         mark = "  <-- FINDING" if v.is_finding() else ""
-        print(f"  input {i:03d}      {v.outcome.value:12} nodes={v.nodes:3} "
+        print(f"  input {i:03d}  {what:11} {v.outcome.value:12} nodes={v.nodes:3} "
               f"term={v.termination.value if v.termination else '-':10} "
               f"{f.stat().st_size:>6}B{mark}")
-    print(f"\n  {a.n} inputs: " + ", ".join(f"{k}={v}" for k, v in sorted(tally.items())))
+    acc = tally.get("accepted", 0)
+    print(f"\n  {a.n} inputs ({'byte flips' if a.naive else 'structure-aware'}): "
+          + ", ".join(f"{k}={v}" for k, v in sorted(tally.items())))
+    print(f"  past the front door: {acc}/{a.n} = {100.0*acc/max(1,a.n):.0f}% accepted")
     findings = tally.get("crashed", 0) + tally.get("unresponsive", 0)
     print(f"  findings: {findings}   (a refusal is the target working, not a finding)")
     return 0
