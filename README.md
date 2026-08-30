@@ -148,6 +148,44 @@ $ python3 -m hforge audit target/classes --classpath app.jar
 `audit` lifts the harness into the same IR and grades it, so a third-party harness and a
 generated one are judged by identical criteria.
 
+### Handing the harness to a fuzzer
+
+This engine certifies harnesses. It does not hunt bugs with them, and the certificate says
+so: it names what the harness *cannot* find. Something still has to run the campaign and
+prove what it finds.
+
+[**Nemesis Forge**](https://github.com/eobi/nemesisforge) is built for the second half, on
+the same principle as this one — a model may propose, and may certify nothing; oracles that
+are deterministic and independent of the proposer decide what a finding is worth. It uses
+the **same 0-6 rung ladder** this repository does, which is what lets the two compose
+instead of merely coexisting.
+
+```console
+$ hforge propose  cJSON.h --include . --name cjson
+451 plan(s) proposed
+$ hforge validate build/proposed/cjson_cJSON_ParseWithLength.hir.json
+[PASS] S1..S6   the plan is contract-compliant
+$ hforge emit    build/proposed/cjson_cJSON_ParseWithLength.hir.json -o out
+$ python -m forge lab out/harness.c --fuzz-time 20      # Nemesis Forge
+```
+
+A **certificate** states what the harness cannot reach. A **finding** states what the
+campaign did not prove. Neither hides its gaps, and between them there is no step where
+somebody has to take it on trust that the harness was correct — which is the step that
+makes most fuzzing results unreviewable.
+
+The pairing is worth more than convenience. Nemesis Forge's harness synthesiser asks a model,
+in a prompt, for the properties this engine proves mechanically: do not pass fuzz bytes as a
+size or a filename, never leave a required pointer NULL, size output buffers for the one call
+that uses them, call only what the public header declares. It then checks one of them — a
+coverage probe, after a compiler and a campaign have already been paid for. `S2` and `S4`
+refuse those plans before `clang` starts.
+
+`hforge audit` runs the same gate bank against harnesses this engine did not write, so a
+model-written harness and a generated one are judged by identical criteria.
+
+---
+
 ### Pointing it at a target, by platform
 
 The engine is one pipeline with several backends, and they are not equally finished. This
