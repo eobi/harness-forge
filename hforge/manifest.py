@@ -1655,6 +1655,25 @@ PHASES: tuple = (
                          "pointer to an owned container -- because a GUESSED constructor "
                          "argument is a silent behaviour change; anything else is refused "
                          "with the parameter named."),
+        Deliverable("L.CXX_FLAGS",
+                    "a defaulted flag exercised across its family, read from the header",
+                    DONE,
+                    modules=("hforge.producers.cxx_header",),
+                    tests=("test_the_flag_family_is_read_out_of_the_header",
+                           "test_the_call_is_repeated_once_per_flag_value",
+                           "test_each_repeat_passes_a_named_constant_not_a_guessed_number",
+                           "test_a_defaulted_parameter_with_no_family_is_still_dropped"),
+                    note="MEASURED motivation: pugixml's own harness calls load_buffer "
+                         "three times, with parse_minimal, parse_default and parse_full, "
+                         "and that accounted for 1.3 of the 1.32 points between us and it. "
+                         "Dropping the parameter leaves one behaviour out of several; "
+                         "guessing a value is a silent change. So the family is READ: "
+                         "every constant sharing the default's prefix, of which the LEAST "
+                         "is the bare zero, the DEFAULT is what the signature names, and "
+                         "the MOST INCLUSIVE is the one whose expression references the "
+                         "most other members. That derives exactly the three the library's "
+                         "authors chose, with no per-library list. Fewer than three "
+                         "members and the parameter is dropped as before."),
         Deliverable("L.CXX_EMIT",
                     "C++ backend: objects, new/delete, std::string and vector inputs", DONE,
                     modules=("hforge.emit.cxx_libfuzzer",),

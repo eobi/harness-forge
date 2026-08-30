@@ -92,6 +92,7 @@ class Method:
     is_const: bool = False
     is_pure: bool = False               # `= 0`: the class is abstract and cannot be built
     n_required: int = 0                 # leading params with no default argument
+    defaults: list = field(default_factory=list)   # default expression per param, "" if none
 
     @property
     def is_free(self) -> bool:
@@ -150,6 +151,15 @@ def _split_raw(s: str) -> list:
             cur.append(ch)
     if cur and "".join(cur).strip():
         out.append("".join(cur).strip())
+    return out
+
+
+def default_exprs(s: str) -> list:
+    """The default argument of each parameter, verbatim, or "" where there is none."""
+    out = []
+    for p in _split_raw(s):
+        m = re.search(r"=\s*(.+)$", p)
+        out.append(m.group(1).strip() if m else "")
     return out
 
 
@@ -272,7 +282,8 @@ def parse_classes(path: str, include_dirs=(), cflags=()) -> tuple:
                               params=_split_params(fm.group(4)),
                               is_static="static" in (fm.group(1) or ""),
                               is_const=bool(fm.group(5)), is_pure=bool(fm.group(6)),
-                              n_required=n_required(fm.group(4))))
+                              n_required=n_required(fm.group(4)),
+                              defaults=default_exprs(fm.group(4))))
 
     return methods, skipped, classes
 
@@ -298,7 +309,8 @@ def _methods_in(seg: str, cls: str, ns: str, skipped: list) -> list:
                           params=_split_params(params),
                           is_ctor=is_ctor, is_dtor=is_dtor,
                           is_static="static" in spec, is_const=is_const,
-                          is_pure=is_pure, n_required=n_required(params)))
+                          is_pure=is_pure, n_required=n_required(params),
+                          defaults=default_exprs(params)))
     return out
 
 
@@ -478,6 +490,74 @@ def _kind_of(ty: str) -> str:
     return "scalar"
 
 
+_CONST = re.compile(
+    r"^[ \t]*(?:static\s+)?const\s+(?:unsigned\s+|signed\s+)?"
+    r"(?:int|long|short|char|size_t|u?int(?:8|16|32|64)_t)\s+"
+    r"([A-Za-z_]\w*)\s*=\s*([^;]+);", re.M)
+
+
+def parse_constants(path: str) -> dict:
+    """Named integer constants, as name -> (namespace, expression).
+
+    A library's option flags are declared like this, and the DEFAULT ARGUMENT of a
+    parameter names one of them. That is what makes the alternatives derivable instead of
+    guessed: see `flag_family`.
+    """
+    src = _strip(Path(path).read_text(errors="replace"))
+    ns_at = []
+    for m in _NAMESPACE.finditer(src):
+        ob = src.find("{", m.end() - 1)
+        if ob >= 0:
+            ns_at.append((ob, _match_brace(src, ob), m.group(1)))
+
+    def ns_for(pos):
+        return "::".join(n for a, b, n in ns_at if a < pos < b)
+
+    out = {}
+    for m in _CONST.finditer(src):
+        out[m.group(1)] = (ns_for(m.start()), " ".join(m.group(2).split()))
+    return out
+
+
+def flag_family(default_expr: str, consts: dict) -> list:
+    """The least, the default and the most inclusive member of a flag family.
+
+    pugixml's `load_buffer(..., unsigned int options = parse_default, ...)` is the shape.
+    The family is every constant sharing the default's prefix; within it,
+
+      * the LEAST is the one whose expression is a bare zero (`parse_minimal = 0x0000`);
+      * the DEFAULT is what the signature already names;
+      * the MOST INCLUSIVE is the one whose expression references the most other members
+        (`parse_full = parse_default | parse_pi | parse_comments | ...`).
+
+    Those are exactly the three values pugixml's own harness passes, and none of them is a
+    per-library list: the structure is read out of the header. Returns qualified names,
+    fewest first, or [] when the default does not name a constant in a family.
+    """
+    name = default_expr.strip()
+    if name not in consts or "_" not in name:
+        return []
+    prefix = name.rsplit("_", 1)[0] + "_"
+    fam = {k: v for k, v in consts.items() if k.startswith(prefix)}
+    if len(fam) < 3:
+        return []
+
+    def qual(k):
+        ns = fam[k][0]
+        return f"{ns}::{k}" if ns else k
+
+    least = next((k for k, (_ns, e) in sorted(fam.items())
+                  if re.fullmatch(r"0[xX]0+|0", e.strip())), "")
+    most = max(sorted(fam), key=lambda k: sum(1 for o in fam if o != k and o in fam[k][1]))
+    picks = [x for x in (least, name, most) if x]
+    seen, out = set(), []
+    for k in picks:
+        if k not in seen:
+            seen.add(k)
+            out.append(qual(k))
+    return out if len(out) > 1 else []
+
+
 def propose(headers, target, platforms=(), knobs=None, max_plans: int = 12,
             skipped=None) -> list:
     """Plans for a C++ class API: construct the object, feed it the fuzzer's bytes.
@@ -497,9 +577,11 @@ def propose(headers, target, platforms=(), knobs=None, max_plans: int = 12,
     # that passes a list gets them back; the parser has used this convention all along.
     skipped: list = skipped if skipped is not None else []
     classes: dict = {}
+    consts: dict = {}
     for h in hs:
         ms, sk, cs = parse_classes(str(h))
         classes.update(cs)
+        consts.update(parse_constants(str(h)))
         for m in ms:
             m.header = Path(h).name
         methods += ms
@@ -594,6 +676,23 @@ def propose(headers, target, platforms=(), knobs=None, max_plans: int = 12,
             else:
                 args.append({"param": pn, "source": "literal", "value": 0})
 
+        # A DEFAULTED FLAG, exercised across its family instead of dropped or guessed.
+        # Dropping `options` leaves the library's own default, which is one behaviour out
+        # of several; guessing a value would be a silent change. The header says which
+        # values exist, so the call is repeated with the least, the default and the most
+        # inclusive -- the three pugixml's own harness passes, worth 1.3 points of the gap
+        # measured against it.
+        flags = []
+        di = m.n_required
+        if di < len(m.params):
+            fty, fnm = m.params[di]
+            if "*" not in fty and "&" not in fty and _INT_LEN.search(fty):
+                flags = flag_family((m.defaults[di] if di < len(m.defaults) else ""), consts)
+        fpn = (m.params[di][1] or f"arg{di}") if flags else ""
+        if flags:
+            params.append({"name": fpn,
+                           "type": {"name": m.params[di][0], "kind": "scalar"}})
+
         tgt = dict(name=target.name, language="c++",
                    public_headers=list(target.public_headers),
                    include_dirs=list(target.include_dirs), sources=list(target.sources),
@@ -625,8 +724,14 @@ def propose(headers, target, platforms=(), knobs=None, max_plans: int = 12,
             "sequence": (([] if free else
                           [{"id": "o_new", "api": ctor.symbol, "args": [], "binds": "o"}])
                          + extra_ops
-                         + [dict({"id": "o_consume", "api": m.symbol, "args": args},
-                                 **({} if free else {"guarded_by": ["o"]}))]),
+                         + ([dict({"id": "o_consume", "api": m.symbol, "args": args},
+                                 **({} if free else {"guarded_by": ["o"]}))]
+                            if not flags else
+                            [dict({"id": f"o_consume_{k}", "api": m.symbol,
+                                   "args": args + [{"param": fpn, "source": "literal",
+                                                    "value": fv}]},
+                                  **({} if free else {"guarded_by": ["o"]}))
+                             for k, fv in enumerate(flags)])),
             "knobs": {"max_len": (knobs.max_len if knobs else 4096)},
             "platforms": list(platforms) or ["linux-x86_64-glibc"],
         }))

@@ -479,3 +479,78 @@ def test_the_sink_is_passed_by_address_to_a_pointer_parameter(tmp_path):
     src = cxx_libfuzzer.emit(ir).source
     assert "&*hf_o_a2" in src
     assert "hf_o_a2.emplace(&hf_x_b2)" in src
+
+
+# ── a defaulted flag, exercised across its family ────────────────────────────
+
+_FLAGS = '''
+namespace pugi {
+  const unsigned int parse_minimal = 0x0000;
+  const unsigned int parse_pi = 0x0001;
+  const unsigned int parse_comments = 0x0002;
+  const unsigned int parse_cdata = 0x0004;
+  const unsigned int parse_default = parse_cdata | parse_pi;
+  const unsigned int parse_full = parse_default | parse_pi | parse_comments;
+  class PUGIXML_CLASS xml_document {
+   public:
+    xml_document();
+    ~xml_document();
+    int load_buffer(const void* contents, size_t size,
+                    unsigned int options = parse_default);
+  };
+}
+'''
+
+
+def test_the_flag_family_is_read_out_of_the_header(tmp_path):
+    """The three values pugixml's own harness passes, derived rather than listed: the
+    least (a bare zero), the default the signature names, and the most inclusive (the
+    one referencing the most other members)."""
+    h = tmp_path / "f.hpp"
+    h.write_text(_FLAGS)
+    consts = cx.parse_constants(str(h))
+    assert cx.flag_family("parse_default", consts) == [
+        "pugi::parse_minimal", "pugi::parse_default", "pugi::parse_full"]
+
+
+def _flag_plan(tmp_path):
+    from hforge.ir import Target
+    h = tmp_path / "f.hpp"
+    h.write_text(_FLAGS)
+    t = Target(name="pugixml", public_headers=["f.hpp"], include_dirs=[str(tmp_path)],
+               sources=[], link_libs=[], cflags=[], seed_dirs=[])
+    return next(p for p in cx.propose([str(h)], t) if "load_buffer" in p.name)
+
+
+def test_the_call_is_repeated_once_per_flag_value(tmp_path):
+    ir = _flag_plan(tmp_path)
+    assert [o.id for o in ir.sequence] == ["o_new", "o_consume_0", "o_consume_1",
+                                           "o_consume_2"]
+
+
+def test_each_repeat_passes_a_named_constant_not_a_guessed_number(tmp_path):
+    """A guessed flag value is a silent behaviour change; a named constant is the
+    library's own vocabulary and is auditable in the emitted source."""
+    src = cxx_libfuzzer.emit(_flag_plan(tmp_path)).source
+    for v in ("pugi::parse_minimal", "pugi::parse_default", "pugi::parse_full"):
+        assert f"hf_s_d.size(), {v})" in src
+
+
+def test_a_defaulted_parameter_with_no_family_is_still_dropped(tmp_path):
+    """The family must be READ, not invented: when the default is not a named constant in
+    a family of at least three, the parameter is omitted as before."""
+    h = tmp_path / "g.hpp"
+    h.write_text('''
+namespace lib {
+  class Reader {
+   public:
+    Reader();
+    int read(const void* d, size_t n, int mode = 3);
+  };
+}
+''')
+    from hforge.ir import Target
+    t = Target(name="lib", public_headers=["g.hpp"], include_dirs=[str(tmp_path)],
+               sources=[], link_libs=[], cflags=[], seed_dirs=[])
+    ir = next(p for p in cx.propose([str(h)], t) if "read" in p.name)
+    assert [o.id for o in ir.sequence] == ["o_new", "o_consume"]
