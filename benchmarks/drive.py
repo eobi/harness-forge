@@ -406,6 +406,35 @@ CASES = {
     cover=["/b/woff2/src/woff2_dec.cc", "/b/woff2/src/woff2_common.cc",
            "/b/woff2/src/woff2_out.cc", "/b/woff2/src/variable_length.cc",
            "/b/woff2/src/table_tags.cc"]),
+ # THE THIRD C++ CLASS-AND-NAMESPACE CASE, and the one that needed the most from the
+ # producer. `ReadBinaryIr(const char* filename, const uint8_t* data, size_t size,
+ # const ReadBinaryOptions&, Errors*, Module*)` needs an IMPLICIT default constructor
+ # (`struct Module` declares none), a type alias resolved and QUALIFIED for the harness's
+ # scope (`using Errors = std::vector<Error>` inside namespace wabt), and a `const char*`
+ # read as an incidental label rather than as the input -- which is only safe because a
+ # byte pointer WITHOUT a length is still refused.
+ #
+ # wabt ships fuzzers/wasm2wat_fuzzer.cc, so gold is MEASURED here rather than cited, and
+ # it is the same harness: `ReadBinaryOptions options; Errors errors; Module module;
+ # ReadBinaryIr("dummy filename", {data, size}, options, &errors, &module);`
+ #
+ # C++20 is REQUIRED: `using ByteSpan = std::span<const uint8_t>` in base-types.h does not
+ # compile under C++17. Run benchmarks/targets/wabt.sh first for include/wabt/config.h.
+ "wabt/read_binary_ir": dict(
+    lang="c++", cxx=True, std="c++20",
+    hdr="/b/wabt/include/wabt/binary-reader-ir.h",
+    also=["/b/wabt/include/wabt/error.h", "/b/wabt/include/wabt/binary-reader.h",
+          "/b/wabt/include/wabt/ir.h"],
+    inc=["/b/wabt/include"],
+    # tools/ and interp/ are applications and a separate library; the decode path is what
+    # this harness reaches and what the denominator should count.
+    src=[f for f in sorted(glob.glob("/b/wabt/src/*.cc"))
+         if not f.endswith(("emscripten-helpers.cc", "config.cc"))],
+    fn="wabt::ReadBinaryIr",
+    cflags=["-std=c++20"], max_len=65536,
+    gold_harness="/b/wabt/fuzzers/wasm2wat_fuzzer.cc",
+    cover=[f for f in sorted(glob.glob("/b/wabt/src/*.cc"))
+           if not f.endswith(("emscripten-helpers.cc", "config.cc"))]),
 }
 
 
