@@ -547,7 +547,7 @@ here under identical conditions:
 
 | case | ours | its own harness | ratio |
 |---|---:|---:|---:|
-| woff2/convert | **29.46%** | 29.79% | **0.99x** |
+| woff2/convert | 29.46% → see below | 29.79% | *single sample — do not rely on it* |
 | pugixml/parse | **14.79%** (n=5, ±0.00) | 14.79% (n=5, ±0.49) | **1.00x** |
 
 **woff2 is the one that shows what the producer is doing.** Its entry point is
@@ -566,6 +566,17 @@ which is, apart from a `SetMaxSize` guard, the harness woff2's own authors wrote
 side had a seed corpus, so both started cold -- fair against each other, and **not**
 comparable to the 87.3% `dataset_v2` publishes for that harness, which had OSS-Fuzz's
 accumulated corpus behind it.
+
+**The woff2 number is being re-measured and the single sample above should not be relied
+on.** A repeat of the byte-identical harness, with a byte-identical fuzz command, produced
+**38.76%** against the first run's 29.46% — a 9.3-point swing with nothing changed. The
+campaign starts from an EMPTY corpus and libFuzzer is not given a fixed seed, so on a
+format where a valid container must be constructed before the decoder is reached at all,
+run-to-run luck dominates. That is a property of this target: pugixml's coverage does not
+move across five runs, libyaml's spans 3.55 points across nine, and woff2 moves further
+than either. A distribution is being collected; until it exists, the honest statement is
+that we are somewhere around the developer harness on woff2 and the ratio is not yet
+pinned down.
 
 **The pugixml case is a prediction that was tested.** The first measurement put our
 harness at **13.47%** against the project's own `tests/fuzz_parse.cpp` at 14.79% — 0.91x —
