@@ -89,6 +89,31 @@ passed.
 
 ---
 
+## Install
+
+```bash
+git clone https://github.com/eobi/harness-forge.git
+cd harness-forge
+python3 -m hforge doctor
+```
+
+There is nothing to install and nothing to configure. **No runtime dependencies, no model, no
+API key** — the engine is standard library only, because it has to run where the target
+builds: inside an OSS-Fuzz image, on a CI runner, on an air-gapped box.
+
+`doctor` reports what this machine can do and **what each missing tool costs you**, so a
+stage that could not run is never mistaken for one that passed.
+
+Every command on this page is written `python3 -m hforge …`, which works straight from a
+clone. If you prefer the short form, `pip install -e .` puts an `hforge` executable on your
+PATH and the two are interchangeable.
+
+To fuzz anything you also need a **libFuzzer-capable clang**. Apple's `/usr/bin/clang` does
+not ship the runtime; on macOS use Homebrew LLVM (`brew install llvm`), and on Linux the
+distribution clang has it. `doctor` will tell you which one it found.
+
+---
+
 ## Try it
 
 No installation, no build step, nothing beyond a C compiler. Captured from real runs against
@@ -97,6 +122,30 @@ the demo library in [`examples/lib/`](examples/lib/), so a clone and a paste get
 ### Point it at a library
 
 Nothing here needs a hand-written plan. Give it the public header and the include paths:
+
+Everything below runs from a fresh clone against the demo library in `examples/lib/`, so you
+can paste it before pointing the engine at anything of your own:
+
+```console
+$ python3 -m hforge propose examples/lib/hf_demo.h --include examples/lib --name hf_demo
+
+4 plan(s) proposed from examples/lib/hf_demo.h, written to build/proposed/
+
+RANK  PLAN                               BLOCK   EDGES  GREW   KILL  SINKS  N/RUN  WARN
+--------------------------------------------------------------------------------------
+ 1    hf_demo_hd_parse                       0       ?     ?    0%    0%      0     0
+ 2    hf_demo_hd_parse_len64k                0       ?     ?    0%    0%      0     0
+ 3    hf_demo_hd_parse_n                     0       ?     ?    0%    0%      0     0
+ 4    hf_demo_hd_parse_n_len64k              0       ?     ?    0%    0%      0     0
+
+UNRANKED. 4 plan(s) are shippable and NO GATE DISTINGUISHES THEM.
+The order above is alphabetical, which is a tie-break, not a measurement.
+Naming a winner here would be inventing one.
+```
+
+That last paragraph is the engine refusing to rank without evidence, which is the behaviour
+the rest of this page is about. On a real library the same command scales up — here libyaml,
+with paths as they appear inside the benchmark container:
 
 ```console
 $ python3 -m hforge propose /b/libyaml/include/yaml.h \
@@ -216,7 +265,7 @@ that uses them, call only what the public header declares. It then checks one of
 coverage probe, after a compiler and a campaign have already been paid for. `S2` and `S4`
 refuse those plans before `clang` starts.
 
-`hforge audit` runs the same gate bank against harnesses this engine did not write, so a
+`python3 -m hforge audit` runs the same gate bank against harnesses this engine did not write, so a
 model-written harness and a generated one are judged by identical criteria.
 
 ---
@@ -229,11 +278,11 @@ trust ceiling each one carries, and `doctor` reports what your own machine can p
 
 | target | status | how you point it |
 |---|---|---|
-| **Linux CLI** (native or Docker) | verified end to end — 92 tests, 11/11 runnable stages | `hforge batch <header> --source ...` |
+| **Linux CLI** (native or Docker) | verified end to end — 92 tests, 11/11 runnable stages | `python3 -m hforge batch <header> --source ...` |
 | **Linux GUI** | early: file-drop driver and AT-SPI dialog automation both PARTIAL, coverage-guided termination PLANNED | not yet a supported entry point |
 | **Android CLI** | verified end to end on arm64-v8a API 35: cross-build, push, run, differential | `--platform android-arm64-emulator` |
 | **Android GUI** | planned, next after Linux GUI | — |
-| **macOS** arm64 | verified end to end | `hforge batch ...` natively |
+| **macOS** arm64 | verified end to end | `python3 -m hforge batch ...` natively |
 | **JVM / Java** | Jazzer backend, own gates and sink ladder | `--classpath app.jar` in place of the header |
 | **Windows** | exit-code semantics implemented and unit-tested from any host, **never run on a Windows host** | after the mobile track |
 | **iOS** | simulator detected via `simctl`; harness emission not yet wired | — |
@@ -529,7 +578,7 @@ docs/              EVIDENCE.md — the measured claims   PLATFORMS.md — the ma
 ## Checks
 
 ```
-pip install pytest && python3 -m pytest -q     # 326 passed
+pip install pytest && python3 -m pytest -q     # 345 passed
 python3 tools/plancheck.py                     # repository vs manifest: no drift
 python3 -m hforge selftest                     # the pipeline, end to end, on this machine
 ```
@@ -544,8 +593,8 @@ does not. That is what makes the status table above worth reading.
 ## Questions this answers
 
 **How do I know my fuzzing harness is correct?**
-Run the gates on it. `hforge validate <plan>` checks six static properties with no compiler
-involved; `hforge certify` adds eleven dynamic ones and writes a certificate. A harness this
+Run the gates on it. `python3 -m hforge validate <plan>` checks six static properties with no compiler
+involved; `python3 -m hforge certify` adds eleven dynamic ones and writes a certificate. A harness this
 engine passes still has limits, and the certificate names them under
 `WHAT THIS HARNESS CANNOT FIND` rather than leaving you to discover them later.
 
@@ -557,7 +606,7 @@ sized for a different call. `S2` refuses all three before `clang` runs.
 
 **How do I write a libFuzzer harness for a C library?**
 You do not have to. Point the engine at the public header:
-`hforge batch <header> --source lib.c --include dir/`. It proposes every plan the API admits,
+`python3 -m hforge batch <header> --source lib.c --include dir/`. It proposes every plan the API admits,
 gates them, campaigns the survivors, and ships only the ones that earn it.
 
 **My harness builds and runs but finds nothing. Why?**
@@ -570,11 +619,11 @@ harness. On mbedTLS, adding eleven real X.509 certificates moved coverage from 1
 **Can an LLM write fuzz harnesses?**
 Yes, and the good generators are LLM-driven. This engine is the other half: it does not
 generate with a model at all, and it grades harnesses whichever way they were written.
-`hforge audit <harness.c>` runs the same gate bank over somebody else's harness, so a
+`python3 -m hforge audit <harness.c>` runs the same gate bank over somebody else's harness, so a
 model-written one and a generated one are judged by identical criteria.
 
 **How do I audit existing OSS-Fuzz harnesses at scale?**
-`hforge audit <dir>` lifts every harness it finds into the IR and grades it. Violations are
+`python3 -m hforge audit <dir>` lifts every harness it finds into the IR and grades it. Violations are
 reported with the fix, and a harness the lift cannot read with confidence is marked low
 fidelity rather than silently passed.
 
