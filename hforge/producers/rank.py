@@ -143,7 +143,7 @@ def _why_undiscriminating(ranked: list) -> list:
     return out
 
 
-def render(ranked: list) -> str:
+def render(ranked: list, has_sources: bool = True) -> str:
     L = ["", f"{'RANK':<5} {'PLAN':<34} {'BLOCK':>5} {'EDGES':>7} {'GREW':>5} "
              f"{'KILL':>6} {'SINKS':>6} {'N/RUN':>6} {'WARN':>5}", "-" * 92]
     for i, s in enumerate(ranked, 1):
@@ -181,8 +181,18 @@ def render(ranked: list) -> str:
             for w in why:
                 L.append(f"  - {w}")
             L.append("")
-            L.append("Supply the target's sources (--source, plus --cflag as needed) and "
-                     "re-run.")
+            # ADVICE THAT CONTRADICTS WHAT THE USER DID IS WORSE THAN NO ADVICE. This
+            # told an operator who had passed THIRTY --source arguments to supply the
+            # target's sources. When the sources are already there the cause is that the
+            # build or the run failed, and the reason above is the thing to read.
+            if has_sources:
+                L.append("The sources ARE present, so this is a BUILD or RUN failure, not "
+                         "a missing argument:")
+                L.append("build the plan with `hforge emit` and run its build.sh to see "
+                         "the compiler's own error.")
+            else:
+                L.append("Supply the target's sources (--source, plus --cflag as needed) "
+                         "and re-run.")
             L.append("D2 measures whether each harness can find a planted defect and D4 "
                      "measures how")
             L.append("much of the sink surface it reaches; those are what rank a plan.")

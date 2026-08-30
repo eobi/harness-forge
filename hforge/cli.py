@@ -365,7 +365,8 @@ def cmd_propose(args) -> int:
 
     print(f"{len(plans)} plan(s) proposed from {args.classpath or args.header}, "
           f"written to {out}/")
-    print(ranking.render(ranking.rank(scored)))
+    print(ranking.render(ranking.rank(scored),
+                         has_sources=bool(tgt.sources or tgt.link_libs)))
     return 0 if any(s.shippable for s in scored) else 1
 
 
@@ -699,7 +700,8 @@ def cmd_batch(args) -> int:
         scored.append(replace(ranking.score(ir.name, ir.producer, gates), measured=False))
 
     ranked = ranking.rank(scored)
-    report = ranking.render(ranked)
+    report = ranking.render(ranked, has_sources=bool(
+        getattr(tgt, 'sources', None) or getattr(tgt, 'link_libs', None)))
     print(report)
 
     # WHERE each defect was caught, which is the axis this engine is actually different on.
