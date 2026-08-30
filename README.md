@@ -5,8 +5,15 @@
 The field builds generators. The field's own numbers say the generator is not the
 bottleneck: harness defects produce false-positive crash rates **as high as 94%**, and an
 audit of **586 production harnesses** found 53 protocol violations, 35 of which were fixed
-upstream. The bottleneck is that nobody can tell you whether a harness is any good until
-after it has wasted a campaign or produced a false finding.
+upstream.
+
+That audit was done by [QuartetFuzz](https://arxiv.org/abs/2605.21824), which checks a
+harness against four correctness principles **before any fuzzing begins** — so "nobody
+checks harnesses up front" would be false, and citing their audit while saying it would be
+incoherent. The gap is narrower and it is about the RECORD: a checker returns a verdict,
+and a verdict does not tell you which checks ran, which could not, and what the harness
+therefore cannot find. When a campaign then reports nothing, there is no way to tell a
+clean library from an unexercised one.
 
 So this is not a generator. It is an **IR**, a **gate bank** and an **evidence record**.
 A producer proposes a plan; the gates certify it; confidence decides nothing.
