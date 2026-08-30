@@ -2612,7 +2612,20 @@ def _plans_for_handle(decls, target, handle, inline_base, init_name, fini_name,
                       repeat=((knobs.max_len if knobs and knobs.max_len else 4096)
                               if _repeats else 0),
                       guarded_by=["h"] if (create and handle and uses_h) else []))
-        fin = _finisher_for(handle, cons, apis, pm, used)
+        # A FINISHER WITHOUT A CREATE DESTROYS SOMETHING THAT WAS NEVER MADE.
+        #
+        # The op below binds resource "h" unconditionally while only its GUARD was
+        # conditional on a create existing. For a consumer that neither takes nor returns
+        # the library's handle -- ZSTD_decompress(void *dst, size_t, const void *src,
+        # size_t) against a ZSTD_DCtx handle -- that emitted `o_finish` against a resource
+        # nothing declared. S1 refused the plan as UNKNOWN_RESOURCE and zstd went from
+        # 30.04% to no measurement at all. The gate was right; the plan should never have
+        # been built.
+        # `needs_resource` is the same term the o_create above is gated on: a resource is
+        # only declared when the call's own arguments reference it. Without it here, the
+        # finisher was emitted for a handle the plan never created.
+        fin = (_finisher_for(handle, cons, apis, pm, used)
+               if (create and handle and needs_resource) else None)
         if fin is not None:
             seq.append(Op("o_finish", fin.symbol,
                           [Arg(fin.params[0].name, "resource", "h")],
