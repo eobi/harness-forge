@@ -91,6 +91,7 @@ _RETURN = re.compile(r"\breturn\b")
 class Lifted:
     ir: HarnessIR
     unread: list = field(default_factory=list)     # what the lifter could not express
+    missed: list = field(default_factory=list)     # calls in the body that never became ops
     entry_data: str = ""
     entry_size: str = ""
     branches: int = 0                              # control-flow statements in the body
@@ -116,13 +117,31 @@ class Lifted:
         # asserted. So branching alone no longer disqualifies a lift. What still does is not
         # being able to attribute the values: if most arguments are opaque, the call graph
         # this reports is not the one that runs.
+        # A MISSED CALL IS INVISIBLE TO AN UNATTRIBUTED-VALUE COUNT, and that is how four
+        # false positives reached the reportable pile in one audit of 372 production
+        # harnesses. nettle's harness calls
+        #     asn1_der_iterator_first(&iter, size, data)
+        # inside an `if` condition; the lifter dropped the call entirely, reported ZERO
+        # unattributed values because every call it DID read was clean, and declared the
+        # lift high fidelity. The gate then correctly observed that no op consumed the
+        # input, and the conclusion -- "this harness fuzzes nothing" -- was about a library
+        # that fuzzes fine.
+        #
+        # So fidelity now asks whether the body contains calls we never turned into ops.
+        # It fails CLOSED: a shape the lifter does not model makes the lift untrusted
+        # without anyone having to predict the shape in advance.
         ops = max(1, len(self.ir.sequence))
+        if self.missed:
+            return False
         return (len(self.unread) / ops) < 1.5
 
     @property
     def why_low_fidelity(self) -> str:
         bits = []
         ops = max(1, len(self.ir.sequence))
+        if self.missed:
+            bits.append(f"{len(self.missed)} call(s) in the body the lifter did not read: "
+                        + ", ".join(sorted(self.missed)[:4]))
         if (len(self.unread) / ops) >= 1.5:
             bits.append(f"{len(self.unread)} unattributed value(s) across {ops} call(s)")
         return "; ".join(bits)
@@ -196,6 +215,28 @@ def _classify_args(args_raw, data, size, tainted, resources, is_ptr, unread, fn)
             unread.append(f"argument {i} of {fn}: {a.strip()[:48]!r} could not be "
                           f"attributed; treated as an opaque literal")
     return args, params, out_created
+
+
+_NOT_A_CALL = {
+    "if", "for", "while", "switch", "return", "sizeof", "alignof", "defined",
+    "static_cast", "reinterpret_cast", "const_cast", "dynamic_cast", "catch",
+    "assert", "offsetof", "va_start", "va_end", "va_arg", "typeof", "__typeof__",
+    "LLVMFuzzerTestOneInput", "LLVMFuzzerInitialize", "printf", "fprintf", "sizeof",
+}
+_CALLISH = re.compile(r"\b([A-Za-z_]\w*)\s*\(")
+
+
+def _missed_calls(body: str, lifted_symbols: set) -> list:
+    """Call names in the body that never became ops.
+
+    Deliberately NAME-based and deliberately noisy in the safe direction: the point is not
+    to enumerate the harness's semantics, it is to notice that the lifter's view is
+    incomplete. A name we cannot classify counts as missed, because the alternative --
+    assuming anything we did not recognise was unimportant -- is exactly what let a dropped
+    `asn1_der_iterator_first` be reported as "this harness consumes no input".
+    """
+    seen = {m.group(1) for m in _CALLISH.finditer(body)}
+    return sorted(seen - _NOT_A_CALL - {s.rsplit("::", 1)[-1] for s in lifted_symbols})
 
 
 def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
@@ -333,5 +374,40 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
         producer="lift:c_harness",
         raw_blocks=blocks,
         notes=notes)
+    _syms = {a.symbol for a in ir.apis.values()} if hasattr(ir, "apis") else set()
+    _missed = _missed_calls(body, _syms)
+
+    # AN INPUT USE WE DID NOT BIND IS A FLOW WE DID NOT FOLLOW.
+    #
+    # haproxy's harness reaches its parser through a designated initialiser --
+    #     struct cfgfile dummy_cfg = { .content = (const char *)data, .size = size };
+    # -- and lcms consumes bytes as `data[0]`, `data[1]`. In both, every CALL was lifted, so
+    # the missed-call check above stays silent, and both were reported as harnesses that
+    # consume no input. They consume it; the lifter could not see the path.
+    #
+    # So: count how often the entry's data parameter is named in the body, and how often we
+    # actually bound it. Fewer bindings than uses means a flow we did not follow, and the
+    # lift is untrusted -- again failing closed, without naming the shapes in advance.
+    # Count each parameter against ITS OWN bindings. Counting `input` and `length_of`
+    # together against uses of the DATA name let zlib's single length binding of `size`
+    # mask the fact that `d` -- assigned straight into a global and never seen again --
+    # was bound nowhere. The harness works; the lifter cannot see through the global, and
+    # the check written to notice exactly that missed it.
+    for _name, _src in ((data, "input"), (size, "length_of")):
+        if not _name:
+            continue
+        # A GUARD IS NOT A FLOW. `if (size < 4) return 0;` names the parameter without
+        # passing it anywhere, and nearly every harness has one; counting guards made a
+        # correct lift of a branching sqlite harness untrusted. Only uses that are not a
+        # comparison against the parameter are candidates for a flow we failed to follow.
+        _n = re.escape(_name)
+        _all = len(re.findall(r"\b" + _n + r"\b", body))
+        _guards = len(re.findall(r"\b" + _n + r"\b\s*(?:<|>|<=|>=|==|!=)", body)) \
+            + len(re.findall(r"(?:<|>|<=|>=|==|!=)\s*\b" + _n + r"\b", body))
+        _uses = _all - _guards
+        _bound = sum(1 for o in ops for a in o.args if a.source == _src)
+        if _uses > _bound:
+            _missed.append(f"{_uses - _bound} use(s) of {_name!r} the lifter did not bind")
+
     return Lifted(ir=ir, unread=unread, entry_data=data, entry_size=size,
-                  branches=parsed.branches, hedged=hedged)
+                  branches=parsed.branches, hedged=hedged, missed=_missed)

@@ -30,5 +30,25 @@
  },
  "result": "0 upstream-reportable findings; 4 flags, all four false",
  "false_positive_rate_high_fidelity": "4/214 = 1.9%",
- "the_actual_finding": "the HIGH-FIDELITY classifier admitted all four. The gates are correct about the IR they were handed; the LIFTER produced IR that does not match the harness, and the fidelity signal -- 'the lifter could not attribute some values' -- did not fire on any of them. A fidelity signal that misses four out of four is the defect, not the gates."
+ "the_actual_finding": "the HIGH-FIDELITY classifier admitted all four. The gates are correct about the IR they were handed; the LIFTER produced IR that does not match the harness, and the fidelity signal -- 'the lifter could not attribute some values' -- did not fire on any of them. A fidelity signal that misses four out of four is the defect, not the gates.",
+ "CORRECTION": "The population figures first recorded here (214 high-fidelity, 4 flagged, 1.9%) were produced by a script that detected fidelity by GREPPING THE CLI OUTPUT for 'could not attribute'. Changing that message then made 130 harnesses appear to become high-fidelity and the flags appear to vanish -- a result manufactured entirely by the measuring script. The audit is re-run through the lifter's API below. The four triage verdicts stand; they came from reading the harnesses, not from the script.",
+ "after_fidelity_fix": {
+  "harnesses": 372,
+  "lifted": 362,
+  "high_fidelity": 44,
+  "flagged": 3,
+  "false_positive_rate": "3/44 = 6.8%",
+  "findings": 0,
+  "triage": {
+   "yajl-ruby/json_fuzzer.c": "FALSE POSITIVE - `yajl_parser_config cfg = {...}` is a declared local passed as &cfg; the lifter does not count a designated-initialiser declaration as a create",
+   "bluez/fuzz_gobex.c": "FALSE POSITIVE - same shape: a local passed by address, which for an out-parameter is uninitialised BY DESIGN",
+   "sentencepiece/trainer_fuzzer.cc": "S2.UNKNOWN_PARAM, not triaged in this round"
+  },
+  "remaining_lifter_gap": "A CALLER-DECLARED LOCAL PASSED BY ADDRESS IS NOT AN UNCREATED RESOURCE. This one shape produced the tdengine, lcms, yajl-ruby and bluez flags -- it is the single largest false-positive source left, and fixing it is the prerequisite for running this audit for findings rather than for calibration."
+ },
+ "fidelity_fixes_made": [
+  "a call in the body that never became an op now makes the lift untrusted",
+  "a use of the data or size parameter that was never bound now makes it untrusted",
+  "comparison guards (`if (size < 4)`) are excluded, because counting them rejected a correctly lifted branching harness -- fail closed, but not shut"
+ ]
 }

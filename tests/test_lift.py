@@ -251,3 +251,50 @@ if __name__ == "__main__":
         check(name, fn)
     print(f"\n{_pass}/{_pass + _fail} passed")
     raise SystemExit(1 if _fail else 0)
+
+
+# ── fidelity must fail CLOSED ────────────────────────────────────────────────
+#
+# An audit of 372 production OSS-Fuzz harnesses put four in the reportable pile and all
+# four were false positives. None was caused by a gate: the LIFTER built IR that did not
+# match the harness, and the fidelity signal -- "values the lifter could not attribute" --
+# cannot see a call or a flow that was never lifted at all. These pin the closed door.
+
+def test_a_call_the_lifter_never_read_makes_the_lift_untrusted():
+    """nettle calls `asn1_der_iterator_first(&iter, size, data)` inside an `if` condition.
+    The lifter dropped it, reported zero unattributed values because every call it DID
+    read was clean, and declared high fidelity. The gate then correctly said no op consumes
+    input -- about a harness that consumes input fine."""
+    L = c_harness.lift(_c("""
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    struct it iter;
+    if (asn1_der_iterator_first(&iter, size, data) == 1) { use_it(&iter); }
+    return 0;
+}
+"""))
+    assert not L.high_fidelity
+    assert any("asn1_der_iterator_first" in m for m in L.missed)
+
+
+def test_input_reaching_the_target_by_a_path_we_cannot_follow_is_untrusted():
+    """haproxy hands its parser a designated initialiser holding the input; lcms consumes
+    it as data[0], data[1]. Every CALL is lifted in both, so a missed-call check stays
+    silent -- but the flow was never followed and the harness looked inert."""
+    L = c_harness.lift(_c("""
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    struct cfgfile f = { .content = (const char *)data, .size = size };
+    parse_cfg(&f);
+    return 0;
+}
+"""))
+    assert not L.high_fidelity
+    assert any("did not bind" in m for m in L.missed)
+
+
+def test_a_size_guard_is_not_a_missed_flow():
+    """`if (size < 4) return 0;` names the parameter without passing it anywhere, and
+    nearly every harness has one. Counting guards as unfollowed flows made a correctly
+    lifted branching harness untrusted -- a filter that rejects everything is not a
+    filter."""
+    L = c_harness.lift(_c(BRANCHING))
+    assert L.high_fidelity, L.why_low_fidelity
