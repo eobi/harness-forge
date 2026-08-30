@@ -111,6 +111,7 @@ CASES = {
     src=(sorted(glob.glob("/b/leptonica/src/*.c"))
          + [f for f in sorted(glob.glob("/b/libpng/*.c"))
             if not f.endswith(("/example.c", "/pngtest.c"))]
+         + sorted(glob.glob("/b/libpng/arm/*.c"))
          + sorted(glob.glob("/b/zlib/*.c"))),
     fn="pixReadMem",
     # The image I/O modules compile against libjpeg, libpng, libtiff, libwebp and giflib,
@@ -176,8 +177,14 @@ CASES = {
     # pngtest.c and example.c each carry their own main(), which collides with
     # libFuzzer's — the same shape as zopfli's zopfli_bin.c. Excluded from the link and
     # from the denominator: a test program is not the library's attack surface.
+    # # libpng's aarch64 NEON paths. pnglibconf.h leaves PNG_ARM_NEON_API_SUPPORTED undefined,
+    # but pngpriv.h turns the optimisation ON whenever the compiler defines __ARM_NEON --
+    # which it always does on aarch64 -- so png_read_filter_row and png_do_expand_palette
+    # reference symbols that live only in arm/. Omitting the directory does not disable NEON,
+    # it just fails to link, and it took leptonica down with it because leptonica links libpng.
     src=[f for f in sorted(glob.glob("/b/libpng/*.c"))
          if not f.endswith(("/example.c", "/pngtest.c"))]
+        + sorted(glob.glob("/b/libpng/arm/*.c"))
         + sorted(glob.glob("/b/zlib/*.c")),
     fn="png_image_begin_read_from_memory", cflags=[], max_len=65536,
     # THE CANONICAL PNG TEST SUITE, 51 files, in the tree. A PNG has a magic number, a
@@ -189,7 +196,8 @@ CASES = {
     # png's own sources only: zlib is a dependency this build links, not the surface under
     # test, and it already has two cases of its own.
     cover=[f for f in sorted(glob.glob("/b/libpng/*.c"))
-           if not f.endswith(("/example.c", "/pngtest.c"))]),
+           if not f.endswith(("/example.c", "/pngtest.c"))]
+          + sorted(glob.glob("/b/libpng/arm/*.c"))),
  "libwebp/WebPDecodeRGBA": dict(
     # THE MAP'S CANONICAL EXAMPLE: one heap overflow in libwebp reached Chrome, Firefox,
     # Safari, Electron, Signal, Slack, Android and iOS at the same time. It is also in
@@ -258,8 +266,15 @@ CASES = {
                   and not f.endswith("/random_getrandom.c"))],
     fn="XML_Parse", cflags=["-DHAVE_EXPAT_CONFIG_H", "-DXML_GE=1"], max_len=65536,
     seeds=["/b/expat/expat/tests"],
+    # COVERAGE IS NOT THE SOURCE LIST. xmltok_impl.c is #included into xmltok.c, so it must
+    # not be compiled separately -- but llvm-cov still attributes its lines to their own
+    # file, and that file is where the tokenizer loop runs. Excluding it from the
+    # denominator dropped the most-executed code in expat out of expat's own figure, which
+    # is why the reachable number (22.80%) came out BELOW the whole-project one (31.70%).
+    # A denominator that a harness cannot reach is a denominator to drop; this was the
+    # opposite mistake.
     cover=[f for f in sorted(glob.glob("/b/expat/expat/lib/*.c"))
-           if not f.endswith(("/xmltok_impl.c", "/xmltok_ns.c", "/xcsinc.c"))
+           if not f.endswith("/xcsinc.c")
            and not (f.rsplit("/", 1)[-1].startswith("random_")
                     and not f.endswith("/random_getrandom.c"))]),
  "mbedtls/mbedtls_x509_crt_parse": dict(

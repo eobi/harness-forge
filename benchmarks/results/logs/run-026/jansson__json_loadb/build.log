@@ -1,0 +1,45 @@
+In file included from /b/jansson/src/dump.c:12:
+/b/jansson/src/jansson_private.h:13:10: fatal error: 'jansson_private_config.h' file not found
+#include "jansson_private_config.h"
+         ^~~~~~~~~~~~~~~~~~~~~~~~~~
+1 error generated.
+In file included from /b/jansson/src/error.c:1:
+/b/jansson/src/jansson_private.h:13:10: fatal error: 'jansson_private_config.h' file not found
+#include "jansson_private_config.h"
+         ^~~~~~~~~~~~~~~~~~~~~~~~~~
+1 error generated.
+In file included from /b/jansson/src/hashtable.c:20:
+/b/jansson/src/jansson_private.h:13:10: fatal error: 'jansson_private_config.h' file not found
+#include "jansson_private_config.h"
+         ^~~~~~~~~~~~~~~~~~~~~~~~~~
+1 error generated.
+In file included from /b/jansson/src/load.c:12:
+/b/jansson/src/jansson_private.h:13:10: fatal error: 'jansson_private_config.h' file not found
+#include "jansson_private_config.h"
+         ^~~~~~~~~~~~~~~~~~~~~~~~~~
+1 error generated.
+In file included from /b/jansson/src/memory.c:13:
+/b/jansson/src/jansson_private.h:13:10: fatal error: 'jansson_private_config.h' file not found
+#include "jansson_private_config.h"
+         ^~~~~~~~~~~~~~~~~~~~~~~~~~
+1 error generated.
+In file included from /b/jansson/src/pack_unpack.c:10:
+/b/jansson/src/jansson_private.h:13:10: fatal error: 'jansson_private_config.h' file not found
+#include "jansson_private_config.h"
+         ^~~~~~~~~~~~~~~~~~~~~~~~~~
+1 error generated.
+In file included from /b/jansson/src/strbuffer.c:13:
+/b/jansson/src/jansson_private.h:13:10: fatal error: 'jansson_private_config.h' file not found
+#include "jansson_private_config.h"
+         ^~~~~~~~~~~~~~~~~~~~~~~~~~
+1 error generated.
+In file included from /b/jansson/src/strconv.c:1:
+/b/jansson/src/jansson_private.h:13:10: fatal error: 'jansson_private_config.h' file not found
+#include "jansson_private_config.h"
+         ^~~~~~~~~~~~~~~~~~~~~~~~~~
+1 error generated.
+In file included from /b/jansson/src/value.c:27:
+/b/jansson/src/jansson_private.h:13:10: fatal error: 'jansson_private_config.h' file not found
+#include "jansson_private_config.h"
+         ^~~~~~~~~~~~~~~~~~~~~~~~~~
+1 error generated.

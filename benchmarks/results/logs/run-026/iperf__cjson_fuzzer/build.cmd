@@ -1,0 +1,1 @@
+clang -g -O1 -fno-omit-frame-pointer -fprofile-instr-generate -fcoverage-mapping -I/b/cjson -fsanitize=fuzzer,address /b/runs/iperf__cjson_fuzzer/harness.c /b/cjson/cJSON.c -o /b/runs/iperf__cjson_fuzzer/fuzz

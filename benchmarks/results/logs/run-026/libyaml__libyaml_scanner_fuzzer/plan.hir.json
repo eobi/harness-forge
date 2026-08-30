@@ -1,0 +1,403 @@
+{
+  "schema_version": "1.0",
+  "name": "libyaml_yaml_parser_scan",
+  "producer": "header_graph",
+  "notes": "proposed from yaml.h by signature inference; handle type inferred as 'yaml_parser_t *' (caller-allocated). Every inference here is checked by a static gate, and the producer certifies nothing.",
+  "target": {
+    "name": "libyaml",
+    "version": "",
+    "commit": "",
+    "public_headers": [
+      "/b/inc/yaml.h"
+    ],
+    "include_dirs": [
+      "/b/inc",
+      "/b/libyaml/include",
+      "/b/libyaml/src"
+    ],
+    "sources": [
+      "/b/libyaml/src/api.c",
+      "/b/libyaml/src/dumper.c",
+      "/b/libyaml/src/emitter.c",
+      "/b/libyaml/src/loader.c",
+      "/b/libyaml/src/parser.c",
+      "/b/libyaml/src/reader.c",
+      "/b/libyaml/src/scanner.c",
+      "/b/libyaml/src/writer.c"
+    ],
+    "link_libs": [],
+    "cflags": [
+      "-DYAML_VERSION_STRING=\"0.2.5\"",
+      "-DYAML_VERSION_MAJOR=0",
+      "-DYAML_VERSION_MINOR=2",
+      "-DYAML_VERSION_PATCH=5"
+    ],
+    "seed_dirs": [],
+    "language": "c"
+  },
+  "platforms": [
+    "linux-aarch64-glibc"
+  ],
+  "apis": {
+    "yaml_parser_delete": {
+      "symbol": "yaml_parser_delete",
+      "header": "yaml.h",
+      "params": [
+        {
+          "name": "parser",
+          "type": {
+            "name": "yaml_parser_t *",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        }
+      ],
+      "returns": {
+        "name": "void",
+        "kind": "void",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "destroy",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [],
+        "transfers_ownership": [],
+        "requires_nonnull": [],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    },
+    "yaml_parser_initialize": {
+      "symbol": "yaml_parser_initialize",
+      "header": "yaml.h",
+      "params": [
+        {
+          "name": "parser",
+          "type": {
+            "name": "yaml_parser_t *",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        }
+      ],
+      "returns": {
+        "name": "int",
+        "kind": "scalar",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "create",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [],
+        "transfers_ownership": [],
+        "requires_nonnull": [
+          "parser"
+        ],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    },
+    "yaml_parser_scan": {
+      "symbol": "yaml_parser_scan",
+      "header": "yaml.h",
+      "params": [
+        {
+          "name": "parser",
+          "type": {
+            "name": "yaml_parser_t *",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "token",
+          "type": {
+            "name": "yaml_token_t *",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        }
+      ],
+      "returns": {
+        "name": "int",
+        "kind": "scalar",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "consume",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [],
+        "transfers_ownership": [],
+        "requires_nonnull": [
+          "parser"
+        ],
+        "error_return": "negative",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    },
+    "yaml_parser_set_input_string": {
+      "symbol": "yaml_parser_set_input_string",
+      "header": "yaml.h",
+      "params": [
+        {
+          "name": "parser",
+          "type": {
+            "name": "yaml_parser_t *",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "input",
+          "type": {
+            "name": "const unsigned char *",
+            "kind": "pointer",
+            "const": true,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "size",
+          "type": {
+            "name": "size_t",
+            "kind": "scalar",
+            "const": false,
+            "resolved": ""
+          }
+        }
+      ],
+      "returns": {
+        "name": "void",
+        "kind": "void",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "consume",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [
+          [
+            "input",
+            "size"
+          ]
+        ],
+        "transfers_ownership": [],
+        "requires_nonnull": [
+          "parser"
+        ],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    },
+    "yaml_token_delete": {
+      "symbol": "yaml_token_delete",
+      "header": "yaml.h",
+      "params": [
+        {
+          "name": "token",
+          "type": {
+            "name": "yaml_token_t *",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        }
+      ],
+      "returns": {
+        "name": "void",
+        "kind": "void",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "query",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [],
+        "transfers_ownership": [],
+        "requires_nonnull": [],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    }
+  },
+  "slices": [
+    {
+      "id": "input",
+      "kind": "bytes",
+      "remainder": true,
+      "min_len": 1,
+      "max_len": 0
+    }
+  ],
+  "resources": [
+    {
+      "id": "h",
+      "type": {
+        "name": "yaml_parser_t",
+        "kind": "struct",
+        "const": false,
+        "resolved": ""
+      },
+      "storage": "inline"
+    },
+    {
+      "id": "out_token",
+      "type": {
+        "name": "yaml_token_t",
+        "kind": "struct",
+        "const": false,
+        "resolved": ""
+      },
+      "storage": "inline"
+    }
+  ],
+  "scratch": [],
+  "sequence": [
+    {
+      "id": "o_create",
+      "api": "yaml_parser_initialize",
+      "args": [
+        {
+          "param": "parser",
+          "source": "resource",
+          "ref": "h",
+          "value": null
+        }
+      ],
+      "binds": "h",
+      "targets": "",
+      "repeat": 0,
+      "repeat_while": "",
+      "guarded_by": []
+    },
+    {
+      "id": "o_feed",
+      "api": "yaml_parser_set_input_string",
+      "args": [
+        {
+          "param": "parser",
+          "source": "resource",
+          "ref": "h",
+          "value": null
+        },
+        {
+          "param": "input",
+          "source": "input",
+          "ref": "input",
+          "value": null
+        },
+        {
+          "param": "size",
+          "source": "length_of",
+          "ref": "input",
+          "value": null
+        }
+      ],
+      "binds": "",
+      "targets": "",
+      "repeat": 0,
+      "repeat_while": "",
+      "guarded_by": [
+        "h"
+      ]
+    },
+    {
+      "id": "o_consume",
+      "api": "yaml_parser_scan",
+      "args": [
+        {
+          "param": "parser",
+          "source": "resource",
+          "ref": "h",
+          "value": null
+        },
+        {
+          "param": "token",
+          "source": "resource",
+          "ref": "out_token",
+          "value": null
+        }
+      ],
+      "binds": "out_token",
+      "targets": "",
+      "repeat": 4096,
+      "repeat_while": "",
+      "guarded_by": [
+        "h"
+      ]
+    },
+    {
+      "id": "o_drop_out_token",
+      "api": "yaml_token_delete",
+      "args": [
+        {
+          "param": "token",
+          "source": "resource",
+          "ref": "out_token",
+          "value": null
+        }
+      ],
+      "binds": "",
+      "targets": "out_token",
+      "repeat": 0,
+      "repeat_while": "",
+      "guarded_by": [
+        "out_token"
+      ]
+    },
+    {
+      "id": "o_destroy",
+      "api": "yaml_parser_delete",
+      "args": [
+        {
+          "param": "parser",
+          "source": "resource",
+          "ref": "h",
+          "value": null
+        }
+      ],
+      "binds": "",
+      "targets": "h",
+      "repeat": 0,
+      "repeat_while": "",
+      "guarded_by": []
+    }
+  ],
+  "knobs": {
+    "max_len": 4096,
+    "min_len": 0,
+    "timeout_s": 25,
+    "rss_limit_mb": 2048,
+    "malloc_limit_mb": 0,
+    "sanitizers": [
+      "address"
+    ],
+    "detect_leaks": false,
+    "optimisation": "-O1"
+  },
+  "format_model": null,
+  "raw_blocks": []
+}

@@ -49,29 +49,27 @@ reads 48.74% over the wrong file set and 70.47% over the right one.
 
 | case | ours | QuartetFuzz | gold | ours/gold | QF/gold |
 |---|---|---|---|---|---|
-| libyaml/libyaml_loader_fuzzer | **77.77** | 73.89 | 77.7 | 1.00x | 0.95x |
-| libyaml/libyaml_scanner_fuzzer | **70.47** | 67.30 | 70.6 | 1.00x | 0.95x |
-| brotli/decode_fuzzer | **85.50** | 84.15 | 77.2 | 1.11x | 1.09x |
-| yajl-ruby/json_fuzzer | **72.80** | 79.87 | 69.1 | 1.05x | 1.16x |
-| iperf/cjson_fuzzer | **25.10** | 0.00 | 24.5 | 1.02x | 0.00x |
-| zopfli/zopfli_deflate_fuzzer | **86.17** | 80.06 | 85.7 | 1.01x | 0.93x |
-| zlib/zlib_uncompress2_fuzzer | **53.93** | 51.74 | 53.1 | 1.02x | 0.97x |
-| lcms2/cmsOpenProfileFromMem | **5.14** | — | — |  |  |
-| libde265/stream_decode | **14.57** | — | 14.80† | 0.98x |  |
-| jbig2dec/jbig2_data_in | *NOT MEASURED: campaign ended on out-of-memory, so no coverage was flushed; 0.00% would be a failed measurement reported as a real one* | — | — |  |  |
-| leptonica/pixReadMem | **17.96** | — | — |  |  |
-| jansson/json_loadb | **18.98** | — | — |  |  |
-| libwebp/WebPDecodeRGBA | **50.33** | — | — |  |  |
-| libpng/png_image_begin_read_from_memory | **0.15** | — | — |  |  |
-| expat/XML_Parse | *NO PLAN for the gold target* | — | — |  |  |
-| zstd/ZSTD_decompress | **29.71** | — | — |  |  |
-| mbedtls/mbedtls_x509_crt_parse | *NO PLAN for the gold target* | — | — |  |  |
+| libyaml/libyaml_loader_fuzzer | **73.69** | 73.89 | 77.7 | 0.95x | 0.95x |
+| libyaml/libyaml_scanner_fuzzer | **70.48** | 67.30 | 70.6 | 1.00x | 0.95x |
+| brotli/decode_fuzzer | **84.95** | 84.15 | 77.2 | 1.10x | 1.09x |
+| yajl-ruby/json_fuzzer | *NO PLAN for the gold target* | 79.87 | 69.1 |  | 1.16x |
+| iperf/cjson_fuzzer | **24.82** | 0.00 | 24.5 | 1.01x | 0.00x |
+| zopfli/zopfli_deflate_fuzzer | **76.51** | 80.06 | 85.7 | 0.89x | 0.93x |
+| zlib/zlib_uncompress2_fuzzer | **51.91** | 51.74 | 53.1 | 0.98x | 0.97x |
+| lcms2/cmsOpenProfileFromMem | **5.00** | — | — |  |  |
+| libde265/stream_decode | **13.99** | — | — |  |  |
+| jbig2dec/jbig2_data_in | **2.58** | — | — |  |  |
+| leptonica/pixReadMem | *build failed* | — | — |  |  |
+| jansson/json_loadb | *build failed* | — | — |  |  |
+| libwebp/WebPDecodeRGBA | **50.73** | — | — |  |  |
+| libpng/png_image_begin_read_from_memory | *NO PLAN for the gold target* | — | — |  |  |
+| expat/XML_Parse | **22.80** | — | — |  |  |
+| zstd/ZSTD_decompress | **30.04** | — | — |  |  |
+| mbedtls/mbedtls_x509_crt_parse | **12.22** | — | — |  |  |
 
-† gold MEASURED by this repository from the project's own in-tree harness, not cited. Same machine, same compiler, same 600 s, same file list, and a fresh corpus from the same seeds — so the comparison differs in the harness and in nothing else.
+Measured cases with a gold baseline: **6**. Median ours/gold: **0.99x**. Ahead of the cited QuartetFuzz figure on **4 of the 6** cases it published one for.
 
-Measured cases with a gold baseline: **8**. Median ours/gold: **1.02x**. Ahead of the cited QuartetFuzz figure on **6 of the 7** cases it published one for.
-
-Sources: run-001-quartetfuzz-6case, run-005-partial, run-007-partial-4of7, run-009, run-010, run-011, run-012, run-013, run-014, run-015, run-016, run-017, run-018, run-019, run-020, run-021, run-022, run-023, run-024.
+Sources: run-001-quartetfuzz-6case, run-005-partial, run-007-partial-4of7, run-009, run-010, run-011, run-012, run-013, run-014, run-015, run-016, run-017, run-018, run-019, run-020, run-021, run-022, run-023, run-024, run-026.
 
 <!-- TABLE:END -->
 

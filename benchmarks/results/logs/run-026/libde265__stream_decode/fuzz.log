@@ -1,0 +1,1283 @@
+Dictionary: 199 entries
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2923327496
+INFO: Loaded 1 modules   (9502 inline 8-bit counters): 9502 [0xaaaac0e2f178, 0xaaaac0e31696), 
+INFO: Loaded 1 PC tables (9502 PCs): 9502 [0xaaaac0e31698,0xaaaac0e56878), 
+INFO:       11 files found in /b/runs/libde265__stream_decode/corpus
+INFO: seed corpus: files: 11 min: 2b max: 4b total: 37b rss: 43Mb
+#12	INITED cov: 199 ft: 212 corp: 10/33b exec/s: 0 rss: 45Mb
+#209	NEW    cov: 199 ft: 213 corp: 11/39b lim: 6 exec/s: 209 rss: 49Mb L: 6/6 MS: 2 ShuffleBytes-CrossOver-
+#223	NEW    cov: 199 ft: 214 corp: 12/45b lim: 6 exec/s: 111 rss: 50Mb L: 6/6 MS: 4 CopyPart-CopyPart-ShuffleBytes-CrossOver-
+	NEW_FUNC[1/18]: 0xaaaac0c67dec in bitreader_init(bitreader*, unsigned char*, int) /b/libde265/libde265/bitstream.cc:31
+	NEW_FUNC[2/18]: 0xaaaac0c68340 in get_bits(bitreader*, int) /b/libde265/libde265/bitstream.cc:58
+#242	NEW    cov: 265 ft: 286 corp: 13/51b lim: 6 exec/s: 121 rss: 50Mb L: 6/6 MS: 4 ChangeBit-ChangeBinInt-CrossOver-ShuffleBytes-
+#247	REDUCE cov: 265 ft: 286 corp: 13/50b lim: 6 exec/s: 123 rss: 50Mb L: 5/6 MS: 5 CrossOver-ShuffleBytes-ShuffleBytes-ChangeBinInt-EraseBytes-
+#252	NEW    cov: 265 ft: 287 corp: 14/55b lim: 6 exec/s: 126 rss: 50Mb L: 5/6 MS: 5 CopyPart-CopyPart-EraseBytes-CopyPart-InsertRepeatedBytes-
+#256	pulse  cov: 265 ft: 287 corp: 14/55b lim: 6 exec/s: 128 rss: 50Mb
+#263	NEW    cov: 266 ft: 294 corp: 15/60b lim: 6 exec/s: 131 rss: 50Mb L: 5/6 MS: 1 ChangeBit-
+#337	NEW    cov: 267 ft: 295 corp: 16/66b lim: 6 exec/s: 112 rss: 51Mb L: 6/6 MS: 4 CrossOver-ChangeByte-ChangeByte-CrossOver-
+#428	NEW    cov: 268 ft: 296 corp: 17/72b lim: 6 exec/s: 107 rss: 54Mb L: 6/6 MS: 1 InsertByte-
+#429	NEW    cov: 268 ft: 297 corp: 18/78b lim: 6 exec/s: 107 rss: 54Mb L: 6/6 MS: 1 InsertByte-
+#446	NEW    cov: 269 ft: 298 corp: 19/84b lim: 6 exec/s: 111 rss: 54Mb L: 6/6 MS: 2 CopyPart-ChangeBinInt-
+#512	pulse  cov: 269 ft: 298 corp: 19/84b lim: 6 exec/s: 102 rss: 55Mb
+#653	NEW    cov: 269 ft: 300 corp: 20/91b lim: 8 exec/s: 108 rss: 59Mb L: 7/7 MS: 2 ChangeBit-CopyPart-
+#693	REDUCE cov: 269 ft: 301 corp: 21/99b lim: 8 exec/s: 115 rss: 60Mb L: 8/8 MS: 5 CrossOver-ShuffleBytes-InsertRepeatedBytes-CrossOver-CMP- DE: "\000\000\000\000\000\000\000\000"-
+#694	NEW    cov: 271 ft: 303 corp: 22/107b lim: 8 exec/s: 115 rss: 60Mb L: 8/8 MS: 1 CrossOver-
+#718	NEW    cov: 271 ft: 304 corp: 23/115b lim: 8 exec/s: 102 rss: 60Mb L: 8/8 MS: 4 ShuffleBytes-ManualDict-ShuffleBytes-ChangeBit- DE: "BI"-
+#743	NEW    cov: 271 ft: 305 corp: 24/123b lim: 8 exec/s: 106 rss: 60Mb L: 8/8 MS: 5 ChangeBinInt-InsertByte-ChangeASCIIInt-ChangeASCIIInt-CopyPart-
+#792	REDUCE cov: 271 ft: 305 corp: 24/122b lim: 8 exec/s: 113 rss: 62Mb L: 7/8 MS: 4 CrossOver-CopyPart-CrossOver-EraseBytes-
+#803	NEW    cov: 271 ft: 306 corp: 25/129b lim: 8 exec/s: 114 rss: 62Mb L: 7/8 MS: 1 ManualDict- DE: " : "-
+#819	NEW    cov: 272 ft: 307 corp: 26/135b lim: 8 exec/s: 102 rss: 62Mb L: 6/8 MS: 1 ChangeByte-
+#843	NEW    cov: 272 ft: 309 corp: 27/143b lim: 8 exec/s: 105 rss: 63Mb L: 8/8 MS: 4 CopyPart-InsertByte-InsertByte-PersAutoDict- DE: "BI"-
+#846	NEW    cov: 274 ft: 311 corp: 28/148b lim: 8 exec/s: 105 rss: 63Mb L: 5/8 MS: 3 InsertByte-ShuffleBytes-ChangeByte-
+#1024	pulse  cov: 274 ft: 311 corp: 28/148b lim: 8 exec/s: 102 rss: 67Mb
+#1025	NEW    cov: 275 ft: 313 corp: 29/156b lim: 8 exec/s: 102 rss: 67Mb L: 8/8 MS: 4 CopyPart-ShuffleBytes-ShuffleBytes-CopyPart-
+#1030	NEW    cov: 275 ft: 314 corp: 30/164b lim: 8 exec/s: 103 rss: 67Mb L: 8/8 MS: 5 CrossOver-CrossOver-CrossOver-CopyPart-CopyPart-
+#1071	NEW    cov: 276 ft: 315 corp: 31/172b lim: 8 exec/s: 107 rss: 68Mb L: 8/8 MS: 1 CrossOver-
+#1208	NEW    cov: 279 ft: 320 corp: 32/178b lim: 8 exec/s: 109 rss: 71Mb L: 6/8 MS: 2 ChangeBit-ChangeBinInt-
+#1243	REDUCE cov: 285 ft: 349 corp: 33/186b lim: 8 exec/s: 103 rss: 72Mb L: 8/8 MS: 5 ChangeBit-ShuffleBytes-ChangeByte-InsertByte-CopyPart-
+#1294	NEW    cov: 287 ft: 353 corp: 34/191b lim: 8 exec/s: 107 rss: 73Mb L: 5/8 MS: 1 ChangeBinInt-
+#1392	NEW    cov: 288 ft: 354 corp: 35/199b lim: 8 exec/s: 107 rss: 75Mb L: 8/8 MS: 3 CrossOver-EraseBytes-CrossOver-
+#1559	NEW    cov: 289 ft: 357 corp: 36/207b lim: 8 exec/s: 103 rss: 78Mb L: 8/8 MS: 2 CopyPart-CopyPart-
+#1560	REDUCE cov: 289 ft: 357 corp: 36/206b lim: 8 exec/s: 104 rss: 78Mb L: 6/8 MS: 1 CrossOver-
+#1657	NEW    cov: 289 ft: 358 corp: 37/214b lim: 8 exec/s: 103 rss: 81Mb L: 8/8 MS: 2 CopyPart-CopyPart-
+#1734	NEW    cov: 289 ft: 360 corp: 38/221b lim: 8 exec/s: 108 rss: 83Mb L: 7/8 MS: 2 CrossOver-ShuffleBytes-
+#1795	NEW    cov: 290 ft: 361 corp: 39/227b lim: 8 exec/s: 105 rss: 84Mb L: 6/8 MS: 1 ChangeBit-
+#1816	NEW    cov: 291 ft: 363 corp: 40/233b lim: 8 exec/s: 106 rss: 85Mb L: 6/8 MS: 1 InsertByte-
+#1817	NEW    cov: 291 ft: 364 corp: 41/241b lim: 8 exec/s: 106 rss: 85Mb L: 8/8 MS: 1 CrossOver-
+#1828	NEW    cov: 293 ft: 366 corp: 42/247b lim: 8 exec/s: 107 rss: 85Mb L: 6/8 MS: 1 ChangeBit-
+#1876	REDUCE cov: 293 ft: 366 corp: 42/246b lim: 8 exec/s: 104 rss: 86Mb L: 5/8 MS: 3 CMP-PersAutoDict-EraseBytes- DE: "\011\000"-"BI"-
+#1967	REDUCE cov: 293 ft: 366 corp: 42/245b lim: 8 exec/s: 103 rss: 88Mb L: 5/8 MS: 1 EraseBytes-
+	NEW_FUNC[1/11]: 0xaaaac0c9b1a4 in decoder_context::read_vps_NAL(bitreader&) /b/libde265/libde265/decctx.cc:531
+	NEW_FUNC[2/11]: 0xaaaac0cb2a78 in std::__shared_count<(__gnu_cxx::_Lock_policy)2>::__shared_count<video_parameter_set, std::allocator<void> >(video_parameter_set*&, std::_Sp_alloc_shared_tag<std::allocator<void> >) /usr/lib/gcc/aarch64-linux-gnu/12/../../../../include/c++/12/bits/shared_ptr_base.h:966
+#2043	NEW    cov: 324 ft: 408 corp: 43/251b lim: 8 exec/s: 107 rss: 90Mb L: 6/8 MS: 1 CopyPart-
+#2048	pulse  cov: 324 ft: 408 corp: 43/251b lim: 8 exec/s: 107 rss: 90Mb
+#2355	NEW    cov: 324 ft: 409 corp: 44/262b lim: 11 exec/s: 107 rss: 96Mb L: 11/11 MS: 2 ChangeBinInt-InsertRepeatedBytes-
+#2403	NEW    cov: 325 ft: 414 corp: 45/273b lim: 11 exec/s: 104 rss: 97Mb L: 11/11 MS: 3 CopyPart-PersAutoDict-CopyPart- DE: "\011\000"-
+#2419	NEW    cov: 325 ft: 415 corp: 46/284b lim: 11 exec/s: 105 rss: 98Mb L: 11/11 MS: 1 ManualDict- DE: "NxN"-
+#2428	NEW    cov: 325 ft: 416 corp: 47/294b lim: 11 exec/s: 105 rss: 98Mb L: 10/11 MS: 4 InsertRepeatedBytes-ChangeBinInt-PersAutoDict-CrossOver- DE: "\000\000\000\000\000\000\000\000"-
+#2436	NEW    cov: 325 ft: 417 corp: 48/305b lim: 11 exec/s: 105 rss: 98Mb L: 11/11 MS: 3 ChangeBit-CopyPart-CopyPart-
+#2467	NEW    cov: 325 ft: 471 corp: 49/316b lim: 11 exec/s: 107 rss: 99Mb L: 11/11 MS: 1 CopyPart-
+#2470	REDUCE cov: 325 ft: 471 corp: 49/314b lim: 11 exec/s: 107 rss: 99Mb L: 9/11 MS: 3 CMP-CrossOver-EraseBytes- DE: "\377\377\377\377\377\377\377\000"-
+#2629	NEW    cov: 326 ft: 472 corp: 50/323b lim: 11 exec/s: 105 rss: 102Mb L: 9/11 MS: 4 ChangeByte-ChangeByte-CrossOver-ChangeByte-
+#2731	REDUCE cov: 326 ft: 472 corp: 50/322b lim: 11 exec/s: 105 rss: 105Mb L: 5/11 MS: 2 ChangeBinInt-EraseBytes-
+#2732	NEW    cov: 326 ft: 473 corp: 51/333b lim: 11 exec/s: 105 rss: 105Mb L: 11/11 MS: 1 InsertRepeatedBytes-
+#2809	REDUCE cov: 326 ft: 473 corp: 51/332b lim: 11 exec/s: 104 rss: 107Mb L: 7/11 MS: 2 InsertByte-EraseBytes-
+#2980	NEW    cov: 326 ft: 474 corp: 52/343b lim: 11 exec/s: 106 rss: 110Mb L: 11/11 MS: 1 InsertRepeatedBytes-
+#3267	NEW    cov: 326 ft: 475 corp: 53/354b lim: 11 exec/s: 105 rss: 117Mb L: 11/11 MS: 2 ChangeBinInt-CopyPart-
+#3273	NEW    cov: 326 ft: 476 corp: 54/365b lim: 11 exec/s: 105 rss: 117Mb L: 11/11 MS: 1 CopyPart-
+#3404	NEW    cov: 326 ft: 478 corp: 55/372b lim: 11 exec/s: 106 rss: 120Mb L: 7/11 MS: 1 InsertByte-
+#3405	NEW    cov: 326 ft: 479 corp: 56/383b lim: 11 exec/s: 106 rss: 120Mb L: 11/11 MS: 1 CrossOver-
+#3577	NEW    cov: 326 ft: 480 corp: 57/394b lim: 11 exec/s: 105 rss: 124Mb L: 11/11 MS: 2 ChangeBinInt-CrossOver-
+#3630	NEW    cov: 326 ft: 482 corp: 58/405b lim: 11 exec/s: 103 rss: 125Mb L: 11/11 MS: 3 ShuffleBytes-ChangeBit-CrossOver-
+#3656	REDUCE cov: 326 ft: 483 corp: 59/415b lim: 11 exec/s: 104 rss: 126Mb L: 10/11 MS: 1 InsertRepeatedBytes-
+#4096	pulse  cov: 326 ft: 483 corp: 59/415b lim: 14 exec/s: 105 rss: 135Mb
+#4102	REDUCE cov: 326 ft: 483 corp: 59/413b lim: 14 exec/s: 105 rss: 136Mb L: 7/11 MS: 1 EraseBytes-
+#4182	NEW    cov: 326 ft: 485 corp: 60/426b lim: 14 exec/s: 104 rss: 137Mb L: 13/13 MS: 5 InsertByte-CopyPart-ShuffleBytes-ShuffleBytes-ChangeBinInt-
+#4303	NEW    cov: 326 ft: 486 corp: 61/439b lim: 14 exec/s: 104 rss: 140Mb L: 13/13 MS: 1 CopyPart-
+#4455	NEW    cov: 326 ft: 488 corp: 62/453b lim: 14 exec/s: 106 rss: 144Mb L: 14/14 MS: 2 CopyPart-InsertByte-
+#4599	NEW    cov: 326 ft: 489 corp: 63/467b lim: 14 exec/s: 104 rss: 147Mb L: 14/14 MS: 4 ChangeBit-InsertByte-CopyPart-CrossOver-
+#4651	NEW    cov: 326 ft: 490 corp: 64/481b lim: 14 exec/s: 105 rss: 148Mb L: 14/14 MS: 2 ChangeBit-CopyPart-
+#4659	REDUCE cov: 326 ft: 490 corp: 64/480b lim: 14 exec/s: 105 rss: 148Mb L: 6/14 MS: 3 CopyPart-InsertByte-EraseBytes-
+#4969	NEW    cov: 326 ft: 491 corp: 65/497b lim: 17 exec/s: 105 rss: 155Mb L: 17/17 MS: 5 EraseBytes-CrossOver-CMP-CopyPart-InsertRepeatedBytes- DE: "\020\000\000\000\000\000\000\000"-
+#4992	NEW    cov: 326 ft: 492 corp: 66/511b lim: 17 exec/s: 104 rss: 155Mb L: 14/17 MS: 3 ManualDict-ChangeByte-InsertByte- DE: "INTER"-
+#5060	NEW    cov: 327 ft: 493 corp: 67/522b lim: 17 exec/s: 105 rss: 157Mb L: 11/17 MS: 3 CrossOver-CrossOver-ChangeBit-
+	NEW_FUNC[1/3]: 0xaaaac0c9c438 in decoder_context::read_sei_NAL(bitreader&, bool) /b/libde265/libde265/decctx.cc:599
+	NEW_FUNC[2/3]: 0xaaaac0d2347c in read_sei(bitreader*, sei_message*, bool, seq_parameter_set const*) /b/libde265/libde265/sei.cc:364
+#5212	NEW    cov: 336 ft: 502 corp: 68/528b lim: 17 exec/s: 104 rss: 160Mb L: 6/17 MS: 2 EraseBytes-EraseBytes-
+#5237	NEW    cov: 336 ft: 504 corp: 69/545b lim: 17 exec/s: 104 rss: 161Mb L: 17/17 MS: 5 InsertByte-InsertByte-InsertRepeatedBytes-ManualDict-CopyPart- DE: "*,"-
+#5634	NEW    cov: 336 ft: 534 corp: 70/562b lim: 17 exec/s: 104 rss: 169Mb L: 17/17 MS: 2 InsertRepeatedBytes-CrossOver-
+	NEW_FUNC[1/8]: 0xaaaac0c9b638 in decoder_context::read_sps_NAL(bitreader&) /b/libde265/libde265/decctx.cc:550
+	NEW_FUNC[2/8]: 0xaaaac0cb3b48 in std::__shared_count<(__gnu_cxx::_Lock_policy)2>::__shared_count<seq_parameter_set, std::allocator<void> >(seq_parameter_set*&, std::_Sp_alloc_shared_tag<std::allocator<void> >) /usr/lib/gcc/aarch64-linux-gnu/12/../../../../include/c++/12/bits/shared_ptr_base.h:966
+#5758	NEW    cov: 350 ft: 554 corp: 71/571b lim: 17 exec/s: 104 rss: 173Mb L: 9/17 MS: 4 PersAutoDict-CrossOver-ChangeBinInt-ChangeBit- DE: "BI"-
+#5768	REDUCE cov: 350 ft: 555 corp: 72/586b lim: 17 exec/s: 104 rss: 173Mb L: 15/17 MS: 5 ChangeBinInt-CrossOver-ShuffleBytes-CrossOver-CopyPart-
+#5880	NEW    cov: 350 ft: 556 corp: 73/602b lim: 17 exec/s: 105 rss: 176Mb L: 16/17 MS: 2 CopyPart-CopyPart-
+#6194	NEW    cov: 350 ft: 557 corp: 74/618b lim: 17 exec/s: 103 rss: 182Mb L: 16/17 MS: 4 CrossOver-ChangeByte-CrossOver-InsertByte-
+#6445	NEW    cov: 351 ft: 558 corp: 75/632b lim: 17 exec/s: 103 rss: 188Mb L: 14/17 MS: 1 CopyPart-
+#6455	NEW    cov: 351 ft: 559 corp: 76/648b lim: 17 exec/s: 104 rss: 189Mb L: 16/17 MS: 5 ChangeBinInt-InsertRepeatedBytes-ChangeBinInt-InsertRepeatedBytes-PersAutoDict- DE: "*,"-
+#6496	REDUCE cov: 351 ft: 560 corp: 77/658b lim: 17 exec/s: 103 rss: 190Mb L: 10/17 MS: 1 CopyPart-
+#6999	NEW    cov: 351 ft: 563 corp: 78/677b lim: 21 exec/s: 102 rss: 201Mb L: 19/19 MS: 3 ChangeBit-InsertByte-InsertRepeatedBytes-
+#7115	NEW    cov: 351 ft: 564 corp: 79/697b lim: 21 exec/s: 103 rss: 203Mb L: 20/20 MS: 1 InsertRepeatedBytes-
+#7241	NEW    cov: 351 ft: 588 corp: 80/718b lim: 21 exec/s: 103 rss: 206Mb L: 21/21 MS: 1 CopyPart-
+#7378	NEW    cov: 351 ft: 592 corp: 81/734b lim: 21 exec/s: 103 rss: 209Mb L: 16/21 MS: 2 ChangeBit-ChangeBinInt-
+#7544	NEW    cov: 351 ft: 593 corp: 82/753b lim: 21 exec/s: 103 rss: 213Mb L: 19/21 MS: 1 CopyPart-
+#7646	NEW    cov: 351 ft: 594 corp: 83/774b lim: 21 exec/s: 103 rss: 215Mb L: 21/21 MS: 2 EraseBytes-InsertRepeatedBytes-
+#7659	NEW    cov: 359 ft: 605 corp: 84/794b lim: 21 exec/s: 103 rss: 216Mb L: 20/21 MS: 3 CrossOver-InsertByte-InsertByte-
+#7781	NEW    cov: 361 ft: 616 corp: 85/808b lim: 21 exec/s: 103 rss: 218Mb L: 14/21 MS: 2 PersAutoDict-ShuffleBytes- DE: "INTER"-
+#8192	pulse  cov: 361 ft: 616 corp: 85/808b lim: 25 exec/s: 103 rss: 228Mb
+#8208	REDUCE cov: 361 ft: 616 corp: 85/805b lim: 25 exec/s: 103 rss: 228Mb L: 17/21 MS: 2 InsertRepeatedBytes-EraseBytes-
+#8282	NEW    cov: 361 ft: 621 corp: 86/818b lim: 25 exec/s: 103 rss: 230Mb L: 13/21 MS: 4 ShuffleBytes-ManualDict-CrossOver-CMP- DE: "Cr"-"\006\000"-
+#8343	NEW    cov: 364 ft: 629 corp: 87/837b lim: 25 exec/s: 103 rss: 231Mb L: 19/21 MS: 1 ShuffleBytes-
+#8344	NEW    cov: 367 ft: 634 corp: 88/860b lim: 25 exec/s: 103 rss: 231Mb L: 23/23 MS: 1 CMP- DE: "\375\377\377\377"-
+#8345	NEW    cov: 368 ft: 696 corp: 89/882b lim: 25 exec/s: 103 rss: 231Mb L: 22/23 MS: 1 CopyPart-
+#8372	REDUCE cov: 368 ft: 699 corp: 90/907b lim: 25 exec/s: 103 rss: 232Mb L: 25/25 MS: 2 InsertByte-CrossOver-
+#8373	NEW    cov: 368 ft: 701 corp: 91/922b lim: 25 exec/s: 103 rss: 232Mb L: 15/25 MS: 1 InsertByte-
+#8415	NEW    cov: 369 ft: 703 corp: 92/946b lim: 25 exec/s: 102 rss: 232Mb L: 24/25 MS: 2 ShuffleBytes-ManualDict- DE: "TSA_R"-
+#8424	NEW    cov: 370 ft: 704 corp: 93/966b lim: 25 exec/s: 102 rss: 233Mb L: 20/25 MS: 4 ChangeASCIIInt-CopyPart-InsertByte-EraseBytes-
+#8489	NEW    cov: 370 ft: 706 corp: 94/991b lim: 25 exec/s: 103 rss: 235Mb L: 25/25 MS: 5 InsertByte-ChangeByte-CrossOver-ChangeByte-ChangeBit-
+#8495	REDUCE cov: 370 ft: 706 corp: 94/990b lim: 25 exec/s: 103 rss: 235Mb L: 13/25 MS: 1 EraseBytes-
+#8507	NEW    cov: 370 ft: 710 corp: 95/1015b lim: 25 exec/s: 103 rss: 235Mb L: 25/25 MS: 2 InsertRepeatedBytes-ChangeByte-
+#8552	REDUCE cov: 370 ft: 710 corp: 95/1006b lim: 25 exec/s: 103 rss: 237Mb L: 10/25 MS: 5 ManualDict-CopyPart-ChangeASCIIInt-InsertByte-EraseBytes- DE: "BI"-
+#8555	NEW    cov: 370 ft: 712 corp: 96/1029b lim: 25 exec/s: 103 rss: 237Mb L: 23/25 MS: 3 InsertByte-InsertByte-InsertByte-
+#8954	NEW    cov: 371 ft: 713 corp: 97/1054b lim: 25 exec/s: 102 rss: 246Mb L: 25/25 MS: 4 CopyPart-ChangeBit-InsertRepeatedBytes-CrossOver-
+#8987	NEW    cov: 371 ft: 714 corp: 98/1079b lim: 25 exec/s: 103 rss: 247Mb L: 25/25 MS: 3 ChangeBinInt-CopyPart-ShuffleBytes-
+#9020	NEW    cov: 371 ft: 715 corp: 99/1100b lim: 25 exec/s: 103 rss: 248Mb L: 21/25 MS: 3 CopyPart-ShuffleBytes-CopyPart-
+#9066	NEW    cov: 371 ft: 716 corp: 100/1120b lim: 25 exec/s: 103 rss: 249Mb L: 20/25 MS: 1 InsertRepeatedBytes-
+#9163	NEW    cov: 371 ft: 719 corp: 101/1144b lim: 25 exec/s: 102 rss: 251Mb L: 24/25 MS: 2 ChangeASCIIInt-InsertRepeatedBytes-
+#9209	REDUCE cov: 371 ft: 719 corp: 101/1143b lim: 25 exec/s: 103 rss: 252Mb L: 20/25 MS: 1 EraseBytes-
+#9235	NEW    cov: 371 ft: 724 corp: 102/1167b lim: 25 exec/s: 103 rss: 253Mb L: 24/25 MS: 1 ManualDict- DE: "lf-after-V-%05d.yuv"-
+#9306	NEW    cov: 371 ft: 725 corp: 103/1192b lim: 25 exec/s: 103 rss: 255Mb L: 25/25 MS: 1 CopyPart-
+#9347	NEW    cov: 373 ft: 727 corp: 104/1217b lim: 25 exec/s: 102 rss: 255Mb L: 25/25 MS: 1 InsertByte-
+#9456	NEW    cov: 373 ft: 729 corp: 105/1228b lim: 25 exec/s: 102 rss: 258Mb L: 11/25 MS: 4 ChangeByte-EraseBytes-ChangeBit-PersAutoDict- DE: "\375\377\377\377"-
+#9568	NEW    cov: 373 ft: 731 corp: 106/1253b lim: 25 exec/s: 102 rss: 262Mb L: 25/25 MS: 2 ShuffleBytes-CopyPart-
+#9722	NEW    cov: 374 ft: 732 corp: 107/1276b lim: 25 exec/s: 103 rss: 266Mb L: 23/25 MS: 4 ChangeBinInt-ChangeBit-CopyPart-ShuffleBytes-
+#9740	NEW    cov: 374 ft: 733 corp: 108/1297b lim: 25 exec/s: 103 rss: 266Mb L: 21/25 MS: 3 CrossOver-EraseBytes-CrossOver-
+#9757	REDUCE cov: 374 ft: 733 corp: 108/1290b lim: 25 exec/s: 102 rss: 266Mb L: 13/25 MS: 2 ChangeBinInt-CrossOver-
+#9764	NEW    cov: 374 ft: 734 corp: 109/1313b lim: 25 exec/s: 102 rss: 266Mb L: 23/25 MS: 2 ChangeBinInt-ChangeBinInt-
+#9931	REDUCE cov: 374 ft: 734 corp: 109/1312b lim: 25 exec/s: 103 rss: 270Mb L: 19/25 MS: 2 CrossOver-EraseBytes-
+#9962	REDUCE cov: 374 ft: 734 corp: 109/1311b lim: 25 exec/s: 102 rss: 271Mb L: 5/25 MS: 1 EraseBytes-
+#9978	NEW    cov: 374 ft: 735 corp: 110/1330b lim: 25 exec/s: 102 rss: 271Mb L: 19/25 MS: 1 CMP- DE: "\377\377\377\377\377\377\000\177"-
+#10054	REDUCE cov: 374 ft: 735 corp: 110/1318b lim: 25 exec/s: 102 rss: 273Mb L: 13/25 MS: 1 CrossOver-
+#10260	NEW    cov: 375 ft: 740 corp: 111/1338b lim: 25 exec/s: 102 rss: 278Mb L: 20/25 MS: 1 EraseBytes-
+#10389	REDUCE cov: 375 ft: 741 corp: 112/1363b lim: 25 exec/s: 102 rss: 281Mb L: 25/25 MS: 4 InsertByte-CrossOver-CopyPart-CrossOver-
+#10400	NEW    cov: 377 ft: 743 corp: 113/1388b lim: 25 exec/s: 102 rss: 282Mb L: 25/25 MS: 1 CrossOver-
+#10596	REDUCE cov: 377 ft: 743 corp: 113/1384b lim: 25 exec/s: 102 rss: 286Mb L: 20/25 MS: 1 EraseBytes-
+#10665	NEW    cov: 379 ft: 745 corp: 114/1409b lim: 25 exec/s: 102 rss: 288Mb L: 25/25 MS: 4 ShuffleBytes-ChangeBit-ChangeASCIIInt-CopyPart-
+#10671	NEW    cov: 379 ft: 747 corp: 115/1432b lim: 25 exec/s: 102 rss: 289Mb L: 23/25 MS: 1 InsertRepeatedBytes-
+#10699	NEW    cov: 380 ft: 748 corp: 116/1451b lim: 25 exec/s: 102 rss: 289Mb L: 19/25 MS: 3 PersAutoDict-EraseBytes-InsertByte- DE: "BI"-
+#10821	REDUCE cov: 380 ft: 748 corp: 116/1449b lim: 25 exec/s: 103 rss: 292Mb L: 12/25 MS: 2 CopyPart-EraseBytes-
+#10972	NEW    cov: 380 ft: 749 corp: 117/1474b lim: 25 exec/s: 102 rss: 296Mb L: 25/25 MS: 1 ChangeBit-
+#11121	REDUCE cov: 380 ft: 749 corp: 117/1473b lim: 25 exec/s: 102 rss: 299Mb L: 14/25 MS: 4 ShuffleBytes-EraseBytes-ChangeByte-InsertByte-
+#11192	REDUCE cov: 380 ft: 750 corp: 118/1496b lim: 25 exec/s: 102 rss: 301Mb L: 23/25 MS: 1 CopyPart-
+#11539	NEW    cov: 380 ft: 751 corp: 119/1514b lim: 25 exec/s: 102 rss: 309Mb L: 18/25 MS: 2 CopyPart-CopyPart-
+#11544	NEW    cov: 380 ft: 752 corp: 120/1538b lim: 25 exec/s: 102 rss: 309Mb L: 24/25 MS: 5 EraseBytes-InsertByte-ChangeBit-CopyPart-CopyPart-
+#11575	REDUCE cov: 380 ft: 752 corp: 120/1536b lim: 25 exec/s: 102 rss: 310Mb L: 16/25 MS: 1 EraseBytes-
+#11706	REDUCE cov: 380 ft: 752 corp: 120/1535b lim: 25 exec/s: 102 rss: 313Mb L: 16/25 MS: 1 EraseBytes-
+#11842	REDUCE cov: 380 ft: 752 corp: 120/1528b lim: 25 exec/s: 102 rss: 316Mb L: 13/25 MS: 1 EraseBytes-
+#11858	REDUCE cov: 380 ft: 755 corp: 121/1548b lim: 25 exec/s: 102 rss: 317Mb L: 20/25 MS: 1 ChangeByte-
+#11957	NEW    cov: 380 ft: 757 corp: 122/1568b lim: 25 exec/s: 102 rss: 319Mb L: 20/25 MS: 4 CopyPart-ChangeBit-ChangeBit-EraseBytes-
+#11968	NEW    cov: 380 ft: 758 corp: 123/1593b lim: 25 exec/s: 102 rss: 320Mb L: 25/25 MS: 1 InsertRepeatedBytes-
+#12036	NEW    cov: 383 ft: 764 corp: 124/1617b lim: 25 exec/s: 102 rss: 322Mb L: 24/25 MS: 3 ChangeBinInt-ShuffleBytes-ChangeBit-
+#12083	NEW    cov: 383 ft: 768 corp: 125/1642b lim: 25 exec/s: 102 rss: 323Mb L: 25/25 MS: 2 CMP-InsertByte- DE: "\377\377\377\377\376\377\377\341"-
+#12141	NEW    cov: 384 ft: 769 corp: 126/1667b lim: 25 exec/s: 102 rss: 324Mb L: 25/25 MS: 3 CrossOver-CrossOver-CrossOver-
+#12200	NEW    cov: 388 ft: 776 corp: 127/1692b lim: 25 exec/s: 102 rss: 325Mb L: 25/25 MS: 4 ShuffleBytes-CopyPart-ShuffleBytes-ShuffleBytes-
+#12347	NEW    cov: 388 ft: 778 corp: 128/1715b lim: 25 exec/s: 102 rss: 329Mb L: 23/25 MS: 2 CrossOver-InsertRepeatedBytes-
+#12368	REDUCE cov: 388 ft: 778 corp: 128/1713b lim: 25 exec/s: 102 rss: 330Mb L: 21/25 MS: 1 EraseBytes-
+#12438	NEW    cov: 388 ft: 779 corp: 129/1732b lim: 25 exec/s: 102 rss: 331Mb L: 19/25 MS: 5 ChangeByte-ManualDict-CrossOver-InsertByte-InsertByte- DE: " {"-
+#12480	NEW    cov: 389 ft: 780 corp: 130/1757b lim: 25 exec/s: 102 rss: 333Mb L: 25/25 MS: 2 CMP-InsertByte- DE: "\000\000\000\372"-
+#12487	NEW    cov: 389 ft: 782 corp: 131/1778b lim: 25 exec/s: 102 rss: 333Mb L: 21/25 MS: 2 CopyPart-InsertByte-
+#12556	REDUCE cov: 389 ft: 782 corp: 131/1775b lim: 25 exec/s: 102 rss: 335Mb L: 8/25 MS: 4 CMP-ShuffleBytes-ChangeBinInt-EraseBytes- DE: "\004\000"-
+#12700	REDUCE cov: 389 ft: 783 corp: 132/1800b lim: 25 exec/s: 102 rss: 338Mb L: 25/25 MS: 4 CopyPart-ManualDict-CopyPart-CopyPart- DE: "lf-after-V-%05d.yuv"-
+#12749	NEW    cov: 389 ft: 784 corp: 133/1825b lim: 25 exec/s: 102 rss: 340Mb L: 25/25 MS: 4 ChangeBinInt-CrossOver-CMP-CopyPart- DE: "\002\000\000\000"-
+#12760	REDUCE cov: 389 ft: 784 corp: 133/1814b lim: 25 exec/s: 102 rss: 341Mb L: 13/25 MS: 1 EraseBytes-
+	NEW_FUNC[1/4]: 0xaaaac0cb113c in std::__shared_count<(__gnu_cxx::_Lock_policy)2>::operator=(std::__shared_count<(__gnu_cxx::_Lock_policy)2> const&) /usr/lib/gcc/aarch64-linux-gnu/12/../../../../include/c++/12/bits/shared_ptr_base.h:1083
+	NEW_FUNC[2/4]: 0xaaaac0d66eb0 in std::vector<std::vector<char, std::allocator<char> >, std::allocator<std::vector<char, std::allocator<char> > > >::resize(unsigned long) /usr/lib/gcc/aarch64-linux-gnu/12/../../../../include/c++/12/bits/stl_vector.h:1009
+#12890	NEW    cov: 413 ft: 811 corp: 134/1838b lim: 25 exec/s: 102 rss: 344Mb L: 24/25 MS: 5 CMP-CrossOver-CopyPart-CrossOver-ManualDict- DE: "\001\000\000\031"-"pre-sao-%05d.yuv"-
+	NEW_FUNC[1/3]: 0xaaaac0cb9298 in std::vector<char, std::allocator<char> >::_M_check_len(unsigned long, char const*) const /usr/lib/gcc/aarch64-linux-gnu/12/../../../../include/c++/12/bits/stl_vector.h:1892
+	NEW_FUNC[2/3]: 0xaaaac0d68460 in std::vector<char, std::allocator<char> >::resize(unsigned long) /usr/lib/gcc/aarch64-linux-gnu/12/../../../../include/c++/12/bits/stl_vector.h:1009
+#13091	NEW    cov: 432 ft: 830 corp: 135/1862b lim: 25 exec/s: 102 rss: 349Mb L: 24/25 MS: 1 ChangeBinInt-
+#13477	NEW    cov: 433 ft: 831 corp: 136/1882b lim: 25 exec/s: 102 rss: 359Mb L: 20/25 MS: 1 InsertByte-
+#13559	REDUCE cov: 433 ft: 831 corp: 136/1876b lim: 25 exec/s: 102 rss: 361Mb L: 19/25 MS: 2 ChangeBit-EraseBytes-
+	NEW_FUNC[1/8]: 0xaaaac0c9bfb4 in decoder_context::read_pps_NAL(bitreader&) /b/libde265/libde265/decctx.cc:579
+	NEW_FUNC[2/8]: 0xaaaac0cb45a0 in std::__shared_count<(__gnu_cxx::_Lock_policy)2>::__shared_count<pic_parameter_set, std::allocator<void> >(pic_parameter_set*&, std::_Sp_alloc_shared_tag<std::allocator<void> >) /usr/lib/gcc/aarch64-linux-gnu/12/../../../../include/c++/12/bits/shared_ptr_base.h:966
+#13642	NEW    cov: 455 ft: 853 corp: 137/1900b lim: 25 exec/s: 102 rss: 362Mb L: 24/25 MS: 3 ChangeBit-PersAutoDict-ChangeBinInt- DE: "\377\377\377\377\377\377\000\177"-
+#13693	REDUCE cov: 455 ft: 853 corp: 137/1899b lim: 25 exec/s: 102 rss: 362Mb L: 16/25 MS: 1 EraseBytes-
+#13704	REDUCE cov: 456 ft: 854 corp: 138/1920b lim: 25 exec/s: 102 rss: 362Mb L: 21/25 MS: 1 ChangeByte-
+#13710	NEW    cov: 457 ft: 855 corp: 139/1945b lim: 25 exec/s: 102 rss: 362Mb L: 25/25 MS: 1 ChangeBit-
+#13817	NEW    cov: 457 ft: 857 corp: 140/1967b lim: 25 exec/s: 102 rss: 362Mb L: 22/25 MS: 2 ChangeBinInt-ManualDict- DE: "PPS"-
+#13888	REDUCE cov: 457 ft: 857 corp: 140/1961b lim: 25 exec/s: 102 rss: 363Mb L: 7/25 MS: 1 EraseBytes-
+#13963	REDUCE cov: 457 ft: 857 corp: 140/1960b lim: 25 exec/s: 102 rss: 363Mb L: 24/25 MS: 5 ChangeBit-ShuffleBytes-EraseBytes-ChangeASCIIInt-InsertRepeatedBytes-
+#14059	REDUCE cov: 457 ft: 857 corp: 140/1953b lim: 25 exec/s: 102 rss: 363Mb L: 17/25 MS: 1 EraseBytes-
+#14080	NEW    cov: 457 ft: 858 corp: 141/1978b lim: 25 exec/s: 102 rss: 364Mb L: 25/25 MS: 1 ShuffleBytes-
+#14186	REDUCE cov: 457 ft: 858 corp: 141/1977b lim: 25 exec/s: 102 rss: 364Mb L: 12/25 MS: 1 EraseBytes-
+#14472	REDUCE cov: 457 ft: 858 corp: 141/1975b lim: 25 exec/s: 102 rss: 365Mb L: 15/25 MS: 1 EraseBytes-
+#14473	REDUCE cov: 458 ft: 859 corp: 142/1996b lim: 25 exec/s: 102 rss: 365Mb L: 21/25 MS: 1 CMP- DE: "\000\000\000\000\000\000\000\002"-
+#14918	REDUCE cov: 458 ft: 859 corp: 142/1995b lim: 29 exec/s: 102 rss: 367Mb L: 24/25 MS: 5 ChangeBinInt-EraseBytes-ShuffleBytes-ChangeBit-ChangeBinInt-
+#14919	NEW    cov: 459 ft: 862 corp: 143/2024b lim: 29 exec/s: 102 rss: 367Mb L: 29/29 MS: 1 InsertRepeatedBytes-
+#14950	NEW    cov: 459 ft: 865 corp: 144/2052b lim: 29 exec/s: 102 rss: 367Mb L: 28/29 MS: 1 CopyPart-
+#15047	NEW    cov: 460 ft: 868 corp: 145/2080b lim: 29 exec/s: 102 rss: 367Mb L: 28/29 MS: 2 InsertRepeatedBytes-InsertByte-
+#15049	NEW    cov: 461 ft: 869 corp: 146/2104b lim: 29 exec/s: 102 rss: 367Mb L: 24/29 MS: 2 ChangeASCIIInt-InsertRepeatedBytes-
+#15277	REDUCE cov: 461 ft: 869 corp: 146/2103b lim: 29 exec/s: 102 rss: 368Mb L: 11/29 MS: 3 InsertByte-InsertRepeatedBytes-CrossOver-
+#15363	NEW    cov: 461 ft: 878 corp: 147/2115b lim: 29 exec/s: 102 rss: 369Mb L: 12/29 MS: 1 CopyPart-
+#15506	NEW    cov: 462 ft: 879 corp: 148/2144b lim: 29 exec/s: 102 rss: 369Mb L: 29/29 MS: 3 CrossOver-ChangeBinInt-ChangeASCIIInt-
+#15532	NEW    cov: 463 ft: 880 corp: 149/2170b lim: 29 exec/s: 102 rss: 370Mb L: 26/29 MS: 1 InsertByte-
+#15588	NEW    cov: 463 ft: 881 corp: 150/2199b lim: 29 exec/s: 102 rss: 370Mb L: 29/29 MS: 1 InsertRepeatedBytes-
+#15611	NEW    cov: 464 ft: 882 corp: 151/2228b lim: 29 exec/s: 102 rss: 373Mb L: 29/29 MS: 3 ManualDict-ChangeByte-PersAutoDict- DE: "BI"-"\001\000\000\031"-
+#15642	NEW    cov: 464 ft: 883 corp: 152/2256b lim: 29 exec/s: 102 rss: 373Mb L: 28/29 MS: 1 InsertRepeatedBytes-
+#15676	REDUCE cov: 464 ft: 884 corp: 153/2285b lim: 29 exec/s: 102 rss: 373Mb L: 29/29 MS: 4 InsertByte-PersAutoDict-ChangeByte-CopyPart- DE: "\002\000\000\000"-
+#15811	NEW    cov: 465 ft: 885 corp: 154/2314b lim: 29 exec/s: 102 rss: 373Mb L: 29/29 MS: 5 CopyPart-ChangeByte-ChangeByte-CopyPart-ChangeByte-
+#16085	NEW    cov: 465 ft: 887 corp: 155/2342b lim: 29 exec/s: 102 rss: 374Mb L: 28/29 MS: 4 CrossOver-CrossOver-ChangeByte-InsertRepeatedBytes-
+#16157	REDUCE cov: 465 ft: 887 corp: 155/2340b lim: 29 exec/s: 102 rss: 374Mb L: 11/29 MS: 2 ChangeASCIIInt-EraseBytes-
+#16190	NEW    cov: 466 ft: 888 corp: 156/2369b lim: 29 exec/s: 102 rss: 374Mb L: 29/29 MS: 3 InsertRepeatedBytes-ChangeBinInt-InsertByte-
+#16207	NEW    cov: 467 ft: 889 corp: 157/2396b lim: 29 exec/s: 102 rss: 375Mb L: 27/29 MS: 2 EraseBytes-ManualDict- DE: "flags: "-
+#16220	NEW    cov: 468 ft: 890 corp: 158/2401b lim: 29 exec/s: 102 rss: 375Mb L: 5/29 MS: 3 ChangeBit-EraseBytes-CrossOver-
+#16384	pulse  cov: 468 ft: 890 corp: 158/2401b lim: 29 exec/s: 102 rss: 375Mb
+#16488	NEW    cov: 468 ft: 891 corp: 159/2427b lim: 29 exec/s: 102 rss: 375Mb L: 26/29 MS: 3 InsertByte-PersAutoDict-CopyPart- DE: "\006\000"-
+#16504	REDUCE cov: 468 ft: 891 corp: 159/2415b lim: 29 exec/s: 102 rss: 375Mb L: 17/29 MS: 1 EraseBytes-
+#16555	REDUCE cov: 469 ft: 892 corp: 160/2422b lim: 29 exec/s: 102 rss: 376Mb L: 7/29 MS: 1 ChangeBinInt-
+#16729	NEW    cov: 470 ft: 893 corp: 161/2449b lim: 29 exec/s: 102 rss: 377Mb L: 27/29 MS: 4 ChangeBinInt-ChangeBit-CrossOver-CopyPart-
+#16770	REDUCE cov: 470 ft: 893 corp: 161/2448b lim: 29 exec/s: 102 rss: 378Mb L: 24/29 MS: 1 EraseBytes-
+#16814	NEW    cov: 471 ft: 894 corp: 162/2477b lim: 29 exec/s: 102 rss: 378Mb L: 29/29 MS: 4 CopyPart-ChangeBit-ChangeBit-ManualDict- DE: "RESERVED_NVCL42"-
+#16826	NEW    cov: 474 ft: 898 corp: 163/2505b lim: 29 exec/s: 102 rss: 379Mb L: 28/29 MS: 2 CrossOver-CopyPart-
+#16972	NEW    cov: 474 ft: 907 corp: 164/2527b lim: 29 exec/s: 102 rss: 379Mb L: 22/29 MS: 1 CopyPart-
+#17005	REDUCE cov: 474 ft: 907 corp: 164/2525b lim: 29 exec/s: 102 rss: 379Mb L: 9/29 MS: 3 ShuffleBytes-InsertRepeatedBytes-EraseBytes-
+#17236	NEW    cov: 475 ft: 908 corp: 165/2539b lim: 29 exec/s: 102 rss: 380Mb L: 14/29 MS: 1 PersAutoDict- DE: "\377\377\377\377\377\377\377\000"-
+#17272	REDUCE cov: 475 ft: 908 corp: 165/2537b lim: 29 exec/s: 102 rss: 380Mb L: 27/29 MS: 1 EraseBytes-
+#17325	NEW    cov: 476 ft: 909 corp: 166/2566b lim: 29 exec/s: 102 rss: 380Mb L: 29/29 MS: 3 ChangeBinInt-ChangeByte-CopyPart-
+#17327	NEW    cov: 476 ft: 934 corp: 167/2594b lim: 29 exec/s: 102 rss: 380Mb L: 28/29 MS: 2 ShuffleBytes-CrossOver-
+#17438	REDUCE cov: 476 ft: 936 corp: 168/2621b lim: 29 exec/s: 102 rss: 381Mb L: 27/29 MS: 1 CopyPart-
+#17486	NEW    cov: 476 ft: 950 corp: 169/2648b lim: 29 exec/s: 102 rss: 381Mb L: 27/29 MS: 3 ChangeBit-ChangeByte-InsertRepeatedBytes-
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+	NEW_FUNC[1/4]: 0xaaaac0d2228c in get_scan_order(int, int) /b/libde265/libde265/scan.cc:81
+	NEW_FUNC[2/4]: 0xaaaac0d4f49c in set_default_scaling_lists(scaling_list_data*) /b/libde265/libde265/sps.cc:1040
+#17508	NEW    cov: 511 ft: 985 corp: 170/2677b lim: 29 exec/s: 102 rss: 381Mb L: 29/29 MS: 2 InsertByte-PersAutoDict- DE: "RESERVED_NVCL42"-
+#17539	NEW    cov: 512 ft: 986 corp: 171/2705b lim: 29 exec/s: 102 rss: 381Mb L: 28/29 MS: 1 ChangeByte-
+#17545	NEW    cov: 513 ft: 987 corp: 172/2734b lim: 29 exec/s: 102 rss: 381Mb L: 29/29 MS: 1 CopyPart-
+#17676	NEW    cov: 514 ft: 988 corp: 173/2760b lim: 29 exec/s: 102 rss: 382Mb L: 26/29 MS: 1 InsertRepeatedBytes-
+#17827	REDUCE cov: 514 ft: 988 corp: 173/2757b lim: 29 exec/s: 102 rss: 384Mb L: 8/29 MS: 1 EraseBytes-
+	NEW_FUNC[1/1]: 0xaaaac0d6f1f0 in video_usability_information::read(error_queue*, bitreader*, seq_parameter_set const*) /b/libde265/libde265/vui.cc:234
+#17849	NEW    cov: 525 ft: 999 corp: 174/2786b lim: 29 exec/s: 102 rss: 384Mb L: 29/29 MS: 2 ChangeBit-ManualDict- DE: "RESERVED_VCL_R13"-
+SPS error: CB alignment
+#18104	NEW    cov: 531 ft: 1005 corp: 175/2813b lim: 29 exec/s: 102 rss: 385Mb L: 27/29 MS: 5 CrossOver-CrossOver-ChangeByte-ChangeBinInt-ShuffleBytes-
+#18169	REDUCE cov: 531 ft: 1006 corp: 176/2840b lim: 29 exec/s: 102 rss: 385Mb L: 27/29 MS: 5 CrossOver-ShuffleBytes-CopyPart-ShuffleBytes-ChangeBit-
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+#18433	NEW    cov: 531 ft: 1008 corp: 177/2861b lim: 29 exec/s: 102 rss: 386Mb L: 21/29 MS: 4 ChangeByte-EraseBytes-ChangeByte-InsertRepeatedBytes-
+#18640	NEW    cov: 531 ft: 1022 corp: 178/2890b lim: 29 exec/s: 102 rss: 387Mb L: 29/29 MS: 2 ShuffleBytes-ManualDict- DE: "INTER"-
+#18667	REDUCE cov: 531 ft: 1022 corp: 178/2889b lim: 29 exec/s: 102 rss: 387Mb L: 24/29 MS: 2 ChangeBit-CrossOver-
+SPS error: CB alignment
+	NEW_FUNC[1/2]: 0xaaaac0c697d4 in get_svlc(bitreader*) /b/libde265/libde265/bitstream.cc:154
+	NEW_FUNC[2/2]: 0xaaaac0d4e01c in read_scaling_list(bitreader*, seq_parameter_set const*, scaling_list_data*, bool) /b/libde265/libde265/sps.cc:885
+#18704	NEW    cov: 556 ft: 1053 corp: 179/2917b lim: 29 exec/s: 102 rss: 387Mb L: 28/29 MS: 2 ChangeByte-InsertByte-
+#18776	NEW    cov: 557 ft: 1054 corp: 180/2923b lim: 29 exec/s: 102 rss: 388Mb L: 6/29 MS: 2 ChangeByte-ChangeBit-
+#18834	NEW    cov: 558 ft: 1055 corp: 181/2944b lim: 29 exec/s: 102 rss: 388Mb L: 21/29 MS: 3 ChangeBinInt-EraseBytes-InsertRepeatedBytes-
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: CB alignment
+#19128	NEW    cov: 558 ft: 1056 corp: 182/2973b lim: 29 exec/s: 102 rss: 389Mb L: 29/29 MS: 4 CrossOver-ChangeByte-ChangeByte-CrossOver-
+#19226	REDUCE cov: 558 ft: 1056 corp: 182/2971b lim: 29 exec/s: 102 rss: 390Mb L: 23/29 MS: 3 ChangeBit-InsertByte-EraseBytes-
+SPS error: CB alignment
+#19293	NEW    cov: 559 ft: 1057 corp: 183/2998b lim: 29 exec/s: 102 rss: 390Mb L: 27/29 MS: 2 ManualDict-ChangeBinInt- DE: "SECAM"-
+#19309	REDUCE cov: 559 ft: 1057 corp: 183/2997b lim: 29 exec/s: 102 rss: 390Mb L: 22/29 MS: 1 EraseBytes-
+#19332	NEW    cov: 560 ft: 1058 corp: 184/3026b lim: 29 exec/s: 102 rss: 390Mb L: 29/29 MS: 3 ChangeASCIIInt-ChangeASCIIInt-CopyPart-
+#19384	REDUCE cov: 560 ft: 1058 corp: 184/3024b lim: 29 exec/s: 102 rss: 391Mb L: 25/29 MS: 2 EraseBytes-CopyPart-
+#19387	NEW    cov: 560 ft: 1059 corp: 185/3052b lim: 29 exec/s: 102 rss: 391Mb L: 28/29 MS: 3 CopyPart-ChangeBinInt-ChangeBit-
+#19460	NEW    cov: 561 ft: 1060 corp: 186/3080b lim: 29 exec/s: 102 rss: 391Mb L: 28/29 MS: 3 PersAutoDict-ChangeASCIIInt-CopyPart- DE: "\001\000\000\031"-
+#19561	REDUCE cov: 561 ft: 1060 corp: 186/3079b lim: 29 exec/s: 102 rss: 392Mb L: 10/29 MS: 1 EraseBytes-
+	NEW_FUNC[1/3]: 0xaaaac0d1574c in read_short_term_ref_pic_set(error_queue*, seq_parameter_set const*, bitreader*, ref_pic_set*, int, std::vector<ref_pic_set, std::allocator<ref_pic_set> > const&, bool) /b/libde265/libde265/refpic.cc:92
+	NEW_FUNC[2/3]: 0xaaaac0d55744 in std::vector<ref_pic_set, std::allocator<ref_pic_set> >::_M_default_append(unsigned long) /usr/lib/gcc/aarch64-linux-gnu/12/../../../../include/c++/12/bits/vector.tcc:628
+#19584	NEW    cov: 579 ft: 1080 corp: 187/3108b lim: 29 exec/s: 102 rss: 392Mb L: 29/29 MS: 3 CrossOver-CrossOver-InsertRepeatedBytes-
+#19680	REDUCE cov: 579 ft: 1080 corp: 187/3107b lim: 29 exec/s: 102 rss: 392Mb L: 10/29 MS: 1 EraseBytes-
+#19696	NEW    cov: 581 ft: 1082 corp: 188/3136b lim: 29 exec/s: 102 rss: 392Mb L: 29/29 MS: 1 ChangeBinInt-
+#19762	REDUCE cov: 581 ft: 1082 corp: 188/3127b lim: 29 exec/s: 102 rss: 392Mb L: 16/29 MS: 1 CrossOver-
+#19764	NEW    cov: 581 ft: 1083 corp: 189/3152b lim: 29 exec/s: 102 rss: 392Mb L: 25/29 MS: 2 CMP-CopyPart- DE: "\014\000\000\000"-
+#19847	REDUCE cov: 581 ft: 1083 corp: 189/3151b lim: 29 exec/s: 102 rss: 392Mb L: 24/29 MS: 3 EraseBytes-ChangeByte-InsertRepeatedBytes-
+#19998	NEW    cov: 582 ft: 1084 corp: 190/3179b lim: 29 exec/s: 102 rss: 393Mb L: 28/29 MS: 1 ChangeByte-
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+#20065	NEW    cov: 601 ft: 1104 corp: 191/3208b lim: 29 exec/s: 102 rss: 393Mb L: 29/29 MS: 2 ShuffleBytes-PersAutoDict- DE: "Cr"-
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+#20144	NEW    cov: 602 ft: 1105 corp: 192/3237b lim: 29 exec/s: 102 rss: 393Mb L: 29/29 MS: 4 ChangeByte-ChangeBinInt-CrossOver-ChangeBinInt-
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+#20236	NEW    cov: 603 ft: 1106 corp: 193/3266b lim: 29 exec/s: 102 rss: 393Mb L: 29/29 MS: 2 ChangeASCIIInt-CopyPart-
+#20352	REDUCE cov: 603 ft: 1106 corp: 193/3260b lim: 29 exec/s: 102 rss: 394Mb L: 20/29 MS: 1 EraseBytes-
+#20389	NEW    cov: 603 ft: 1112 corp: 194/3289b lim: 29 exec/s: 102 rss: 394Mb L: 29/29 MS: 2 ShuffleBytes-CrossOver-
+#20390	REDUCE cov: 603 ft: 1112 corp: 194/3275b lim: 29 exec/s: 102 rss: 394Mb L: 15/29 MS: 1 EraseBytes-
+#20772	REDUCE cov: 603 ft: 1112 corp: 194/3273b lim: 29 exec/s: 102 rss: 395Mb L: 21/29 MS: 2 EraseBytes-CMP- DE: "\015\000\000\000"-
+#20882	REDUCE cov: 603 ft: 1114 corp: 195/3298b lim: 29 exec/s: 102 rss: 396Mb L: 25/29 MS: 5 ChangeASCIIInt-InsertByte-InsertByte-CMP-CrossOver- DE: "\377\377\377\377\377\377\377\000"-
+#20894	NEW    cov: 604 ft: 1115 corp: 196/3325b lim: 29 exec/s: 102 rss: 396Mb L: 27/29 MS: 2 ChangeByte-PersAutoDict- DE: "INTER"-
+#20935	NEW    cov: 611 ft: 1122 corp: 197/3354b lim: 29 exec/s: 102 rss: 396Mb L: 29/29 MS: 1 CopyPart-
+#20948	NEW    cov: 611 ft: 1123 corp: 198/3383b lim: 29 exec/s: 102 rss: 396Mb L: 29/29 MS: 3 ChangeBit-ChangeBinInt-CopyPart-
+#21155	REDUCE cov: 611 ft: 1123 corp: 198/3381b lim: 29 exec/s: 102 rss: 396Mb L: 27/29 MS: 2 PersAutoDict-EraseBytes- DE: "\015\000\000\000"-
+#21198	NEW    cov: 612 ft: 1124 corp: 199/3410b lim: 29 exec/s: 102 rss: 396Mb L: 29/29 MS: 3 ChangeBinInt-CopyPart-CopyPart-
+#21209	NEW    cov: 613 ft: 1125 corp: 200/3439b lim: 29 exec/s: 102 rss: 396Mb L: 29/29 MS: 1 ChangeBinInt-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#21300	NEW    cov: 614 ft: 1126 corp: 201/3467b lim: 29 exec/s: 102 rss: 396Mb L: 28/29 MS: 1 ChangeByte-
+SPS error: CB alignment
+#21446	NEW    cov: 622 ft: 1134 corp: 202/3496b lim: 29 exec/s: 102 rss: 397Mb L: 29/29 MS: 1 InsertByte-
+#21467	NEW    cov: 623 ft: 1135 corp: 203/3525b lim: 29 exec/s: 102 rss: 397Mb L: 29/29 MS: 1 InsertByte-
+#21521	NEW    cov: 624 ft: 1136 corp: 204/3548b lim: 29 exec/s: 102 rss: 397Mb L: 23/29 MS: 4 EraseBytes-ShuffleBytes-InsertByte-CopyPart-
+#21752	REDUCE cov: 624 ft: 1136 corp: 204/3544b lim: 29 exec/s: 102 rss: 398Mb L: 21/29 MS: 1 CrossOver-
+#21758	NEW    cov: 625 ft: 1137 corp: 205/3572b lim: 29 exec/s: 102 rss: 398Mb L: 28/29 MS: 1 CopyPart-
+#21778	REDUCE cov: 625 ft: 1137 corp: 205/3569b lim: 29 exec/s: 102 rss: 398Mb L: 14/29 MS: 5 CrossOver-ChangeBinInt-CrossOver-ChangeByte-CrossOver-
+SPS error: CB alignment
+SPS error: CB alignment
+#21909	NEW    cov: 627 ft: 1139 corp: 206/3597b lim: 29 exec/s: 102 rss: 399Mb L: 28/29 MS: 1 EraseBytes-
+#22000	REDUCE cov: 627 ft: 1139 corp: 206/3589b lim: 29 exec/s: 102 rss: 400Mb L: 12/29 MS: 1 EraseBytes-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#22116	REDUCE cov: 627 ft: 1139 corp: 206/3588b lim: 29 exec/s: 102 rss: 400Mb L: 6/29 MS: 1 EraseBytes-
+SPS error: CB alignment
+SPS error: CB alignment
+#22135	REDUCE cov: 627 ft: 1139 corp: 206/3587b lim: 29 exec/s: 102 rss: 400Mb L: 27/29 MS: 4 ChangeBit-EraseBytes-ChangeBit-PersAutoDict- DE: "TSA_R"-
+#22234	NEW    cov: 627 ft: 1140 corp: 207/3615b lim: 29 exec/s: 102 rss: 400Mb L: 28/29 MS: 4 InsertRepeatedBytes-PersAutoDict-CrossOver-ShuffleBytes- DE: "\011\000"-
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+#22423	REDUCE cov: 627 ft: 1140 corp: 207/3614b lim: 29 exec/s: 102 rss: 400Mb L: 23/29 MS: 4 ChangeBinInt-ShuffleBytes-ChangeBit-EraseBytes-
+#22504	NEW    cov: 631 ft: 1146 corp: 208/3643b lim: 29 exec/s: 102 rss: 400Mb L: 29/29 MS: 1 ShuffleBytes-
+#22546	NEW    cov: 632 ft: 1147 corp: 209/3663b lim: 29 exec/s: 102 rss: 400Mb L: 20/29 MS: 2 ChangeBit-ShuffleBytes-
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+#22722	NEW    cov: 632 ft: 1162 corp: 210/3692b lim: 29 exec/s: 102 rss: 402Mb L: 29/29 MS: 1 CopyPart-
+#22733	REDUCE cov: 632 ft: 1162 corp: 210/3690b lim: 29 exec/s: 102 rss: 402Mb L: 27/29 MS: 1 EraseBytes-
+SPS error: CB alignment
+SPS error: CB alignment
+#22896	REDUCE cov: 632 ft: 1162 corp: 210/3687b lim: 29 exec/s: 102 rss: 402Mb L: 18/29 MS: 3 InsertRepeatedBytes-EraseBytes-CrossOver-
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#23195	REDUCE cov: 633 ft: 1163 corp: 211/3716b lim: 29 exec/s: 102 rss: 403Mb L: 29/29 MS: 4 InsertByte-PersAutoDict-CrossOver-InsertByte- DE: "BI"-
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+#23262	NEW    cov: 636 ft: 1168 corp: 212/3745b lim: 29 exec/s: 102 rss: 404Mb L: 29/29 MS: 2 ShuffleBytes-ChangeBit-
+#23289	REDUCE cov: 636 ft: 1168 corp: 212/3739b lim: 29 exec/s: 102 rss: 404Mb L: 19/29 MS: 2 CrossOver-EraseBytes-
+#23319	NEW    cov: 636 ft: 1169 corp: 213/3765b lim: 29 exec/s: 102 rss: 404Mb L: 26/29 MS: 5 CrossOver-CopyPart-CopyPart-ChangeBit-EraseBytes-
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#23596	NEW    cov: 657 ft: 1199 corp: 214/3794b lim: 29 exec/s: 102 rss: 404Mb L: 29/29 MS: 2 ChangeASCIIInt-ChangeASCIIInt-
+#23914	REDUCE cov: 657 ft: 1199 corp: 214/3792b lim: 29 exec/s: 102 rss: 404Mb L: 27/29 MS: 3 ChangeBinInt-ChangeByte-EraseBytes-
+#23932	REDUCE cov: 657 ft: 1199 corp: 214/3791b lim: 29 exec/s: 102 rss: 404Mb L: 27/29 MS: 3 ShuffleBytes-CopyPart-EraseBytes-
+#23993	NEW    cov: 658 ft: 1200 corp: 215/3814b lim: 29 exec/s: 102 rss: 404Mb L: 23/29 MS: 1 ChangeASCIIInt-
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: CB alignment
+#24109	NEW    cov: 660 ft: 1202 corp: 216/3842b lim: 29 exec/s: 102 rss: 404Mb L: 28/29 MS: 1 InsertRepeatedBytes-
+SPS error: CB alignment
+SPS error: CB alignment
+#24516	NEW    cov: 660 ft: 1203 corp: 217/3875b lim: 33 exec/s: 102 rss: 406Mb L: 33/33 MS: 2 CopyPart-ManualDict- DE: "arm/arm.h"-
+#24540	REDUCE cov: 660 ft: 1205 corp: 218/3907b lim: 33 exec/s: 102 rss: 406Mb L: 32/33 MS: 4 ManualDict-ShuffleBytes-ChangeBinInt-ManualDict- DE: "unused for reference"-"MainStillPicture"-
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+#24815	NEW    cov: 660 ft: 1206 corp: 219/3940b lim: 33 exec/s: 102 rss: 406Mb L: 33/33 MS: 5 CopyPart-ChangeBinInt-ShuffleBytes-ChangeBit-CMP- DE: "\001\000\000\000\377\377\377\341"-
+#24972	NEW    cov: 661 ft: 1207 corp: 220/3969b lim: 33 exec/s: 102 rss: 406Mb L: 29/33 MS: 2 ShuffleBytes-ChangeByte-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#24981	NEW    cov: 664 ft: 1218 corp: 221/4002b lim: 33 exec/s: 102 rss: 406Mb L: 33/33 MS: 4 PersAutoDict-ChangeBinInt-CopyPart-InsertByte- DE: "INTER"-
+#25023	NEW    cov: 664 ft: 1219 corp: 222/4034b lim: 33 exec/s: 102 rss: 406Mb L: 32/33 MS: 2 ShuffleBytes-CrossOver-
+#25033	NEW    cov: 665 ft: 1220 corp: 223/4065b lim: 33 exec/s: 102 rss: 406Mb L: 31/33 MS: 5 InsertByte-InsertByte-ChangeByte-ChangeASCIIInt-CopyPart-
+#25099	NEW    cov: 665 ft: 1234 corp: 224/4098b lim: 33 exec/s: 102 rss: 406Mb L: 33/33 MS: 1 CrossOver-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: CB alignment
+	NEW_FUNC[1/1]: 0xaaaac0d5022c in sps_range_extension::read(error_queue*, bitreader*) /b/libde265/libde265/sps.cc:1302
+#25290	NEW    cov: 667 ft: 1236 corp: 225/4127b lim: 33 exec/s: 102 rss: 406Mb L: 29/33 MS: 1 ShuffleBytes-
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+#25527	REDUCE cov: 667 ft: 1236 corp: 225/4124b lim: 33 exec/s: 102 rss: 407Mb L: 22/33 MS: 2 ChangeBinInt-CrossOver-
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+#25552	NEW    cov: 667 ft: 1250 corp: 226/4155b lim: 33 exec/s: 102 rss: 407Mb L: 31/33 MS: 5 EraseBytes-PersAutoDict-CrossOver-CMP-ManualDict- DE: "\000\000\000\372"-"\341\377\377\377\000\000\000\000"-"DST-H: "-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: CB alignment
+#25988	NEW    cov: 671 ft: 1261 corp: 227/4188b lim: 33 exec/s: 102 rss: 408Mb L: 33/33 MS: 1 InsertRepeatedBytes-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+#26120	NEW    cov: 672 ft: 1262 corp: 228/4219b lim: 33 exec/s: 102 rss: 408Mb L: 31/33 MS: 2 ChangeByte-CrossOver-
+#26158	NEW    cov: 676 ft: 1275 corp: 229/4251b lim: 33 exec/s: 102 rss: 408Mb L: 32/33 MS: 3 InsertRepeatedBytes-ChangeByte-ChangeBinInt-
+#26196	NEW    cov: 676 ft: 1278 corp: 230/4283b lim: 33 exec/s: 102 rss: 408Mb L: 32/33 MS: 3 ChangeBit-ChangeBinInt-CrossOver-
+#26507	NEW    cov: 677 ft: 1279 corp: 231/4297b lim: 33 exec/s: 102 rss: 408Mb L: 14/33 MS: 1 ChangeBinInt-
+#26524	NEW    cov: 677 ft: 1282 corp: 232/4325b lim: 33 exec/s: 102 rss: 408Mb L: 28/33 MS: 2 CrossOver-ChangeBinInt-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#26561	REDUCE cov: 677 ft: 1285 corp: 233/4352b lim: 33 exec/s: 102 rss: 408Mb L: 27/33 MS: 2 CrossOver-ChangeBinInt-
+SPS error: CB alignment
+#26732	NEW    cov: 677 ft: 1286 corp: 234/4381b lim: 33 exec/s: 102 rss: 409Mb L: 29/33 MS: 1 ChangeByte-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#26790	NEW    cov: 678 ft: 1287 corp: 235/4406b lim: 33 exec/s: 102 rss: 409Mb L: 25/33 MS: 3 ChangeBit-CopyPart-EraseBytes-
+#26797	NEW    cov: 679 ft: 1288 corp: 236/4431b lim: 33 exec/s: 102 rss: 409Mb L: 25/33 MS: 2 ChangeBit-EraseBytes-
+#26848	NEW    cov: 680 ft: 1289 corp: 237/4463b lim: 33 exec/s: 102 rss: 409Mb L: 32/33 MS: 1 InsertRepeatedBytes-
+#26854	NEW    cov: 680 ft: 1299 corp: 238/4496b lim: 33 exec/s: 102 rss: 409Mb L: 33/33 MS: 1 InsertRepeatedBytes-
+#26882	NEW    cov: 681 ft: 1301 corp: 239/4529b lim: 33 exec/s: 102 rss: 409Mb L: 33/33 MS: 3 PersAutoDict-CrossOver-InsertByte- DE: "*,"-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#26893	NEW    cov: 683 ft: 1303 corp: 240/4561b lim: 33 exec/s: 102 rss: 410Mb L: 32/33 MS: 1 CopyPart-
+#26962	REDUCE cov: 683 ft: 1303 corp: 240/4558b lim: 33 exec/s: 102 rss: 410Mb L: 21/33 MS: 4 ChangeBinInt-EraseBytes-InsertByte-CMP- DE: "\003\000"-
+#27063	NEW    cov: 683 ft: 1304 corp: 241/4591b lim: 33 exec/s: 102 rss: 410Mb L: 33/33 MS: 1 CrossOver-
+SPS error: CB alignment
+#27169	REDUCE cov: 683 ft: 1304 corp: 241/4587b lim: 33 exec/s: 102 rss: 410Mb L: 10/33 MS: 1 EraseBytes-
+SPS error: CB alignment
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+#27391	NEW    cov: 683 ft: 1306 corp: 242/4620b lim: 33 exec/s: 102 rss: 410Mb L: 33/33 MS: 2 ChangeBinInt-CrossOver-
+#27432	NEW    cov: 683 ft: 1307 corp: 243/4649b lim: 33 exec/s: 102 rss: 410Mb L: 29/33 MS: 1 ChangeByte-
+#27544	REDUCE cov: 683 ft: 1307 corp: 243/4647b lim: 33 exec/s: 102 rss: 410Mb L: 6/33 MS: 2 CopyPart-EraseBytes-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#27852	NEW    cov: 686 ft: 1311 corp: 244/4676b lim: 33 exec/s: 102 rss: 411Mb L: 29/33 MS: 3 CopyPart-CMP-CrossOver- DE: "\377\377\377\377"-
+#27853	NEW    cov: 686 ft: 1316 corp: 245/4709b lim: 33 exec/s: 102 rss: 411Mb L: 33/33 MS: 1 ChangeASCIIInt-
+#27895	REDUCE cov: 686 ft: 1316 corp: 245/4706b lim: 33 exec/s: 102 rss: 411Mb L: 25/33 MS: 2 InsertByte-EraseBytes-
+#27911	REDUCE cov: 686 ft: 1316 corp: 245/4704b lim: 33 exec/s: 102 rss: 411Mb L: 23/33 MS: 1 EraseBytes-
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+#27977	REDUCE cov: 686 ft: 1317 corp: 246/4732b lim: 33 exec/s: 102 rss: 411Mb L: 28/33 MS: 1 InsertByte-
+SPS error: CB alignment
+SPS error: CB alignment
+#27980	NEW    cov: 687 ft: 1318 corp: 247/4765b lim: 33 exec/s: 102 rss: 411Mb L: 33/33 MS: 3 PersAutoDict-ChangeByte-ShuffleBytes- DE: "BI"-
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#28040	NEW    cov: 687 ft: 1319 corp: 248/4794b lim: 33 exec/s: 102 rss: 411Mb L: 29/33 MS: 5 InsertRepeatedBytes-EraseBytes-ChangeBit-EraseBytes-ChangeASCIIInt-
+#28088	REDUCE cov: 687 ft: 1319 corp: 248/4793b lim: 33 exec/s: 102 rss: 411Mb L: 20/33 MS: 3 ChangeBinInt-ChangeBinInt-EraseBytes-
+#28269	REDUCE cov: 687 ft: 1320 corp: 249/4822b lim: 33 exec/s: 102 rss: 411Mb L: 29/33 MS: 1 CopyPart-
+#28451	NEW    cov: 688 ft: 1334 corp: 250/4854b lim: 33 exec/s: 102 rss: 411Mb L: 32/33 MS: 2 ChangeASCIIInt-InsertByte-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#28617	NEW    cov: 691 ft: 1341 corp: 251/4886b lim: 33 exec/s: 102 rss: 411Mb L: 32/33 MS: 1 InsertRepeatedBytes-
+SPS error: CB alignment
+#28628	NEW    cov: 692 ft: 1342 corp: 252/4913b lim: 33 exec/s: 102 rss: 411Mb L: 27/33 MS: 1 ChangeBinInt-
+#28701	NEW    cov: 692 ft: 1356 corp: 253/4946b lim: 33 exec/s: 102 rss: 412Mb L: 33/33 MS: 3 ManualDict-ChangeBit-ShuffleBytes- DE: "BLA_N_LP"-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#28767	REDUCE cov: 696 ft: 1360 corp: 254/4973b lim: 33 exec/s: 102 rss: 412Mb L: 27/33 MS: 1 ChangeByte-
+#29065	NEW    cov: 697 ft: 1362 corp: 255/5003b lim: 33 exec/s: 101 rss: 413Mb L: 30/33 MS: 3 InsertRepeatedBytes-PersAutoDict-ManualDict- DE: "Cr"-"RESERVED_VCL_R15"-
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#29247	NEW    cov: 697 ft: 1367 corp: 256/5032b lim: 33 exec/s: 102 rss: 413Mb L: 29/33 MS: 2 CrossOver-ManualDict- DE: "VPS"-
+SPS error: CB alignment
+#29374	REDUCE cov: 697 ft: 1367 corp: 256/5031b lim: 33 exec/s: 101 rss: 413Mb L: 24/33 MS: 2 CopyPart-EraseBytes-
+SPS error: CB alignment
+#29395	NEW    cov: 698 ft: 1370 corp: 257/5061b lim: 33 exec/s: 102 rss: 413Mb L: 30/33 MS: 1 CrossOver-
+#29396	NEW    cov: 698 ft: 1372 corp: 258/5086b lim: 33 exec/s: 102 rss: 413Mb L: 25/33 MS: 1 ChangeBit-
+SPS error: CB alignment
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: CB alignment
+SPS error: CB alignment
+#29936	NEW    cov: 704 ft: 1388 corp: 259/5123b lim: 38 exec/s: 102 rss: 414Mb L: 37/37 MS: 5 InsertByte-ChangeBinInt-CopyPart-ChangeBit-InsertRepeatedBytes-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#30008	NEW    cov: 704 ft: 1401 corp: 260/5161b lim: 38 exec/s: 102 rss: 415Mb L: 38/38 MS: 2 ShuffleBytes-CopyPart-
+SPS error: CB alignment
+SPS error: CB alignment
+#30144	NEW    cov: 704 ft: 1407 corp: 261/5198b lim: 38 exec/s: 102 rss: 415Mb L: 37/38 MS: 1 InsertRepeatedBytes-
+#30235	REDUCE cov: 704 ft: 1409 corp: 262/5229b lim: 38 exec/s: 102 rss: 416Mb L: 31/38 MS: 1 CMP- DE: "\377\377\377\377\377\377\377\377"-
+#30236	NEW    cov: 704 ft: 1410 corp: 263/5252b lim: 38 exec/s: 102 rss: 416Mb L: 23/38 MS: 1 EraseBytes-
+#30243	NEW    cov: 704 ft: 1414 corp: 264/5274b lim: 38 exec/s: 102 rss: 416Mb L: 22/38 MS: 2 ChangeASCIIInt-EraseBytes-
+#30314	NEW    cov: 704 ft: 1423 corp: 265/5311b lim: 38 exec/s: 102 rss: 416Mb L: 37/38 MS: 1 CopyPart-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#30536	NEW    cov: 704 ft: 1426 corp: 266/5347b lim: 38 exec/s: 102 rss: 416Mb L: 36/38 MS: 2 ChangeBinInt-CopyPart-
+#30909	NEW    cov: 704 ft: 1428 corp: 267/5366b lim: 38 exec/s: 102 rss: 416Mb L: 19/38 MS: 3 ChangeBit-CrossOver-PersAutoDict- DE: " {"-
+#30926	NEW    cov: 704 ft: 1429 corp: 268/5398b lim: 38 exec/s: 102 rss: 416Mb L: 32/38 MS: 2 ChangeBit-ChangeBinInt-
+#31020	NEW    cov: 704 ft: 1430 corp: 269/5436b lim: 38 exec/s: 102 rss: 416Mb L: 38/38 MS: 4 ChangeBit-ChangeBit-ChangeBinInt-InsertRepeatedBytes-
+#31111	NEW    cov: 704 ft: 1431 corp: 270/5470b lim: 38 exec/s: 102 rss: 416Mb L: 34/38 MS: 1 CrossOver-
+SPS error: CB alignment
+#31252	NEW    cov: 704 ft: 1435 corp: 271/5508b lim: 38 exec/s: 102 rss: 417Mb L: 38/38 MS: 1 InsertByte-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: CB alignment
+#31355	NEW    cov: 704 ft: 1436 corp: 272/5546b lim: 38 exec/s: 102 rss: 417Mb L: 38/38 MS: 3 ChangeByte-ShuffleBytes-CrossOver-
+#31402	REDUCE cov: 704 ft: 1436 corp: 272/5544b lim: 38 exec/s: 102 rss: 417Mb L: 14/38 MS: 2 CopyPart-EraseBytes-
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+#31470	NEW    cov: 704 ft: 1443 corp: 273/5582b lim: 38 exec/s: 102 rss: 417Mb L: 38/38 MS: 3 ChangeBinInt-InsertRepeatedBytes-InsertByte-
+#31496	NEW    cov: 704 ft: 1444 corp: 274/5611b lim: 38 exec/s: 102 rss: 417Mb L: 29/38 MS: 1 PersAutoDict- DE: " {"-
+#31502	NEW    cov: 705 ft: 1445 corp: 275/5638b lim: 38 exec/s: 102 rss: 417Mb L: 27/38 MS: 1 CopyPart-
+#31578	NEW    cov: 706 ft: 1446 corp: 276/5670b lim: 38 exec/s: 102 rss: 417Mb L: 32/38 MS: 1 ChangeByte-
+#31596	NEW    cov: 706 ft: 1448 corp: 277/5704b lim: 38 exec/s: 102 rss: 417Mb L: 34/38 MS: 3 ChangeByte-InsertRepeatedBytes-ChangeByte-
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+#31673	REDUCE cov: 706 ft: 1448 corp: 277/5698b lim: 38 exec/s: 102 rss: 417Mb L: 28/38 MS: 2 CMP-CrossOver- DE: "\006\000\000\000"-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#31791	REDUCE cov: 706 ft: 1448 corp: 277/5696b lim: 38 exec/s: 102 rss: 417Mb L: 6/38 MS: 3 EraseBytes-ChangeByte-CrossOver-
+#31821	NEW    cov: 706 ft: 1452 corp: 278/5733b lim: 38 exec/s: 102 rss: 417Mb L: 37/38 MS: 5 ChangeASCIIInt-InsertRepeatedBytes-CrossOver-ManualDict-ChangeBinInt- DE: " {"-
+#31980	NEW    cov: 706 ft: 1454 corp: 279/5771b lim: 38 exec/s: 102 rss: 418Mb L: 38/38 MS: 4 InsertRepeatedBytes-CrossOver-ChangeBinInt-CopyPart-
+SPS error: CB alignment
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+#32137	NEW    cov: 706 ft: 1456 corp: 280/5809b lim: 38 exec/s: 102 rss: 418Mb L: 38/38 MS: 2 ShuffleBytes-InsertByte-
+#32140	NEW    cov: 708 ft: 1460 corp: 281/5839b lim: 38 exec/s: 102 rss: 418Mb L: 30/38 MS: 3 PersAutoDict-ShuffleBytes-InsertByte- DE: "flags: "-
+#32146	NEW    cov: 708 ft: 1463 corp: 282/5873b lim: 38 exec/s: 102 rss: 418Mb L: 34/38 MS: 1 InsertByte-
+#32194	NEW    cov: 708 ft: 1464 corp: 283/5910b lim: 38 exec/s: 102 rss: 418Mb L: 37/38 MS: 3 InsertRepeatedBytes-PersAutoDict-ManualDict- DE: "flags: "-"fallback-motion.h"-
+#32341	NEW    cov: 708 ft: 1467 corp: 284/5942b lim: 38 exec/s: 102 rss: 419Mb L: 32/38 MS: 2 PersAutoDict-InsertRepeatedBytes- DE: "BLA_N_LP"-
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+#32432	NEW    cov: 708 ft: 1468 corp: 285/5973b lim: 38 exec/s: 102 rss: 420Mb L: 31/38 MS: 1 ChangeByte-
+#32768	pulse  cov: 708 ft: 1468 corp: 285/5973b lim: 38 exec/s: 102 rss: 420Mb
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#32924	NEW    cov: 708 ft: 1469 corp: 286/6002b lim: 38 exec/s: 102 rss: 420Mb L: 29/38 MS: 2 ChangeBinInt-ChangeByte-
+#33094	REDUCE cov: 708 ft: 1469 corp: 286/6001b lim: 38 exec/s: 102 rss: 420Mb L: 13/38 MS: 5 InsertByte-ShuffleBytes-PersAutoDict-PersAutoDict-EraseBytes- DE: "flags: "-"flags: "-
+#33160	REDUCE cov: 708 ft: 1469 corp: 286/5999b lim: 38 exec/s: 102 rss: 420Mb L: 25/38 MS: 1 EraseBytes-
+#33175	NEW    cov: 708 ft: 1470 corp: 287/6031b lim: 38 exec/s: 102 rss: 420Mb L: 32/38 MS: 5 ChangeASCIIInt-ShuffleBytes-InsertByte-ChangeByte-CrossOver-
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#33382	NEW    cov: 708 ft: 1471 corp: 288/6060b lim: 38 exec/s: 102 rss: 420Mb L: 29/38 MS: 2 ChangeBinInt-ChangeASCIIInt-
+SPS error: CB alignment
+#33633	NEW    cov: 708 ft: 1473 corp: 289/6091b lim: 38 exec/s: 102 rss: 420Mb L: 31/38 MS: 1 ChangeByte-
+#33689	NEW    cov: 709 ft: 1478 corp: 290/6124b lim: 38 exec/s: 102 rss: 420Mb L: 33/38 MS: 1 CopyPart-
+#33735	NEW    cov: 710 ft: 1479 corp: 291/6157b lim: 38 exec/s: 102 rss: 420Mb L: 33/38 MS: 1 InsertRepeatedBytes-
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+#33884	NEW    cov: 711 ft: 1480 corp: 292/6189b lim: 38 exec/s: 102 rss: 420Mb L: 32/38 MS: 4 CopyPart-ChangeBinInt-CopyPart-ChangeASCIIInt-
+	NEW_FUNC[1/1]: 0xaaaac0d686a8 in std::vector<unsigned short, std::allocator<unsigned short> >::resize(unsigned long) /usr/lib/gcc/aarch64-linux-gnu/12/../../../../include/c++/12/bits/stl_vector.h:1009
+#33977	NEW    cov: 716 ft: 1485 corp: 293/6227b lim: 38 exec/s: 102 rss: 420Mb L: 38/38 MS: 3 ChangeBinInt-ShuffleBytes-CopyPart-
+#33999	REDUCE cov: 716 ft: 1485 corp: 293/6213b lim: 38 exec/s: 102 rss: 420Mb L: 14/38 MS: 2 CopyPart-EraseBytes-
+#34008	NEW    cov: 716 ft: 1486 corp: 294/6251b lim: 38 exec/s: 102 rss: 420Mb L: 38/38 MS: 4 CopyPart-ChangeBinInt-ChangeByte-InsertRepeatedBytes-
+#34065	REDUCE cov: 716 ft: 1486 corp: 294/6248b lim: 38 exec/s: 102 rss: 420Mb L: 29/38 MS: 2 CrossOver-EraseBytes-
+SPS error: CB alignment
+#34142	NEW    cov: 716 ft: 1487 corp: 295/6284b lim: 38 exec/s: 102 rss: 421Mb L: 36/38 MS: 2 CopyPart-InsertByte-
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+#34189	REDUCE cov: 716 ft: 1487 corp: 295/6280b lim: 38 exec/s: 102 rss: 421Mb L: 25/38 MS: 2 CrossOver-CrossOver-
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#34416	NEW    cov: 718 ft: 1504 corp: 296/6316b lim: 38 exec/s: 102 rss: 421Mb L: 36/38 MS: 2 PersAutoDict-ManualDict- DE: "\377\377\377\377"-"long-term"-
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#34763	NEW    cov: 720 ft: 1506 corp: 297/6345b lim: 38 exec/s: 102 rss: 421Mb L: 29/38 MS: 2 InsertByte-InsertByte-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#34874	REDUCE cov: 720 ft: 1506 corp: 297/6339b lim: 38 exec/s: 102 rss: 421Mb L: 32/38 MS: 1 EraseBytes-
+#34900	NEW    cov: 720 ft: 1507 corp: 298/6376b lim: 38 exec/s: 102 rss: 421Mb L: 37/38 MS: 1 PersAutoDict- DE: "\015\000\000\000"-
+SPS error: CB alignment
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#35117	REDUCE cov: 720 ft: 1507 corp: 298/6364b lim: 38 exec/s: 102 rss: 421Mb L: 22/38 MS: 2 EraseBytes-ShuffleBytes-
+#35193	REDUCE cov: 720 ft: 1507 corp: 298/6363b lim: 38 exec/s: 102 rss: 421Mb L: 30/38 MS: 1 EraseBytes-
+#35214	REDUCE cov: 720 ft: 1507 corp: 298/6362b lim: 38 exec/s: 102 rss: 421Mb L: 26/38 MS: 1 EraseBytes-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: CB alignment
+#35303	NEW    cov: 720 ft: 1512 corp: 299/6400b lim: 38 exec/s: 102 rss: 422Mb L: 38/38 MS: 4 ShuffleBytes-ChangeBinInt-ChangeBinInt-CrossOver-
+#35305	REDUCE cov: 720 ft: 1512 corp: 299/6392b lim: 38 exec/s: 102 rss: 422Mb L: 11/38 MS: 2 ChangeBinInt-EraseBytes-
+#35406	NEW    cov: 725 ft: 1531 corp: 300/6421b lim: 38 exec/s: 102 rss: 422Mb L: 29/38 MS: 1 ChangeByte-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#35513	NEW    cov: 726 ft: 1532 corp: 301/6457b lim: 38 exec/s: 102 rss: 422Mb L: 36/38 MS: 2 EraseBytes-CopyPart-
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+#35515	NEW    cov: 727 ft: 1533 corp: 302/6489b lim: 38 exec/s: 102 rss: 422Mb L: 32/38 MS: 2 ChangeBinInt-ChangeBinInt-
+#35769	REDUCE cov: 727 ft: 1534 corp: 303/6520b lim: 38 exec/s: 102 rss: 424Mb L: 31/38 MS: 4 CopyPart-InsertByte-CopyPart-PersAutoDict- DE: "\003\000"-
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#35958	NEW    cov: 727 ft: 1535 corp: 304/6548b lim: 38 exec/s: 102 rss: 424Mb L: 28/38 MS: 4 InsertRepeatedBytes-EraseBytes-ManualDict-CMP- DE: "PPS"-"\277\000\000\000"-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#36609	NEW    cov: 727 ft: 1536 corp: 305/6577b lim: 43 exec/s: 102 rss: 424Mb L: 29/38 MS: 1 CopyPart-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#36652	NEW    cov: 728 ft: 1537 corp: 306/6616b lim: 43 exec/s: 102 rss: 424Mb L: 39/39 MS: 3 ChangeByte-ChangeBinInt-CopyPart-
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#36714	NEW    cov: 728 ft: 1554 corp: 307/6649b lim: 43 exec/s: 102 rss: 425Mb L: 33/39 MS: 2 ChangeBinInt-InsertRepeatedBytes-
+#36791	REDUCE cov: 728 ft: 1554 corp: 307/6648b lim: 43 exec/s: 102 rss: 425Mb L: 20/39 MS: 2 ShuffleBytes-EraseBytes-
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+#36852	NEW    cov: 729 ft: 1555 corp: 308/6685b lim: 43 exec/s: 102 rss: 426Mb L: 37/39 MS: 1 PersAutoDict- DE: "\341\377\377\377\000\000\000\000"-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#36893	NEW    cov: 729 ft: 1561 corp: 309/6717b lim: 43 exec/s: 102 rss: 426Mb L: 32/39 MS: 1 ChangeASCIIInt-
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+#36916	NEW    cov: 729 ft: 1562 corp: 310/6750b lim: 43 exec/s: 102 rss: 426Mb L: 33/39 MS: 3 ChangeByte-InsertByte-CrossOver-
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: CB alignment
+#37043	NEW    cov: 730 ft: 1563 corp: 311/6778b lim: 43 exec/s: 102 rss: 426Mb L: 28/39 MS: 2 ChangeBinInt-CrossOver-
+#37054	REDUCE cov: 730 ft: 1563 corp: 311/6777b lim: 43 exec/s: 102 rss: 426Mb L: 26/39 MS: 1 EraseBytes-
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+#37119	REDUCE cov: 730 ft: 1563 corp: 311/6775b lim: 43 exec/s: 102 rss: 426Mb L: 18/39 MS: 5 ShuffleBytes-CrossOver-CrossOver-CrossOver-CMP- DE: "\240\377\377\377"-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#37202	NEW    cov: 730 ft: 1564 corp: 312/6815b lim: 43 exec/s: 102 rss: 426Mb L: 40/40 MS: 3 CMP-ChangeASCIIInt-ChangeByte- DE: "\377\377\377\377\377\377\377\000"-
+#37204	NEW    cov: 730 ft: 1565 corp: 313/6854b lim: 43 exec/s: 102 rss: 426Mb L: 39/40 MS: 2 ChangeBit-CrossOver-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#37437	NEW    cov: 731 ft: 1566 corp: 314/6896b lim: 43 exec/s: 102 rss: 426Mb L: 42/42 MS: 3 InsertRepeatedBytes-ChangeASCIIInt-ManualDict- DE: "RefPicList[1] ="-
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+#37535	NEW    cov: 732 ft: 1567 corp: 315/6934b lim: 43 exec/s: 102 rss: 426Mb L: 38/42 MS: 3 CrossOver-InsertByte-ChangeBit-
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+#37957	NEW    cov: 732 ft: 1571 corp: 316/6972b lim: 43 exec/s: 102 rss: 427Mb L: 38/42 MS: 2 CopyPart-ManualDict- DE: "SECAM"-
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: CB alignment
+#37993	REDUCE cov: 732 ft: 1571 corp: 316/6968b lim: 43 exec/s: 102 rss: 427Mb L: 8/42 MS: 1 EraseBytes-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: CB alignment
+SPS error: CB alignment
+#38007	NEW    cov: 733 ft: 1572 corp: 317/7011b lim: 43 exec/s: 102 rss: 427Mb L: 43/43 MS: 4 PersAutoDict-ChangeBinInt-ShuffleBytes-ManualDict- DE: "\006\000"-"libde265/sps.h"-
+SPS error: CB alignment
+#38100	NEW    cov: 733 ft: 1574 corp: 318/7039b lim: 43 exec/s: 102 rss: 428Mb L: 28/43 MS: 3 ChangeBinInt-ChangeBit-ShuffleBytes-
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: CB alignment
+#38202	NEW    cov: 733 ft: 1575 corp: 319/7081b lim: 43 exec/s: 102 rss: 428Mb L: 42/43 MS: 2 ChangeBit-InsertRepeatedBytes-
+#38215	NEW    cov: 733 ft: 1578 corp: 320/7123b lim: 43 exec/s: 102 rss: 428Mb L: 42/43 MS: 3 ChangeBit-CrossOver-CopyPart-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#38289	NEW    cov: 733 ft: 1579 corp: 321/7166b lim: 43 exec/s: 102 rss: 428Mb L: 43/43 MS: 4 ShuffleBytes-CrossOver-ShuffleBytes-InsertByte-
+#38482	REDUCE cov: 733 ft: 1579 corp: 321/7164b lim: 43 exec/s: 102 rss: 428Mb L: 30/43 MS: 3 ChangeASCIIInt-ChangeByte-EraseBytes-
+#38489	REDUCE cov: 733 ft: 1579 corp: 321/7160b lim: 43 exec/s: 102 rss: 428Mb L: 34/43 MS: 2 ChangeBit-EraseBytes-
+#38574	NEW    cov: 750 ft: 1604 corp: 322/7201b lim: 43 exec/s: 102 rss: 428Mb L: 41/43 MS: 5 PersAutoDict-ManualDict-CopyPart-ShuffleBytes-InsertByte- DE: "\377\377\377\377"-"INTER"-
+#38596	REDUCE cov: 750 ft: 1606 corp: 323/7216b lim: 43 exec/s: 102 rss: 428Mb L: 15/43 MS: 2 CopyPart-ChangeByte-
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+#38687	NEW    cov: 750 ft: 1609 corp: 324/7259b lim: 43 exec/s: 102 rss: 428Mb L: 43/43 MS: 1 InsertRepeatedBytes-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#38872	REDUCE cov: 750 ft: 1610 corp: 325/7288b lim: 43 exec/s: 102 rss: 429Mb L: 29/43 MS: 5 InsertRepeatedBytes-ChangeBit-EraseBytes-ChangeBit-InsertRepeatedBytes-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#39094	NEW    cov: 751 ft: 1611 corp: 326/7320b lim: 43 exec/s: 102 rss: 429Mb L: 32/43 MS: 2 ManualDict-ChangeBinInt- DE: "PPS"-
+#39123	NEW    cov: 751 ft: 1614 corp: 327/7363b lim: 43 exec/s: 102 rss: 429Mb L: 43/43 MS: 4 CopyPart-ChangeBit-ChangeByte-CopyPart-
+#39200	NEW    cov: 751 ft: 1615 corp: 328/7396b lim: 43 exec/s: 102 rss: 429Mb L: 33/43 MS: 2 ChangeASCIIInt-CMP- DE: "\001\000\000\007"-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#39462	REDUCE cov: 751 ft: 1615 corp: 328/7392b lim: 43 exec/s: 102 rss: 429Mb L: 19/43 MS: 2 ChangeBinInt-EraseBytes-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#39478	NEW    cov: 751 ft: 1617 corp: 329/7430b lim: 43 exec/s: 102 rss: 429Mb L: 38/43 MS: 1 ChangeBinInt-
+#39489	NEW    cov: 751 ft: 1618 corp: 330/7472b lim: 43 exec/s: 102 rss: 429Mb L: 42/43 MS: 1 InsertRepeatedBytes-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#39537	NEW    cov: 751 ft: 1634 corp: 331/7508b lim: 43 exec/s: 102 rss: 429Mb L: 36/43 MS: 3 ShuffleBytes-CopyPart-InsertRepeatedBytes-
+#39573	REDUCE cov: 751 ft: 1634 corp: 331/7507b lim: 43 exec/s: 102 rss: 429Mb L: 15/43 MS: 1 EraseBytes-
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+#39685	REDUCE cov: 751 ft: 1634 corp: 331/7503b lim: 43 exec/s: 102 rss: 429Mb L: 28/43 MS: 2 InsertRepeatedBytes-EraseBytes-
+#39696	REDUCE cov: 751 ft: 1634 corp: 331/7502b lim: 43 exec/s: 102 rss: 429Mb L: 18/43 MS: 1 EraseBytes-
+SPS error: CB alignment
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#39812	REDUCE cov: 751 ft: 1636 corp: 332/7534b lim: 43 exec/s: 102 rss: 430Mb L: 32/43 MS: 1 CopyPart-
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#40013	NEW    cov: 751 ft: 1637 corp: 333/7566b lim: 43 exec/s: 102 rss: 431Mb L: 32/43 MS: 1 ChangeBinInt-
+#40109	REDUCE cov: 751 ft: 1637 corp: 333/7565b lim: 43 exec/s: 102 rss: 431Mb L: 10/43 MS: 1 EraseBytes-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#40225	NEW    cov: 752 ft: 1638 corp: 334/7596b lim: 43 exec/s: 102 rss: 431Mb L: 31/43 MS: 1 PersAutoDict- DE: "\006\000\000\000"-
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+#40308	NEW    cov: 752 ft: 1639 corp: 335/7626b lim: 43 exec/s: 102 rss: 431Mb L: 30/43 MS: 3 CMP-ChangeBit-CopyPart- DE: "\030\000\000\000"-
+	NEW_FUNC[1/2]: 0xaaaac0d6d0e0 in std::vector<unsigned short, std::allocator<unsigned short> >::_M_default_append(unsigned long) /usr/lib/gcc/aarch64-linux-gnu/12/../../../../include/c++/12/bits/vector.tcc:628
+	NEW_FUNC[2/2]: 0xaaaac0d6da24 in std::vector<unsigned short, std::allocator<unsigned short> >::_M_check_len(unsigned long, char const*) const /usr/lib/gcc/aarch64-linux-gnu/12/../../../../include/c++/12/bits/stl_vector.h:1892
+#40319	NEW    cov: 766 ft: 1653 corp: 336/7668b lim: 43 exec/s: 102 rss: 431Mb L: 42/43 MS: 1 InsertRepeatedBytes-
+#40335	REDUCE cov: 766 ft: 1653 corp: 336/7662b lim: 43 exec/s: 102 rss: 431Mb L: 14/43 MS: 1 EraseBytes-
+#40366	REDUCE cov: 766 ft: 1653 corp: 336/7659b lim: 43 exec/s: 102 rss: 431Mb L: 24/43 MS: 1 EraseBytes-
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: CB alignment
+#40522	REDUCE cov: 766 ft: 1653 corp: 336/7658b lim: 43 exec/s: 102 rss: 431Mb L: 13/43 MS: 1 EraseBytes-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#40863	REDUCE cov: 766 ft: 1653 corp: 336/7653b lim: 43 exec/s: 102 rss: 431Mb L: 10/43 MS: 1 EraseBytes-
+#40906	NEW    cov: 766 ft: 1654 corp: 337/7693b lim: 43 exec/s: 102 rss: 431Mb L: 40/43 MS: 3 ChangeBinInt-ShuffleBytes-InsertRepeatedBytes-
+#40947	NEW    cov: 766 ft: 1655 corp: 338/7731b lim: 43 exec/s: 102 rss: 431Mb L: 38/43 MS: 1 ShuffleBytes-
+#40958	NEW    cov: 769 ft: 1658 corp: 339/7769b lim: 43 exec/s: 102 rss: 431Mb L: 38/43 MS: 1 ChangeBinInt-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#40986	NEW    cov: 770 ft: 1659 corp: 340/7807b lim: 43 exec/s: 102 rss: 431Mb L: 38/43 MS: 3 ShuffleBytes-ChangeByte-ChangeBinInt-
+SPS error: CB alignment
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: CB alignment
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#41108	NEW    cov: 770 ft: 1660 corp: 341/7845b lim: 43 exec/s: 102 rss: 431Mb L: 38/43 MS: 2 CopyPart-ManualDict- DE: "free()"-
+#41164	NEW    cov: 771 ft: 1661 corp: 342/7878b lim: 43 exec/s: 102 rss: 431Mb L: 33/43 MS: 1 CopyPart-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#41205	REDUCE cov: 771 ft: 1661 corp: 342/7873b lim: 43 exec/s: 102 rss: 432Mb L: 34/43 MS: 1 EraseBytes-
+SPS error: CB alignment
+SPS error: CB alignment
+#41226	NEW    cov: 772 ft: 1663 corp: 343/7912b lim: 43 exec/s: 102 rss: 432Mb L: 39/43 MS: 1 InsertByte-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#41252	NEW    cov: 773 ft: 1669 corp: 344/7945b lim: 43 exec/s: 102 rss: 432Mb L: 33/43 MS: 1 ChangeByte-
+#41349	NEW    cov: 774 ft: 1670 corp: 345/7981b lim: 43 exec/s: 102 rss: 432Mb L: 36/43 MS: 2 CMP-ChangeBit- DE: "\000\000\000\000\000\000\000\000"-
+#41364	REDUCE cov: 774 ft: 1670 corp: 345/7978b lim: 43 exec/s: 102 rss: 432Mb L: 29/43 MS: 5 InsertByte-ChangeByte-PersAutoDict-ChangeByte-EraseBytes- DE: "flags: "-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#41380	NEW    cov: 774 ft: 1673 corp: 346/8011b lim: 43 exec/s: 102 rss: 432Mb L: 33/43 MS: 1 ChangeByte-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#41493	NEW    cov: 775 ft: 1674 corp: 347/8046b lim: 43 exec/s: 102 rss: 432Mb L: 35/43 MS: 3 ChangeByte-ChangeBit-CMP- DE: "\000\000\000\001"-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#41747	NEW    cov: 775 ft: 1677 corp: 348/8089b lim: 43 exec/s: 102 rss: 432Mb L: 43/43 MS: 4 ChangeBit-ChangeBit-CopyPart-PersAutoDict- DE: "DST-H: "-
+	NEW_FUNC[1/1]: 0xaaaac0d6e28c in video_usability_information::hrd_parameters(error_queue*, bitreader*, seq_parameter_set const*) /b/libde265/libde265/vui.cc:148
+#41898	NEW    cov: 785 ft: 1687 corp: 349/8131b lim: 43 exec/s: 102 rss: 432Mb L: 42/43 MS: 1 CrossOver-
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: CB alignment
+#42194	NEW    cov: 785 ft: 1688 corp: 350/8161b lim: 43 exec/s: 102 rss: 433Mb L: 30/43 MS: 1 CrossOver-
+#42205	NEW    cov: 785 ft: 1689 corp: 351/8199b lim: 43 exec/s: 102 rss: 433Mb L: 38/43 MS: 1 CopyPart-
+#42236	REDUCE cov: 785 ft: 1691 corp: 352/8236b lim: 43 exec/s: 102 rss: 433Mb L: 37/43 MS: 1 CopyPart-
+#42257	REDUCE cov: 785 ft: 1692 corp: 353/8265b lim: 43 exec/s: 102 rss: 433Mb L: 29/43 MS: 1 ChangeBit-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: CB alignment
+#42677	NEW    cov: 786 ft: 1693 corp: 354/8296b lim: 43 exec/s: 102 rss: 433Mb L: 31/43 MS: 5 ChangeBinInt-InsertByte-ChangeBinInt-CMP-EraseBytes- DE: "\030\000"-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#42748	REDUCE cov: 786 ft: 1693 corp: 354/8290b lim: 43 exec/s: 102 rss: 433Mb L: 9/43 MS: 1 EraseBytes-
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#43577	REDUCE cov: 786 ft: 1695 corp: 355/8338b lim: 48 exec/s: 102 rss: 434Mb L: 48/48 MS: 4 CopyPart-InsertRepeatedBytes-CopyPart-CopyPart-
+#43588	NEW    cov: 786 ft: 1696 corp: 356/8365b lim: 48 exec/s: 102 rss: 434Mb L: 27/48 MS: 1 ChangeBinInt-
+#43605	REDUCE cov: 786 ft: 1696 corp: 356/8364b lim: 48 exec/s: 102 rss: 434Mb L: 9/48 MS: 2 ChangeByte-EraseBytes-
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+#43653	NEW    cov: 786 ft: 1697 corp: 357/8410b lim: 48 exec/s: 102 rss: 434Mb L: 46/48 MS: 3 PersAutoDict-PersAutoDict-ChangeByte- DE: "\003\000"-"\375\377\377\377"-
+#43669	NEW    cov: 786 ft: 1698 corp: 358/8456b lim: 48 exec/s: 102 rss: 434Mb L: 46/48 MS: 1 CopyPart-
+SPS error: CB alignment
+#43852	REDUCE cov: 786 ft: 1698 corp: 358/8454b lim: 48 exec/s: 102 rss: 434Mb L: 44/48 MS: 3 EraseBytes-CopyPart-InsertRepeatedBytes-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: CB alignment
+#44143	NEW    cov: 786 ft: 1699 corp: 359/8487b lim: 48 exec/s: 102 rss: 434Mb L: 33/48 MS: 1 CMP- DE: "\020\000"-
+#44194	REDUCE cov: 786 ft: 1699 corp: 359/8484b lim: 48 exec/s: 102 rss: 434Mb L: 34/48 MS: 1 EraseBytes-
+#44226	NEW    cov: 786 ft: 1700 corp: 360/8531b lim: 48 exec/s: 102 rss: 434Mb L: 47/48 MS: 2 InsertRepeatedBytes-CopyPart-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#44272	NEW    cov: 786 ft: 1707 corp: 361/8567b lim: 48 exec/s: 102 rss: 434Mb L: 36/48 MS: 1 PersAutoDict- DE: "DST-H: "-
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: CB alignment
+#44350	NEW    cov: 786 ft: 1710 corp: 362/8612b lim: 48 exec/s: 102 rss: 435Mb L: 45/48 MS: 3 ChangeBinInt-ChangeBit-InsertRepeatedBytes-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: CB alignment
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: CB alignment
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#44796	REDUCE cov: 786 ft: 1710 corp: 362/8609b lim: 48 exec/s: 102 rss: 435Mb L: 10/48 MS: 1 EraseBytes-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: CB alignment
+#45128	REDUCE cov: 786 ft: 1710 corp: 362/8607b lim: 48 exec/s: 102 rss: 435Mb L: 31/48 MS: 2 CrossOver-EraseBytes-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+#45480	REDUCE cov: 786 ft: 1710 corp: 362/8606b lim: 48 exec/s: 101 rss: 436Mb L: 32/48 MS: 2 ChangeASCIIInt-EraseBytes-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+#45882	REDUCE cov: 786 ft: 1710 corp: 362/8605b lim: 48 exec/s: 101 rss: 436Mb L: 41/48 MS: 2 PersAutoDict-EraseBytes- DE: "\011\000"-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#46234	NEW    cov: 789 ft: 1713 corp: 363/8644b lim: 48 exec/s: 101 rss: 436Mb L: 39/48 MS: 2 ChangeBit-InsertByte-
+#46270	REDUCE cov: 789 ft: 1713 corp: 363/8642b lim: 48 exec/s: 101 rss: 436Mb L: 6/48 MS: 1 EraseBytes-
+#46327	REDUCE cov: 789 ft: 1713 corp: 363/8625b lim: 48 exec/s: 101 rss: 436Mb L: 15/48 MS: 2 PersAutoDict-CrossOver- DE: "RESERVED_VCL_R13"-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#46457	NEW    cov: 789 ft: 1716 corp: 364/8673b lim: 48 exec/s: 101 rss: 436Mb L: 48/48 MS: 5 CMP-CrossOver-ChangeBinInt-CopyPart-ShuffleBytes- DE: "\001\000\000\007"-
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: CB alignment
+SPS error: CB alignment
+#46718	REDUCE cov: 789 ft: 1716 corp: 364/8672b lim: 48 exec/s: 101 rss: 437Mb L: 6/48 MS: 1 EraseBytes-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: CB alignment
+SPS error: CB alignment
+#46903	REDUCE cov: 789 ft: 1716 corp: 364/8671b lim: 48 exec/s: 101 rss: 437Mb L: 25/48 MS: 5 CrossOver-ChangeBit-CrossOver-EraseBytes-ChangeByte-
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#47020	NEW    cov: 789 ft: 1717 corp: 365/8704b lim: 48 exec/s: 101 rss: 437Mb L: 33/48 MS: 2 ShuffleBytes-ChangeASCIIInt-
+#47058	REDUCE cov: 789 ft: 1717 corp: 365/8702b lim: 48 exec/s: 101 rss: 437Mb L: 40/48 MS: 3 ChangeBinInt-ChangeBinInt-EraseBytes-
+SPS error: CB alignment
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#47636	NEW    cov: 789 ft: 1720 corp: 366/8752b lim: 53 exec/s: 101 rss: 437Mb L: 50/50 MS: 3 InsertRepeatedBytes-InsertRepeatedBytes-InsertRepeatedBytes-
+#47687	NEW    cov: 789 ft: 1721 corp: 367/8800b lim: 53 exec/s: 101 rss: 437Mb L: 48/50 MS: 1 ChangeASCIIInt-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#47743	REDUCE cov: 789 ft: 1722 corp: 368/8847b lim: 53 exec/s: 101 rss: 437Mb L: 47/50 MS: 1 InsertRepeatedBytes-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#47762	REDUCE cov: 789 ft: 1722 corp: 368/8845b lim: 53 exec/s: 101 rss: 437Mb L: 39/50 MS: 4 ChangeBinInt-CopyPart-CopyPart-EraseBytes-
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+#47818	NEW    cov: 789 ft: 1725 corp: 369/8884b lim: 53 exec/s: 101 rss: 437Mb L: 39/50 MS: 1 ChangeBinInt-
+#47990	NEW    cov: 789 ft: 1726 corp: 370/8934b lim: 53 exec/s: 101 rss: 437Mb L: 50/50 MS: 2 ShuffleBytes-PersAutoDict- DE: "\341\377\377\377\000\000\000\000"-
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: CB alignment
+#48137	NEW    cov: 789 ft: 1732 corp: 371/8972b lim: 53 exec/s: 101 rss: 437Mb L: 38/50 MS: 2 ChangeByte-CMP- DE: "\341\377\377\377\000\000\000\000"-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#48284	REDUCE cov: 789 ft: 1732 corp: 371/8971b lim: 53 exec/s: 101 rss: 437Mb L: 16/50 MS: 2 EraseBytes-CopyPart-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#48676	NEW    cov: 789 ft: 1733 corp: 372/8994b lim: 53 exec/s: 100 rss: 437Mb L: 23/50 MS: 2 CopyPart-InsertRepeatedBytes-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#49153	REDUCE cov: 789 ft: 1733 corp: 372/8993b lim: 53 exec/s: 100 rss: 437Mb L: 36/50 MS: 2 EraseBytes-ChangeBit-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#49215	REDUCE cov: 789 ft: 1733 corp: 372/8992b lim: 53 exec/s: 101 rss: 437Mb L: 28/50 MS: 2 ShuffleBytes-EraseBytes-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#49275	REDUCE cov: 789 ft: 1733 corp: 372/8989b lim: 53 exec/s: 100 rss: 437Mb L: 26/50 MS: 5 InsertRepeatedBytes-InsertByte-ChangeBinInt-CrossOver-EraseBytes-
+#49354	NEW    cov: 789 ft: 1734 corp: 373/9033b lim: 53 exec/s: 100 rss: 437Mb L: 44/50 MS: 4 ChangeBit-CrossOver-InsertRepeatedBytes-ChangeBit-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#49406	NEW    cov: 789 ft: 1743 corp: 374/9069b lim: 53 exec/s: 101 rss: 437Mb L: 36/50 MS: 2 ShuffleBytes-ChangeBit-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#49408	NEW    cov: 789 ft: 1745 corp: 375/9109b lim: 53 exec/s: 101 rss: 437Mb L: 40/50 MS: 2 CopyPart-ChangeBinInt-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#49525	NEW    cov: 789 ft: 1746 corp: 376/9151b lim: 53 exec/s: 100 rss: 437Mb L: 42/50 MS: 2 ManualDict-CrossOver- DE: "RADL_R"-
+#49551	REDUCE cov: 789 ft: 1746 corp: 376/9150b lim: 53 exec/s: 100 rss: 437Mb L: 8/50 MS: 1 EraseBytes-
+#49617	REDUCE cov: 789 ft: 1766 corp: 377/9200b lim: 53 exec/s: 100 rss: 437Mb L: 50/50 MS: 1 CopyPart-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#49709	NEW    cov: 789 ft: 1767 corp: 378/9241b lim: 53 exec/s: 101 rss: 438Mb L: 41/50 MS: 2 InsertByte-InsertRepeatedBytes-
+SPS error: CB alignment
+SPS error: CB alignment
+#49783	REDUCE cov: 789 ft: 1767 corp: 378/9238b lim: 53 exec/s: 100 rss: 438Mb L: 35/50 MS: 4 PersAutoDict-CopyPart-InsertByte-EraseBytes- DE: " {"-
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: CB alignment
+#49890	NEW    cov: 789 ft: 1770 corp: 379/9267b lim: 53 exec/s: 100 rss: 438Mb L: 29/50 MS: 2 EraseBytes-InsertByte-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#50011	REDUCE cov: 789 ft: 1770 corp: 379/9265b lim: 53 exec/s: 101 rss: 438Mb L: 20/50 MS: 1 EraseBytes-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: CB alignment
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: CB alignment
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+#50773	NEW    cov: 789 ft: 1774 corp: 380/9307b lim: 58 exec/s: 100 rss: 438Mb L: 42/50 MS: 2 CrossOver-ManualDict- DE: "unknown error"-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#51058	NEW    cov: 789 ft: 1775 corp: 381/9364b lim: 58 exec/s: 101 rss: 438Mb L: 57/57 MS: 5 InsertByte-InsertRepeatedBytes-InsertRepeatedBytes-ChangeBit-InsertByte-
+#51099	NEW    cov: 789 ft: 1776 corp: 382/9409b lim: 58 exec/s: 100 rss: 438Mb L: 45/57 MS: 1 ManualDict- DE: "RESERVED_VCL_R15"-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#51206	REDUCE cov: 790 ft: 1777 corp: 383/9441b lim: 58 exec/s: 100 rss: 438Mb L: 32/57 MS: 2 ManualDict-CopyPart- DE: "set "-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#51404	REDUCE cov: 790 ft: 1777 corp: 383/9440b lim: 58 exec/s: 100 rss: 438Mb L: 23/57 MS: 3 ChangeBinInt-ChangeASCIIInt-CrossOver-
+#51465	NEW    cov: 790 ft: 1778 corp: 384/9490b lim: 58 exec/s: 101 rss: 438Mb L: 50/57 MS: 1 ChangeBit-
+#51481	REDUCE cov: 790 ft: 1778 corp: 384/9489b lim: 58 exec/s: 100 rss: 438Mb L: 29/57 MS: 1 EraseBytes-
+SPS error: CB alignment
+SPS error: CB alignment
+#51638	REDUCE cov: 790 ft: 1779 corp: 385/9524b lim: 58 exec/s: 101 rss: 438Mb L: 35/57 MS: 2 ChangeBinInt-InsertRepeatedBytes-
+SPS error: CB alignment
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#52049	NEW    cov: 790 ft: 1780 corp: 386/9563b lim: 58 exec/s: 101 rss: 438Mb L: 39/57 MS: 1 ChangeASCIIInt-
+#52065	REDUCE cov: 790 ft: 1781 corp: 387/9614b lim: 58 exec/s: 101 rss: 438Mb L: 51/57 MS: 1 ManualDict- DE: "INVALID NAL >= 48"-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#52116	REDUCE cov: 790 ft: 1781 corp: 387/9613b lim: 58 exec/s: 101 rss: 438Mb L: 9/57 MS: 1 EraseBytes-
+#52152	NEW    cov: 790 ft: 1782 corp: 388/9649b lim: 58 exec/s: 101 rss: 439Mb L: 36/57 MS: 1 ChangeBinInt-
+#52212	NEW    cov: 790 ft: 1784 corp: 389/9697b lim: 58 exec/s: 100 rss: 439Mb L: 48/57 MS: 5 PersAutoDict-CopyPart-ShuffleBytes-InsertByte-ChangeBit- DE: "VPS"-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: CB alignment
+#52263	NEW    cov: 790 ft: 1795 corp: 390/9743b lim: 58 exec/s: 101 rss: 439Mb L: 46/57 MS: 1 CrossOver-
+#52264	REDUCE cov: 790 ft: 1795 corp: 390/9740b lim: 58 exec/s: 101 rss: 439Mb L: 31/57 MS: 1 EraseBytes-
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: CB alignment
+#52572	REDUCE cov: 790 ft: 1795 corp: 390/9728b lim: 58 exec/s: 101 rss: 439Mb L: 45/51 MS: 3 ChangeByte-ShuffleBytes-EraseBytes-
+#52607	NEW    cov: 790 ft: 1798 corp: 391/9784b lim: 58 exec/s: 100 rss: 439Mb L: 56/56 MS: 5 EraseBytes-ChangeBinInt-InsertByte-CrossOver-CrossOver-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#52809	REDUCE cov: 790 ft: 1798 corp: 391/9783b lim: 58 exec/s: 101 rss: 439Mb L: 30/56 MS: 2 ShuffleBytes-EraseBytes-
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#52913	NEW    cov: 790 ft: 1800 corp: 392/9833b lim: 58 exec/s: 101 rss: 439Mb L: 50/56 MS: 4 ChangeASCIIInt-ChangeBit-ChangeBit-InsertRepeatedBytes-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#53347	REDUCE cov: 790 ft: 1801 corp: 393/9887b lim: 58 exec/s: 101 rss: 439Mb L: 54/56 MS: 4 ChangeBit-InsertRepeatedBytes-InsertRepeatedBytes-InsertRepeatedBytes-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#53503	REDUCE cov: 790 ft: 1801 corp: 393/9883b lim: 58 exec/s: 101 rss: 439Mb L: 46/56 MS: 1 EraseBytes-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#53764	NEW    cov: 790 ft: 1802 corp: 394/9918b lim: 58 exec/s: 101 rss: 439Mb L: 35/56 MS: 1 EraseBytes-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: CB alignment
+#54052	NEW    cov: 790 ft: 1806 corp: 395/9953b lim: 58 exec/s: 101 rss: 440Mb L: 35/56 MS: 3 ShuffleBytes-ChangeBinInt-CopyPart-
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+#54108	REDUCE cov: 790 ft: 1806 corp: 395/9945b lim: 58 exec/s: 101 rss: 440Mb L: 18/56 MS: 1 EraseBytes-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#54290	NEW    cov: 790 ft: 1807 corp: 396/9995b lim: 58 exec/s: 101 rss: 440Mb L: 50/56 MS: 2 ShuffleBytes-CMP- DE: "0\000"-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: CB alignment
+#54454	NEW    cov: 802 ft: 1819 corp: 397/10053b lim: 58 exec/s: 101 rss: 440Mb L: 58/58 MS: 4 ShuffleBytes-InsertRepeatedBytes-InsertByte-CrossOver-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#54476	NEW    cov: 802 ft: 1820 corp: 398/10108b lim: 58 exec/s: 101 rss: 440Mb L: 55/58 MS: 2 InsertRepeatedBytes-ChangeBit-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+#54732	REDUCE cov: 802 ft: 1820 corp: 398/10105b lim: 58 exec/s: 101 rss: 440Mb L: 24/58 MS: 1 EraseBytes-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#55028	NEW    cov: 802 ft: 1822 corp: 399/10141b lim: 58 exec/s: 101 rss: 441Mb L: 36/58 MS: 1 ShuffleBytes-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: CB alignment
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#55749	REDUCE cov: 803 ft: 1823 corp: 400/10176b lim: 63 exec/s: 101 rss: 441Mb L: 35/58 MS: 1 InsertByte-
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#56489	REDUCE cov: 803 ft: 1824 corp: 401/10236b lim: 68 exec/s: 101 rss: 442Mb L: 60/60 MS: 5 ShuffleBytes-ChangeByte-InsertRepeatedBytes-PersAutoDict-CrossOver- DE: "\377\377\377\377\377\377\000\177"-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#56763	NEW    cov: 804 ft: 1825 corp: 402/10304b lim: 68 exec/s: 101 rss: 442Mb L: 68/68 MS: 4 ShuffleBytes-ManualDict-ShuffleBytes-CrossOver- DE: "non-existing reference picture accessed"-
+#56804	NEW    cov: 804 ft: 1827 corp: 403/10339b lim: 68 exec/s: 101 rss: 442Mb L: 35/68 MS: 1 ChangeByte-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#56835	NEW    cov: 804 ft: 1828 corp: 404/10368b lim: 68 exec/s: 100 rss: 442Mb L: 29/68 MS: 1 ChangeBinInt-
+#56856	REDUCE cov: 804 ft: 1828 corp: 404/10364b lim: 68 exec/s: 100 rss: 442Mb L: 6/68 MS: 1 CrossOver-
+#56877	REDUCE cov: 804 ft: 1828 corp: 404/10362b lim: 68 exec/s: 101 rss: 442Mb L: 21/68 MS: 1 EraseBytes-
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#56959	NEW    cov: 805 ft: 1829 corp: 405/10407b lim: 68 exec/s: 100 rss: 442Mb L: 45/68 MS: 2 ChangeByte-CrossOver-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: CB alignment
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#57312	NEW    cov: 805 ft: 1832 corp: 406/10471b lim: 68 exec/s: 101 rss: 442Mb L: 64/68 MS: 3 ShuffleBytes-PersAutoDict-InsertRepeatedBytes- DE: "RESERVED_NVCL42"-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#57601	REDUCE cov: 805 ft: 1833 corp: 407/10518b lim: 68 exec/s: 101 rss: 442Mb L: 47/68 MS: 4 ChangeBit-CMP-CopyPart-CopyPart- DE: "\377\024"-
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+#57728	REDUCE cov: 805 ft: 1835 corp: 408/10570b lim: 68 exec/s: 100 rss: 442Mb L: 52/68 MS: 2 ChangeBinInt-InsertRepeatedBytes-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#57734	NEW    cov: 805 ft: 1836 corp: 409/10608b lim: 68 exec/s: 100 rss: 442Mb L: 38/68 MS: 1 PersAutoDict- DE: "SECAM"-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#58370	NEW    cov: 805 ft: 1839 corp: 410/10649b lim: 74 exec/s: 100 rss: 443Mb L: 41/68 MS: 1 ChangeBinInt-
+#58480	REDUCE cov: 805 ft: 1840 corp: 411/10716b lim: 74 exec/s: 101 rss: 443Mb L: 67/68 MS: 5 CopyPart-InsertRepeatedBytes-ShuffleBytes-EraseBytes-PersAutoDict- DE: "SECAM"-
+#58553	NEW    cov: 806 ft: 1841 corp: 412/10741b lim: 74 exec/s: 100 rss: 443Mb L: 25/68 MS: 3 EraseBytes-ChangeBit-ChangeBit-
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+#58665	REDUCE cov: 806 ft: 1841 corp: 412/10735b lim: 74 exec/s: 100 rss: 443Mb L: 8/68 MS: 2 CopyPart-EraseBytes-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#59027	NEW    cov: 806 ft: 1858 corp: 413/10800b lim: 74 exec/s: 101 rss: 443Mb L: 65/68 MS: 2 ManualDict-CMP- DE: "CRA_NUT"-"\000\000\000\000\000\000\000\001"-
+#59030	REDUCE cov: 806 ft: 1859 corp: 414/10874b lim: 74 exec/s: 101 rss: 443Mb L: 74/74 MS: 3 InsertRepeatedBytes-ShuffleBytes-CopyPart-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#59128	REDUCE cov: 806 ft: 1862 corp: 415/10931b lim: 74 exec/s: 101 rss: 443Mb L: 57/74 MS: 3 InsertRepeatedBytes-ChangeByte-CrossOver-
+#59237	NEW    cov: 806 ft: 1863 corp: 416/10993b lim: 74 exec/s: 101 rss: 443Mb L: 62/74 MS: 4 InsertRepeatedBytes-ShuffleBytes-ChangeBit-CrossOver-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: CB alignment
+#59309	REDUCE cov: 806 ft: 1863 corp: 416/10992b lim: 74 exec/s: 101 rss: 443Mb L: 26/74 MS: 2 EraseBytes-InsertByte-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#59385	NEW    cov: 806 ft: 1865 corp: 417/11033b lim: 74 exec/s: 100 rss: 443Mb L: 41/74 MS: 1 InsertRepeatedBytes-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#59726	NEW    cov: 806 ft: 1868 corp: 418/11092b lim: 74 exec/s: 101 rss: 443Mb L: 59/74 MS: 1 InsertRepeatedBytes-
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: CB alignment
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+#60082	NEW    cov: 807 ft: 1869 corp: 419/11122b lim: 74 exec/s: 100 rss: 443Mb L: 30/74 MS: 1 InsertByte-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (intra) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: CB alignment
+#60518	REDUCE cov: 807 ft: 1869 corp: 419/11118b lim: 74 exec/s: 101 rss: 443Mb L: 9/74 MS: 1 EraseBytes-
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: transform hierarchy depth (inter) > CTB size - min TB size
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: CB alignment
+SPS error: CB alignment
+#60678	DONE   cov: 807 ft: 1869 corp: 419/11118b lim: 74 exec/s: 100 rss: 443Mb
+###### Recommended dictionary. ######
+"\000\000\000\000\000\000\000\000" # Uses: 160
+"\011\000" # Uses: 209
+"\377\377\377\377\377\377\377\000" # Uses: 138
+"\020\000\000\000\000\000\000\000" # Uses: 136
+"\006\000" # Uses: 121
+"\375\377\377\377" # Uses: 126
+"\377\377\377\377\377\377\000\177" # Uses: 104
+"\377\377\377\377\376\377\377\341" # Uses: 86
+"\000\000\000\372" # Uses: 92
+"\004\000" # Uses: 121
+"\002\000\000\000" # Uses: 86
+"\001\000\000\031" # Uses: 97
+"\000\000\000\000\000\000\000\002" # Uses: 86
+"\014\000\000\000" # Uses: 79
+"\015\000\000\000" # Uses: 69
+"\001\000\000\000\377\377\377\341" # Uses: 53
+"\341\377\377\377\000\000\000\000" # Uses: 57
+"\003\000" # Uses: 65
+"\377\377\377\377" # Uses: 69
+"\377\377\377\377\377\377\377\377" # Uses: 45
+"\006\000\000\000" # Uses: 43
+"\277\000\000\000" # Uses: 36
+"\240\377\377\377" # Uses: 27
+"\001\000\000\007" # Uses: 33
+"\030\000\000\000" # Uses: 33
+"\000\000\000\001" # Uses: 34
+"\030\000" # Uses: 27
+"\020\000" # Uses: 23
+"0\000" # Uses: 8
+"\377\024" # Uses: 2
+"\000\000\000\000\000\000\000\001" # Uses: 3
+###### End of recommended dictionary. ######
+Done 60678 runs in 601 second(s)
+stat::number_of_executed_units: 60678
+stat::average_exec_per_sec:     100
+stat::new_units_added:          547
+stat::slowest_unit_time_sec:    0
+stat::peak_rss_mb:              443
