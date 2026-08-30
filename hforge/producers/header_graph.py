@@ -974,6 +974,18 @@ def infer_role(d: Decl, handle: Optional[str]) -> str:
     # sequence; the rule below is only for functions that ARE the sequence.
     if _SETTER_ISH.search(d.name or ""):
         return ROLE_QUERY
+    # NO DOUBLE POINTERS. `ZopfliDeflate(const ZopfliOptions *, int, int,
+    # const unsigned char *in, size_t insize, unsigned char **out, size_t *outsize)`
+    # matches buffer-and-length exactly, and calling it a direct entry point cost zopfli
+    # its setup: the producer stopped chaining ZopfliInitOptions and emitted a bare call
+    # that took NULL for the options and segfaulted on the first valid input. D3 refused
+    # it, so the case reported a refusal instead of the 76.51% it had measured before.
+    #
+    # A `T **` parameter means the library allocates and hands something back, which is a
+    # lifecycle this rule is not entitled to assume it understands. libpng's entry point
+    # has no such parameter and is unaffected.
+    if any(ty.count("*") >= 2 for ty, _ in d.params):
+        return ROLE_QUERY
     _buf = any(not _path_like(nm) and "const" in ty and _byte_carrying_ty(ty)
                and base_type(ty) != "char"
                for ty, nm in d.params)
