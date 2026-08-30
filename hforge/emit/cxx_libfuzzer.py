@@ -27,7 +27,7 @@ from typing import Optional
 
 from ..ir import (
     HarnessIR, SLICE_BYTES, SLICE_CSTRING, SRC_INPUT, SRC_LENGTH_OF, SRC_LITERAL,
-    SRC_OUT, SRC_RESOURCE,
+    SRC_OUT, SRC_RESOURCE, SRC_SCRATCH, SRC_SCRATCH_ADDR,
 )
 from .c_libfuzzer import EmitError, Emitted
 
@@ -43,6 +43,10 @@ def _res(rid: str) -> str:
 
 def _slice(sid: str) -> str:
     return f"{P}s_{sid}"
+
+
+def _scratch(sid: str) -> str:
+    return f"{P}x_{sid}"
 
 
 def _cxx_input(type_name: str, sid: str) -> str:
@@ -80,6 +84,14 @@ def emit(ir: HarnessIR, with_driver: bool = True) -> Emitted:
         decls.append(f"    std::vector<uint8_t> {_slice(s.id)}_v("
                      f"{_slice(s.id)}.begin(), {_slice(s.id)}.end());")
 
+    # Storage the harness owns because the library requires the CALLER to provide it.
+    # In C this is a byte array and a size; in C++ it is usually a std::string or a
+    # vector standing behind an output-sink object, so the declared type is honoured
+    # verbatim when the plan carries one.
+    for sc in ir.scratch:
+        ty = sc.c_type or "std::string"
+        decls.append(f"    {ty} {_scratch(sc.id)}{{}};")
+
     # resources
     heap = {r.id for r in ir.resources if r.storage == "handle"}
     for r in ir.resources:
@@ -109,8 +121,21 @@ def emit(ir: HarnessIR, with_driver: bool = True) -> Emitted:
                 args.append(_cxx_input(pd.type.name, a.ref))
             elif a.source == SRC_LENGTH_OF:
                 args.append(f"{_slice(a.ref)}.size()")
+            elif a.source == SRC_SCRATCH:
+                args.append(_scratch(a.ref))
+            elif a.source == SRC_SCRATCH_ADDR:
+                args.append(f"&{_scratch(a.ref)}")
             elif a.source == SRC_RESOURCE:
-                args.append(_res(a.ref) if a.ref in heap else f"*{_res(a.ref)}")
+                # A resource may be the RECEIVER of a method or an ARGUMENT to a call, and
+                # the two are spelled differently. An object held inline lives in a
+                # std::optional, so a parameter that wants `T*` needs `&*opt` and one that
+                # wants `T&` needs `*opt`; passing the optional itself compiles for neither.
+                if a.ref in heap:
+                    args.append(_res(a.ref) if "*" in pd.type.name
+                                else f"*{_res(a.ref)}")
+                else:
+                    args.append(f"&*{_res(a.ref)}" if "*" in pd.type.name
+                                else f"*{_res(a.ref)}")
             elif a.source == SRC_OUT:
                 base = pd.type.name.replace("*", "").replace("&", "").strip()
                 decls.append(f"    {base} {P}out_{op.id}_{pd.name}{{}};")
@@ -131,8 +156,18 @@ def emit(ir: HarnessIR, with_driver: bool = True) -> Emitted:
         elif op.binds:
             base = sym.rsplit("::", 1)[0]
             body.append(f"{indent}{_res(op.binds)}.emplace({', '.join(args)});")
-        elif "::" in sym and op.args and any(a.source == SRC_RESOURCE for a in op.args):
-            recv = next(a.ref for a in op.args if a.source == SRC_RESOURCE)
+        elif any(a.source == SRC_RESOURCE and a.param == "self" for a in op.args):
+            # A METHOD, identified by its receiver rather than by a `::` in the name.
+            # `woff2::ConvertWOFF2ToTTF` is a namespace-qualified FREE function, and once
+            # it takes a constructed sink as an argument it also has a resource argument
+            # -- so "qualified and has a resource" called it as a method on the sink and
+            # dropped the sink from the argument list. The receiver is a named parameter.
+            # NAMED, not positional. Once a call takes a constructed object as an
+            # ARGUMENT there are two resource arguments, and taking the first would
+            # invoke the method on the sink instead of on the parser.
+            recv = next((a.ref for a in op.args
+                         if a.source == SRC_RESOURCE and a.param == "self"),
+                        next(a.ref for a in op.args if a.source == SRC_RESOURCE))
             rest = [x for x, a in zip(args, api.params)
                     if not (next((y for y in op.args if y.param == a.name), None)
                             and next(y for y in op.args if y.param == a.name).source

@@ -1,0 +1,401 @@
+{
+  "schema_version": "1.0",
+  "name": "libpng_png_image_begin_read_from_memory",
+  "producer": "header_graph",
+  "notes": "proposed from png.h by signature inference; handle type inferred as 'png_structp'. Every inference here is checked by a static gate, and the producer certifies nothing.",
+  "target": {
+    "name": "libpng",
+    "version": "",
+    "commit": "",
+    "public_headers": [
+      "/b/libpng/png.h",
+      "/b/libpng/pngconf.h"
+    ],
+    "include_dirs": [
+      "/b/libpng",
+      "/b/zlib"
+    ],
+    "sources": [
+      "/b/libpng/png.c",
+      "/b/libpng/pngerror.c",
+      "/b/libpng/pngget.c",
+      "/b/libpng/pngmem.c",
+      "/b/libpng/pngpread.c",
+      "/b/libpng/pngread.c",
+      "/b/libpng/pngrio.c",
+      "/b/libpng/pngrtran.c",
+      "/b/libpng/pngrutil.c",
+      "/b/libpng/pngset.c",
+      "/b/libpng/pngtrans.c",
+      "/b/libpng/pngwio.c",
+      "/b/libpng/pngwrite.c",
+      "/b/libpng/pngwtran.c",
+      "/b/libpng/pngwutil.c",
+      "/b/libpng/arm/arm_init.c",
+      "/b/libpng/arm/filter_neon_intrinsics.c",
+      "/b/libpng/arm/palette_neon_intrinsics.c",
+      "/b/zlib/adler32.c",
+      "/b/zlib/compress.c",
+      "/b/zlib/crc32.c",
+      "/b/zlib/deflate.c",
+      "/b/zlib/gzclose.c",
+      "/b/zlib/gzlib.c",
+      "/b/zlib/gzread.c",
+      "/b/zlib/gzwrite.c",
+      "/b/zlib/infback.c",
+      "/b/zlib/inffast.c",
+      "/b/zlib/inflate.c",
+      "/b/zlib/inftrees.c",
+      "/b/zlib/trees.c",
+      "/b/zlib/uncompr.c",
+      "/b/zlib/zutil.c"
+    ],
+    "link_libs": [],
+    "cflags": [],
+    "seed_dirs": [],
+    "language": "c"
+  },
+  "platforms": [
+    "linux-aarch64-glibc"
+  ],
+  "apis": {
+    "png_create_read_struct": {
+      "symbol": "png_create_read_struct",
+      "header": "png.h",
+      "params": [
+        {
+          "name": "user_png_ver",
+          "type": {
+            "name": "png_const_charp",
+            "kind": "pointer",
+            "const": true,
+            "resolved": "char"
+          }
+        },
+        {
+          "name": "error_ptr",
+          "type": {
+            "name": "png_voidp",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "error_fn",
+          "type": {
+            "name": "png_error_ptr",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "warn_fn",
+          "type": {
+            "name": "png_error_ptr",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        }
+      ],
+      "returns": {
+        "name": "png_structp",
+        "kind": "pointer",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "create",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [
+          [
+            "error_fn",
+            "warn_fn"
+          ]
+        ],
+        "transfers_ownership": [],
+        "requires_nonnull": [],
+        "error_return": "null",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    },
+    "png_image_begin_read_from_memory": {
+      "symbol": "png_image_begin_read_from_memory",
+      "header": "png.h",
+      "params": [
+        {
+          "name": "image",
+          "type": {
+            "name": "png_imagep",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "memory",
+          "type": {
+            "name": "png_const_voidp",
+            "kind": "pointer",
+            "const": true,
+            "resolved": "void"
+          }
+        },
+        {
+          "name": "size",
+          "type": {
+            "name": "size_t",
+            "kind": "scalar",
+            "const": false,
+            "resolved": ""
+          }
+        }
+      ],
+      "returns": {
+        "name": "int",
+        "kind": "scalar",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "consume",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [
+          [
+            "memory",
+            "size"
+          ]
+        ],
+        "transfers_ownership": [],
+        "requires_nonnull": [],
+        "error_return": "negative",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    },
+    "png_image_free": {
+      "symbol": "png_image_free",
+      "header": "png.h",
+      "params": [
+        {
+          "name": "image",
+          "type": {
+            "name": "png_imagep",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        }
+      ],
+      "returns": {
+        "name": "void",
+        "kind": "void",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "query",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [],
+        "transfers_ownership": [],
+        "requires_nonnull": [],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    },
+    "png_write_chunk_end": {
+      "symbol": "png_write_chunk_end",
+      "header": "png.h",
+      "params": [
+        {
+          "name": "png_ptr",
+          "type": {
+            "name": "png_structrp",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        }
+      ],
+      "returns": {
+        "name": "void",
+        "kind": "void",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "destroy",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [],
+        "transfers_ownership": [],
+        "requires_nonnull": [],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    }
+  },
+  "slices": [
+    {
+      "id": "memory",
+      "kind": "bytes",
+      "remainder": true,
+      "min_len": 1,
+      "max_len": 0
+    }
+  ],
+  "resources": [
+    {
+      "id": "h",
+      "type": {
+        "name": "png_structp",
+        "kind": "pointer",
+        "const": false,
+        "resolved": ""
+      },
+      "storage": "handle"
+    },
+    {
+      "id": "out_image",
+      "type": {
+        "name": "png_image",
+        "kind": "struct",
+        "const": false,
+        "resolved": ""
+      },
+      "storage": "inline",
+      "init_fields": {
+        "version": "PNG_IMAGE_VERSION"
+      }
+    }
+  ],
+  "scratch": [],
+  "sequence": [
+    {
+      "id": "o_create",
+      "api": "png_create_read_struct",
+      "args": [
+        {
+          "param": "user_png_ver",
+          "source": "literal",
+          "ref": "",
+          "value": 0
+        },
+        {
+          "param": "error_ptr",
+          "source": "literal",
+          "ref": "",
+          "value": 0
+        },
+        {
+          "param": "error_fn",
+          "source": "literal",
+          "ref": "",
+          "value": 0
+        },
+        {
+          "param": "warn_fn",
+          "source": "literal",
+          "ref": "",
+          "value": 0
+        }
+      ],
+      "binds": "h",
+      "targets": "",
+      "repeat": 0,
+      "repeat_while": "",
+      "guarded_by": []
+    },
+    {
+      "id": "o_consume",
+      "api": "png_image_begin_read_from_memory",
+      "args": [
+        {
+          "param": "image",
+          "source": "resource",
+          "ref": "out_image",
+          "value": null
+        },
+        {
+          "param": "memory",
+          "source": "input",
+          "ref": "memory",
+          "value": null
+        },
+        {
+          "param": "size",
+          "source": "length_of",
+          "ref": "memory",
+          "value": null
+        }
+      ],
+      "binds": "out_image",
+      "targets": "",
+      "repeat": 65536,
+      "repeat_while": "",
+      "guarded_by": []
+    },
+    {
+      "id": "o_drop_out_image",
+      "api": "png_image_free",
+      "args": [
+        {
+          "param": "image",
+          "source": "resource",
+          "ref": "out_image",
+          "value": null
+        }
+      ],
+      "binds": "",
+      "targets": "out_image",
+      "repeat": 0,
+      "repeat_while": "",
+      "guarded_by": [
+        "out_image"
+      ]
+    },
+    {
+      "id": "o_destroy",
+      "api": "png_write_chunk_end",
+      "args": [
+        {
+          "param": "png_ptr",
+          "source": "resource",
+          "ref": "h",
+          "value": null
+        }
+      ],
+      "binds": "",
+      "targets": "h",
+      "repeat": 0,
+      "repeat_while": "",
+      "guarded_by": []
+    }
+  ],
+  "knobs": {
+    "max_len": 65536,
+    "min_len": 0,
+    "timeout_s": 25,
+    "rss_limit_mb": 2048,
+    "malloc_limit_mb": 0,
+    "sanitizers": [
+      "address"
+    ],
+    "detect_leaks": false,
+    "optimisation": "-O1"
+  },
+  "format_model": null,
+  "raw_blocks": []
+}

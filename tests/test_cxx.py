@@ -411,3 +411,71 @@ def test_a_void_call_is_not_cast_to_long(tmp_path):
     src = cxx_libfuzzer.emit(ir).source
     assert "(long)woff2::Consume" not in src
     assert "    woff2::Consume(" in src
+
+
+# ── constructing an object to satisfy a parameter ────────────────────────────
+#
+# The shape that separates a harness from a stub. woff2's entry point is
+# `ConvertWOFF2ToTTF(data, len, WOFF2Out* out)`: refusing it costs the library, and
+# binding the sink to nullptr crashes on the library's contract rather than on a bug.
+
+_SINK = '''
+namespace woff2 {
+  class WOFF2Out {
+   public:
+    virtual ~WOFF2Out(void) {}
+    virtual bool Write(const void *buf, size_t n) = 0;
+  };
+  class WOFF2StringOut : public WOFF2Out {
+   public:
+    explicit WOFF2StringOut(std::string *buf);
+    bool Write(const void *buf, size_t n);
+  };
+  bool ConvertWOFF2ToTTF(const uint8_t *data, size_t length, WOFF2Out* out);
+}
+'''
+
+
+def _sink_plans(tmp_path):
+    from hforge.ir import Target
+    h = tmp_path / "s.hpp"
+    h.write_text(_SINK)
+    t = Target(name="woff2", public_headers=["s.hpp"], include_dirs=[str(tmp_path)],
+               sources=[], link_libs=[], cflags=[], seed_dirs=[])
+    return cx.propose([str(h)], t)
+
+
+def test_an_abstract_parameter_is_satisfied_by_a_concrete_subclass(tmp_path):
+    """`WOFF2Out` is pure virtual. The only way to call the entry point is to find a
+    concrete descendant, which is what the library's own harness does."""
+    ir = next(p for p in _sink_plans(tmp_path) if "ConvertWOFF2ToTTF" in p.name)
+    assert [r.type.name for r in ir.resources] == ["woff2::WOFF2StringOut"]
+
+
+def test_a_constructor_taking_a_buffer_gets_scratch_the_harness_owns(tmp_path):
+    ir = next(p for p in _sink_plans(tmp_path) if "ConvertWOFF2ToTTF" in p.name)
+    assert [(s.id, s.c_type) for s in ir.scratch] == [("b2", "std::string")]
+
+
+def test_the_object_is_constructed_before_the_call_that_uses_it(tmp_path):
+    ir = next(p for p in _sink_plans(tmp_path) if "ConvertWOFF2ToTTF" in p.name)
+    ids = [o.id for o in ir.sequence]
+    assert ids.index("o_a2") < ids.index("o_consume")
+
+
+def test_a_namespaced_free_function_is_not_called_as_a_method(tmp_path):
+    """`woff2::ConvertWOFF2ToTTF` is qualified AND has a resource argument once the sink
+    exists. Treating "qualified plus a resource" as a method call invoked the function ON
+    the sink and dropped the sink from the argument list."""
+    ir = next(p for p in _sink_plans(tmp_path) if "ConvertWOFF2ToTTF" in p.name)
+    src = cxx_libfuzzer.emit(ir).source
+    assert "->ConvertWOFF2ToTTF(" not in src
+    assert "woff2::ConvertWOFF2ToTTF(" in src
+
+
+def test_the_sink_is_passed_by_address_to_a_pointer_parameter(tmp_path):
+    """An object held inline lives in a std::optional: a `T*` parameter needs `&*opt`."""
+    ir = next(p for p in _sink_plans(tmp_path) if "ConvertWOFF2ToTTF" in p.name)
+    src = cxx_libfuzzer.emit(ir).source
+    assert "&*hf_o_a2" in src
+    assert "hf_o_a2.emplace(&hf_x_b2)" in src

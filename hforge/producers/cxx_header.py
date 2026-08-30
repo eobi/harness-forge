@@ -47,7 +47,7 @@ _CLASS = re.compile(
     r"\b(class|struct)\s+"
     r"((?:(?:[A-Z_][A-Z0-9_]*|__declspec\s*\([^)]*\)|__attribute__\s*\(\([^)]*\)\)|"
     r"alignas\s*\([^)]*\))\s+)*)"
-    r"([A-Za-z_]\w*)(?:\s+final)?\s*(?::\s*[^{]+)?\{")
+    r"([A-Za-z_]\w*)(?:\s+final)?\s*(?::\s*([^{]+))?\{")
 _NAMESPACE = re.compile(r"\bnamespace\s+([A-Za-z_]\w*)\s*\{")
 _ACCESS = re.compile(r"\b(public|private|protected)\s*:")
 
@@ -62,6 +62,21 @@ _METHOD = re.compile(
 _STD_BYTES = re.compile(r"std::(?:vector\s*<\s*(?:uint8_t|unsigned\s+char|char)\s*>|"
                         r"string|string_view|span\s*<)", re.I)
 _TEMPLATE = re.compile(r"\btemplate\s*<")
+
+
+@dataclass
+class Klass:
+    """What is known about a class, for deciding whether a harness can BUILD one.
+
+    `bases` is what makes an abstract interface usable: woff2's entry point takes a
+    `WOFF2Out*`, which is pure virtual and cannot be constructed, and the library's own
+    harness passes a `WOFF2StringOut` -- a concrete subclass sitting in the same header.
+    Without inheritance the only honest answer is to refuse the plan.
+    """
+    name: str                          # qualified
+    bases: list = field(default_factory=list)
+    abstract: bool = False
+    default_ctor: bool = False
 
 
 @dataclass
@@ -168,16 +183,24 @@ def _split_params(s: str) -> list:
 
 
 def parse_header(path: str, include_dirs=(), cflags=()) -> tuple:
+    """Methods and skips. `parse_classes` returns the inheritance graph beside them."""
+    ms, sk, _ = parse_classes(path, include_dirs, cflags)
+    return ms, sk
+
+
+def parse_classes(path: str, include_dirs=(), cflags=()) -> tuple:
     """Classes and their public methods. Returns (methods, skipped) — what could not be read
     is returned, not dropped, because a producer that silently ignores half a header
     proposes plans for an API that is not there."""
     src = _strip(Path(path).read_text(errors="replace"))
     methods: list = []
     skipped: list = []
+    classes: dict = {}
 
     # namespace stack by brace position
     ns_at: list = []
     class_spans: list = []
+    classes: dict = {}
     for m in _NAMESPACE.finditer(src):
         ob = src.find("{", m.end() - 1)
         if ob >= 0:
@@ -213,6 +236,19 @@ def parse_header(path: str, include_dirs=(), cflags=()) -> tuple:
             methods += _methods_in(body[pos:], cls, ns, skipped)
         class_spans.append((ob, cb))
 
+        qual = f"{ns}::{cls}" if ns else cls
+        own = [m for m in methods if m.cls == cls and m.ns == ns]
+        bases = []
+        for b in (cm.group(4) or "").split(","):
+            b = re.sub(r"\b(public|private|protected|virtual)\b", " ", b)
+            b = re.sub(r"<[^>]*>", "", b).strip()
+            if b:
+                bases.append(b.split("::")[-1])
+        classes[qual] = Klass(
+            name=qual, bases=bases,
+            abstract=any(m.is_pure for m in own),
+            default_ctor=any(m.is_ctor and m.n_required == 0 for m in own))
+
     # FREE FUNCTIONS AT NAMESPACE SCOPE. `woff2::ConvertWOFF2ToTTF(const uint8_t*, size_t,
     # ...)` is the entry point of its library and is not a member of anything. Scanning
     # only class bodies dropped every such function WITHOUT recording it -- neither
@@ -238,7 +274,7 @@ def parse_header(path: str, include_dirs=(), cflags=()) -> tuple:
                               is_const=bool(fm.group(5)), is_pure=bool(fm.group(6)),
                               n_required=n_required(fm.group(4))))
 
-    return methods, skipped
+    return methods, skipped, classes
 
 
 def _methods_in(seg: str, cls: str, ns: str, skipped: list) -> list:
@@ -315,6 +351,101 @@ def consume_binding(m: "Method"):
     return None
 
 
+_OWNED_SCRATCH = {"std::string": "std::string", "std::vector<uint8_t>": "std::vector<uint8_t>"}
+
+
+def _base_name(ty: str) -> str:
+    """The class a parameter refers to, with cv-qualifiers and indirection removed."""
+    t = re.sub(r"\b(const|volatile|struct|class)\b", " ", ty)
+    t = t.replace("*", " ").replace("&", " ").strip()
+    return t.split("::")[-1].split()[-1] if t.split() else ""
+
+
+def _concrete_for(ty: str, classes: dict) -> list:
+    """Classes that could stand in for a parameter of this type, most direct first.
+
+    An abstract interface is the normal shape for an output sink: woff2's entry point
+    takes a `WOFF2Out*`, which has a pure virtual `Write`, and the only way to call it is
+    with a concrete subclass. Both the type itself and its descendants are considered, so
+    a concrete parameter type still works without a special case.
+    """
+    want = _base_name(ty)
+    if not want:
+        return []
+    out = []
+    for qual, k in sorted(classes.items()):
+        if qual.split("::")[-1] == want and not k.abstract:
+            out.append(qual)
+    for qual, k in sorted(classes.items()):
+        if k.abstract or qual in out:
+            continue
+        seen, stack = set(), list(k.bases)
+        while stack:
+            b = stack.pop()
+            if b in seen:
+                continue
+            seen.add(b)
+            for q2, k2 in classes.items():
+                if q2.split("::")[-1] == b:
+                    stack += k2.bases
+        if want in seen:
+            out.append(qual)
+    return out
+
+
+def constructible_argument(ty: str, classes: dict, methods: list):
+    """How to BUILD an object for a parameter of this type, or None.
+
+    Returns (qualified class, ctor Method, scratch type or ""). Two shapes are accepted
+    and no others, because a guessed constructor argument is a silent behaviour change:
+
+    * a default constructor, which needs nothing; or
+    * a constructor taking ONE pointer to a standard container the harness can own --
+      `WOFF2StringOut(std::string *buf)` is the shape, and the buffer becomes scratch.
+    """
+    for cls in _concrete_for(ty, classes):
+        ctors = [m for m in methods if m.is_ctor and
+                 (f"{m.ns}::{m.cls}" if m.ns else m.cls) == cls]
+        for c in sorted(ctors, key=lambda m: m.n_required):
+            if c.n_required == 0:
+                return cls, c, ""
+            if c.n_required == 1:
+                pty = c.params[0][0]
+                for spelled, decl in _OWNED_SCRATCH.items():
+                    if spelled in pty.replace(" ", "") and "*" in pty:
+                        return cls, c, decl
+    return None
+
+
+def resolve_extras(m: "Method", b, classes: dict, methods: list):
+    """Every required parameter that is neither the bytes nor their length.
+
+    Returns (bindings, "") or (None, reason). A binding is
+    (index, class, ctor Method, scratch type) for a parameter the harness can CONSTRUCT,
+    or (index, None, None, "") for a scalar, which is bound to literal 0.
+
+    This is what separates a harness from a stub. woff2's entry point is
+    `ConvertWOFF2ToTTF(data, len, WOFF2Out* out)`; refusing it costs the whole library,
+    and binding the sink to nullptr crashes on the library's own contract. Building a
+    `WOFF2StringOut` over a std::string is what the project's own harness does.
+    """
+    bi, li = b
+    out = []
+    for i, (ty, nm) in enumerate(m.params[:m.n_required]):
+        if i in (bi, li):
+            continue
+        if "*" not in ty and "&" not in ty:
+            out.append((i, None, None, ""))          # a scalar: literal 0 is a real value
+            continue
+        r = constructible_argument(ty, classes, methods)
+        if r is None:
+            return None, (f"{nm or ty}: a required pointer this producer cannot construct "
+                          f"-- no concrete class with a default constructor, or one taking "
+                          f"a single owned buffer, stands in for {ty}")
+        out.append((i, r[0], r[1], r[2]))
+    return out, ""
+
+
 def _unbindable(m: "Method", b) -> str:
     """The first required parameter that is a pointer we have no value for, if any.
 
@@ -354,8 +485,10 @@ def propose(headers, target, platforms=(), knobs=None, max_plans: int = 12) -> l
     hs = [headers] if isinstance(headers, (str, Path)) else list(headers)
     methods: list = []
     skipped: list = []
+    classes: dict = {}
     for h in hs:
-        ms, sk = parse_header(str(h))
+        ms, sk, cs = parse_classes(str(h))
+        classes.update(cs)
         for m in ms:
             m.header = Path(h).name
         methods += ms
@@ -374,13 +507,12 @@ def propose(headers, target, platforms=(), knobs=None, max_plans: int = 12) -> l
         b = consume_binding(m)
         if b is None:
             continue
-        if _unbindable(m, b):
-            skipped.append(f"{m.symbol}: a required pointer parameter this producer "
-                           f"cannot construct ({_unbindable(m, b)}); binding it to "
-                           f"nullptr would crash on the library's contract, not a bug")
+        ex, why = resolve_extras(m, b, classes, methods)
+        if ex is None:
+            skipped.append(f"{m.symbol}: {why}")
             continue
         extra = m.n_required - (1 if b[1] is None else 2)
-        cands.append((extra, m.name, None, None, m, b))
+        cands.append((extra, m.name, None, None, m, b, ex))
 
     for cls, ms in sorted(by_class.items()):
         if any(m.is_pure for m in ms):
@@ -396,19 +528,45 @@ def propose(headers, target, platforms=(), knobs=None, max_plans: int = 12) -> l
             b = consume_binding(m)
             if b is None:
                 continue
-            if _unbindable(m, b):
-                skipped.append(f"{m.symbol}: a required pointer parameter this producer "
-                               f"cannot construct ({_unbindable(m, b)}); binding it to "
-                               f"nullptr would crash on the library's contract, not a bug")
+            ex, why = resolve_extras(m, b, classes, methods)
+            if ex is None:
+                skipped.append(f"{m.symbol}: {why}")
                 continue
             # Fewer unbound required parameters first, then by name so the choice is
             # deterministic -- the same tie-break discipline the C producer uses.
             extra = m.n_required - (1 if b[1] is None else 2)
-            cands.append((extra, m.name, cls, ctor, m, b))
+            cands.append((extra, m.name, cls, ctor, m, b, ex))
 
     plans = []
-    for _e, _n, cls, ctor, m, (bi, li) in sorted(cands, key=lambda x: (x[0], x[1]))[:max_plans]:
+    for _e, _n, cls, ctor, m, (bi, li), extras in sorted(
+            cands, key=lambda x: (x[0], x[1]))[:max_plans]:
         free = ctor is None
+        # Objects the harness must BUILD to satisfy a parameter -- an output sink, most
+        # often. Each becomes a resource, a constructor op that runs before the call, and,
+        # when the constructor takes a buffer, scratch the harness owns.
+        built, extra_res, extra_scratch, extra_ops, extra_apis = {}, [], [], [], []
+        for idx, kcls, kctor, sctype in extras:
+            if kcls is None:
+                continue
+            rid = "a%d" % idx
+            built[idx] = rid
+            extra_res.append({"id": rid, "type": {"name": kcls, "kind": "pointer"},
+                              "storage": "inline"})
+            cargs, cparams = [], []
+            if sctype:
+                sid = "b%d" % idx
+                extra_scratch.append({"id": sid, "kind": "bytes", "c_type": sctype})
+                pty, pnm = kctor.params[0]
+                pnm = pnm or "buf"
+                cparams.append({"name": pnm, "type": {"name": pty, "kind": "pointer"}})
+                cargs.append({"param": pnm, "source": "scratch_addr", "ref": sid})
+            extra_apis.append((kctor.symbol, {
+                "symbol": kctor.symbol, "header": getattr(kctor, "header", ""),
+                "role": "create", "params": cparams,
+                "returns": {"name": "void", "kind": "void"}}))
+            extra_ops.append({"id": "o_" + rid, "api": kctor.symbol, "args": cargs,
+                              "binds": rid})
+
         params = ([] if free else
                   [{"name": "self", "type": {"name": f"{cls} *", "kind": "pointer"}}])
         args = ([] if free else
@@ -420,6 +578,8 @@ def propose(headers, target, platforms=(), knobs=None, max_plans: int = 12) -> l
                 args.append({"param": pn, "source": "input", "ref": "d"})
             elif i == li:
                 args.append({"param": pn, "source": "length_of", "ref": "d"})
+            elif i in built:
+                args.append({"param": pn, "source": "resource", "ref": built[i]})
             else:
                 args.append({"param": pn, "source": "literal", "value": 0})
 
@@ -444,13 +604,16 @@ def propose(headers, target, platforms=(), knobs=None, max_plans: int = 12) -> l
                     {"symbol": m.symbol, "header": getattr(m, "header", ""),
                      "role": "consume", "params": params,
                      "returns": {"name": m.ret or "void",
-                                 "kind": _kind_of(m.ret or "void")}})]),
+                                 "kind": _kind_of(m.ret or "void")}})]
+                + extra_apis),
             "slices": [{"id": "d", "kind": "bytes", "remainder": True, "min_len": 1}],
             "resources": ([] if free else
                           [{"id": "o", "type": {"name": cls, "kind": "pointer"},
-                            "storage": "inline"}]),
+                            "storage": "inline"}]) + extra_res,
+            "scratch": extra_scratch,
             "sequence": (([] if free else
                           [{"id": "o_new", "api": ctor.symbol, "args": [], "binds": "o"}])
+                         + extra_ops
                          + [dict({"id": "o_consume", "api": m.symbol, "args": args},
                                  **({} if free else {"guarded_by": ["o"]}))]),
             "knobs": {"max_len": (knobs.max_len if knobs else 4096)},

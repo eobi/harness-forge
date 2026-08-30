@@ -1636,6 +1636,25 @@ PHASES: tuple = (
                          "default constructor, a byte pointer with no length (a FILENAME, "
                          "as in load_file) and a non-const buffer the callee may free "
                          "(load_buffer_inplace_own) are all declined with a reason."),
+        Deliverable("L.CXX_ARG_OBJECT",
+                    "construct an object to satisfy a parameter, including an abstract one",
+                    DONE,
+                    modules=("hforge.producers.cxx_header", "hforge.emit.cxx_libfuzzer"),
+                    tests=("test_an_abstract_parameter_is_satisfied_by_a_concrete_subclass",
+                           "test_a_constructor_taking_a_buffer_gets_scratch_the_harness_owns",
+                           "test_the_object_is_constructed_before_the_call_that_uses_it",
+                           "test_a_namespaced_free_function_is_not_called_as_a_method",
+                           "test_the_sink_is_passed_by_address_to_a_pointer_parameter"),
+                    note="the shape that separates a harness from a stub. woff2's entry "
+                         "point is ConvertWOFF2ToTTF(data, len, WOFF2Out* out): the sink "
+                         "is PURE VIRTUAL, so the plan resolves it to a concrete "
+                         "descendant (WOFF2StringOut) and gives its constructor a "
+                         "std::string the harness owns. The result is structurally the "
+                         "library's own harness, derived from headers alone. Two shapes "
+                         "only -- a default constructor, or a constructor taking one "
+                         "pointer to an owned container -- because a GUESSED constructor "
+                         "argument is a silent behaviour change; anything else is refused "
+                         "with the parameter named."),
         Deliverable("L.CXX_EMIT",
                     "C++ backend: objects, new/delete, std::string and vector inputs", DONE,
                     modules=("hforge.emit.cxx_libfuzzer",),
