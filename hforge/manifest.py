@@ -1689,6 +1689,26 @@ PHASES: tuple = (
                          "harness owns and is passed by address. A pointer to a class "
                          "nothing can build is still refused with the parameter named: "
                          "the alias path is not a way to smuggle one in."),
+        Deliverable("L.CXX_BUILD_ARGS",
+                    "every remaining argument shape: implicit constructors, aliases, "
+                    "incidental labels", DONE,
+                    modules=("hforge.producers.cxx_header",),
+                    tests=("test_an_incidental_char_pointer_is_bound_to_a_fixed_literal",
+                           "test_a_struct_with_no_declared_constructor_can_still_be_built",
+                           "test_an_alias_resolves_to_the_container_behind_it"),
+                    note="wabt's ReadBinaryIr(const char* filename, const uint8_t* data, "
+                         "size_t size, const ReadBinaryOptions&, Errors*, Module*) needed "
+                         "THREE things at once, and each is general rather than a wabt "
+                         "quirk: a struct declaring no constructor still HAS an implicit "
+                         "default one (most plain structs); an alias is not a class, so "
+                         "`using Errors = std::vector<Error>` becomes scratch, QUALIFIED "
+                         "for the harness's scope because the alias was declared inside a "
+                         "namespace and the harness is not; and a const char* BESIDE a "
+                         "(bytes, length) pair is a label, bound to a fixed literal. The "
+                         "safety property is kept: a byte pointer with NO length is still "
+                         "refused, because there the pointer IS the input and a harness "
+                         "on it opens attacker-named paths. Result: the producer derives "
+                         "wabt's own wasm2wat_fuzzer from headers alone."),
         Deliverable("L.CXX_EMIT",
                     "C++ backend: objects, new/delete, std::string and vector inputs", DONE,
                     modules=("hforge.emit.cxx_libfuzzer",),

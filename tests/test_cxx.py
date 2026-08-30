@@ -654,21 +654,24 @@ def test_an_alias_resolves_to_the_container_behind_it(tmp_path):
     h = tmp_path / "a.hpp"
     h.write_text(_ALIASED)
     al = cx.parse_aliases(str(h))
-    assert al["Errors"] == "std::vector<Error>"
-    assert cx.ownable_type("Errors*", al) == "std::vector<Error>"
+    # QUALIFIED: the alias is declared inside `namespace wabt`, and the harness is not
+    # in that namespace. Emitting the target verbatim gave `std::vector<Error>` at global
+    # scope and clang answered "unknown type name 'Error'".
+    assert al["Errors"] == "std::vector<wabt::Error>"
+    assert cx.ownable_type("Errors*", al) == "std::vector<wabt::Error>"
 
 
 def test_an_ownable_container_becomes_scratch_not_a_resource(tmp_path):
     """Declaring a vector IS constructing it: no constructor call, so it is scratch the
     harness owns rather than a resource with a create op."""
     ir = _alias_plan(tmp_path)
-    assert [(s.id, s.c_type) for s in ir.scratch] == [("b2", "std::vector<Error>")]
+    assert [(s.id, s.c_type) for s in ir.scratch] == [("b2", "std::vector<wabt::Error>")]
     assert ir.resources == []
 
 
 def test_the_container_is_passed_by_address(tmp_path):
     src = cxx_libfuzzer.emit(_alias_plan(tmp_path)).source
-    assert "std::vector<Error> hf_x_b2{};" in src
+    assert "std::vector<wabt::Error> hf_x_b2{};" in src
     assert "&hf_x_b2" in src
 
 
@@ -688,3 +691,49 @@ namespace lib {
     sk = []
     assert cx.propose([str(h)], t, skipped=sk) == []
     assert any("out" in x for x in sk)
+
+
+def test_an_incidental_char_pointer_is_bound_to_a_fixed_literal(tmp_path):
+    """A `const char*` BESIDE a real (bytes, length) pair is a label, not the input.
+    wabt's `ReadBinaryIr(const char* filename, const uint8_t* data, size_t size, ...)`
+    uses it to name the module in diagnostics and its own harness passes a dummy.
+
+    The SAFETY PROPERTY is kept, not traded away: a byte pointer with NO length is still
+    refused, because there the pointer IS the input and a harness built on it opens
+    attacker-named paths. The length is what separates the two cases.
+    """
+    from hforge.ir import Target
+    h = tmp_path / "c.hpp"
+    h.write_text('''
+namespace lib {
+  bool Read(const char* label, const uint8_t* data, size_t size);
+  bool Open(const char* path);
+}
+''')
+    t = Target(name="lib", public_headers=["c.hpp"], include_dirs=[str(tmp_path)],
+               sources=[], link_libs=[], cflags=[], seed_dirs=[])
+    plans = {p.name: p for p in cx.propose([str(h)], t)}
+    assert "lib_Read" in plans
+    assert "lib_Open" not in plans           # the pointer IS the input: still refused
+    op = next(o for o in plans["lib_Read"].sequence if o.id.startswith("o_consume"))
+    lab = next(a for a in op.args if a.param == "label")
+    assert (lab.source, lab.value) == ("literal", '""')
+
+
+def test_a_struct_with_no_declared_constructor_can_still_be_built(tmp_path):
+    """`struct Module { ... }` declares no constructor, which in C++ means it HAS an
+    implicit default one. Counting only explicit declarations made most plain structs
+    unconstructible."""
+    from hforge.ir import Target
+    h = tmp_path / "d.hpp"
+    h.write_text('''
+namespace lib {
+  struct Out { int n; };
+  bool Read(const uint8_t* data, size_t size, Out* out);
+}
+''')
+    t = Target(name="lib", public_headers=["d.hpp"], include_dirs=[str(tmp_path)],
+               sources=[], link_libs=[], cflags=[], seed_dirs=[])
+    ir = next(p for p in cx.propose([str(h)], t) if "Read" in p.name)
+    assert [r.type.name for r in ir.resources] == ["lib::Out"]
+    assert "&*hf_o_a2" in cxx_libfuzzer.emit(ir).source

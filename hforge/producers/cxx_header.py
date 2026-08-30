@@ -287,7 +287,12 @@ def parse_classes(path: str, include_dirs=(), cflags=()) -> tuple:
         classes[qual] = Klass(
             name=qual, bases=bases,
             abstract=any(m.is_pure for m in own),
-            default_ctor=any(m.is_ctor and m.n_required == 0 for m in own))
+            # A class that declares NO constructor has an IMPLICIT default one -- that
+            # is the language rule, and `struct Module { ... }` in wabt is exactly this
+            # shape. Counting only explicitly declared constructors made every such type
+            # unconstructible, which is most plain structs in most headers.
+            default_ctor=(any(m.is_ctor and m.n_required == 0 for m in own)
+                          or not any(m.is_ctor for m in own)))
 
     # FREE FUNCTIONS AT NAMESPACE SCOPE. `woff2::ConvertWOFF2ToTTF(const uint8_t*, size_t,
     # ...)` is the entry point of its library and is not a member of anything. Scanning
@@ -303,7 +308,7 @@ def parse_classes(path: str, include_dirs=(), cflags=()) -> tuple:
           name = fm.group(3)
           if name in ("if", "for", "while", "switch", "return", "operator"):
               continue
-          ret = (fm.group(2) or "")
+          ret = _clean_ret(fm.group(2) or "")
           if not ret.strip() or "operator" in ret or name.startswith("operator"):
               continue
           if not _is_declaration(ret, name, ''):
@@ -356,6 +361,23 @@ _NOT_A_TYPE = re.compile(r"\}|\b(?:else|do|try|catch|case|default|break|continue
                         r"delete|throw|new)\b")
 
 
+def _clean_ret(ret: str) -> str:
+    """The return type with the previous statement's residue removed.
+
+    A chunk is cut at `{`, so the next one opens with the `}` that closed the last body:
+
+        virtual ~WOFF2Out(void) {}
+        virtual bool Write(const void *buf, size_t n) = 0;
+
+    puts `}` at the head of Write's captured type. Those leading braces belong to the
+    statement before, not to this declaration -- rejecting on them made the class look
+    CONCRETE, and then the sink resolved to the abstract base instead of the descendant
+    that can actually be built. `} } } else` still fails: what is left after the braces is
+    a keyword.
+    """
+    return re.sub(r"^[\s}]+", "", ret)
+
+
 def _is_declaration(ret: str, name: str, cls: str) -> bool:
     """Whether this looks like a DECLARATION rather than a statement in a body.
 
@@ -369,6 +391,7 @@ def _is_declaration(ret: str, name: str, cls: str) -> bool:
     of them called that macro. A return type is a TYPE: it holds no `}` and no statement
     keyword, and outside a constructor or destructor it is never empty.
     """
+    ret = _clean_ret(ret)
     if _NOT_A_TYPE.search(ret):
         return False
     if not ret.strip() and name != cls and not name.startswith("~"):
@@ -380,7 +403,7 @@ def _methods_in(seg: str, cls: str, ns: str, skipped: list) -> list:
     out = []
     for chunk, _off in _chunks(seg):
       for m in _METHOD.finditer(chunk):
-          spec, ret, name, params = (m.group(1) or ""), (m.group(2) or ""), \
+          spec, ret, name, params = (m.group(1) or ""), _clean_ret(m.group(2) or ""), \
               m.group(3), m.group(4)
           _tail = m.group(5) or ""
           is_const = bool(re.search(r"\bconst\b", _tail))
@@ -507,6 +530,36 @@ _ALIAS = re.compile(r"^[ \t]*using\s+([A-Za-z_]\w*)\s*=\s*([^;]+);", re.M)
 _TYPEDEF = re.compile(r"^[ \t]*typedef\s+(.+?)\s+([A-Za-z_]\w*)\s*;", re.M)
 
 
+_BUILTIN = {"int", "char", "unsigned", "signed", "long", "short", "bool", "float",
+            "double", "void", "size_t", "ssize_t", "wchar_t", "const", "volatile",
+            "uint8_t", "uint16_t", "uint32_t", "uint64_t",
+            "int8_t", "int16_t", "int32_t", "int64_t"}
+
+
+def _qualify(ty: str, ns: str) -> str:
+    """A type spelled for use OUTSIDE the namespace it was declared in.
+
+    `using Errors = std::vector<Error>;` inside `namespace wabt` means
+    `std::vector<wabt::Error>` anywhere else, and the harness is anywhere else -- emitting
+    the target verbatim produced `std::vector<Error>` at global scope and clang answered
+    "unknown type name 'Error'; did you mean 'lib::Error'?". A name already qualified, a
+    builtin, and the `std` in `std::vector` are all left alone.
+    """
+    if not ns:
+        return ty
+    def sub(m):
+        name = m.group(0)
+        a, b = m.start(), m.end()
+        if name in _BUILTIN:
+            return name
+        if a >= 2 and ty[a - 2:a] == "::":
+            return name
+        if ty[b:b + 2] == "::":
+            return name
+        return f"{ns}::{name}"
+    return re.sub(r"[A-Za-z_]\w*", sub, ty)
+
+
 def parse_aliases(path: str) -> dict:
     """Type aliases, as name -> target type.
 
@@ -516,11 +569,20 @@ def parse_aliases(path: str) -> dict:
     is a container the harness can simply declare.
     """
     src = _strip(Path(path).read_text(errors="replace"))
+    ns_at = []
+    for m in _NAMESPACE.finditer(src):
+        ob = src.find("{", m.end() - 1)
+        if ob >= 0:
+            ns_at.append((ob, _match_brace(src, ob), m.group(1)))
+
+    def ns_for(pos):
+        return "::".join(n for a, b, n in ns_at if a < pos < b)
+
     out = {}
     for m in _ALIAS.finditer(src):
-        out[m.group(1)] = " ".join(m.group(2).split())
+        out[m.group(1)] = _qualify(" ".join(m.group(2).split()), ns_for(m.start()))
     for m in _TYPEDEF.finditer(src):
-        out[m.group(2)] = " ".join(m.group(1).split())
+        out[m.group(2)] = _qualify(" ".join(m.group(1).split()), ns_for(m.start()))
     return out
 
 
@@ -554,6 +616,14 @@ def constructible_argument(ty: str, classes: dict, methods: list):
     for cls in _concrete_for(ty, classes):
         ctors = [m for m in methods if m.is_ctor and
                  (f"{m.ns}::{m.cls}" if m.ns else m.cls) == cls]
+        if not ctors:
+            # Implicit default constructor: there is no declaration to point at, so the
+            # create op is synthesised. `Module()` is a real call even though no header
+            # line spells it.
+            short = cls.split("::")[-1]
+            ns = cls[:-(len(short) + 2)] if "::" in cls else ""
+            return cls, Method(cls=short, ns=ns, name=short, ret="void", params=[],
+                               is_ctor=True, n_required=0), ""
         for c in sorted(ctors, key=lambda m: m.n_required):
             if c.n_required == 0:
                 return cls, c, ""
@@ -585,6 +655,17 @@ def resolve_extras(m: "Method", b, classes: dict, methods: list,
             continue
         if "*" not in ty and "&" not in ty:
             out.append((i, None, None, ""))          # a scalar: literal 0 is a real value
+            continue
+        # A `const char*` BESIDE a real (bytes, length) pair is a label, not the input:
+        # wabt's `ReadBinaryIr(const char* filename, const uint8_t* data, size_t size, ...)`
+        # uses it only to name the module in diagnostics, and its own harness passes a
+        # dummy. Binding a FIXED empty string is safe because it is not attacker-derived --
+        # which is the whole reason a byte pointer WITHOUT a length is refused instead: for
+        # pugixml's `load_file(const char* path, ...)` the pointer IS the input, and a
+        # harness built on it opens attacker-named paths. The condition below is what
+        # separates the two, so the safety property is kept rather than traded away.
+        if li is not None and re.search(r"\bchar\b", ty) and "*" in ty:
+            out.append((i, "LITERAL", None, '""'))
             continue
         own = ownable_type(ty, aliases or {})
         if own:
@@ -780,6 +861,9 @@ def propose(headers, target, platforms=(), knobs=None, max_plans: int = 12,
         # when the constructor takes a buffer, scratch the harness owns.
         built, extra_res, extra_scratch, extra_ops, extra_apis = {}, [], [], [], []
         for idx, kcls, kctor, sctype in extras:
+            if kcls == "LITERAL":
+                built[idx] = ("literal", sctype)
+                continue
             if kcls == "SCRATCH":
                 sid = "b%d" % idx
                 extra_scratch.append({"id": sid, "kind": "bytes", "c_type": sctype})
@@ -819,7 +903,9 @@ def propose(headers, target, platforms=(), knobs=None, max_plans: int = 12,
                 args.append({"param": pn, "source": "length_of", "ref": "d"})
             elif i in built:
                 _b = built[i]
-                if isinstance(_b, tuple):
+                if isinstance(_b, tuple) and _b[0] == "literal":
+                    args.append({"param": pn, "source": "literal", "value": _b[1]})
+                elif isinstance(_b, tuple):
                     args.append({"param": pn, "source": _b[0], "ref": _b[1]})
                 else:
                     args.append({"param": pn, "source": "resource", "ref": _b})
