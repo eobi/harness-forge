@@ -614,6 +614,20 @@ agree closely here is evidence the libyaml gap is that target's build configurat
 than a systematic difference in how the two projects count lines -- one case, not a proof,
 but it narrows where to look.
 
+> **Every `ours/gold` ratio above is pending re-measurement, and the bias runs in our
+> favour.** Found 2026-08-30: the D3 gate ("valid input must not crash") ran the harness
+> for 400 executions against the campaign's own corpus directory, and libFuzzer writes
+> newly-interesting inputs back into any corpus directory it is given. So our campaign
+> started with inputs a fuzzer had already discovered, while the developer's harness --
+> which does not run our gates -- started from the mined seeds alone. On a case with no
+> mined seeds the effect is the whole starting corpus: ours began with a handful of
+> discovered inputs, gold with nothing.
+>
+> The gate now runs against a copy in its own directory, so both harnesses start from the
+> same inputs, and the fix is in. The numbers above were taken before it and have not yet
+> been re-run. They are left in place rather than deleted, because removing them would
+> hide the size of the correction when it arrives.
+
 ### What this table does not establish
 
 Four limits, stated because the numbers above are easy to over-read.
