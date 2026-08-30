@@ -2370,6 +2370,23 @@ def _plans_for_handle(decls, target, handle, inline_base, init_name, fini_name,
         extra_drop: list = []        # and the destructors that free them
         pair_lens = {p[1] for p in cons.contract.length_delimited}
 
+        # WHICH PARAMETER GETS THE FUZZER'S BYTES, when more than one could take them.
+        #
+        # `ZSTD_decompress(void *dst, size_t dstCapacity, const void *src, size_t srcSize)`
+        # has two void* parameters and the FIRST one is the output. Taking them in
+        # declaration order bound the input to `dst` and passed `src` as NULL, so the
+        # harness decompressed nothing while handing attacker bytes to a destination
+        # pointer -- and all six static gates accepted it, which is the outcome this engine
+        # exists to prevent. Coverage fell from 30.04% to 2.24% and the number still looked
+        # like a measurement.
+        #
+        # A library marks its input `const`. That is the whole signal, and it is the same
+        # one the const arm of _byte_carrying already trusts. When some parameter carries
+        # it, no other parameter may take the input slice.
+        _const_byte = next((q.name for q in cons.params
+                            if "const" in q.type.name and _byte_carrying(q)
+                            and not _path_like(q.name)), "")
+
         for pd in (() if stream_args is not None else cons.params):
             nm, ty = pd.name, pd.type.name
             if handle and hkey(ty, pm) == hkey(handle, pm):
@@ -2418,8 +2435,9 @@ def _plans_for_handle(decls, target, handle, inline_base, init_name, fini_name,
             elif nm in cons.contract.nul_terminated and not slices:
                 slices.append(InputSlice(nm, SLICE_CSTRING, remainder=True, min_len=1))
                 args.append(Arg(nm, "input", nm))
-            elif not slices and (("*" in ty and base_type(ty) in BYTE_BASES)
-                                 or ty.strip() in _CONST_BYTE_PTRS):
+            elif (not slices and (not _const_byte or nm == _const_byte)
+                  and (("*" in ty and base_type(ty) in BYTE_BASES)
+                       or ty.strip() in _CONST_BYTE_PTRS)):
                 # The second arm is the pointer-typedef spelling. Added rather than folded
                 # into the first so `char **` keeps whatever it did before: this is the
                 # branch that decides where the fuzzer's bytes go, and it is not the place
