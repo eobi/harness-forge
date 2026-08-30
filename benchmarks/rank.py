@@ -80,6 +80,15 @@ def main(results, write: bool = False) -> int:
     measured: dict[str, dict] = {}
     for case, ds in samples.items():
         ok = [d for d in ds if d.get("result") == "measured" and d.get("lines_pct")]
+        # ONLY SAMPLES OF THE SAME ENGINE ARE THE SAME EXPERIMENT. Aggregating across
+        # engines put pugixml at "n=6 +/-1.32" by folding in a measurement of the harness
+        # this engine no longer emits -- 13.47% from before the flag family was derived
+        # from the header. That is a spread between two DIFFERENT harnesses reported as
+        # the run-to-run noise of one, which is the confound this repository exists to
+        # argue about, arriving in its own table generator.
+        if ok:
+            newest = ok[-1].get("engine")
+            ok = [d for d in ok if d.get("engine") == newest]
         if len(ok) < 2:
             measured[case] = ds[-1]
             continue

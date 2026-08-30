@@ -529,14 +529,14 @@ confirmed reports — on its own 100-case benchmark with its gold OSS-Fuzz basel
 | expat/XML_Parse | **31.23** | — | — |  |  |
 | zstd/ZSTD_decompress | **29.92** | — | — |  |  |
 | mbedtls/mbedtls_x509_crt_parse | **32.29** | — | — |  |  |
-| pugixml/parse | **13.47** | — | 14.79† | 0.91x |  |
+| pugixml/parse | **14.79** <sub>n=5 ±0.00</sub> | — | 14.79† <sub>n=5 ±0.49</sub> | 1.00x |  |
 | woff2/convert | **29.46** | — | 29.79† | 0.99x |  |
 
 † gold MEASURED by this repository from the project's own in-tree harness, not cited. Same machine, same compiler, same 600 s, same file list, and a fresh corpus from the same seeds — so the comparison differs in the harness and in nothing else.
 
 Measured cases with a gold baseline: **9**. Median ours/gold: **1.01x**. Ahead of the cited QuartetFuzz figure on **5 of the 7** cases it published one for.
 
-Sources: run-001-quartetfuzz-6case, run-005-partial, run-007-partial-4of7, run-009, run-010, run-011, run-012, run-013, run-014, run-015, run-016, run-017, run-018, run-019, run-020, run-021, run-022, run-023, run-024, run-026, run-028, run-029, run-030, run-031, run-032, run-033.
+Sources: run-001-quartetfuzz-6case, run-005-partial, run-007-partial-4of7, run-009, run-010, run-011, run-012, run-013, run-014, run-015, run-016, run-017, run-018, run-019, run-020, run-021, run-022, run-023, run-024, run-026, run-028, run-029, run-030, run-031, run-032, run-033, run-034, run-035, run-036, run-037, run-038.
 
 <!-- BENCH:END -->
 
@@ -548,7 +548,7 @@ here under identical conditions:
 | case | ours | its own harness | ratio |
 |---|---:|---:|---:|
 | woff2/convert | **29.46%** | 29.79% | **0.99x** |
-| pugixml/parse | **13.47%** | 14.79% | **0.91x** |
+| pugixml/parse | **14.79%** (n=5, ±0.00) | 14.79% (n=5, ±0.49) | **1.00x** |
 
 **woff2 is the one that shows what the producer is doing.** Its entry point is
 `ConvertWOFF2ToTTF(data, len, WOFF2Out* out)`, and `WOFF2Out` is **pure virtual** -- there
@@ -567,16 +567,33 @@ side had a seed corpus, so both started cold -- fair against each other, and **n
 comparable to the 87.3% `dataset_v2` publishes for that harness, which had OSS-Fuzz's
 accumulated corpus behind it.
 
-**The pugixml gap, and what it is made of.** `pugixml/parse` is the first genuine C++
-class API in the suite -- an object with a constructor and a destructor, not C behind an
-`extern "C"` façade. Our generated harness reaches **13.47%** against the project's own
-`tests/fuzz_parse.cpp` at **14.79%**, measured here under identical conditions: **0.91x**.
+**The pugixml case is a prediction that was tested.** The first measurement put our
+harness at **13.47%** against the project's own `tests/fuzz_parse.cpp` at 14.79% — 0.91x —
+and the gap had a stated cause rather than a shrug: the gold harness calls `load_buffer`
+three times, with `parse_default`, `parse_minimal` and `parse_full`, and ours called it
+once, because `options` is a defaulted parameter and the producer drops defaulted
+parameters rather than guessing a value for them.
 
-The gap is not mysterious. The gold harness calls `load_buffer` three times, with
-`parse_default`, `parse_minimal` and `parse_full`; ours calls it once, because `options` is
-a **defaulted parameter and the producer drops defaulted parameters rather than guessing a
-value for them**. That is the right default -- a guessed flag is a silent behaviour change
--- and it is also, measurably, what the remaining 1.3 points are worth.
+That is a falsifiable claim about where 1.32 points live, so it was built and re-measured.
+The producer now reads the flag family out of the header — every constant sharing the
+default's prefix, of which the **least** is the bare zero (`parse_minimal = 0x0000`), the
+**default** is what the signature names, and the **most inclusive** is the one whose
+expression references the most other members (`parse_full`) — and repeats the call across
+the three. That derives exactly the values pugixml's own authors chose, with no
+per-library list, and the emitted source passes them as named constants so what the
+harness does stays auditable.
+
+Re-measured over five repeats: **14.79%**, which is the developer harness's median. The
+predicted gap closed, and it closed for the predicted reason.
+
+**Read the dispersion beside it, because it corrected us.** After three repeats both
+harnesses looked perfectly deterministic. The fourth put *gold* at 15.28%. So ours is
+stable across five runs (±0.00) and the developer's is not (±0.49), and "both are
+deterministic" was an artifact of stopping at three. Executions vary by 20% throughout, on
+both sides, without moving our coverage at all — so on this target the campaign is noisy
+and the coverage is not, which is the opposite of libyaml, where nine runs of a
+byte-identical harness spanned 3.55 points. **The noise floor is a property of the target,
+not a constant you can measure once and reuse.**
 
 **A useful cross-check falls out of this case.** `dataset_v2` publishes a gold of 15.27% for
 `pugixml/fuzz_parse` over 7,734 lines; we measure that same in-tree harness at 14.79% over
