@@ -1,0 +1,1 @@
+clang++ -std=c++17 -g -O1 -fno-omit-frame-pointer -fprofile-instr-generate -fcoverage-mapping -I/b/pugixml/src -fsanitize=fuzzer,address /b/pugixml/tests/fuzz_parse.cpp /b/pugixml/src/pugixml.cpp -o /b/runs/pugixml__parse/gold/fuzz

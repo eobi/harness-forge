@@ -359,6 +359,25 @@ CASES = {
     # are not compiled on aarch64, and sherlock265/dec265 are applications.
     cover=[f for f in sorted(glob.glob("/b/libde265/libde265/*.cc"))
            if not f.endswith("/en265.cc")]),
+ # A GENUINE C++ CLASS API -- the first in the suite. libde265 above is C++ behind an
+ # `extern "C"` API, which the C producer reads unchanged; this is the other shape, a class
+ # with a constructor, a destructor and methods, and the C producer cannot see it at all.
+ #
+ # pugixml ships its own harness at tests/fuzz_parse.cpp, so the gold column here is
+ # MEASURED on this machine at this budget, not cited. That harness is
+ # `xml_document doc; doc.load_buffer(Data, Size)` repeated with three option flags --
+ # structurally what our producer emits, which makes this the tightest gold comparison in
+ # the suite. The flags are the defaulted parameter our producer drops rather than guesses.
+ "pugixml/parse": dict(
+    lang="c++", cxx=True, std="c++17",
+    hdr="/b/pugixml/src/pugixml.hpp",
+    inc=["/b/pugixml/src"],
+    src=["/b/pugixml/src/pugixml.cpp"],
+    fn="pugi::xml_document::load_buffer",
+    cflags=[], max_len=4096,
+    seeds=["/b/pugixml/tests/data_fuzz_parse"],
+    gold_harness="/b/pugixml/tests/fuzz_parse.cpp",
+    cover=["/b/pugixml/src/pugixml.cpp"]),
 }
 
 
@@ -407,8 +426,17 @@ def main():
     # every one of them at the door — `if (hf_size > 4096u) return 0;` — so the seeds are
     # mined, handed to libFuzzer, and thrown away by the harness itself.
     mlen = c.get("max_len", 4096)
-    plans = hg.propose(t.public_headers, t, platforms=["linux-aarch64-glibc"],
-                       knobs=Knobs(max_len=mlen))
+    # A C++ CLASS API needs the C++ producer. libde265 is C++ behind `extern "C"`, so the
+    # header producer reads it and only the build changes; a class with a constructor and
+    # methods is invisible to it -- pugixml parsed to zero plans until this routed.
+    if c.get("lang") == "c++":
+        from hforge.producers import cxx_header as cxh
+        t.language = "c++"
+        plans = cxh.propose(t.public_headers, t, platforms=["linux-aarch64-glibc"],
+                            knobs=Knobs(max_len=mlen))
+    else:
+        plans = hg.propose(t.public_headers, t, platforms=["linux-aarch64-glibc"],
+                           knobs=Knobs(max_len=mlen))
     # Any plan that CALLS the gold target function, in whatever role. `cJSON_Parse(const
     # char *)` returns a handle, so our producer uses it as the CONSTRUCTOR — which is
     # exactly what the gold harness does (parse then delete). Insisting the target be the
@@ -480,7 +508,10 @@ def main():
     except EmitError as ex:
         out["result"] = f"emit refused: {ex}"; print(json.dumps(out)); return
     wd = pathlib.Path(f"/b/runs/{case.replace('/','__')}"); wd.mkdir(parents=True, exist_ok=True)
-    (wd/"harness.c").write_text(e.source)
+    # A C++ harness written to harness.c is compiled as C -- or, with clang++, earns a
+    # deprecation warning and hides the real diagnostic behind it.
+    hname = "harness.cc" if c.get("cxx") else "harness.c"
+    (wd/hname).write_text(e.source)
 
     # KEEP EVERY RUN'S EVIDENCE ON DISK.
     #
@@ -491,7 +522,7 @@ def main():
     # field would have shown it. So the log outlives the run.
     logs = pathlib.Path(os.environ.get("HF_LOGDIR", "/b/logs")) / case.replace("/", "__")
     logs.mkdir(parents=True, exist_ok=True)
-    (logs/"harness.c").write_text(e.source)
+    (logs/hname).write_text(e.source)
     (logs/"plan.hir.json").write_text(json.dumps(p.to_json() if hasattr(p, "to_json")
                                                  else {"name": p.name,
                                                        "sequence": [o.api for o in p.sequence]},
@@ -508,8 +539,8 @@ def main():
     # declared `unsigned char hf_r_err` for a function returning `unsigned char *`, clang
     # warned, the build succeeded, and the harness segfaulted on its third execution for a
     # measured 0.00% where the case had been 65.12%. The compiler knew in milliseconds.
-    diag = check_emitted_c(cc[0], wd/"harness.c", c["inc"], c["cflags"],
-                           is_cxx=bool(c.get("cxx")))
+    diag = check_emitted_c(cc[0], wd/hname, c["inc"], c["cflags"],
+                           is_cxx=bool(c.get("cxx")), std=c.get("std", "c++11"))
     if diag:
         (logs/"emitter-defect.log").write_text("\n".join(diag) + "\n")
         out["result"] = "REFUSED: the emitted harness has an emitter defect"
@@ -521,7 +552,7 @@ def main():
     cmd = cc + ["-g","-O1","-fno-omit-frame-pointer",
            "-fprofile-instr-generate","-fcoverage-mapping"]
     cmd += [f"-I{i}" for i in c["inc"]] + c["cflags"]
-    cmd += ["-fsanitize=fuzzer,address", str(wd/"harness.c")] + c["src"] + ["-o", str(binp)]
+    cmd += ["-fsanitize=fuzzer,address", str(wd/hname)] + c["src"] + ["-o", str(binp)]
     r = subprocess.run(cmd, capture_output=True, text=True)
     (logs/"build.cmd").write_text(" ".join(cmd) + "\n")
     # A build.log left over from an EARLIER failed attempt sits next to a successful build

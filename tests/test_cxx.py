@@ -263,3 +263,151 @@ def test_a_pointer_squeezed_into_a_byte_is_refused_before_the_campaign():
     good = d / "good.c"
     good.write_text(decl % "*")
     assert not check_emitted_c(cc, good), "a correct harness must not be refused"
+
+
+# ── the join: header -> plan ─────────────────────────────────────────────────
+#
+# parse_header and the emitter both existed and were green, and C++ still did not work
+# end to end: nothing synthesised a plan, nothing routed to it, and the emitted build.sh
+# referenced an undefined $CXX so every C++ build aborted. These pin all three.
+
+_REAL = '''
+namespace pugi {
+    class PUGIXML_CLASS xml_writer {
+    public:
+        virtual void write(const void* data, size_t size) = 0;
+    };
+    class PUGIXML_CLASS xml_document: public xml_node {
+    public:
+        xml_document();
+        ~xml_document();
+        xml_parse_result load_file(const char* path, unsigned int options = 4);
+        xml_parse_result load_buffer(const void* contents, size_t size,
+                                     unsigned int options = 4, xml_encoding e = enc_auto);
+        xml_parse_result load_buffer_inplace_own(void* contents, size_t size);
+    };
+}
+'''
+
+
+def _parse_real(tmp_path):
+    h = tmp_path / "p.hpp"
+    h.write_text(_REAL)
+    return cx.parse_header(str(h))
+
+
+def test_an_export_macro_does_not_hide_the_class(tmp_path):
+    """`class PUGIXML_CLASS xml_document` is how real headers are written. Matching only
+    `class <name>` found ZERO classes in pugixml -- 241 methods were invisible."""
+    ms, _ = _parse_real(tmp_path)
+    assert {m.cls for m in ms} == {"xml_writer", "xml_document"}
+
+
+def test_trailing_defaulted_parameters_are_not_required(tmp_path):
+    ms, _ = _parse_real(tmp_path)
+    lb = next(m for m in ms if m.name == "load_buffer")
+    assert (lb.n_required, len(lb.params)) == (2, 4)
+
+
+def test_a_pure_virtual_marks_the_class_abstract(tmp_path):
+    ms, _ = _parse_real(tmp_path)
+    assert next(m for m in ms if m.name == "write").is_pure
+
+
+def _plans(tmp_path):
+    from hforge.ir import Target
+    _parse_real(tmp_path)
+    t = Target(name="pugixml", public_headers=["p.hpp"], include_dirs=[str(tmp_path)],
+               sources=[], link_libs=[], cflags=[], seed_dirs=[])
+    return cx.propose([str(tmp_path / "p.hpp")], t)
+
+
+def test_only_the_safe_consumer_is_proposed(tmp_path):
+    """Three of the four byte-taking methods are traps:
+
+    * `write` is pure virtual, so the class cannot be constructed at all;
+    * `load_file` takes a FILENAME, and a harness built on it opens attacker-named paths;
+    * `load_buffer_inplace_own` FREES the pointer with the library's allocator, so handing
+      it a std::string's buffer crashes by construction and proves nothing.
+    """
+    names = {p.name for p in _plans(tmp_path)}
+    assert names == {"pugixml_xml_document_load_buffer"}
+
+
+def test_the_plan_binds_bytes_and_length_to_the_right_parameters(tmp_path):
+    ir = _plans(tmp_path)[0]
+    op = next(o for o in ir.sequence if o.id == "o_consume")
+    got = {a.param: a.source for a in op.args}
+    assert got["contents"] == "input" and got["size"] == "length_of"
+    assert got["self"] == "resource"
+    # the two defaulted parameters are dropped, not bound to a guessed value
+    assert "options" not in got and "e" not in got
+
+
+def test_a_cxx_plan_emits_a_runnable_build(tmp_path):
+    """The C++ build command says `$CXX`. A preamble setting only `CC` made every emitted
+    C++ build.sh abort on `CXX: unbound variable` under `set -eu`."""
+    from hforge.cli import _cc_preamble, _artifact_names
+    ir = _plans(tmp_path)[0]
+    assert 'CXX="${CXX:-clang++}"' in _cc_preamble(ir)
+    assert _artifact_names(ir) == ("harness.cc", "driver.cc")
+
+
+def test_a_cxx_header_routes_to_the_cxx_producer(tmp_path):
+    from hforge.cli import looks_like_cxx
+    h = tmp_path / "p.hpp"
+    h.write_text(_REAL)
+    assert looks_like_cxx(str(h))
+    c = tmp_path / "plain.h"
+    c.write_text("int foo(const unsigned char *b, size_t n);\n")
+    assert not looks_like_cxx(str(c))
+
+
+# ── free functions at namespace scope ────────────────────────────────────────
+
+_FREE = '''
+namespace woff2 {
+  bool ConvertWOFF2ToTTF(const uint8_t* data, size_t length, WOFF2Out* out);
+  size_t ComputeWOFF2FinalSize(const uint8_t* data, size_t length);
+  void Consume(const uint8_t* data, size_t length);
+}
+'''
+
+
+def _free(tmp_path):
+    from hforge.ir import Target
+    h = tmp_path / "w.hpp"
+    h.write_text(_FREE)
+    t = Target(name="woff2", public_headers=["w.hpp"], include_dirs=[str(tmp_path)],
+               sources=[], link_libs=[], cflags=[], seed_dirs=[])
+    return cx.propose([str(h)], t)
+
+
+def test_a_free_function_is_not_dropped_silently(tmp_path):
+    """`woff2::ConvertWOFF2ToTTF` is its library's entry point and belongs to no class.
+    Scanning only class bodies dropped every such function without recording it."""
+    h = tmp_path / "w.hpp"
+    h.write_text(_FREE)
+    ms, _ = cx.parse_header(str(h))
+    assert "woff2::ComputeWOFF2FinalSize" in {m.symbol for m in ms}
+
+
+def test_a_required_pointer_we_cannot_build_is_refused(tmp_path):
+    """`ConvertWOFF2ToTTF(data, len, WOFF2Out* out)` with a null sink crashes on the
+    library's own contract. That crash is not a finding."""
+    assert "woff2_ConvertWOFF2ToTTF" not in {p.name for p in _free(tmp_path)}
+    assert "woff2_ComputeWOFF2FinalSize" in {p.name for p in _free(tmp_path)}
+
+
+def test_a_free_function_plan_needs_no_object(tmp_path):
+    ir = next(p for p in _free(tmp_path) if p.name == "woff2_ComputeWOFF2FinalSize")
+    assert ir.resources == []
+    assert [o.id for o in ir.sequence] == ["o_consume"]
+
+
+def test_a_void_call_is_not_cast_to_long(tmp_path):
+    """`hf_sink += (long)f(...)` does not compile when f returns void."""
+    ir = next(p for p in _free(tmp_path) if p.name == "woff2_Consume")
+    src = cxx_libfuzzer.emit(ir).source
+    assert "(long)woff2::Consume" not in src
+    assert "    woff2::Consume(" in src

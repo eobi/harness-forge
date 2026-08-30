@@ -146,8 +146,14 @@ def emit(ir: HarnessIR, with_driver: bool = True) -> Emitted:
                         f"(void *)&{obj});")
             body.append(f"{indent}{obj}{arrow}{meth}({', '.join(rest)});")
         else:
-            sink_used = True
-            body.append(f"{indent}{P}sink += (long){sym}({', '.join(args)});")
+            # `(long)f(...)` does not compile when f returns void, and a free function at
+            # namespace scope is the common case where it does -- the sink exists to stop
+            # the optimiser discarding the call, so a void call simply gets no sink.
+            if (api.returns.kind or "").lower() == "void":
+                body.append(f"{indent}{sym}({', '.join(args)});")
+            else:
+                sink_used = True
+                body.append(f"{indent}{P}sink += (long){sym}({', '.join(args)});")
 
         if op.targets and op.targets in heap:
             body.append(f"{indent}delete {_res(op.targets)};")

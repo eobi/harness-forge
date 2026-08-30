@@ -337,11 +337,48 @@ def c12_backends_go_through_the_router():
            "every emit goes through the language router")
 
 
+def c13_producers_are_reachable():
+    """Every producer that defines `propose` must be reachable from the CLI.
+
+    THIS CHECK EXISTS BECAUSE THE MANIFEST LIED WITHOUT ANY CLAIM IN IT BEING FALSE.
+    `L.CXX_PARSE` and `L.CXX_EMIT` were both DONE, both named a module that imported and
+    tests that passed, and C++ did not work: `cmd_propose` routed every non-Java header to
+    the C producer, so `cxx_header` was reachable only from a test that imported it
+    directly. C3 checks that a DONE deliverable's evidence RESOLVES; nothing checked that a
+    user could reach the feature, and a capability no entry point routes to is a capability
+    nobody has.
+
+    `producers/model.py` is exempt by design, not by oversight: M4.PRODUCER states that it
+    "deliberately calls no API" because the proposer boundary has to hold whoever proposes,
+    and one wired to a vendor client is one that gets bypassed. An exemption is recorded
+    here so that the check stays honest about what it is not enforcing.
+    """
+    exempt = {"model"}
+    cli = (ROOT / "hforge" / "cli.py").read_text(errors="replace")
+    problems: list[str] = []
+    for f in sorted((ROOT / "hforge" / "producers").glob("*.py")):
+        name = f.stem
+        if name.startswith("__") or name in exempt:
+            continue
+        if not any(l.startswith("def propose") for l in f.read_text(
+                errors="replace").splitlines()):
+            continue
+        if f"producers import {name}" in cli or f"producers.{name}" in cli \
+                or f"import {name}" in cli:
+            continue
+        problems.append(f"hforge/producers/{name}.py defines propose() but hforge/cli.py "
+                        f"never routes to it")
+    record("C13", BAD if problems else OK,
+           "; ".join(problems) if problems else
+           f"every producer with propose() is routed from the CLI "
+           f"({', '.join(sorted(exempt))} exempt by design)")
+
+
 CHECKS = (c1_declared_gates_exist, c2_code_gates_are_declared, c3_done_evidence_resolves,
           c4_tests_pass, c5_plan_platforms_modelled, c6_doctrine_invariants,
           c7_phase_docs_agree, c8_no_done_inside_planned_phase,
           c9_mcp_never_gates, c10_rank_is_producer_blind, c11_mcp_may_not_verdict,
-          c12_backends_go_through_the_router)
+          c12_backends_go_through_the_router, c13_producers_are_reachable)
 
 
 def main() -> int:

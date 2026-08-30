@@ -361,7 +361,8 @@ EMITTER_DEFECT_WARNINGS = (
 )
 
 
-def check_emitted_c(cc: str, source, include_dirs=(), cflags=(), is_cxx: bool = False):
+def check_emitted_c(cc: str, source, include_dirs=(), cflags=(), is_cxx: bool = False,
+                    std: str = "c++11"):
     """Compile the harness ALONE with the emitter-defect warnings as errors.
 
     Returns [] when the emitted code is clean, or a list of diagnostics when it is not.
@@ -379,7 +380,10 @@ def check_emitted_c(cc: str, source, include_dirs=(), cflags=(), is_cxx: bool = 
     with tempfile.TemporaryDirectory() as td:
         cmd = [cc, "-fsyntax-only"]
         if is_cxx:
-            cmd.append("-std=c++11")
+            # The CALLER's standard, not a fixed one. Hardcoding c++11 here reported a
+            # clean C++17 harness as an emitter defect: `std::optional` does not exist in
+            # C++11, so the check failed on the harness rather than on the compiler flag.
+            cmd.append(f"-std={std}")
         cmd += [f"-Werror={w}" for w in EMITTER_DEFECT_WARNINGS]
         cmd += [f"-I{d}" for d in include_dirs] + list(cflags) + [str(src)]
         r = subprocess.run(cmd, capture_output=True, text=True, errors="replace")

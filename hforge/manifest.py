@@ -1615,6 +1615,27 @@ PHASES: tuple = (
                          "at roughly half. Templates, exceptions across the boundary, "
                          "multiple inheritance and operator overloads are REPORTED as "
                          "skipped, not guessed at."),
+        Deliverable("L.CXX_PROPOSE",
+                    "C++ plans: construct the object, bind the bytes, drop the defaults",
+                    DONE,
+                    modules=("hforge.producers.cxx_header",),
+                    tests=("test_an_export_macro_does_not_hide_the_class",
+                           "test_trailing_defaulted_parameters_are_not_required",
+                           "test_a_pure_virtual_marks_the_class_abstract",
+                           "test_only_the_safe_consumer_is_proposed",
+                           "test_the_plan_binds_bytes_and_length_to_the_right_parameters",
+                           "test_a_cxx_plan_emits_a_runnable_build",
+                           "test_a_cxx_header_routes_to_the_cxx_producer"),
+                    note="PARSE and EMIT were both DONE while C++ did not work end to end: "
+                         "nothing synthesised a plan between them, `propose` routed every "
+                         "non-Java header to the C producer, and the emitted build.sh set "
+                         "CC while the C++ build command reads $CXX, so every C++ build "
+                         "aborted on an unbound variable. A deliverable per END, and none "
+                         "for the JOIN, is how a manifest reports a feature nobody can "
+                         "reach. Refusals are explicit: an abstract class, a class with no "
+                         "default constructor, a byte pointer with no length (a FILENAME, "
+                         "as in load_file) and a non-const buffer the callee may free "
+                         "(load_buffer_inplace_own) are all declined with a reason."),
         Deliverable("L.CXX_EMIT",
                     "C++ backend: objects, new/delete, std::string and vector inputs", DONE,
                     modules=("hforge.emit.cxx_libfuzzer",),

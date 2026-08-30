@@ -283,6 +283,7 @@ trust ceiling each one carries, and `doctor` reports what your own machine can p
 | **Android CLI** | verified end to end on arm64-v8a API 35: cross-build, push, run, differential | `--platform android-arm64-emulator` |
 | **Android GUI** | planned, next after Linux GUI | — |
 | **macOS** arm64 | verified end to end | `python3 -m hforge batch ...` natively |
+| **C++ class APIs** | producer, emitter and build verified end to end on pugixml; templates, exceptions across the boundary and operator overloads are reported as skipped, not guessed | `python3 -m hforge propose lib.hpp --source lib.cpp` (`.hpp`/`.hh` route automatically; `--lang c++` forces it) |
 | **JVM / Java** | Jazzer backend, own gates and sink ladder | `--classpath app.jar` in place of the header |
 | **Windows** | exit-code semantics implemented and unit-tested from any host, **never run on a Windows host** | after the mobile track |
 | **iOS** | simulator detected via `simctl`; harness emission not yet wired | — |
@@ -487,12 +488,34 @@ confirmed reports — on its own 100-case benchmark with its gold OSS-Fuzz basel
 | expat/XML_Parse | **31.23** | — | — |  |  |
 | zstd/ZSTD_decompress | **29.92** | — | — |  |  |
 | mbedtls/mbedtls_x509_crt_parse | **32.29** | — | — |  |  |
+| pugixml/parse | **13.47** | — | 14.79† | 0.91x |  |
 
-Measured cases with a gold baseline: **7**. Median ours/gold: **1.01x**. Ahead of the cited QuartetFuzz figure on **5 of the 7** cases it published one for.
+† gold MEASURED by this repository from the project's own in-tree harness, not cited. Same machine, same compiler, same 600 s, same file list, and a fresh corpus from the same seeds — so the comparison differs in the harness and in nothing else.
 
-Sources: run-001-quartetfuzz-6case, run-005-partial, run-007-partial-4of7, run-009, run-010, run-011, run-012, run-013, run-014, run-015, run-016, run-017, run-018, run-019, run-020, run-021, run-022, run-023, run-024, run-026, run-028, run-029.
+Measured cases with a gold baseline: **8**. Median ours/gold: **1.01x**. Ahead of the cited QuartetFuzz figure on **5 of the 7** cases it published one for.
+
+Sources: run-001-quartetfuzz-6case, run-005-partial, run-007-partial-4of7, run-009, run-010, run-011, run-012, run-013, run-014, run-015, run-016, run-017, run-018, run-019, run-020, run-021, run-022, run-023, run-024, run-026, run-028, run-029, run-030, run-031.
 
 <!-- BENCH:END -->
+
+**The C++ case, and what its gap is made of.** `pugixml/parse` is the first genuine C++
+class API in the suite -- an object with a constructor and a destructor, not C behind an
+`extern "C"` façade. Our generated harness reaches **13.47%** against the project's own
+`tests/fuzz_parse.cpp` at **14.79%**, measured here under identical conditions: **0.91x**.
+
+The gap is not mysterious. The gold harness calls `load_buffer` three times, with
+`parse_default`, `parse_minimal` and `parse_full`; ours calls it once, because `options` is
+a **defaulted parameter and the producer drops defaulted parameters rather than guessing a
+value for them**. That is the right default -- a guessed flag is a silent behaviour change
+-- and it is also, measurably, what the remaining 1.3 points are worth.
+
+**A useful cross-check falls out of this case.** `dataset_v2` publishes a gold of 15.27% for
+`pugixml/fuzz_parse` over 7,734 lines; we measure that same in-tree harness at 14.79% over
+7,567. **0.48 points apart, with denominators 2.2% apart.** For libyaml our denominator and
+theirs differ by 48%, which is why no cross-tool comparison is claimed there. That the two
+agree closely here is evidence the libyaml gap is that target's build configuration rather
+than a systematic difference in how the two projects count lines -- one case, not a proof,
+but it narrows where to look.
 
 ### What this table does not establish
 

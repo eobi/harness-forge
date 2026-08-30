@@ -1,0 +1,8 @@
+clang: warning: treating 'c' input as 'c++' when in C++ mode, this behavior is deprecated [-Wdeprecated]
+/b/runs/pugixml__parse/harness.c:24:10: error: no member named 'optional' in namespace 'std'
+/b/runs/pugixml__parse/harness.c:24:37: error: expected '(' for function-style cast or type construction
+/b/runs/pugixml__parse/harness.c:24:39: error: use of undeclared identifier 'hf_o_o'; did you mean 'hf_s_d'?
+/b/runs/pugixml__parse/harness.c:29:5: error: use of undeclared identifier 'hf_o_o'; did you mean 'hf_s_d'?
+/b/runs/pugixml__parse/harness.c:29:12: error: no member named 'emplace' in 'std::basic_string<char>'
+/b/runs/pugixml__parse/harness.c:31:9: error: use of undeclared identifier 'hf_o_o'; did you mean 'hf_s_d'?
+/b/runs/pugixml__parse/harness.c:31:9: error: value of type 'std::string' (aka 'basic_string<char>') is not contextually convertible to 'bool'

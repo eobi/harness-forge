@@ -66,10 +66,13 @@ reads 48.74% over the wrong file set and 70.47% over the right one.
 | expat/XML_Parse | **31.23** | — | — |  |  |
 | zstd/ZSTD_decompress | **29.92** | — | — |  |  |
 | mbedtls/mbedtls_x509_crt_parse | **32.29** | — | — |  |  |
+| pugixml/parse | **13.47** | — | 14.79† | 0.91x |  |
 
-Measured cases with a gold baseline: **7**. Median ours/gold: **1.01x**. Ahead of the cited QuartetFuzz figure on **5 of the 7** cases it published one for.
+† gold MEASURED by this repository from the project's own in-tree harness, not cited. Same machine, same compiler, same 600 s, same file list, and a fresh corpus from the same seeds — so the comparison differs in the harness and in nothing else.
 
-Sources: run-001-quartetfuzz-6case, run-005-partial, run-007-partial-4of7, run-009, run-010, run-011, run-012, run-013, run-014, run-015, run-016, run-017, run-018, run-019, run-020, run-021, run-022, run-023, run-024, run-026, run-028, run-029.
+Measured cases with a gold baseline: **8**. Median ours/gold: **1.01x**. Ahead of the cited QuartetFuzz figure on **5 of the 7** cases it published one for.
+
+Sources: run-001-quartetfuzz-6case, run-005-partial, run-007-partial-4of7, run-009, run-010, run-011, run-012, run-013, run-014, run-015, run-016, run-017, run-018, run-019, run-020, run-021, run-022, run-023, run-024, run-026, run-028, run-029, run-030, run-031.
 
 <!-- TABLE:END -->
 

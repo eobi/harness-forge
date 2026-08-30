@@ -1,0 +1,182 @@
+{
+  "schema_version": "1.0",
+  "name": "pugixml_xml_document_load_buffer",
+  "producer": "cxx_header",
+  "notes": "",
+  "target": {
+    "name": "pugixml",
+    "version": "",
+    "commit": "",
+    "public_headers": [
+      "/b/pugixml/src/pugixml.hpp"
+    ],
+    "include_dirs": [
+      "/b/pugixml/src"
+    ],
+    "sources": [
+      "/b/pugixml/src/pugixml.cpp"
+    ],
+    "link_libs": [],
+    "cflags": [],
+    "seed_dirs": [],
+    "language": "c++"
+  },
+  "platforms": [
+    "linux-aarch64-glibc"
+  ],
+  "apis": {
+    "pugi::xml_document::xml_document": {
+      "symbol": "pugi::xml_document::xml_document",
+      "header": "pugixml.hpp",
+      "params": [],
+      "returns": {
+        "name": "void",
+        "kind": "void",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "create",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [],
+        "transfers_ownership": [],
+        "requires_nonnull": [],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    },
+    "pugi::xml_document::load_buffer": {
+      "symbol": "pugi::xml_document::load_buffer",
+      "header": "pugixml.hpp",
+      "params": [
+        {
+          "name": "self",
+          "type": {
+            "name": "pugi::xml_document *",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "contents",
+          "type": {
+            "name": "const void*",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "size",
+          "type": {
+            "name": "size_t",
+            "kind": "scalar",
+            "const": false,
+            "resolved": ""
+          }
+        }
+      ],
+      "returns": {
+        "name": "xml_parse_result",
+        "kind": "scalar",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "consume",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [],
+        "transfers_ownership": [],
+        "requires_nonnull": [],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    }
+  },
+  "slices": [
+    {
+      "id": "d",
+      "kind": "bytes",
+      "remainder": true,
+      "min_len": 1,
+      "max_len": 0
+    }
+  ],
+  "resources": [
+    {
+      "id": "o",
+      "type": {
+        "name": "pugi::xml_document",
+        "kind": "pointer",
+        "const": false,
+        "resolved": ""
+      },
+      "storage": "inline"
+    }
+  ],
+  "scratch": [],
+  "sequence": [
+    {
+      "id": "o_new",
+      "api": "pugi::xml_document::xml_document",
+      "args": [],
+      "binds": "o",
+      "targets": "",
+      "repeat": 0,
+      "repeat_while": "",
+      "guarded_by": []
+    },
+    {
+      "id": "o_consume",
+      "api": "pugi::xml_document::load_buffer",
+      "args": [
+        {
+          "param": "self",
+          "source": "resource",
+          "ref": "o",
+          "value": null
+        },
+        {
+          "param": "contents",
+          "source": "input",
+          "ref": "d",
+          "value": null
+        },
+        {
+          "param": "size",
+          "source": "length_of",
+          "ref": "d",
+          "value": null
+        }
+      ],
+      "binds": "",
+      "targets": "",
+      "repeat": 0,
+      "repeat_while": "",
+      "guarded_by": [
+        "o"
+      ]
+    }
+  ],
+  "knobs": {
+    "max_len": 4096,
+    "min_len": 0,
+    "timeout_s": 25,
+    "rss_limit_mb": 2048,
+    "malloc_limit_mb": 0,
+    "sanitizers": [
+      "address"
+    ],
+    "detect_leaks": false,
+    "optimisation": "-O1"
+  },
+  "format_model": null,
+  "raw_blocks": []
+}
