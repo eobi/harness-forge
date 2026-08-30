@@ -184,6 +184,47 @@ $ python3 -m hforge batch /b/libyaml/include/yaml.h \
 passing. Add `--classpath` in place of the header to drive the Java producer and the Jazzer
 backend instead.
 
+**A C++ class API takes the same command.** A `.hpp`/`.hh` header routes to the C++ producer
+automatically; `--lang c++` forces it for a `.h` that is really C++:
+
+```console
+$ python3 -m hforge propose /b/pugixml/src/pugixml.hpp \
+    --source /b/pugixml/src/pugixml.cpp --name pugixml
+```
+
+What it emits for pugixml is an object with a lifetime, and the call repeated across the flag
+family the header declares rather than left at one default:
+
+```cpp
+std::optional<pugi::xml_document> hf_o_o;
+hf_o_o.emplace();
+hf_o_o->load_buffer(..., hf_s_d.size(), pugi::parse_minimal);
+hf_o_o->load_buffer(..., hf_s_d.size(), pugi::parse_default);
+hf_o_o->load_buffer(..., hf_s_d.size(), pugi::parse_full);
+```
+
+Parameters it cannot honestly supply are **refused with the reason**, not guessed at. Pass
+several headers when the types live apart — this is woff2, whose entry point takes a
+**pure-virtual** `WOFF2Out*`, so the plan finds a concrete descendant and gives its
+constructor a buffer the harness owns:
+
+```console
+$ python3 -m hforge propose /b/woff2/include/woff2/decode.h \
+    --also-header /b/woff2/include/woff2/output.h \
+    --include /b/woff2/include --source /b/woff2/src/woff2_dec.cc --name woff2
+```
+
+```cpp
+std::string hf_x_b2{};
+std::optional<woff2::WOFF2StringOut> hf_o_a2;
+hf_o_a2.emplace(&hf_x_b2);
+woff2::ConvertWOFF2ToTTF(..., hf_s_d.size(), &*hf_o_a2);
+```
+
+Some libraries need a newer standard than the C++17 default — wabt's `ByteSpan` is
+`std::span`, so it wants `--cflag=-std=c++20`, and the emitted build line uses what you
+supply rather than adding a second `-std` beside it.
+
 ### Grade a harness somebody else wrote
 
 The same gate bank runs against harnesses this engine did not write — yours, or a
