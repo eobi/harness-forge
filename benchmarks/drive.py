@@ -839,11 +839,20 @@ def main():
             # The project prefix, from the paths the case itself names -- not from the case
             # title, which does not always match the directory (iperf/cjson lives in cjson).
             srcs = [x for x in (c.get("src") or []) if isinstance(x, str)]
-            srcs += [c["hdr"]] if isinstance(c.get("hdr"), str) else []
+            hdr = c["hdr"] if isinstance(c.get("hdr"), str) else ""
             dirs = [x.split("/")[2] for x in srcs if x.startswith("/b/") and x.count("/") >= 3]
             # /b/inc holds a copied header, not a project tree; it must not become the scope.
             dirs = [d for d in dirs if d != "inc"]
-            prefix = f"/b/{max(set(dirs), key=dirs.count)}/" if dirs else None
+            # THE PROJECT IS THE ONE THE HEADER BELONGS TO -- the API under test -- not the
+            # directory that contributes the most source files. woff2 links TEN brotli
+            # sources beside its own FIVE, so a majority vote made brotli the scope and the
+            # case reported a brotli coverage percentage under a woff2 row. A dependency
+            # can always outnumber the library being tested.
+            own = hdr.split("/")[2] if hdr.startswith("/b/") and hdr.count("/") >= 3 else ""
+            if own and own != "inc":
+                prefix = f"/b/{own}/"
+            else:
+                prefix = f"/b/{max(set(dirs), key=dirs.count)}/" if dirs else None
             if prefix:
                 lc = cv = nf = 0
                 for fentry in cov_json["data"][0]["files"]:

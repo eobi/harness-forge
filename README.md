@@ -283,7 +283,7 @@ trust ceiling each one carries, and `doctor` reports what your own machine can p
 | **Android CLI** | verified end to end on arm64-v8a API 35: cross-build, push, run, differential | `--platform android-arm64-emulator` |
 | **Android GUI** | planned, next after Linux GUI | — |
 | **macOS** arm64 | verified end to end | `python3 -m hforge batch ...` natively |
-| **C++ class APIs** | producer, emitter and build verified end to end on pugixml; templates, exceptions across the boundary and operator overloads are reported as skipped, not guessed | `python3 -m hforge propose lib.hpp --source lib.cpp` (`.hpp`/`.hh` route automatically; `--lang c++` forces it) |
+| **C++ class APIs** | measured on two libraries against their own harnesses (woff2 0.99x, pugixml 0.91x); constructs an object for a parameter, including a pure-virtual one; templates, exceptions across the boundary and operator overloads are reported as skipped, not guessed | `python3 -m hforge propose lib.hpp --source lib.cpp` (`.hpp`/`.hh` route automatically; `--lang c++` forces it) |
 | **JVM / Java** | Jazzer backend, own gates and sink ladder | `--classpath app.jar` in place of the header |
 | **Windows** | exit-code semantics implemented and unit-tested from any host, **never run on a Windows host** | after the mobile track |
 | **iOS** | simulator detected via `simctl`; harness emission not yet wired | — |
@@ -489,16 +489,44 @@ confirmed reports — on its own 100-case benchmark with its gold OSS-Fuzz basel
 | zstd/ZSTD_decompress | **29.92** | — | — |  |  |
 | mbedtls/mbedtls_x509_crt_parse | **32.29** | — | — |  |  |
 | pugixml/parse | **13.47** | — | 14.79† | 0.91x |  |
+| woff2/convert | **29.46** | — | 29.79† | 0.99x |  |
 
 † gold MEASURED by this repository from the project's own in-tree harness, not cited. Same machine, same compiler, same 600 s, same file list, and a fresh corpus from the same seeds — so the comparison differs in the harness and in nothing else.
 
-Measured cases with a gold baseline: **8**. Median ours/gold: **1.01x**. Ahead of the cited QuartetFuzz figure on **5 of the 7** cases it published one for.
+Measured cases with a gold baseline: **9**. Median ours/gold: **1.01x**. Ahead of the cited QuartetFuzz figure on **5 of the 7** cases it published one for.
 
-Sources: run-001-quartetfuzz-6case, run-005-partial, run-007-partial-4of7, run-009, run-010, run-011, run-012, run-013, run-014, run-015, run-016, run-017, run-018, run-019, run-020, run-021, run-022, run-023, run-024, run-026, run-028, run-029, run-030, run-031, run-032.
+Sources: run-001-quartetfuzz-6case, run-005-partial, run-007-partial-4of7, run-009, run-010, run-011, run-012, run-013, run-014, run-015, run-016, run-017, run-018, run-019, run-020, run-021, run-022, run-023, run-024, run-026, run-028, run-029, run-030, run-031, run-032, run-033.
 
 <!-- BENCH:END -->
 
-**The C++ case, and what its gap is made of.** `pugixml/parse` is the first genuine C++
+**The C++ cases.** `pugixml/parse` and `woff2/convert` are the first genuine C++ class
+APIs in the suite -- objects with constructors and destructors, not C behind an
+`extern "C"` façade. Both are measured against the project's own in-tree harness, built
+here under identical conditions:
+
+| case | ours | its own harness | ratio |
+|---|---:|---:|---:|
+| woff2/convert | **29.46%** | 29.79% | **0.99x** |
+| pugixml/parse | **13.47%** | 14.79% | **0.91x** |
+
+**woff2 is the one that shows what the producer is doing.** Its entry point is
+`ConvertWOFF2ToTTF(data, len, WOFF2Out* out)`, and `WOFF2Out` is **pure virtual** -- there
+is no object to pass. From the headers alone the plan resolves it to a concrete descendant
+and gives that constructor a buffer the harness owns:
+
+```cpp
+std::string hf_x_b2{};
+std::optional<woff2::WOFF2StringOut> hf_o_a2;
+hf_o_a2.emplace(&hf_x_b2);
+woff2::ConvertWOFF2ToTTF(data, size, &*hf_o_a2);
+```
+
+which is, apart from a `SetMaxSize` guard, the harness woff2's own authors wrote. Neither
+side had a seed corpus, so both started cold -- fair against each other, and **not**
+comparable to the 87.3% `dataset_v2` publishes for that harness, which had OSS-Fuzz's
+accumulated corpus behind it.
+
+**The pugixml gap, and what it is made of.** `pugixml/parse` is the first genuine C++
 class API in the suite -- an object with a constructor and a destructor, not C behind an
 `extern "C"` façade. Our generated harness reaches **13.47%** against the project's own
 `tests/fuzz_parse.cpp` at **14.79%**, measured here under identical conditions: **0.91x**.

@@ -346,7 +346,12 @@ def consume_binding(m: "Method"):
         if _STD_BYTES.search(ty):
             return i, None
         if _is_const_byte_ptr(ty):
-            if i + 1 < len(req) and _INT_LEN.search(req[i + 1][0]):
+            nxt = req[i + 1][0] if i + 1 < len(req) else ""
+            # A LENGTH IS A SCALAR. `_INT_LEN` matches `uint8_t`, which also appears in
+            # `const uint8_t*` -- so wabt's `ReadBinaryIr(const char* filename,
+            # const uint8_t* data, size_t size, ...)` would have bound the FILENAME as the
+            # input and the data POINTER as its length.
+            if nxt and "*" not in nxt and "&" not in nxt and _INT_LEN.search(nxt):
                 return i, i + 1
     return None
 
@@ -473,7 +478,8 @@ def _kind_of(ty: str) -> str:
     return "scalar"
 
 
-def propose(headers, target, platforms=(), knobs=None, max_plans: int = 12) -> list:
+def propose(headers, target, platforms=(), knobs=None, max_plans: int = 12,
+            skipped=None) -> list:
     """Plans for a C++ class API: construct the object, feed it the fuzzer's bytes.
 
     A class is usable only when it is concrete and default-constructible. Both refusals
@@ -484,7 +490,12 @@ def propose(headers, target, platforms=(), knobs=None, max_plans: int = 12) -> l
 
     hs = [headers] if isinstance(headers, (str, Path)) else list(headers)
     methods: list = []
-    skipped: list = []
+    # WHY THERE IS NO PLAN IS THE ANSWER THE CALLER NEEDS. Every refusal below carries a
+    # reason -- abstract class, no default constructor, a filename rather than a buffer,
+    # a pointer we cannot construct -- and they were all appended to a local list and
+    # thrown away, so `wabt::ReadBinaryIr` reported no plan and no cause at all. A caller
+    # that passes a list gets them back; the parser has used this convention all along.
+    skipped: list = skipped if skipped is not None else []
     classes: dict = {}
     for h in hs:
         ms, sk, cs = parse_classes(str(h))
