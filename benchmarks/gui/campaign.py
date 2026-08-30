@@ -180,6 +180,8 @@ def main() -> int:
     ap.add_argument("--n", type=int, default=10)
     ap.add_argument("--budget", type=float, default=8.0)
     ap.add_argument("--rng", type=int, default=1337)
+    ap.add_argument("--results", default="",
+                    help="append a JSON row here so the GUI table can be regenerated")
     ap.add_argument("--naive", action="store_true",
                     help="byte flips instead of the structure-aware mutator, for comparison")
     a = ap.parse_args()
@@ -226,10 +228,31 @@ def main() -> int:
               "result from this campaign would mean nothing.", file=sys.stderr)
         return 1
 
+    # AND A NEGATIVE CONTROL, which the positive one does not replace.
+    #
+    # The positive control proves the pipeline can open a file. It says nothing about
+    # whether the oracle can SEE a refusal, and without that "12 of 12 accepted" is
+    # indistinguishable from an oracle that never fires. evince accepted every mutated PDF
+    # on its first run here, which is plausible -- poppler is famously tolerant -- and
+    # would look identical to a broken detector.
+    neg = work / "negative" / f"garbage{ext}"
+    neg.parent.mkdir(parents=True, exist_ok=True)
+    neg.write_bytes(b"this is not a valid file of any kind, by construction")
+    nv = run_one(a.app, str(neg), a.budget)
+    print(f"  neg control    {nv.outcome.value:12} nodes={nv.nodes:3} "
+          f"term={nv.termination.value if nv.termination else '-'}")
+    oracle_live = nv.outcome is GuiOutcome.REJECTED
+    if not oracle_live:
+        print("  WARNING: the oracle did not flag deliberate garbage. Every 'accepted' "
+              "below is therefore unproven -- it may be the detector, not the target.",
+              file=sys.stderr)
+
     tally: dict = {}
+    kinds: dict = {}
     for i in range(a.n):
         f = slot(i) / f"input{ext}"
         data, what = mutate(seed, rng, aware=not a.naive)
+        kinds[what] = kinds.get(what, 0) + 1
         f.write_bytes(data)
         v = run_one(a.app, str(f), a.budget)
         tally[v.outcome.value] = tally.get(v.outcome.value, 0) + 1
@@ -243,6 +266,39 @@ def main() -> int:
     print(f"  past the front door: {acc}/{a.n} = {100.0*acc/max(1,a.n):.0f}% accepted")
     findings = tally.get("crashed", 0) + tally.get("unresponsive", 0)
     print(f"  findings: {findings}   (a refusal is the target working, not a finding)")
+
+    # A ROW, so the table can be regenerated rather than hand-maintained. Same discipline as
+    # the C track: a table nobody can regenerate is a table nobody can check.
+    if a.results:
+        import json
+        row = {
+            "app": a.app,
+            "format": ext.lstrip("."),
+            # WHAT WAS ACTUALLY DONE, not what was asked for. The PNG-aware mutator falls
+            # back to raw byte flips on any format it cannot parse, so a row that reported
+            # the requested mode would claim structure-awareness a PDF run never had.
+            "mutator": ("byte-flip" if a.naive
+                        else ("raw-fallback" if set(kinds) <= {"raw", "flip"}
+                              else "structure-aware")),
+            "mutations": kinds,
+            "inputs": a.n,
+            "budget_s": a.budget,
+            "rng": a.rng,
+            "control": cv.outcome.value,
+            "control_nodes": cv.nodes,
+            "neg_control": nv.outcome.value,
+            "oracle_live": oracle_live,
+            "accepted": tally.get("accepted", 0),
+            "rejected": tally.get("rejected", 0),
+            "unresponsive": tally.get("unresponsive", 0),
+            "crashed": tally.get("crashed", 0),
+            "no_window": tally.get("no_window", 0),
+            "past_front_door_pct": round(100.0 * acc / max(1, a.n), 1),
+            "findings": findings,
+        }
+        with open(a.results, "a") as fh:
+            fh.write(json.dumps(row) + "\n")
+        print(f"  row appended to {a.results}")
     return 0
 
 
