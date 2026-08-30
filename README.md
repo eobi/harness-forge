@@ -160,14 +160,39 @@ are deterministic and independent of the proposer decide what a finding is worth
 the **same 0-6 rung ladder** this repository does, which is what lets the two compose
 instead of merely coexisting.
 
-```console
-$ hforge propose  cJSON.h --include . --name cjson
-451 plan(s) proposed
-$ hforge validate build/proposed/cjson_cJSON_ParseWithLength.hir.json
-[PASS] S1..S6   the plan is contract-compliant
-$ hforge emit    build/proposed/cjson_cJSON_ParseWithLength.hir.json -o out
-$ python -m forge lab out/harness.c --fuzz-time 20      # Nemesis Forge
+Get it — standard library only, no server, no key:
+
+```bash
+git clone https://github.com/eobi/nemesisforge.git
+cd nemesisforge && python -m forge doctor
 ```
+
+`doctor` reports which lenses are present **and what each absence costs**, so a null result
+is never mistaken for a completed search. Then the whole pipeline:
+
+```console
+$ python3 -m hforge propose cJSON.h --include . --name cjson
+451 plan(s) proposed
+
+$ python3 -m hforge validate build/proposed/cjson_cJSON_ParseWithLength.hir.json
+[PASS] S1..S6   the plan is contract-compliant
+
+$ python3 -m hforge emit build/proposed/cjson_cJSON_ParseWithLength.hir.json -o out
+wrote out/harness.c
+
+$ python -m forge lab out/harness.c --fuzz-time 20       # Nemesis Forge
+[21:12:34] job=lab-768ee174 harness=out/harness.c fuzz_time=20s provider=null
+[21:12:34] 0 finding(s)
+```
+
+Zero findings on cJSON 1.7.18 is the right answer for a pinned release OSS-Fuzz has hammered
+for years — and it is only readable beside a positive control, which their tree ships:
+`forge lab examples/harness_trunc.c` reaches **rung 1 in 54 executions** on the same machine.
+
+`forge lab` builds one translation unit, so point it at a single-file library or place the
+harness beside the sources it includes; `out/build.sh` records the exact build this engine
+used. Nemesis Forge also exposes an MCP surface (`python -m forge_mcp --ring2`), so an agent
+can drive certify-then-campaign without a shell.
 
 A **certificate** states what the harness cannot reach. A **finding** states what the
 campaign did not prove. Neither hides its gaps, and between them there is no step where
