@@ -84,3 +84,15 @@ def test_both_toolkit_spellings_of_a_real_error_are_caught():
     eog spelling too. The family holds across both."""
     for node in (("info bar", "Error"), ("alert", "dialog-error-symbolic")):
         assert error_nodes([node]), node
+
+
+def test_the_verdict_records_how_termination_was_decided():
+    """A result reached by timeout means something different from one reached by
+    quiescence, and a reader cannot tell them apart from the outcome alone."""
+    from hforge.gui.linux_atspi import TerminationReason
+    v = classify(tree=[("frame", "eog"), ("drawing area", "")], exited=False,
+                 window_ms=330.0, serviced_action=True,
+                 termination=TerminationReason.DEADLINE)
+    assert v.outcome is GuiOutcome.ACCEPTED
+    assert v.termination is TerminationReason.DEADLINE, (
+        "an input that merely ran out of budget must not read as one that settled")

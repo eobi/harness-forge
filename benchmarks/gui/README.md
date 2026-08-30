@@ -49,6 +49,29 @@ role alone classified that as a rejection — an input that was processed, repor
 that was refused. That is the mirror of the false hang this track began with, and only a
 second toolkit exposed it.
 
+## P6.TERM: the observer changes the observed
+
+`observer-effect.sh` answers "when is one GUI input finished?" and finds that the two
+obvious signals cannot be used together.
+
+| condition | CPU quiesces | total ticks |
+|---|---|---:|
+| CPU polled alone | 0.96 s | 26 |
+| CPU polled **while walking AT-SPI** | **never** | **201** |
+| CPU polled alone (repeat) | 0.92 s | 18 |
+
+Walking the accessibility tree makes the target service every request, so it burns eight
+times the CPU and never settles. A driver that polls the tree in a loop **and** uses CPU
+quiescence to decide an input is finished therefore reports **every input as a hang** — a
+third way to manufacture a false hang, after the error-bar-as-hang and the
+warning-as-rejection this lab already found.
+
+The rule that follows: **wait for quiescence without looking, then enumerate once.** Tree
+stability stays as the fallback for targets whose CPU never settles — an animated viewer, a
+spinner — where quiescence is not available at any price. Whichever fired is recorded on the
+verdict, because a result reached by deadline means something different from one that
+settled.
+
 ## Two things that cost time, recorded so they do not again
 
 **`XDG_RUNTIME_DIR` is not optional.** Without it GTK stalls before mapping and says

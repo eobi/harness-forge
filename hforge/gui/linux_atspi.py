@@ -71,6 +71,42 @@ ERROR_NAME_HINTS: tuple = ("error", "failed", "cannot", "unable", "invalid", "co
 WARNING_NAME_HINTS: tuple = ("warning", "warn", "caution")
 
 
+# ── P6.TERM: when is one GUI input finished? ─────────────────────────────────
+#
+# THE OBSERVER CHANGES THE OBSERVED, and this is measured rather than argued. Polling the
+# accessibility tree makes the target service every request, so it never stops burning CPU:
+#
+#     CPU polled alone                   quiesces at 0.96 s,   26 ticks
+#     CPU polled WHILE walking AT-SPI    NEVER quiesces,      201 ticks
+#     CPU polled alone (repeat)          quiesces at 0.92 s,   18 ticks
+#
+# Eight times the CPU, and no quiescent point at all. A driver that walks the tree in a loop
+# AND uses CPU quiescence to decide an input is finished therefore reports EVERY input as a
+# hang -- a third way to manufacture a false hang, after the error-bar-as-hang and the
+# warning-as-rejection already found here.
+#
+# So the two signals must not be used together, and the order matters:
+#
+#   1. WAIT FOR QUIESCENCE WITHOUT LOOKING. Cheap, non-invasive, and it is the signal that
+#      actually means "the process has stopped working on this input".
+#   2. THEN ENUMERATE ONCE for the verdict.
+#
+# Tree stability is kept as the fallback for targets whose CPU never settles -- an animated
+# viewer, a spinner -- where quiescence is not available at any price.
+QUIESCE_POLLS = 6            # consecutive unchanged CPU samples that count as settled
+QUIESCE_INTERVAL_S = 0.05    # between samples; ~0.3 s of stillness at the default
+WINDOW_DEADLINE_S = 15.0     # a window maps in 0.11-0.55 s measured; this is a ceiling
+
+
+class TerminationReason(str, Enum):
+    """Why the driver decided this input was finished. Recorded on the verdict, because a
+    result reached by timeout means something different from one reached by quiescence."""
+
+    QUIESCED = "quiesced"            # the process stopped consuming CPU
+    TREE_STABLE = "tree_stable"      # fallback: the accessibility tree stopped changing
+    DEADLINE = "deadline"            # neither settled; the budget ran out
+
+
 class GuiOutcome(str, Enum):
     """What one input did to the application.
 
@@ -94,6 +130,7 @@ class GuiVerdict:
     action_ms: Optional[float] = None
     evidence: list = field(default_factory=list)
     note: str = ""
+    termination: Optional[TerminationReason] = None
 
     def is_finding(self) -> bool:
         """Only a crash or a genuine hang is a candidate. A refusal is the target working."""
@@ -128,7 +165,8 @@ def error_nodes(tree: Sequence) -> list:
 
 
 def classify(*, tree: Sequence, exited: bool, window_ms: Optional[float],
-             serviced_action: Optional[bool], action_ms: Optional[float] = None) -> GuiVerdict:
+             serviced_action: Optional[bool], action_ms: Optional[float] = None,
+             termination: Optional[TerminationReason] = None) -> GuiVerdict:
     """One input's outcome, from what was observed. Pure, so the rules are testable.
 
     Order matters. A dead process is a crash whatever its last tree said; a target that
@@ -138,17 +176,21 @@ def classify(*, tree: Sequence, exited: bool, window_ms: Optional[float],
     """
     errs = error_nodes(tree)
     if exited:
-        return GuiVerdict(GuiOutcome.CRASHED, len(tree), window_ms, action_ms, errs,
+        return _v(termination, GuiOutcome.CRASHED, len(tree), window_ms, action_ms, errs,
                           "the process died while the input was open")
     if window_ms is None:
-        return GuiVerdict(GuiOutcome.NO_WINDOW, len(tree), None, action_ms, errs,
+        return _v(termination, GuiOutcome.NO_WINDOW, len(tree), None, action_ms, errs,
                           "no window mapped inside the deadline; nothing was tested")
     if errs:
-        return GuiVerdict(GuiOutcome.REJECTED, len(tree), window_ms, action_ms, errs,
+        return _v(termination, GuiOutcome.REJECTED, len(tree), window_ms, action_ms, errs,
                           "the target refused this input and said so — a pass, not a finding")
     if serviced_action is False:
-        return GuiVerdict(GuiOutcome.UNRESPONSIVE, len(tree), window_ms, action_ms, errs,
+        return _v(termination, GuiOutcome.UNRESPONSIVE, len(tree), window_ms, action_ms, errs,
                           "a window is up and the process does not service accessibility "
                           "actions: hung, and independent of what the window shows")
-    return GuiVerdict(GuiOutcome.ACCEPTED, len(tree), window_ms, action_ms, errs,
+    return _v(termination, GuiOutcome.ACCEPTED, len(tree), window_ms, action_ms, errs,
                       "opened without an error element")
+
+
+def _v(termination, outcome, nodes, window_ms, action_ms, evidence, note) -> GuiVerdict:
+    return GuiVerdict(outcome, nodes, window_ms, action_ms, evidence, note, termination)
