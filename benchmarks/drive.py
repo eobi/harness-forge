@@ -981,13 +981,37 @@ def measure_gold(c, wd, logs, corp, dict_args, seconds, mlen, cover):
                         env=dict(os.environ, LLVM_PROFILE_FILE=str(prof)),
                         timeout=seconds + 300)
     (glogs/"fuzz.log").write_text(fr.stdout + fr.stderr)
+
+    # THE SAME COVERAGE METHOD AS OUR SIDE, which it was not.
+    #
+    # Our number comes from replaying the final corpus in a separate `-runs=0` process;
+    # gold's came from the profile the CAMPAIGN wrote. Those measure different things: a
+    # campaign profile counts every input ever executed, a replay counts the corpus the
+    # campaign kept. The campaign figure can only be the larger of the two, so gold was
+    # being scored by a method more generous than ours -- the opposite direction from the
+    # D3 corpus bias, and no more defensible for running in our disfavour. Two harnesses
+    # compared on one budget have to be measured the same way or the difference is partly
+    # the instrument.
+    greplay = gwd/"replay.profraw"
+    grp = subprocess.run([str(gbin), str(gcorp), "-runs=0", f"-max_len={mlen}"],
+                         capture_output=True, text=True, errors="replace",
+                         env=dict(os.environ, LLVM_PROFILE_FILE=str(greplay)),
+                         timeout=600)
+    if greplay.exists() and greplay.stat().st_size > 0:
+        prof = greplay
+        gcov_from, greplay_exit = "corpus replay", grp.returncode
+    else:
+        # A campaign that died takes its replay with it; say which number this is.
+        gcov_from, greplay_exit = "campaign", None
     subprocess.run(["llvm-profdata-14", "merge", "-sparse", str(prof),
                     "-o", str(gwd/"run.profdata")], capture_output=True)
     cr = subprocess.run(["llvm-cov-14", "report", str(gbin),
                          f"-instr-profile={gwd}/run.profdata"] + cover,
                         capture_output=True, text=True)
     (glogs/"coverage.txt").write_text(cr.stdout + cr.stderr)
-    g = {"result": "measured", "source": gsrc}
+    g = {"result": "measured", "source": gsrc, "coverage_from": gcov_from}
+    if greplay_exit is not None:
+        g["replay_exit"] = greplay_exit
     tot = [l for l in cr.stdout.splitlines() if l.startswith("TOTAL")]
     if tot:
         f = tot[0].split()
