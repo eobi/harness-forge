@@ -94,6 +94,110 @@ passed.
 No installation, no build step, nothing beyond a C compiler. Captured from real runs against
 the demo library in [`examples/lib/`](examples/lib/), so a clone and a paste gets the same.
 
+### Point it at a library
+
+Nothing here needs a hand-written plan. Give it the public header and the include paths:
+
+```console
+$ python3 -m hforge propose /b/libyaml/include/yaml.h \
+    --include /b/libyaml/include --include /b/libyaml/src --name libyaml
+
+116 plan(s) proposed from /b/libyaml/include/yaml.h, written to build/proposed/
+
+RANK  PLAN                               BLOCK   EDGES  GREW   KILL  SINKS  N/RUN  WARN
+--------------------------------------------------------------------------------------
+ 1    libyaml_yaml_alias_event_initiali      0       ?     ?    0%    0%      0     0
+ 2    libyaml_yaml_alias_event_initiali      0       ?     ?    0%    0%      0     0
+ ...
+x115  libyaml_yaml_document_get_node_wi      1       ?     ?    0%    0%      0     0
+x116  libyaml_yaml_document_get_node_wi      1       ?     ?    0%    0%      0     0
+
+Winner: libyaml_yaml_alias_event_initialize (producer: header_graph).
+Selected by gate evidence. No producer supplied a score, a confidence or a preference.
+```
+
+An `x` prefix means a static gate blocked that plan; it is reported, not hidden. **Read the
+`?` column before the ranking.** `EDGES` is unknown because no campaign has run, so this
+ranking is ordered by static evidence alone — and it shows: the plan at the top initialises
+an alias event, which is not where YAML parses anything. Static gates prove a harness is not
+wrong. They cannot tell you which correct harness is worth running.
+
+That is what `batch` is for. It generates every plan, gates them all, gives the survivors a
+real campaign, and ships only what earns it:
+
+```console
+$ python3 -m hforge batch /b/libyaml/include/yaml.h \
+    --source /b/libyaml/src/api.c --source /b/libyaml/src/parser.c \
+    --include /b/libyaml/include --top 32 --campaign-seconds 60
+```
+
+`--top` bounds how many get a campaign; the rest are reported as unmeasured rather than as
+passing. Add `--classpath` in place of the header to drive the Java producer and the Jazzer
+backend instead.
+
+### Grade a harness somebody else wrote
+
+The same gate bank runs against harnesses this engine did not write — yours, or a
+generator's you are evaluating:
+
+```console
+$ python3 -m hforge audit path/to/their_fuzzer.c
+$ python3 -m hforge audit target/classes --classpath app.jar
+```
+
+`audit` lifts the harness into the same IR and grades it, so a third-party harness and a
+generated one are judged by identical criteria.
+
+### Pointing it at a target, by platform
+
+The engine is one pipeline with several backends, and they are not equally finished. This
+table is the honest state; `python3 -m hforge platforms` prints the full matrix with the
+trust ceiling each one carries, and `doctor` reports what your own machine can prove.
+
+| target | status | how you point it |
+|---|---|---|
+| **Linux CLI** (native or Docker) | verified end to end — 92 tests, 11/11 runnable stages | `hforge batch <header> --source ...` |
+| **Linux GUI** | early: file-drop driver and AT-SPI dialog automation both PARTIAL, coverage-guided termination PLANNED | not yet a supported entry point |
+| **Android CLI** | verified end to end on arm64-v8a API 35: cross-build, push, run, differential | `--platform android-arm64-emulator` |
+| **Android GUI** | planned, next after Linux GUI | — |
+| **macOS** arm64 | verified end to end | `hforge batch ...` natively |
+| **JVM / Java** | Jazzer backend, own gates and sink ladder | `--classpath app.jar` in place of the header |
+| **Windows** | exit-code semantics implemented and unit-tested from any host, **never run on a Windows host** | after the mobile track |
+| **iOS** | simulator detected via `simctl`; harness emission not yet wired | — |
+
+**Linux, in Docker.** The benchmark image is the reference environment — it fixes the
+compiler, the sanitizer and the coverage tooling, so two runs differ in the engine and in
+nothing else. Mount the repository read-only and the work directory writable:
+
+```console
+$ docker run --rm -v "$PWD:/hf:ro" -v /tmp/hf-work:/b hforge-linuxbench \
+    python3 -m hforge batch /b/libyaml/include/yaml.h \
+      --source /b/libyaml/src/api.c --source /b/libyaml/src/parser.c \
+      --include /b/libyaml/include --top 32 --campaign-seconds 60 -o /b/out
+```
+
+`benchmarks/fetch.sh` populates `/b` with every benchmark target at a pinned revision and
+writes `versions.json`, so a coverage figure can name the source it describes.
+
+**Android.** The same command with a platform selector. Check what is attached first —
+`devices` lists Android devices and iOS simulators, and `selftest` will tell you which
+stages your host can actually run rather than reporting a skip as a pass:
+
+```console
+$ python3 -m hforge devices
+$ python3 -m hforge selftest --abi arm64-v8a --api 29
+[ PASS ] android cross-build   arm64-v8a api29 with asan (downgraded from hwasan:
+                               stock system image; HWASan needs a HWASan image)
+[ PASS ] android device run    emulator-5554: ok
+```
+
+That downgrade line is the point: the harness records that it got ASan where it asked for
+HWASan, so a certificate never claims a sanitizer the run did not have.
+
+**Roadmap.** P1 and P2 (IR, static gates, C emitter, dynamic gates) are done. P3 producers
+and P4 third-party audit are partial. P7 mobile is partial and active. P5 Windows, P6 GUI,
+P8 snapshot-and-scale and P9 exotic targets are planned, in roughly that order.
+
 ### Reject a bad plan before any compiler runs
 
 ```console
