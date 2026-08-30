@@ -313,6 +313,13 @@ CASES = {
                            + glob.glob("/b/zstd/lib/decompress/*.c")
                            + glob.glob("/b/zstd/lib/compress/*.c"))],
     fn="ZSTD_decompress", cflags=["-DZSTD_DISABLE_ASM=1"], max_len=65536,
+    # SEEDS FROM ZSTD'S OWN COMPRESSOR, written by benchmarks/targets/zstd.sh. A zstd frame
+    # opens with a four-byte magic number and a header whose descriptor byte decides which
+    # optional fields follow; a mutator reaches that by chance essentially never. run-026
+    # measured this case at seeds=0 -- 15.4 million executions, almost all of them rejected
+    # at the magic check. mbedTLS settled the argument earlier: eleven real certificates
+    # took X.509 from 12.22% to 27.08% on a campaign a tenth as long.
+    seeds=["/b/zstd/hf-seeds"],
     # DECOMPRESSION ONLY. compress/ is linked because the decoder references shared
     # entropy code, but a decode entry point cannot reach the encoder and counting it
     # would cap the figure for no reason.
