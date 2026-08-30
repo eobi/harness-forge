@@ -686,12 +686,28 @@ def main():
     # faults on input the library ACCEPTS is reporting its own defect, and every finding
     # from it would be the harness's own.
     #
-    # NOTE FOR ANYONE READING A ROW AGAINST A LOG: this gate GROWS THE CORPUS. libFuzzer
-    # writes newly-interesting inputs back into a writable corpus directory, so libwebp's
-    # 24 mined seeds became 79 files by the time the campaign started. `seeds` on the row is
-    # what the miner supplied; the log's "seed corpus: files: N" is what existed after this
-    # check. Both are true and they measure different moments.
-    smoke = subprocess.run([str(binp), str(corp), "-runs=400", f"-max_len={mlen}"],
+    # THIS GATE RUNS IN ITS OWN DIRECTORY, AND THAT IS NOT A DETAIL.
+    #
+    # libFuzzer writes newly-interesting inputs back into whatever corpus directory it is
+    # given. Pointed at the campaign's corpus, this 400-execution check therefore SEEDED
+    # the campaign with whatever it happened to discover -- and `measure_gold` deliberately
+    # does not run it, because it is a gate on OUR plan. So on every case, our harness
+    # started the campaign with inputs a fuzzer had already found for it and the developer's
+    # harness started with the mined seeds alone. On a case with NO seeds -- woff2, libde265
+    # -- ours started with a handful of discovered inputs and gold started with nothing.
+    #
+    # That is an asymmetry in OUR FAVOUR in every head-to-head number this file produces,
+    # and it was documented as a curiosity ("the corpus grows") without anyone noticing
+    # what it did to the comparison. A copy of the seeds goes to a scratch directory, the
+    # gate runs there, and the campaign corpus is left exactly as the miner wrote it.
+    d3dir = wd/"d3"
+    if d3dir.exists():
+        shutil.rmtree(d3dir)
+    d3dir.mkdir(parents=True, exist_ok=True)
+    for f in sorted(corp.iterdir()):
+        if f.is_file():
+            shutil.copy2(f, d3dir/f.name)
+    smoke = subprocess.run([str(binp), str(d3dir), "-runs=400", f"-max_len={mlen}"],
                            capture_output=True, text=True, errors="replace",
                            timeout=300)
     if smoke.returncode != 0:
@@ -744,6 +760,18 @@ def main():
         (logs/"target.dict").write_text(dpath.read_text(errors="replace"))
     out["executions"] = int(next((x for x in __import__("re").findall(
         r"stat::number_of_executed_units:\s*(\d+)", log)), 0) or 0)
+    # THE SEED MAKES A SURPRISING RUN REPRODUCIBLE. libFuzzer picks a random one per
+    # campaign and prints it; without recording it, a run that lands 9 points from its
+    # neighbour can never be re-examined, only re-rolled. Recording it does NOT fix the
+    # seed -- the variance is real and must stay visible -- it makes any single sample
+    # replayable with `-seed=N`.
+    _seed = __import__("re").search(r"INFO: Seed: (\d+)", log)
+    if _seed:
+        out["libfuzzer_seed"] = int(_seed.group(1))
+    _corp0 = __import__("re").search(r"(\d+) files found in", log)
+    if _corp0:
+        # What the campaign ACTUALLY started from, beside what the miner supplied.
+        out["corpus_files_at_start"] = int(_corp0.group(1))
     # AN EMPTY PROFILE IS A FAILED MEASUREMENT, NOT A ZERO.
     #
     # `llvm-profdata merge` SUCCEEDS on an empty .profraw and produces a valid, empty
