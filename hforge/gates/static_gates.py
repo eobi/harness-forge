@@ -130,7 +130,16 @@ def s1_lifetime(ir: HarnessIR) -> GateResult:
             else:
                 state[op.targets] = DEAD
 
+    # STORAGE DECIDES WHETHER A LIVE RESOURCE IS A LEAK. Only a `handle` -- memory the
+    # LIBRARY allocated and handed back -- can leak. An object the harness owns inline is
+    # a stack variable whose destructor runs at scope exit, and reporting it demoted
+    # woff2's real entry point (which constructs a sink) below a trivial size calculation
+    # that constructs nothing: the warning count is part of the ranking, so a spurious
+    # warning does not merely add noise, it picks the wrong harness.
+    _owned = {r.id: (r.storage or "handle") for r in ir.resources}
     for rid, st in state.items():
+        if st == ALIVE and _owned.get(rid, "handle") == "inline":
+            continue
         if st == ALIVE:
             v.append(Violation("S1.LEAK", BLOCK if ir.knobs.detect_leaks else WARN,
                                f"resource {rid!r} is still alive when the harness returns; "

@@ -232,14 +232,38 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *{P}data, size_t {P}size) {{
 }}
 """
 
+    def _langed(srcs):
+        """Target sources, each compiled AS ITS OWN LANGUAGE.
+
+        A C++ harness over a library with C dependencies is the normal case, not an edge
+        one: woff2 is C++ and its decompressor brotli is C. Handing `.c` files to clang++
+        compiles them as C++ -- "treating 'c' input as 'c++'", which clang marks
+        DEPRECATED -- and C++ is not a superset of C, so a valid C source can change
+        meaning or stop compiling. `-x c` around the C files says what each one is, and
+        `-x none` returns to inferring by extension.
+        """
+        out, in_c = [], False
+        for f in srcs:
+            is_c = str(f).endswith(".c")
+            if is_c and not in_c:
+                out.append("-x"); out.append("c"); in_c = True
+            elif not is_c and in_c:
+                out.append("-x"); out.append("none"); in_c = False
+            out.append(f)
+        if in_c:
+            out += ["-x", "none"]
+        return out
+
     incs = [f"-I{d}" for d in ir.target.include_dirs] + list(ir.target.cflags)
     san = ",".join(ir.knobs.sanitizers)
     common = ["$CXX", "-g", ir.knobs.optimisation, "-std=c++17",
               "-fno-omit-frame-pointer", *incs]
     build = [*common, f"-fsanitize=fuzzer{',' + san if san else ''}", "harness.cc",
-             *ir.target.sources, *ir.target.link_libs, "-o", f"{ir.name}_fuzz"]
+             *_langed(ir.target.sources), *ir.target.link_libs, "-o",
+             f"{ir.name}_fuzz"]
     dbuild = [*common] + ([f"-fsanitize={san}"] if san else []) + \
-             ["harness.cc", "driver.cc", *ir.target.sources, *ir.target.link_libs,
+             ["harness.cc", "driver.cc", *_langed(ir.target.sources),
+              *ir.target.link_libs,
               "-o", f"{ir.name}_replay"]
 
     driver = f"""/* Standalone replay for {ir.name}. Same exactly-sized heap buffer as the C

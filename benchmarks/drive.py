@@ -378,6 +378,34 @@ CASES = {
     seeds=["/b/pugixml/tests/data_fuzz_parse"],
     gold_harness="/b/pugixml/tests/fuzz_parse.cpp",
     cover=["/b/pugixml/src/pugixml.cpp"]),
+ # THE OUTPUT-SINK SHAPE, and the case that motivated building for it. woff2's entry
+ # point takes a `WOFF2Out*`, which is PURE VIRTUAL: the plan has to find a concrete
+ # descendant and give its constructor a buffer the harness owns. Before that capability
+ # the only honest answer here was a refusal.
+ #
+ # woff2 ships src/convert_woff2ttf_fuzzer.cc, so gold is MEASURED here, not cited. It is
+ # the same harness ours emits apart from a SetMaxSize OOM guard.
+ #
+ # brotli is woff2's decompressor and is built from the tree already fetched for the
+ # brotli cases. The ENCODER (woff2_enc, woff2_compress) and the command-line tools are
+ # excluded from both the link line and the denominator: they are a separate library and
+ # counting them would deflate the figure for work this harness cannot reach.
+ "woff2/convert": dict(
+    lang="c++", cxx=True, std="c++17",
+    hdr="/b/woff2/include/woff2/decode.h",
+    also=["/b/woff2/include/woff2/output.h"],
+    inc=["/b/woff2/include", "/b/woff2/src", "/b/brotli/c/include"],
+    src=["/b/woff2/src/woff2_dec.cc", "/b/woff2/src/woff2_common.cc",
+         "/b/woff2/src/woff2_out.cc", "/b/woff2/src/variable_length.cc",
+         "/b/woff2/src/table_tags.cc"]
+        + sorted(glob.glob("/b/brotli/c/dec/*.c"))
+        + sorted(glob.glob("/b/brotli/c/common/*.c")),
+    fn="woff2::ConvertWOFF2ToTTF",
+    cflags=[], max_len=65536,
+    gold_harness="/b/woff2/src/convert_woff2ttf_fuzzer.cc",
+    cover=["/b/woff2/src/woff2_dec.cc", "/b/woff2/src/woff2_common.cc",
+           "/b/woff2/src/woff2_out.cc", "/b/woff2/src/variable_length.cc",
+           "/b/woff2/src/table_tags.cc"]),
 }
 
 
