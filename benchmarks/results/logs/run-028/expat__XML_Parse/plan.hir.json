@@ -1,0 +1,277 @@
+{
+  "schema_version": "1.0",
+  "name": "expat_XML_Parse",
+  "producer": "header_graph",
+  "notes": "proposed from expat.h by signature inference; handle type inferred as 'XML_Parser'. Every inference here is checked by a static gate, and the producer certifies nothing.",
+  "target": {
+    "name": "expat",
+    "version": "",
+    "commit": "",
+    "public_headers": [
+      "/b/expat/expat/lib/expat.h"
+    ],
+    "include_dirs": [
+      "/b/expat/expat",
+      "/b/expat/expat/lib"
+    ],
+    "sources": [
+      "/b/expat/expat/lib/xmlparse.c",
+      "/b/expat/expat/lib/xmlrole.c",
+      "/b/expat/expat/lib/xmltok.c"
+    ],
+    "link_libs": [],
+    "cflags": [
+      "-DHAVE_EXPAT_CONFIG_H",
+      "-DXML_GE=1"
+    ],
+    "seed_dirs": [],
+    "language": "c"
+  },
+  "platforms": [
+    "linux-aarch64-glibc"
+  ],
+  "apis": {
+    "XML_Parse": {
+      "symbol": "XML_Parse",
+      "header": "expat.h",
+      "params": [
+        {
+          "name": "parser",
+          "type": {
+            "name": "XML_Parser",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "s",
+          "type": {
+            "name": "const char *",
+            "kind": "pointer",
+            "const": true,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "len",
+          "type": {
+            "name": "int",
+            "kind": "scalar",
+            "const": false,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "isFinal",
+          "type": {
+            "name": "int",
+            "kind": "scalar",
+            "const": false,
+            "resolved": ""
+          }
+        }
+      ],
+      "returns": {
+        "name": "enum XML_Status",
+        "kind": "scalar",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "consume",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [
+          [
+            "s",
+            "len"
+          ]
+        ],
+        "transfers_ownership": [],
+        "requires_nonnull": [
+          "parser"
+        ],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    },
+    "XML_ParserCreate": {
+      "symbol": "XML_ParserCreate",
+      "header": "expat.h",
+      "params": [
+        {
+          "name": "encoding",
+          "type": {
+            "name": "const XML_Char *",
+            "kind": "pointer",
+            "const": true,
+            "resolved": "char"
+          }
+        }
+      ],
+      "returns": {
+        "name": "XML_Parser",
+        "kind": "pointer",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "create",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [],
+        "transfers_ownership": [],
+        "requires_nonnull": [],
+        "error_return": "null",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    },
+    "XML_ParserFree": {
+      "symbol": "XML_ParserFree",
+      "header": "expat.h",
+      "params": [
+        {
+          "name": "parser",
+          "type": {
+            "name": "XML_Parser",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        }
+      ],
+      "returns": {
+        "name": "void",
+        "kind": "void",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "destroy",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [],
+        "transfers_ownership": [],
+        "requires_nonnull": [],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    }
+  },
+  "slices": [
+    {
+      "id": "s",
+      "kind": "bytes",
+      "remainder": true,
+      "min_len": 1,
+      "max_len": 0
+    }
+  ],
+  "resources": [
+    {
+      "id": "h",
+      "type": {
+        "name": "XML_Parser",
+        "kind": "pointer",
+        "const": false,
+        "resolved": ""
+      },
+      "storage": "handle"
+    }
+  ],
+  "scratch": [],
+  "sequence": [
+    {
+      "id": "o_create",
+      "api": "XML_ParserCreate",
+      "args": [
+        {
+          "param": "encoding",
+          "source": "literal",
+          "ref": "",
+          "value": 0
+        }
+      ],
+      "binds": "h",
+      "targets": "",
+      "repeat": 0,
+      "repeat_while": "",
+      "guarded_by": []
+    },
+    {
+      "id": "o_consume",
+      "api": "XML_Parse",
+      "args": [
+        {
+          "param": "parser",
+          "source": "resource",
+          "ref": "h",
+          "value": null
+        },
+        {
+          "param": "s",
+          "source": "input",
+          "ref": "s",
+          "value": null
+        },
+        {
+          "param": "len",
+          "source": "length_of",
+          "ref": "s",
+          "value": null
+        },
+        {
+          "param": "isFinal",
+          "source": "literal",
+          "ref": "",
+          "value": 0
+        }
+      ],
+      "binds": "",
+      "targets": "",
+      "repeat": 0,
+      "repeat_while": "",
+      "guarded_by": [
+        "h"
+      ]
+    },
+    {
+      "id": "o_destroy",
+      "api": "XML_ParserFree",
+      "args": [
+        {
+          "param": "parser",
+          "source": "resource",
+          "ref": "h",
+          "value": null
+        }
+      ],
+      "binds": "",
+      "targets": "h",
+      "repeat": 0,
+      "repeat_while": "",
+      "guarded_by": []
+    }
+  ],
+  "knobs": {
+    "max_len": 65536,
+    "min_len": 0,
+    "timeout_s": 25,
+    "rss_limit_mb": 2048,
+    "malloc_limit_mb": 0,
+    "sanitizers": [
+      "address"
+    ],
+    "detect_leaks": false,
+    "optimisation": "-O1"
+  },
+  "format_model": null,
+  "raw_blocks": []
+}

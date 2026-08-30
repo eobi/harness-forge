@@ -1,0 +1,438 @@
+{
+  "schema_version": "1.0",
+  "name": "brotli_BrotliDecoderDecompressStream",
+  "producer": "header_graph",
+  "notes": "proposed from decode.h by signature inference; handle type inferred as 'BrotliDecoderState*'. Every inference here is checked by a static gate, and the producer certifies nothing.",
+  "target": {
+    "name": "brotli",
+    "version": "",
+    "commit": "",
+    "public_headers": [
+      "/b/brotli/c/include/brotli/decode.h"
+    ],
+    "include_dirs": [
+      "/b/brotli/c/include"
+    ],
+    "sources": [
+      "/b/brotli/c/common/constants.c",
+      "/b/brotli/c/common/context.c",
+      "/b/brotli/c/common/dictionary.c",
+      "/b/brotli/c/common/platform.c",
+      "/b/brotli/c/common/shared_dictionary.c",
+      "/b/brotli/c/common/transform.c",
+      "/b/brotli/c/dec/bit_reader.c",
+      "/b/brotli/c/dec/decode.c",
+      "/b/brotli/c/dec/huffman.c",
+      "/b/brotli/c/dec/state.c"
+    ],
+    "link_libs": [],
+    "cflags": [],
+    "seed_dirs": [],
+    "language": "c"
+  },
+  "platforms": [
+    "linux-aarch64-glibc"
+  ],
+  "apis": {
+    "BrotliDecoderCreateInstance": {
+      "symbol": "BrotliDecoderCreateInstance",
+      "header": "decode.h",
+      "params": [
+        {
+          "name": "alloc_func",
+          "type": {
+            "name": "brotli_alloc_func",
+            "kind": "scalar",
+            "const": false,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "free_func",
+          "type": {
+            "name": "brotli_free_func",
+            "kind": "scalar",
+            "const": false,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "opaque",
+          "type": {
+            "name": "void*",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        }
+      ],
+      "returns": {
+        "name": "BrotliDecoderState*",
+        "kind": "pointer",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "create",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [],
+        "transfers_ownership": [],
+        "requires_nonnull": [],
+        "error_return": "null",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    },
+    "BrotliDecoderDecompressStream": {
+      "symbol": "BrotliDecoderDecompressStream",
+      "header": "decode.h",
+      "params": [
+        {
+          "name": "state",
+          "type": {
+            "name": "BrotliDecoderState*",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "available_in",
+          "type": {
+            "name": "size_t*",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "next_in",
+          "type": {
+            "name": "const uint8_t**",
+            "kind": "pointer",
+            "const": true,
+            "resolved": "unsigned char"
+          }
+        },
+        {
+          "name": "available_out",
+          "type": {
+            "name": "size_t*",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "next_out",
+          "type": {
+            "name": "uint8_t**",
+            "kind": "pointer",
+            "const": false,
+            "resolved": "unsigned char"
+          }
+        },
+        {
+          "name": "total_out",
+          "type": {
+            "name": "size_t*",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        }
+      ],
+      "returns": {
+        "name": "BrotliDecoderResult",
+        "kind": "scalar",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "consume",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [],
+        "transfers_ownership": [],
+        "requires_nonnull": [
+          "state"
+        ],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    },
+    "BrotliDecoderDestroyInstance": {
+      "symbol": "BrotliDecoderDestroyInstance",
+      "header": "decode.h",
+      "params": [
+        {
+          "name": "state",
+          "type": {
+            "name": "BrotliDecoderState*",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        }
+      ],
+      "returns": {
+        "name": "void",
+        "kind": "void",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "destroy",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [],
+        "transfers_ownership": [],
+        "requires_nonnull": [],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    },
+    "BrotliDecoderIsFinished": {
+      "symbol": "BrotliDecoderIsFinished",
+      "header": "decode.h",
+      "params": [
+        {
+          "name": "state",
+          "type": {
+            "name": "const BrotliDecoderState*",
+            "kind": "pointer",
+            "const": true,
+            "resolved": ""
+          }
+        }
+      ],
+      "returns": {
+        "name": "int",
+        "kind": "scalar",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "query",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [],
+        "transfers_ownership": [],
+        "requires_nonnull": [
+          "state"
+        ],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    }
+  },
+  "slices": [
+    {
+      "id": "next_in_in",
+      "kind": "bytes",
+      "remainder": true,
+      "min_len": 1,
+      "max_len": 0
+    }
+  ],
+  "resources": [
+    {
+      "id": "h",
+      "type": {
+        "name": "BrotliDecoderState*",
+        "kind": "pointer",
+        "const": false,
+        "resolved": ""
+      },
+      "storage": "handle"
+    }
+  ],
+  "scratch": [
+    {
+      "id": "cur_next_in",
+      "kind": "ptr",
+      "capacity": 65536,
+      "c_type": "const uint8_t *",
+      "init_from": "next_in_in",
+      "owns": false
+    },
+    {
+      "id": "outbuf_next_out",
+      "kind": "bytes",
+      "capacity": 65536,
+      "c_type": "",
+      "init_from": "",
+      "owns": false
+    },
+    {
+      "id": "cur_next_out",
+      "kind": "ptr",
+      "capacity": 65536,
+      "c_type": "uint8_t *",
+      "init_from": "outbuf_next_out",
+      "owns": false
+    },
+    {
+      "id": "len_available_in",
+      "kind": "size",
+      "capacity": 0,
+      "c_type": "size_t",
+      "init_from": "next_in_in",
+      "owns": false
+    },
+    {
+      "id": "len_available_out",
+      "kind": "size",
+      "capacity": 65536,
+      "c_type": "size_t",
+      "init_from": "",
+      "owns": false
+    },
+    {
+      "id": "len_total_out",
+      "kind": "size",
+      "capacity": 65536,
+      "c_type": "size_t",
+      "init_from": "",
+      "owns": false
+    }
+  ],
+  "sequence": [
+    {
+      "id": "o_create",
+      "api": "BrotliDecoderCreateInstance",
+      "args": [
+        {
+          "param": "alloc_func",
+          "source": "literal",
+          "ref": "",
+          "value": 0
+        },
+        {
+          "param": "free_func",
+          "source": "literal",
+          "ref": "",
+          "value": 0
+        },
+        {
+          "param": "opaque",
+          "source": "literal",
+          "ref": "",
+          "value": 0
+        }
+      ],
+      "binds": "h",
+      "targets": "",
+      "repeat": 0,
+      "repeat_while": "",
+      "guarded_by": []
+    },
+    {
+      "id": "o_consume",
+      "api": "BrotliDecoderDecompressStream",
+      "args": [
+        {
+          "param": "state",
+          "source": "resource",
+          "ref": "h",
+          "value": null
+        },
+        {
+          "param": "available_in",
+          "source": "scratch_addr",
+          "ref": "len_available_in",
+          "value": null
+        },
+        {
+          "param": "next_in",
+          "source": "scratch_addr",
+          "ref": "cur_next_in",
+          "value": null
+        },
+        {
+          "param": "available_out",
+          "source": "scratch_addr",
+          "ref": "len_available_out",
+          "value": null
+        },
+        {
+          "param": "next_out",
+          "source": "scratch_addr",
+          "ref": "cur_next_out",
+          "value": null
+        },
+        {
+          "param": "total_out",
+          "source": "scratch_addr",
+          "ref": "len_total_out",
+          "value": null
+        }
+      ],
+      "binds": "",
+      "targets": "",
+      "repeat": 4096,
+      "repeat_while": "",
+      "guarded_by": [
+        "h"
+      ]
+    },
+    {
+      "id": "o_finish",
+      "api": "BrotliDecoderIsFinished",
+      "args": [
+        {
+          "param": "state",
+          "source": "resource",
+          "ref": "h",
+          "value": null
+        }
+      ],
+      "binds": "",
+      "targets": "",
+      "repeat": 0,
+      "repeat_while": "",
+      "guarded_by": [
+        "h"
+      ]
+    },
+    {
+      "id": "o_destroy",
+      "api": "BrotliDecoderDestroyInstance",
+      "args": [
+        {
+          "param": "state",
+          "source": "resource",
+          "ref": "h",
+          "value": null
+        }
+      ],
+      "binds": "",
+      "targets": "h",
+      "repeat": 0,
+      "repeat_while": "",
+      "guarded_by": []
+    }
+  ],
+  "knobs": {
+    "max_len": 4096,
+    "min_len": 0,
+    "timeout_s": 25,
+    "rss_limit_mb": 2048,
+    "malloc_limit_mb": 0,
+    "sanitizers": [
+      "address"
+    ],
+    "detect_leaks": false,
+    "optimisation": "-O1"
+  },
+  "format_model": null,
+  "raw_blocks": []
+}

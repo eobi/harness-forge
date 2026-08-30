@@ -1,0 +1,253 @@
+{
+  "schema_version": "1.0",
+  "name": "jansson_json_loadb",
+  "producer": "header_graph",
+  "notes": "free function: no handle, caller-owned buffers",
+  "target": {
+    "name": "jansson",
+    "version": "",
+    "commit": "",
+    "public_headers": [
+      "/b/jansson/src/jansson.h"
+    ],
+    "include_dirs": [
+      "/b/jansson/src",
+      "/b/jansson"
+    ],
+    "sources": [
+      "/b/jansson/src/dump.c",
+      "/b/jansson/src/error.c",
+      "/b/jansson/src/hashtable.c",
+      "/b/jansson/src/hashtable_seed.c",
+      "/b/jansson/src/load.c",
+      "/b/jansson/src/memory.c",
+      "/b/jansson/src/pack_unpack.c",
+      "/b/jansson/src/strbuffer.c",
+      "/b/jansson/src/strconv.c",
+      "/b/jansson/src/utf.c",
+      "/b/jansson/src/value.c",
+      "/b/jansson/src/version.c"
+    ],
+    "link_libs": [],
+    "cflags": [
+      "-include",
+      "stdint.h"
+    ],
+    "seed_dirs": [],
+    "language": "c"
+  },
+  "platforms": [
+    "linux-aarch64-glibc"
+  ],
+  "apis": {
+    "json_loadb": {
+      "symbol": "json_loadb",
+      "header": "jansson.h",
+      "params": [
+        {
+          "name": "buffer",
+          "type": {
+            "name": "const char *",
+            "kind": "pointer",
+            "const": true,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "buflen",
+          "type": {
+            "name": "size_t",
+            "kind": "scalar",
+            "const": false,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "flags",
+          "type": {
+            "name": "size_t",
+            "kind": "scalar",
+            "const": false,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "error",
+          "type": {
+            "name": "json_error_t *",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        }
+      ],
+      "returns": {
+        "name": "json_t *",
+        "kind": "pointer",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "consume",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [
+          [
+            "buffer",
+            "buflen"
+          ]
+        ],
+        "transfers_ownership": [],
+        "requires_nonnull": [],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    },
+    "json_delete": {
+      "symbol": "json_delete",
+      "header": "jansson.h",
+      "params": [
+        {
+          "name": "json",
+          "type": {
+            "name": "json_t *",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        }
+      ],
+      "returns": {
+        "name": "void",
+        "kind": "void",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "query",
+      "contract": {
+        "nul_terminated": [
+          "json"
+        ],
+        "length_delimited": [],
+        "transfers_ownership": [],
+        "requires_nonnull": [],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    }
+  },
+  "slices": [
+    {
+      "id": "mode_flags",
+      "kind": "u8",
+      "remainder": false,
+      "min_len": 0,
+      "max_len": 1
+    },
+    {
+      "id": "buffer",
+      "kind": "bytes",
+      "remainder": true,
+      "min_len": 1,
+      "max_len": 0
+    }
+  ],
+  "resources": [
+    {
+      "id": "out_error",
+      "type": {
+        "name": "json_error_t",
+        "kind": "struct",
+        "const": false,
+        "resolved": ""
+      },
+      "storage": "out"
+    },
+    {
+      "id": "ret_json_t",
+      "type": {
+        "name": "json_t *",
+        "kind": "pointer",
+        "const": false,
+        "resolved": ""
+      },
+      "storage": "handle"
+    }
+  ],
+  "scratch": [],
+  "sequence": [
+    {
+      "id": "o_consume",
+      "api": "json_loadb",
+      "args": [
+        {
+          "param": "buffer",
+          "source": "input",
+          "ref": "buffer",
+          "value": null
+        },
+        {
+          "param": "buflen",
+          "source": "length_of",
+          "ref": "buffer",
+          "value": null
+        },
+        {
+          "param": "flags",
+          "source": "input",
+          "ref": "mode_flags",
+          "value": null
+        },
+        {
+          "param": "error",
+          "source": "resource",
+          "ref": "out_error",
+          "value": null
+        }
+      ],
+      "binds": "ret_json_t",
+      "targets": "",
+      "repeat": 0,
+      "repeat_while": "",
+      "guarded_by": []
+    },
+    {
+      "id": "o_drop_ret_json_t",
+      "api": "json_delete",
+      "args": [
+        {
+          "param": "json",
+          "source": "resource",
+          "ref": "ret_json_t",
+          "value": null
+        }
+      ],
+      "binds": "",
+      "targets": "ret_json_t",
+      "repeat": 0,
+      "repeat_while": "",
+      "guarded_by": [
+        "ret_json_t"
+      ]
+    }
+  ],
+  "knobs": {
+    "max_len": 65536,
+    "min_len": 0,
+    "timeout_s": 25,
+    "rss_limit_mb": 2048,
+    "malloc_limit_mb": 0,
+    "sanitizers": [
+      "address"
+    ],
+    "detect_leaks": false,
+    "optimisation": "-O1"
+  },
+  "format_model": null,
+  "raw_blocks": []
+}

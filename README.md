@@ -470,27 +470,27 @@ confirmed reports — on its own 100-case benchmark with its gold OSS-Fuzz basel
 
 | case | ours | QuartetFuzz | gold | ours/gold | QF/gold |
 |---|---|---|---|---|---|
-| libyaml/libyaml_loader_fuzzer | **73.69** | 73.89 | 77.7 | 0.95x | 0.95x |
+| libyaml/libyaml_loader_fuzzer | **73.00** | 73.89 | 77.7 | 0.94x | 0.95x |
 | libyaml/libyaml_scanner_fuzzer | **70.48** | 67.30 | 70.6 | 1.00x | 0.95x |
-| brotli/decode_fuzzer | **84.95** | 84.15 | 77.2 | 1.10x | 1.09x |
-| yajl-ruby/json_fuzzer | *NO PLAN for the gold target* | 79.87 | 69.1 |  | 1.16x |
+| brotli/decode_fuzzer | **84.87** | 84.15 | 77.2 | 1.10x | 1.09x |
+| yajl-ruby/json_fuzzer | **72.72** | 79.87 | 69.1 | 1.05x | 1.16x |
 | iperf/cjson_fuzzer | **24.82** | 0.00 | 24.5 | 1.01x | 0.00x |
-| zopfli/zopfli_deflate_fuzzer | **76.51** | 80.06 | 85.7 | 0.89x | 0.93x |
-| zlib/zlib_uncompress2_fuzzer | **51.91** | 51.74 | 53.1 | 0.98x | 0.97x |
+| zopfli/zopfli_deflate_fuzzer | *REFUSED by D3: valid input crashes the harness* | 80.06 | 85.7 |  | 0.93x |
+| zlib/zlib_uncompress2_fuzzer | **53.41** | 51.74 | 53.1 | 1.01x | 0.97x |
 | lcms2/cmsOpenProfileFromMem | **5.00** | — | — |  |  |
-| libde265/stream_decode | **13.99** | — | — |  |  |
-| jbig2dec/jbig2_data_in | **2.58** | — | — |  |  |
-| leptonica/pixReadMem | *build failed* | — | — |  |  |
-| jansson/json_loadb | *build failed* | — | — |  |  |
+| libde265/stream_decode | **13.55** | — | — |  |  |
+| jbig2dec/jbig2_data_in | **2.59** | — | — |  |  |
+| leptonica/pixReadMem | **14.63** | — | — |  |  |
+| jansson/json_loadb | **35.20** | — | — |  |  |
 | libwebp/WebPDecodeRGBA | **50.73** | — | — |  |  |
-| libpng/png_image_begin_read_from_memory | *NO PLAN for the gold target* | — | — |  |  |
-| expat/XML_Parse | **22.80** | — | — |  |  |
-| zstd/ZSTD_decompress | **30.04** | — | — |  |  |
-| mbedtls/mbedtls_x509_crt_parse | **12.22** | — | — |  |  |
+| libpng/png_image_begin_read_from_memory | **0.71** | — | — |  |  |
+| expat/XML_Parse | **32.67** | — | — |  |  |
+| zstd/ZSTD_decompress | *all plans for the gold target were refused by a static gate* | — | — |  |  |
+| mbedtls/mbedtls_x509_crt_parse | **32.10** | — | — |  |  |
 
-Measured cases with a gold baseline: **6**. Median ours/gold: **0.99x**. Ahead of the cited QuartetFuzz figure on **4 of the 6** cases it published one for.
+Measured cases with a gold baseline: **6**. Median ours/gold: **1.01x**. Ahead of the cited QuartetFuzz figure on **4 of the 6** cases it published one for.
 
-Sources: run-001-quartetfuzz-6case, run-005-partial, run-007-partial-4of7, run-009, run-010, run-011, run-012, run-013, run-014, run-015, run-016, run-017, run-018, run-019, run-020, run-021, run-022, run-023, run-024, run-026.
+Sources: run-001-quartetfuzz-6case, run-005-partial, run-007-partial-4of7, run-009, run-010, run-011, run-012, run-013, run-014, run-015, run-016, run-017, run-018, run-019, run-020, run-021, run-022, run-023, run-024, run-026, run-028.
 
 <!-- BENCH:END -->
 

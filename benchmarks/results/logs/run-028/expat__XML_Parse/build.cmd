@@ -1,0 +1,1 @@
+clang -g -O1 -fno-omit-frame-pointer -fprofile-instr-generate -fcoverage-mapping -I/b/expat/expat -I/b/expat/expat/lib -DHAVE_EXPAT_CONFIG_H -DXML_GE=1 -fsanitize=fuzzer,address /b/runs/expat__XML_Parse/harness.c /b/expat/expat/lib/xmlparse.c /b/expat/expat/lib/xmlrole.c /b/expat/expat/lib/xmltok.c -o /b/runs/expat__XML_Parse/fuzz

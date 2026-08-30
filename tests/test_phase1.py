@@ -268,3 +268,49 @@ if __name__ == "__main__":
             print(f"  FAIL  {name}: {type(e).__name__}: {e}")
     print(f"\n{len(fns) - bad}/{len(fns)} passed")
     raise SystemExit(1 if bad else 0)
+
+
+# ── S2 catches the zstd inversion: input bound to the OUTPUT parameter ────────
+
+def _two_buffer_ir(*, bind_to: str) -> HarnessIR:
+    """A decompress-shaped API: an output buffer first, the const input second.
+
+    This is ZSTD_decompress(void *dst, size_t dstCapacity, const void *src, size_t
+    srcSize) reduced to the part that matters.
+    """
+    apis = {
+        "zz_decompress": Api(
+            "zz_decompress", "z.h",
+            [ParamDecl("dst", TypeRef("void *", "pointer")),
+             ParamDecl("dstCapacity", TypeRef("size_t")),
+             ParamDecl("src", TypeRef("const void *", "pointer", True)),
+             ParamDecl("srcSize", TypeRef("size_t"))],
+            TypeRef("size_t"), ROLE_CONSUME,
+            Contract(length_delimited=[("src", "srcSize")])),
+    }
+    other = "src" if bind_to == "dst" else "dst"
+    seq = [Op("o_consume", "zz_decompress",
+              [Arg(bind_to, "input", "buf"),
+               Arg("dstCapacity" if bind_to == "dst" else "srcSize", "length_of", "buf"),
+               Arg(other, "literal", value=0),
+               Arg("srcSize" if bind_to == "dst" else "dstCapacity", "literal", value=0)])]
+    return HarnessIR(
+        name="t", target=Target("z", public_headers=["z.h"]), apis=apis,
+        slices=[InputSlice("buf", SLICE_BYTES, remainder=True, min_len=1)],
+        resources=[], sequence=seq,
+        knobs=Knobs(sanitizers=["address"]), platforms=["linux-x86_64-glibc"])
+
+
+def test_s2_rejects_input_bound_to_the_output_buffer():
+    """The defect that produced a harness decompressing nothing while writing attacker
+    bytes through a destination pointer. Every gate passed it, coverage fell from 30.04%
+    to 2.24%, and the 2.24% still looked like a measurement."""
+    codes = _blocking(run_static_gates(_two_buffer_ir(bind_to="dst")))
+    assert "S2.INPUT_TO_OUTPUT" in codes, codes
+
+
+def test_s2_accepts_input_bound_to_the_const_parameter():
+    """The same API bound the right way round must not trip the new rule -- a gate that
+    fires on the correct shape is worse than no gate."""
+    codes = _blocking(run_static_gates(_two_buffer_ir(bind_to="src")))
+    assert "S2.INPUT_TO_OUTPUT" not in codes, codes

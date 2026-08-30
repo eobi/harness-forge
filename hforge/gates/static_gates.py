@@ -190,6 +190,20 @@ def _points_to_bytes(type_name: str, resolved: str = "") -> bool:
     return base in _BYTE_TYPEDEFS
 
 
+_PATH_PARAM = re.compile(r"(?:^|_)(file|filename|fname|path|pathname|dir|dirname|uri|url)"
+                         r"(?:$|_|name)", re.I)
+
+_BYTE_POINTEES = ("char", "void", "unsigned char", "signed char", "uint8_t", "int8_t",
+                  "u_char", "uchar", "byte", "BYTE", "guchar", "Bytef", "Byte")
+
+
+def _byte_pointee(t) -> bool:
+    """Whether a pointer type points at bytes, by spelling or through a typedef."""
+    base = " ".join(re.sub(r"\b(const|volatile|struct|enum|union|restrict)\b", " ",
+                           (t.resolved or t.name)).replace("*", " ").split())
+    return base in _BYTE_POINTEES
+
+
 def s2_contract(ir: HarnessIR) -> GateResult:
     """The API's stated requirements versus what the plan actually feeds it."""
     v: list[Violation] = []
@@ -259,6 +273,41 @@ def s2_contract(ir: HarnessIR) -> GateResult:
                 v.append(Violation("S2.UNKNOWN_SLICE", BLOCK,
                                    f"op {op.id} arg {a.param!r} references undeclared slice "
                                    f"{a.ref!r}", where=op.id, principle="P2"))
+
+        # THE INPUT MUST NOT GO TO AN OUTPUT WHILE THE INPUT PARAMETER SITS UNUSED.
+        #
+        # `ZSTD_decompress(void *dst, size_t dstCapacity, const void *src, size_t srcSize)`
+        # has two void* parameters and the FIRST is the output. A producer that took them
+        # in declaration order bound the fuzzer's bytes to `dst` and passed `src` as NULL:
+        # the harness decompressed nothing, wrote attacker bytes through a destination
+        # pointer, and every gate here passed it. Coverage read 2.24% and looked like a
+        # measurement rather than a broken harness.
+        #
+        # Deliberately narrow. Plenty of APIs take a non-const buffer they transform in
+        # place, and this does not object to those. It fires only when the SAME call
+        # declares a const byte pointer that nothing is bound to -- the library naming its
+        # input, with the plan having chosen something else.
+        _in_params = {a.param for a in op.args if a.source == SRC_INPUT}
+        if _in_params:
+            _const_free = [pd.name for pd in api.params
+                           if pd.type.kind == "pointer" and pd.type.const
+                           and _byte_pointee(pd.type) and not _PATH_PARAM.search(pd.name or "")
+                           and pd.name not in _in_params]
+            for _pn in sorted(_in_params):
+                _pd = ir.param_decl(api, _pn)
+                if _pd is None or _pd.type.kind != "pointer" or _pd.type.const:
+                    continue
+                if _const_free:
+                    v.append(Violation(
+                        "S2.INPUT_TO_OUTPUT", BLOCK,
+                        f"op {op.id} binds the fuzzer's input to {_pn!r}, which "
+                        f"{api.symbol} does not mark const, while {_const_free[0]!r} is a "
+                        f"const buffer parameter nothing is bound to. The library names its "
+                        f"input with const; writing attacker bytes through the output and "
+                        f"leaving the input unset exercises nothing",
+                        where=op.id, principle="P2",
+                        fix=f"bind the input slice to {_const_free[0]!r} and give {_pn!r} "
+                            f"a scratch buffer"))
 
         # ── the one that matters: NUL termination ──
         for pname in api.contract.nul_terminated:

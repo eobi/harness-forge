@@ -1,0 +1,243 @@
+{
+  "schema_version": "1.0",
+  "name": "zstd_ZSTD_decompress",
+  "producer": "header_graph",
+  "notes": "proposed from zstd.h by signature inference; handle type inferred as 'ZSTD_CCtx*'. Every inference here is checked by a static gate, and the producer certifies nothing.",
+  "target": {
+    "name": "zstd",
+    "version": "",
+    "commit": "",
+    "public_headers": [
+      "/b/zstd/lib/zstd.h"
+    ],
+    "include_dirs": [
+      "/b/zstd/lib",
+      "/b/zstd/lib/common"
+    ],
+    "sources": [
+      "/b/zstd/lib/common/debug.c",
+      "/b/zstd/lib/common/entropy_common.c",
+      "/b/zstd/lib/common/error_private.c",
+      "/b/zstd/lib/common/fse_decompress.c",
+      "/b/zstd/lib/common/pool.c",
+      "/b/zstd/lib/common/threading.c",
+      "/b/zstd/lib/common/xxhash.c",
+      "/b/zstd/lib/common/zstd_common.c",
+      "/b/zstd/lib/compress/fse_compress.c",
+      "/b/zstd/lib/compress/hist.c",
+      "/b/zstd/lib/compress/huf_compress.c",
+      "/b/zstd/lib/compress/zstd_compress.c",
+      "/b/zstd/lib/compress/zstd_compress_literals.c",
+      "/b/zstd/lib/compress/zstd_compress_sequences.c",
+      "/b/zstd/lib/compress/zstd_compress_superblock.c",
+      "/b/zstd/lib/compress/zstd_double_fast.c",
+      "/b/zstd/lib/compress/zstd_fast.c",
+      "/b/zstd/lib/compress/zstd_lazy.c",
+      "/b/zstd/lib/compress/zstd_ldm.c",
+      "/b/zstd/lib/compress/zstd_opt.c",
+      "/b/zstd/lib/compress/zstdmt_compress.c",
+      "/b/zstd/lib/decompress/huf_decompress.c",
+      "/b/zstd/lib/decompress/zstd_ddict.c",
+      "/b/zstd/lib/decompress/zstd_decompress.c",
+      "/b/zstd/lib/decompress/zstd_decompress_block.c"
+    ],
+    "link_libs": [],
+    "cflags": [
+      "-DZSTD_DISABLE_ASM=1"
+    ],
+    "seed_dirs": [],
+    "language": "c"
+  },
+  "platforms": [
+    "linux-aarch64-glibc"
+  ],
+  "apis": {
+    "ZSTD_createCCtx": {
+      "symbol": "ZSTD_createCCtx",
+      "header": "zstd.h",
+      "params": [],
+      "returns": {
+        "name": "ZSTD_CCtx*",
+        "kind": "pointer",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "create",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [],
+        "transfers_ownership": [],
+        "requires_nonnull": [],
+        "error_return": "null",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    },
+    "ZSTD_decompress": {
+      "symbol": "ZSTD_decompress",
+      "header": "zstd.h",
+      "params": [
+        {
+          "name": "dst",
+          "type": {
+            "name": "void*",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "dstCapacity",
+          "type": {
+            "name": "size_t",
+            "kind": "scalar",
+            "const": false,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "src",
+          "type": {
+            "name": "const void*",
+            "kind": "pointer",
+            "const": true,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "compressedSize",
+          "type": {
+            "name": "size_t",
+            "kind": "scalar",
+            "const": false,
+            "resolved": ""
+          }
+        }
+      ],
+      "returns": {
+        "name": "size_t",
+        "kind": "scalar",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "consume",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [
+          [
+            "dst",
+            "dstCapacity"
+          ],
+          [
+            "src",
+            "compressedSize"
+          ]
+        ],
+        "transfers_ownership": [],
+        "requires_nonnull": [],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    },
+    "ZSTD_freeCCtx": {
+      "symbol": "ZSTD_freeCCtx",
+      "header": "zstd.h",
+      "params": [
+        {
+          "name": "cctx",
+          "type": {
+            "name": "ZSTD_CCtx*",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        }
+      ],
+      "returns": {
+        "name": "size_t",
+        "kind": "scalar",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "destroy",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [],
+        "transfers_ownership": [],
+        "requires_nonnull": [],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    }
+  },
+  "slices": [
+    {
+      "id": "dst",
+      "kind": "bytes",
+      "remainder": true,
+      "min_len": 1,
+      "max_len": 0
+    }
+  ],
+  "resources": [],
+  "scratch": [],
+  "sequence": [
+    {
+      "id": "o_consume",
+      "api": "ZSTD_decompress",
+      "args": [
+        {
+          "param": "dst",
+          "source": "input",
+          "ref": "dst",
+          "value": null
+        },
+        {
+          "param": "dstCapacity",
+          "source": "length_of",
+          "ref": "dst",
+          "value": null
+        },
+        {
+          "param": "src",
+          "source": "literal",
+          "ref": "",
+          "value": 0
+        },
+        {
+          "param": "compressedSize",
+          "source": "literal",
+          "ref": "",
+          "value": 0
+        }
+      ],
+      "binds": "",
+      "targets": "",
+      "repeat": 0,
+      "repeat_while": "",
+      "guarded_by": []
+    }
+  ],
+  "knobs": {
+    "max_len": 65536,
+    "min_len": 0,
+    "timeout_s": 25,
+    "rss_limit_mb": 2048,
+    "malloc_limit_mb": 0,
+    "sanitizers": [
+      "address"
+    ],
+    "detect_leaks": false,
+    "optimisation": "-O1"
+  },
+  "format_model": null,
+  "raw_blocks": []
+}

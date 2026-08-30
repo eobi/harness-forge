@@ -1,0 +1,31 @@
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 105686293
+INFO: Loaded 1 modules   (1066 inline 8-bit counters): 1066 [0xaaaac3ba7878, 0xaaaac3ba7ca2), 
+INFO: Loaded 1 PC tables (1066 PCs): 1066 [0xaaaac3ba7ca8,0xaaaac3babf48), 
+INFO:        0 files found in /b/runs/zopfli__zopfli_deflate_fuzzer/corpus
+INFO: A corpus is not provided, starting from an empty corpus
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==170==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaac3b3d11c bp 0xfffff0a8fe20 sp 0xfffff0a8fdf0 T0)
+==170==The signal is caused by a READ memory access.
+==170==Hint: address points to the zero page.
+    #0 0xaaaac3b3d11c in ZopfliDeflate /b/zopfli/src/zopfli/deflate.c:911:18
+    #1 0xaaaac3b34c50 in LLVMFuzzerTestOneInput /b/runs/zopfli__zopfli_deflate_fuzzer/harness.c:40:5
+    #2 0xaaaac3a6eac4 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) (/b/runs/zopfli__zopfli_deflate_fuzzer/fuzz+0x4eac4) (BuildId: dc58b8bd6d754e83ac5eb6599c25aad0a5783c5e)
+    #3 0xaaaac3a6e27c in fuzzer::Fuzzer::RunOne(unsigned char const*, unsigned long, bool, fuzzer::InputInfo*, bool, bool*) (/b/runs/zopfli__zopfli_deflate_fuzzer/fuzz+0x4e27c) (BuildId: dc58b8bd6d754e83ac5eb6599c25aad0a5783c5e)
+    #4 0xaaaac3a6fea4 in fuzzer::Fuzzer::ReadAndExecuteSeedCorpora(std::vector<fuzzer::SizedFile, std::allocator<fuzzer::SizedFile> >&) (/b/runs/zopfli__zopfli_deflate_fuzzer/fuzz+0x4fea4) (BuildId: dc58b8bd6d754e83ac5eb6599c25aad0a5783c5e)
+    #5 0xaaaac3a70348 in fuzzer::Fuzzer::Loop(std::vector<fuzzer::SizedFile, std::allocator<fuzzer::SizedFile> >&) (/b/runs/zopfli__zopfli_deflate_fuzzer/fuzz+0x50348) (BuildId: dc58b8bd6d754e83ac5eb6599c25aad0a5783c5e)
+    #6 0xaaaac3a5f824 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) (/b/runs/zopfli__zopfli_deflate_fuzzer/fuzz+0x3f824) (BuildId: dc58b8bd6d754e83ac5eb6599c25aad0a5783c5e)
+    #7 0xaaaac3a86b28 in main (/b/runs/zopfli__zopfli_deflate_fuzzer/fuzz+0x66b28) (BuildId: dc58b8bd6d754e83ac5eb6599c25aad0a5783c5e)
+    #8 0xffffb3417740  (/lib/aarch64-linux-gnu/libc.so.6+0x27740) (BuildId: 6f268ff546c56d7f14e9501a55698cc2d0ab4732)
+    #9 0xffffb3417814 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x27814) (BuildId: 6f268ff546c56d7f14e9501a55698cc2d0ab4732)
+    #10 0xaaaac3a55b6c in _start (/b/runs/zopfli__zopfli_deflate_fuzzer/fuzz+0x35b6c) (BuildId: dc58b8bd6d754e83ac5eb6599c25aad0a5783c5e)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /b/zopfli/src/zopfli/deflate.c:911:18 in ZopfliDeflate
+==170==ABORTING
+MS: 0 ; base unit: 0000000000000000000000000000000000000000
+0xa,
+\012
+artifact_prefix='./'; Test unit written to ./crash-adc83b19e793491b1c6ea0fd8b46cd9f32e592fc
+Base64: Cg==

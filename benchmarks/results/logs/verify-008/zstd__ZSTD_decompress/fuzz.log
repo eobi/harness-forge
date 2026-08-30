@@ -1,0 +1,20 @@
+Dictionary: 340 entries
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1118931853
+INFO: Loaded 1 modules   (18073 inline 8-bit counters): 18073 [0xaaaae2acc9c0, 0xaaaae2ad1059), 
+INFO: Loaded 1 PC tables (18073 PCs): 18073 [0xaaaae2ad1060,0xaaaae2b179f0), 
+INFO:       13 files found in /b/runs/zstd__ZSTD_decompress/corpus
+INFO: seed corpus: files: 13 min: 1b max: 1516b total: 4635b rss: 43Mb
+#14	INITED cov: 18 ft: 19 corp: 1/1b exec/s: 0 rss: 44Mb
+#524288	pulse  cov: 18 ft: 19 corp: 1/1b lim: 5212 exec/s: 262144 rss: 124Mb
+#1048576	pulse  cov: 18 ft: 19 corp: 1/1b lim: 10436 exec/s: 209715 rss: 125Mb
+#2097152	pulse  cov: 18 ft: 19 corp: 1/1b lim: 20884 exec/s: 209715 rss: 125Mb
+#4194304	pulse  cov: 18 ft: 19 corp: 1/1b lim: 41785 exec/s: 199728 rss: 126Mb
+#8388608	pulse  cov: 18 ft: 19 corp: 1/1b lim: 65536 exec/s: 199728 rss: 126Mb
+#11956869	DONE   cov: 18 ft: 19 corp: 1/1b lim: 65536 exec/s: 196014 rss: 127Mb
+Done 11956869 runs in 61 second(s)
+stat::number_of_executed_units: 11956869
+stat::average_exec_per_sec:     196014
+stat::new_units_added:          0
+stat::slowest_unit_time_sec:    0
+stat::peak_rss_mb:              127

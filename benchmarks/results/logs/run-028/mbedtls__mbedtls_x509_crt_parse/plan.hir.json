@@ -1,0 +1,364 @@
+{
+  "schema_version": "1.0",
+  "name": "mbedtls_mbedtls_x509_crt_parse",
+  "producer": "header_graph",
+  "notes": "proposed from x509_crt.h by signature inference; handle type inferred as 'mbedtls_x509_crt *' (caller-allocated). Every inference here is checked by a static gate, and the producer certifies nothing.",
+  "target": {
+    "name": "mbedtls",
+    "version": "",
+    "commit": "",
+    "public_headers": [
+      "/b/mbedtls/include/mbedtls/x509_crt.h"
+    ],
+    "include_dirs": [
+      "/b/mbedtls/include",
+      "/b/mbedtls/library"
+    ],
+    "sources": [
+      "/b/mbedtls/library/aes.c",
+      "/b/mbedtls/library/aesce.c",
+      "/b/mbedtls/library/aesni.c",
+      "/b/mbedtls/library/aria.c",
+      "/b/mbedtls/library/asn1parse.c",
+      "/b/mbedtls/library/asn1write.c",
+      "/b/mbedtls/library/base64.c",
+      "/b/mbedtls/library/bignum.c",
+      "/b/mbedtls/library/bignum_core.c",
+      "/b/mbedtls/library/bignum_mod.c",
+      "/b/mbedtls/library/bignum_mod_raw.c",
+      "/b/mbedtls/library/block_cipher.c",
+      "/b/mbedtls/library/camellia.c",
+      "/b/mbedtls/library/ccm.c",
+      "/b/mbedtls/library/chacha20.c",
+      "/b/mbedtls/library/chachapoly.c",
+      "/b/mbedtls/library/cipher.c",
+      "/b/mbedtls/library/cipher_wrap.c",
+      "/b/mbedtls/library/cmac.c",
+      "/b/mbedtls/library/constant_time.c",
+      "/b/mbedtls/library/ctr_drbg.c",
+      "/b/mbedtls/library/debug.c",
+      "/b/mbedtls/library/des.c",
+      "/b/mbedtls/library/dhm.c",
+      "/b/mbedtls/library/ecdh.c",
+      "/b/mbedtls/library/ecdsa.c",
+      "/b/mbedtls/library/ecjpake.c",
+      "/b/mbedtls/library/ecp.c",
+      "/b/mbedtls/library/ecp_curves.c",
+      "/b/mbedtls/library/ecp_curves_new.c",
+      "/b/mbedtls/library/entropy.c",
+      "/b/mbedtls/library/entropy_poll.c",
+      "/b/mbedtls/library/error.c",
+      "/b/mbedtls/library/gcm.c",
+      "/b/mbedtls/library/hkdf.c",
+      "/b/mbedtls/library/hmac_drbg.c",
+      "/b/mbedtls/library/lmots.c",
+      "/b/mbedtls/library/lms.c",
+      "/b/mbedtls/library/md.c",
+      "/b/mbedtls/library/md5.c",
+      "/b/mbedtls/library/memory_buffer_alloc.c",
+      "/b/mbedtls/library/mps_reader.c",
+      "/b/mbedtls/library/mps_trace.c",
+      "/b/mbedtls/library/net_sockets.c",
+      "/b/mbedtls/library/nist_kw.c",
+      "/b/mbedtls/library/oid.c",
+      "/b/mbedtls/library/padlock.c",
+      "/b/mbedtls/library/pem.c",
+      "/b/mbedtls/library/pk.c",
+      "/b/mbedtls/library/pk_ecc.c",
+      "/b/mbedtls/library/pk_wrap.c",
+      "/b/mbedtls/library/pkcs12.c",
+      "/b/mbedtls/library/pkcs5.c",
+      "/b/mbedtls/library/pkcs7.c",
+      "/b/mbedtls/library/pkparse.c",
+      "/b/mbedtls/library/pkwrite.c",
+      "/b/mbedtls/library/platform.c",
+      "/b/mbedtls/library/platform_util.c",
+      "/b/mbedtls/library/poly1305.c",
+      "/b/mbedtls/library/psa_crypto.c",
+      "/b/mbedtls/library/psa_crypto_aead.c",
+      "/b/mbedtls/library/psa_crypto_cipher.c",
+      "/b/mbedtls/library/psa_crypto_client.c",
+      "/b/mbedtls/library/psa_crypto_driver_wrappers_no_static.c",
+      "/b/mbedtls/library/psa_crypto_ecp.c",
+      "/b/mbedtls/library/psa_crypto_ffdh.c",
+      "/b/mbedtls/library/psa_crypto_hash.c",
+      "/b/mbedtls/library/psa_crypto_mac.c",
+      "/b/mbedtls/library/psa_crypto_pake.c",
+      "/b/mbedtls/library/psa_crypto_rsa.c",
+      "/b/mbedtls/library/psa_crypto_se.c",
+      "/b/mbedtls/library/psa_crypto_slot_management.c",
+      "/b/mbedtls/library/psa_crypto_storage.c",
+      "/b/mbedtls/library/psa_its_file.c",
+      "/b/mbedtls/library/psa_util.c",
+      "/b/mbedtls/library/ripemd160.c",
+      "/b/mbedtls/library/rsa.c",
+      "/b/mbedtls/library/rsa_alt_helpers.c",
+      "/b/mbedtls/library/sha1.c",
+      "/b/mbedtls/library/sha256.c",
+      "/b/mbedtls/library/sha3.c",
+      "/b/mbedtls/library/sha512.c",
+      "/b/mbedtls/library/ssl_cache.c",
+      "/b/mbedtls/library/ssl_ciphersuites.c",
+      "/b/mbedtls/library/ssl_client.c",
+      "/b/mbedtls/library/ssl_cookie.c",
+      "/b/mbedtls/library/ssl_debug_helpers_generated.c",
+      "/b/mbedtls/library/ssl_msg.c",
+      "/b/mbedtls/library/ssl_ticket.c",
+      "/b/mbedtls/library/ssl_tls.c",
+      "/b/mbedtls/library/ssl_tls12_client.c",
+      "/b/mbedtls/library/ssl_tls12_server.c",
+      "/b/mbedtls/library/ssl_tls13_client.c",
+      "/b/mbedtls/library/ssl_tls13_generic.c",
+      "/b/mbedtls/library/ssl_tls13_keys.c",
+      "/b/mbedtls/library/ssl_tls13_server.c",
+      "/b/mbedtls/library/threading.c",
+      "/b/mbedtls/library/timing.c",
+      "/b/mbedtls/library/version.c",
+      "/b/mbedtls/library/version_features.c",
+      "/b/mbedtls/library/x509.c",
+      "/b/mbedtls/library/x509_create.c",
+      "/b/mbedtls/library/x509_crl.c",
+      "/b/mbedtls/library/x509_crt.c",
+      "/b/mbedtls/library/x509_csr.c",
+      "/b/mbedtls/library/x509write.c",
+      "/b/mbedtls/library/x509write_crt.c",
+      "/b/mbedtls/library/x509write_csr.c"
+    ],
+    "link_libs": [],
+    "cflags": [],
+    "seed_dirs": [],
+    "language": "c"
+  },
+  "platforms": [
+    "linux-aarch64-glibc"
+  ],
+  "apis": {
+    "mbedtls_x509_crt_free": {
+      "symbol": "mbedtls_x509_crt_free",
+      "header": "x509_crt.h",
+      "params": [
+        {
+          "name": "crt",
+          "type": {
+            "name": "mbedtls_x509_crt *",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        }
+      ],
+      "returns": {
+        "name": "void",
+        "kind": "void",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "destroy",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [],
+        "transfers_ownership": [],
+        "requires_nonnull": [],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    },
+    "mbedtls_x509_crt_init": {
+      "symbol": "mbedtls_x509_crt_init",
+      "header": "x509_crt.h",
+      "params": [
+        {
+          "name": "crt",
+          "type": {
+            "name": "mbedtls_x509_crt *",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        }
+      ],
+      "returns": {
+        "name": "void",
+        "kind": "void",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "create",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [],
+        "transfers_ownership": [],
+        "requires_nonnull": [],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    },
+    "mbedtls_x509_crt_parse": {
+      "symbol": "mbedtls_x509_crt_parse",
+      "header": "x509_crt.h",
+      "params": [
+        {
+          "name": "chain",
+          "type": {
+            "name": "mbedtls_x509_crt *",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "buf",
+          "type": {
+            "name": "const unsigned char *",
+            "kind": "pointer",
+            "const": true,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "buflen",
+          "type": {
+            "name": "size_t",
+            "kind": "scalar",
+            "const": false,
+            "resolved": ""
+          }
+        }
+      ],
+      "returns": {
+        "name": "int",
+        "kind": "scalar",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "consume",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [
+          [
+            "buf",
+            "buflen"
+          ]
+        ],
+        "transfers_ownership": [],
+        "requires_nonnull": [
+          "chain"
+        ],
+        "error_return": "negative",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    }
+  },
+  "slices": [
+    {
+      "id": "buf",
+      "kind": "bytes",
+      "remainder": true,
+      "min_len": 1,
+      "max_len": 0
+    }
+  ],
+  "resources": [
+    {
+      "id": "h",
+      "type": {
+        "name": "mbedtls_x509_crt",
+        "kind": "struct",
+        "const": false,
+        "resolved": ""
+      },
+      "storage": "inline"
+    }
+  ],
+  "scratch": [],
+  "sequence": [
+    {
+      "id": "o_create",
+      "api": "mbedtls_x509_crt_init",
+      "args": [
+        {
+          "param": "crt",
+          "source": "resource",
+          "ref": "h",
+          "value": null
+        }
+      ],
+      "binds": "h",
+      "targets": "",
+      "repeat": 0,
+      "repeat_while": "",
+      "guarded_by": []
+    },
+    {
+      "id": "o_consume",
+      "api": "mbedtls_x509_crt_parse",
+      "args": [
+        {
+          "param": "chain",
+          "source": "resource",
+          "ref": "h",
+          "value": null
+        },
+        {
+          "param": "buf",
+          "source": "input",
+          "ref": "buf",
+          "value": null
+        },
+        {
+          "param": "buflen",
+          "source": "length_of",
+          "ref": "buf",
+          "value": null
+        }
+      ],
+      "binds": "",
+      "targets": "",
+      "repeat": 0,
+      "repeat_while": "",
+      "guarded_by": [
+        "h"
+      ]
+    },
+    {
+      "id": "o_destroy",
+      "api": "mbedtls_x509_crt_free",
+      "args": [
+        {
+          "param": "crt",
+          "source": "resource",
+          "ref": "h",
+          "value": null
+        }
+      ],
+      "binds": "",
+      "targets": "h",
+      "repeat": 0,
+      "repeat_while": "",
+      "guarded_by": []
+    }
+  ],
+  "knobs": {
+    "max_len": 65536,
+    "min_len": 0,
+    "timeout_s": 25,
+    "rss_limit_mb": 2048,
+    "malloc_limit_mb": 0,
+    "sanitizers": [
+      "address"
+    ],
+    "detect_leaks": false,
+    "optimisation": "-O1"
+  },
+  "format_model": null,
+  "raw_blocks": []
+}

@@ -1,0 +1,507 @@
+{
+  "schema_version": "1.0",
+  "name": "leptonica_pixReadMem",
+  "producer": "header_graph",
+  "notes": "proposed from allheaders.h by signature inference; handle type inferred as 'BOX *'. Every inference here is checked by a static gate, and the producer certifies nothing.",
+  "target": {
+    "name": "leptonica",
+    "version": "",
+    "commit": "",
+    "public_headers": [
+      "/b/leptonica/src/allheaders.h"
+    ],
+    "include_dirs": [
+      "/b/leptonica/src"
+    ],
+    "sources": [
+      "/b/leptonica/src/adaptmap.c",
+      "/b/leptonica/src/affine.c",
+      "/b/leptonica/src/affinecompose.c",
+      "/b/leptonica/src/arrayaccess.c",
+      "/b/leptonica/src/bardecode.c",
+      "/b/leptonica/src/baseline.c",
+      "/b/leptonica/src/bbuffer.c",
+      "/b/leptonica/src/bilateral.c",
+      "/b/leptonica/src/bilinear.c",
+      "/b/leptonica/src/binarize.c",
+      "/b/leptonica/src/binexpand.c",
+      "/b/leptonica/src/binreduce.c",
+      "/b/leptonica/src/blend.c",
+      "/b/leptonica/src/bmf.c",
+      "/b/leptonica/src/bmpio.c",
+      "/b/leptonica/src/bmpiostub.c",
+      "/b/leptonica/src/bootnumgen1.c",
+      "/b/leptonica/src/bootnumgen2.c",
+      "/b/leptonica/src/bootnumgen3.c",
+      "/b/leptonica/src/bootnumgen4.c",
+      "/b/leptonica/src/boxbasic.c",
+      "/b/leptonica/src/boxfunc1.c",
+      "/b/leptonica/src/boxfunc2.c",
+      "/b/leptonica/src/boxfunc3.c",
+      "/b/leptonica/src/boxfunc4.c",
+      "/b/leptonica/src/boxfunc5.c",
+      "/b/leptonica/src/bytearray.c",
+      "/b/leptonica/src/ccbord.c",
+      "/b/leptonica/src/ccthin.c",
+      "/b/leptonica/src/checkerboard.c",
+      "/b/leptonica/src/classapp.c",
+      "/b/leptonica/src/colorcontent.c",
+      "/b/leptonica/src/colorfill.c",
+      "/b/leptonica/src/coloring.c",
+      "/b/leptonica/src/colormap.c",
+      "/b/leptonica/src/colormorph.c",
+      "/b/leptonica/src/colorquant1.c",
+      "/b/leptonica/src/colorquant2.c",
+      "/b/leptonica/src/colorseg.c",
+      "/b/leptonica/src/colorspace.c",
+      "/b/leptonica/src/compare.c",
+      "/b/leptonica/src/conncomp.c",
+      "/b/leptonica/src/convertfiles.c",
+      "/b/leptonica/src/convolve.c",
+      "/b/leptonica/src/correlscore.c",
+      "/b/leptonica/src/dewarp1.c",
+      "/b/leptonica/src/dewarp2.c",
+      "/b/leptonica/src/dewarp3.c",
+      "/b/leptonica/src/dewarp4.c",
+      "/b/leptonica/src/dnabasic.c",
+      "/b/leptonica/src/dnafunc1.c",
+      "/b/leptonica/src/dnahash.c",
+      "/b/leptonica/src/dwacomb.2.c",
+      "/b/leptonica/src/dwacomblow.2.c",
+      "/b/leptonica/src/edge.c",
+      "/b/leptonica/src/encoding.c",
+      "/b/leptonica/src/enhance.c",
+      "/b/leptonica/src/fhmtauto.c",
+      "/b/leptonica/src/fhmtgen.1.c",
+      "/b/leptonica/src/fhmtgenlow.1.c",
+      "/b/leptonica/src/finditalic.c",
+      "/b/leptonica/src/flipdetect.c",
+      "/b/leptonica/src/fmorphauto.c",
+      "/b/leptonica/src/fmorphgen.1.c",
+      "/b/leptonica/src/fmorphgenlow.1.c",
+      "/b/leptonica/src/fpix1.c",
+      "/b/leptonica/src/fpix2.c",
+      "/b/leptonica/src/gifio.c",
+      "/b/leptonica/src/gifiostub.c",
+      "/b/leptonica/src/gplot.c",
+      "/b/leptonica/src/graphics.c",
+      "/b/leptonica/src/graymorph.c",
+      "/b/leptonica/src/grayquant.c",
+      "/b/leptonica/src/hashmap.c",
+      "/b/leptonica/src/heap.c",
+      "/b/leptonica/src/jbclass.c",
+      "/b/leptonica/src/jp2kheader.c",
+      "/b/leptonica/src/jp2kheaderstub.c",
+      "/b/leptonica/src/jp2kio.c",
+      "/b/leptonica/src/jp2kiostub.c",
+      "/b/leptonica/src/jpegio.c",
+      "/b/leptonica/src/jpegiostub.c",
+      "/b/leptonica/src/kernel.c",
+      "/b/leptonica/src/leptwin.c",
+      "/b/leptonica/src/libversions.c",
+      "/b/leptonica/src/list.c",
+      "/b/leptonica/src/map.c",
+      "/b/leptonica/src/maze.c",
+      "/b/leptonica/src/morph.c",
+      "/b/leptonica/src/morphapp.c",
+      "/b/leptonica/src/morphdwa.c",
+      "/b/leptonica/src/morphseq.c",
+      "/b/leptonica/src/numabasic.c",
+      "/b/leptonica/src/numafunc1.c",
+      "/b/leptonica/src/numafunc2.c",
+      "/b/leptonica/src/pageseg.c",
+      "/b/leptonica/src/paintcmap.c",
+      "/b/leptonica/src/parseprotos.c",
+      "/b/leptonica/src/partify.c",
+      "/b/leptonica/src/partition.c",
+      "/b/leptonica/src/pdfapp.c",
+      "/b/leptonica/src/pdfappstub.c",
+      "/b/leptonica/src/pdfio1.c",
+      "/b/leptonica/src/pdfio1stub.c",
+      "/b/leptonica/src/pdfio2.c",
+      "/b/leptonica/src/pdfio2stub.c",
+      "/b/leptonica/src/pix1.c",
+      "/b/leptonica/src/pix2.c",
+      "/b/leptonica/src/pix3.c",
+      "/b/leptonica/src/pix4.c",
+      "/b/leptonica/src/pix5.c",
+      "/b/leptonica/src/pixabasic.c",
+      "/b/leptonica/src/pixacc.c",
+      "/b/leptonica/src/pixafunc1.c",
+      "/b/leptonica/src/pixafunc2.c",
+      "/b/leptonica/src/pixalloc.c",
+      "/b/leptonica/src/pixarith.c",
+      "/b/leptonica/src/pixcomp.c",
+      "/b/leptonica/src/pixconv.c",
+      "/b/leptonica/src/pixlabel.c",
+      "/b/leptonica/src/pixtiling.c",
+      "/b/leptonica/src/pngio.c",
+      "/b/leptonica/src/pngiostub.c",
+      "/b/leptonica/src/pnmio.c",
+      "/b/leptonica/src/pnmiostub.c",
+      "/b/leptonica/src/projective.c",
+      "/b/leptonica/src/psio1.c",
+      "/b/leptonica/src/psio1stub.c",
+      "/b/leptonica/src/psio2.c",
+      "/b/leptonica/src/psio2stub.c",
+      "/b/leptonica/src/ptabasic.c",
+      "/b/leptonica/src/ptafunc1.c",
+      "/b/leptonica/src/ptafunc2.c",
+      "/b/leptonica/src/ptra.c",
+      "/b/leptonica/src/quadtree.c",
+      "/b/leptonica/src/queue.c",
+      "/b/leptonica/src/rank.c",
+      "/b/leptonica/src/rbtree.c",
+      "/b/leptonica/src/readbarcode.c",
+      "/b/leptonica/src/readfile.c",
+      "/b/leptonica/src/recogbasic.c",
+      "/b/leptonica/src/recogdid.c",
+      "/b/leptonica/src/recogident.c",
+      "/b/leptonica/src/recogtrain.c",
+      "/b/leptonica/src/regutils.c",
+      "/b/leptonica/src/renderpdf.c",
+      "/b/leptonica/src/rop.c",
+      "/b/leptonica/src/roplow.c",
+      "/b/leptonica/src/rotate.c",
+      "/b/leptonica/src/rotateam.c",
+      "/b/leptonica/src/rotateorth.c",
+      "/b/leptonica/src/rotateshear.c",
+      "/b/leptonica/src/runlength.c",
+      "/b/leptonica/src/sarray1.c",
+      "/b/leptonica/src/sarray2.c",
+      "/b/leptonica/src/scale1.c",
+      "/b/leptonica/src/scale2.c",
+      "/b/leptonica/src/seedfill.c",
+      "/b/leptonica/src/sel1.c",
+      "/b/leptonica/src/sel2.c",
+      "/b/leptonica/src/selgen.c",
+      "/b/leptonica/src/shear.c",
+      "/b/leptonica/src/skew.c",
+      "/b/leptonica/src/spixio.c",
+      "/b/leptonica/src/stack.c",
+      "/b/leptonica/src/stringcode.c",
+      "/b/leptonica/src/strokes.c",
+      "/b/leptonica/src/sudoku.c",
+      "/b/leptonica/src/textops.c",
+      "/b/leptonica/src/tiffio.c",
+      "/b/leptonica/src/tiffiostub.c",
+      "/b/leptonica/src/utils1.c",
+      "/b/leptonica/src/utils2.c",
+      "/b/leptonica/src/warper.c",
+      "/b/leptonica/src/watershed.c",
+      "/b/leptonica/src/webpanimio.c",
+      "/b/leptonica/src/webpanimiostub.c",
+      "/b/leptonica/src/webpio.c",
+      "/b/leptonica/src/webpiostub.c",
+      "/b/leptonica/src/writefile.c",
+      "/b/leptonica/src/zlibmem.c",
+      "/b/leptonica/src/zlibmemstub.c",
+      "/b/libpng/png.c",
+      "/b/libpng/pngerror.c",
+      "/b/libpng/pngget.c",
+      "/b/libpng/pngmem.c",
+      "/b/libpng/pngpread.c",
+      "/b/libpng/pngread.c",
+      "/b/libpng/pngrio.c",
+      "/b/libpng/pngrtran.c",
+      "/b/libpng/pngrutil.c",
+      "/b/libpng/pngset.c",
+      "/b/libpng/pngtrans.c",
+      "/b/libpng/pngwio.c",
+      "/b/libpng/pngwrite.c",
+      "/b/libpng/pngwtran.c",
+      "/b/libpng/pngwutil.c",
+      "/b/libpng/arm/arm_init.c",
+      "/b/libpng/arm/filter_neon_intrinsics.c",
+      "/b/libpng/arm/palette_neon_intrinsics.c",
+      "/b/zlib/adler32.c",
+      "/b/zlib/compress.c",
+      "/b/zlib/crc32.c",
+      "/b/zlib/deflate.c",
+      "/b/zlib/gzclose.c",
+      "/b/zlib/gzlib.c",
+      "/b/zlib/gzread.c",
+      "/b/zlib/gzwrite.c",
+      "/b/zlib/infback.c",
+      "/b/zlib/inffast.c",
+      "/b/zlib/inflate.c",
+      "/b/zlib/inftrees.c",
+      "/b/zlib/trees.c",
+      "/b/zlib/uncompr.c",
+      "/b/zlib/zutil.c"
+    ],
+    "link_libs": [],
+    "cflags": [
+      "-DHAVE_LIBJPEG=0",
+      "-DHAVE_LIBPNG=1",
+      "-DHAVE_LIBTIFF=0",
+      "-DHAVE_LIBWEBP=0",
+      "-DHAVE_LIBGIF=0",
+      "-DHAVE_LIBZ=1",
+      "-DHAVE_LIBJP2K=0",
+      "-DHAVE_LIBWEBP_ANIM=0",
+      "-I/b/libpng",
+      "-I/b/zlib"
+    ],
+    "seed_dirs": [],
+    "language": "c"
+  },
+  "platforms": [
+    "linux-aarch64-glibc"
+  ],
+  "apis": {
+    "boxCreate": {
+      "symbol": "boxCreate",
+      "header": "allheaders.h",
+      "params": [
+        {
+          "name": "x",
+          "type": {
+            "name": "l_int32",
+            "kind": "scalar",
+            "const": false,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "y",
+          "type": {
+            "name": "l_int32",
+            "kind": "scalar",
+            "const": false,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "w",
+          "type": {
+            "name": "l_int32",
+            "kind": "scalar",
+            "const": false,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "h",
+          "type": {
+            "name": "l_int32",
+            "kind": "scalar",
+            "const": false,
+            "resolved": ""
+          }
+        }
+      ],
+      "returns": {
+        "name": "BOX *",
+        "kind": "pointer",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "create",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [],
+        "transfers_ownership": [],
+        "requires_nonnull": [],
+        "error_return": "null",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    },
+    "boxDestroy": {
+      "symbol": "boxDestroy",
+      "header": "allheaders.h",
+      "params": [
+        {
+          "name": "pbox",
+          "type": {
+            "name": "BOX **",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        }
+      ],
+      "returns": {
+        "name": "void",
+        "kind": "void",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "destroy",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [],
+        "transfers_ownership": [],
+        "requires_nonnull": [],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    },
+    "pixDestroy": {
+      "symbol": "pixDestroy",
+      "header": "allheaders.h",
+      "params": [
+        {
+          "name": "ppix",
+          "type": {
+            "name": "PIX **",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        }
+      ],
+      "returns": {
+        "name": "void",
+        "kind": "void",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "query",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [],
+        "transfers_ownership": [],
+        "requires_nonnull": [],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    },
+    "pixReadMem": {
+      "symbol": "pixReadMem",
+      "header": "allheaders.h",
+      "params": [
+        {
+          "name": "data",
+          "type": {
+            "name": "const l_uint8 *",
+            "kind": "pointer",
+            "const": true,
+            "resolved": "unsigned char"
+          }
+        },
+        {
+          "name": "size",
+          "type": {
+            "name": "size_t",
+            "kind": "scalar",
+            "const": false,
+            "resolved": ""
+          }
+        }
+      ],
+      "returns": {
+        "name": "PIX *",
+        "kind": "pointer",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "consume",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [
+          [
+            "data",
+            "size"
+          ]
+        ],
+        "transfers_ownership": [],
+        "requires_nonnull": [],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    }
+  },
+  "slices": [
+    {
+      "id": "data",
+      "kind": "bytes",
+      "remainder": true,
+      "min_len": 1,
+      "max_len": 0
+    }
+  ],
+  "resources": [
+    {
+      "id": "owned",
+      "type": {
+        "name": "PIX *",
+        "kind": "pointer",
+        "const": false,
+        "resolved": ""
+      },
+      "storage": "handle"
+    }
+  ],
+  "scratch": [],
+  "sequence": [
+    {
+      "id": "o_consume",
+      "api": "pixReadMem",
+      "args": [
+        {
+          "param": "data",
+          "source": "input",
+          "ref": "data",
+          "value": null
+        },
+        {
+          "param": "size",
+          "source": "length_of",
+          "ref": "data",
+          "value": null
+        }
+      ],
+      "binds": "owned",
+      "targets": "",
+      "repeat": 0,
+      "repeat_while": "",
+      "guarded_by": []
+    },
+    {
+      "id": "o_free_owned",
+      "api": "pixDestroy",
+      "args": [
+        {
+          "param": "ppix",
+          "source": "resource",
+          "ref": "owned",
+          "value": null
+        }
+      ],
+      "binds": "",
+      "targets": "owned",
+      "repeat": 0,
+      "repeat_while": "",
+      "guarded_by": [
+        "owned"
+      ]
+    }
+  ],
+  "knobs": {
+    "max_len": 65536,
+    "min_len": 0,
+    "timeout_s": 25,
+    "rss_limit_mb": 2048,
+    "malloc_limit_mb": 0,
+    "sanitizers": [
+      "address"
+    ],
+    "detect_leaks": false,
+    "optimisation": "-O1"
+  },
+  "format_model": null,
+  "raw_blocks": []
+}
