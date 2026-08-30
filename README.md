@@ -180,19 +180,29 @@ $ python3 -m hforge validate build/proposed/cjson_cJSON_ParseWithLength.hir.json
 $ python3 -m hforge emit build/proposed/cjson_cJSON_ParseWithLength.hir.json -o out
 wrote out/harness.c
 
-$ python -m forge lab out/harness.c --fuzz-time 20       # Nemesis Forge
-[21:12:34] job=lab-768ee174 harness=out/harness.c fuzz_time=20s provider=null
-[21:12:34] 0 finding(s)
+$ python -m forge lab out/harness.c --fuzz-time 20 \
+    --source cJSON.c --include .                         # Nemesis Forge
+[22:24:41] job=lab-7d332edd harness=out/harness.c fuzz_time=20s provider=null
+[22:25:04] 0 finding(s)
 ```
 
 Zero findings on cJSON 1.7.18 is the right answer for a pinned release OSS-Fuzz has hammered
 for years — and it is only readable beside a positive control, which their tree ships:
 `forge lab examples/harness_trunc.c` reaches **rung 1 in 54 executions** on the same machine.
 
-`forge lab` builds one translation unit, so point it at a single-file library or place the
-harness beside the sources it includes; `out/build.sh` records the exact build this engine
-used. Nemesis Forge also exposes an MCP surface (`python -m forge_mcp --ring2`), so an agent
-can drive certify-then-campaign without a shell.
+`--source` and `--include` take the library the harness calls into; `out/build.sh` records
+the exact build this engine used, so the two agree. Nemesis Forge also exposes an MCP surface
+(`python -m forge_mcp --ring2`) whose `nf_lab` accepts the same two, so an agent can drive
+certify-then-campaign without a shell.
+
+Getting this to work end to end took four fixes in Nemesis Forge, and the last one is worth
+knowing about if you write harnesses by hand. Its C++ detector treated `extern "C"` as
+evidence of a C++ harness — when it is the opposite, the guard a C entry point carries to
+stay linkable from C++. A correctly guarded harness was compiled as C++, exported the
+unmangled symbol its own guard asked for, and then failed to link against a replay driver
+that wanted the mangled one. The campaign found a real heap overflow and the oracle
+discarded it as a build failure. Both engines now agree on what a correct harness looks
+like, which is the point of pairing them.
 
 A **certificate** states what the harness cannot reach. A **finding** states what the
 campaign did not prove. Neither hides its gaps, and between them there is no step where
@@ -528,6 +538,54 @@ python3 -m hforge selftest                     # the pipeline, end to end, on th
 function that exists. **`plancheck` is a gate, not a report**: every deliverable the manifest
 marks `DONE` must name a module that imports and a test that exists, and CI fails when one
 does not. That is what makes the status table above worth reading.
+
+---
+
+## Questions this answers
+
+**How do I know my fuzzing harness is correct?**
+Run the gates on it. `hforge validate <plan>` checks six static properties with no compiler
+involved; `hforge certify` adds eleven dynamic ones and writes a certificate. A harness this
+engine passes still has limits, and the certificate names them under
+`WHAT THIS HARNESS CANNOT FIND` rather than leaving you to discover them later.
+
+**Why does my fuzzer keep reporting false positives?**
+Usually the harness, not the library. The field's own numbers put harness-caused
+false-positive crash rates as high as **94%**. The classic causes are fuzzer bytes bound to a
+size, length, index or filename; a required pointer passed as NULL; and an output buffer
+sized for a different call. `S2` refuses all three before `clang` runs.
+
+**How do I write a libFuzzer harness for a C library?**
+You do not have to. Point the engine at the public header:
+`hforge batch <header> --source lib.c --include dir/`. It proposes every plan the API admits,
+gates them, campaigns the survivors, and ships only the ones that earn it.
+
+**My harness builds and runs but finds nothing. Why?**
+Three usual reasons, and the engine distinguishes them. It never enters library code (D1/D3
+catch it); it has no seeds for a format a mutator cannot reach by chance; or the entry point
+genuinely cannot reach much, in which case the denominator is the problem and not the
+harness. On mbedTLS, adding eleven real X.509 certificates moved coverage from 12.22% to
+27.08% **on a campaign one tenth as long**.
+
+**Can an LLM write fuzz harnesses?**
+Yes, and the good generators are LLM-driven. This engine is the other half: it does not
+generate with a model at all, and it grades harnesses whichever way they were written.
+`hforge audit <harness.c>` runs the same gate bank over somebody else's harness, so a
+model-written one and a generated one are judged by identical criteria.
+
+**How do I audit existing OSS-Fuzz harnesses at scale?**
+`hforge audit <dir>` lifts every harness it finds into the IR and grades it. Violations are
+reported with the fix, and a harness the lift cannot read with confidence is marked low
+fidelity rather than silently passed.
+
+**What is the difference between this and a fuzzer?**
+A fuzzer runs a harness and finds crashes. This proves the harness was worth running and
+states what it cannot find. For the campaign and the crash triage, pair it with
+[Nemesis Forge](https://github.com/eobi/nemesisforge), which shares the same rung ladder.
+
+**Does it need an API key, a server, or a network?**
+No. There are no runtime dependencies at all — standard library only — because the engine
+runs where the target builds: inside an OSS-Fuzz image, on a CI runner, on an air-gapped box.
 
 ---
 

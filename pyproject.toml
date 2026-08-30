@@ -10,14 +10,33 @@ readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.9"
 authors = [{ name = "Obi Ebuka David" }]
-keywords = ["fuzzing", "libfuzzer", "harness", "security", "static-analysis"]
+keywords = [
+    "fuzzing", "fuzz-testing", "libfuzzer", "fuzzing-harness", "harness-generation",
+    "oss-fuzz", "coverage-guided-fuzzing", "sanitizers", "addresssanitizer",
+    "memory-safety", "static-analysis", "dynamic-analysis", "program-analysis",
+    "security", "security-research", "vulnerability-detection", "code-generation",
+]
 classifiers = [
     "Development Status :: 3 - Alpha",
+    "Environment :: Console",
     "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+    "Intended Audience :: Science/Research",
     "License :: OSI Approved :: Apache Software License",
+    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: C",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Security",
+    "Topic :: Software Development :: Quality Assurance",
     "Topic :: Software Development :: Testing",
+    "Topic :: Software Development :: Code Generators",
+    "Typing :: Typed",
 ]
 
 # NO RUNTIME DEPENDENCIES, and this is a design constraint rather than an accident.
@@ -30,7 +49,14 @@ dependencies = []
 dev = ["pytest>=7"]
 
 [project.urls]
+Homepage = "https://github.com/eobi/harness-forge"
 Source = "https://github.com/eobi/harness-forge"
+Issues = "https://github.com/eobi/harness-forge/issues"
+Changelog = "https://github.com/eobi/harness-forge/commits/main"
+"Benchmark results" = "https://github.com/eobi/harness-forge/blob/main/benchmarks/RANKING.md"
+"Evidence and defect record" = "https://github.com/eobi/harness-forge/blob/main/docs/EVIDENCE.md"
+"Platform matrix" = "https://github.com/eobi/harness-forge/blob/main/docs/PLATFORMS.md"
+"Companion engine (Nemesis Forge)" = "https://github.com/eobi/nemesisforge"
 
 [project.scripts]
 # hforge.cli:main, NOT hforge.__main__:main — __main__.py runs main() at import time, so
