@@ -1,0 +1,231 @@
+"""One GUI campaign: mutate a seed, open it, record what the target did, repeat.
+
+Run inside the lab image, with the repository mounted at /hf:
+
+    docker run --rm -v "$PWD:/hf:ro" -v "$PWD/benchmarks/gui:/lab" hforge-gui \\
+        bash -lc 'source /lab/session.sh && python3 /lab/campaign.py --app eog --n 12'
+
+THE ORDER HERE IS THE RESULT OF P6.TERM, not a preference. Walking the accessibility tree
+makes the target service every request -- measured at eight times the CPU, and it then never
+goes quiet -- so a driver that polls the tree while waiting for quiescence calls every input
+a hang. Wait without looking, then look once.
+"""
+from __future__ import annotations
+
+import argparse
+import os
+import random
+import subprocess
+import sys
+import time
+from pathlib import Path
+
+sys.path.insert(0, "/hf")
+from hforge.gui.linux_atspi import (                              # noqa: E402
+    QUIESCE_INTERVAL_S, QUIESCE_POLLS, WINDOW_DEADLINE_S,
+    GuiOutcome, TerminationReason, classify,
+)
+
+import gi                                                          # noqa: E402
+gi.require_version("Atspi", "2.0")
+from gi.repository import Atspi                                    # noqa: E402
+
+
+def walk(node, out=None):
+    out = out if out is not None else []
+    try:
+        out.append((node.get_role_name(), node.get_name()))
+        for i in range(node.get_child_count()):
+            walk(node.get_child_at_index(i), out)
+    except Exception:                                              # noqa: BLE001
+        pass
+    return out
+
+
+def apps(match: str):
+    found = []
+    for i in range(Atspi.get_desktop_count()):
+        desk = Atspi.get_desktop(i)
+        for j in range(desk.get_child_count()):
+            a = desk.get_child_at_index(j)
+            try:
+                if a and a.get_name() and match in a.get_name().lower():
+                    found.append(a)
+            except Exception:                                      # noqa: BLE001
+                pass
+    return found
+
+
+def ticks(pid: int) -> int:
+    try:
+        st = open(f"/proc/{pid}/stat").read().split()
+        return int(st[13]) + int(st[14])
+    except Exception:                                              # noqa: BLE001
+        return -1
+
+
+def first_button(node):
+    try:
+        if node.get_role_name() == "push button":
+            return node
+        for i in range(node.get_child_count()):
+            b = first_button(node.get_child_at_index(i))
+            if b is not None:
+                return b
+    except Exception:                                              # noqa: BLE001
+        pass
+    return None
+
+
+def run_one(app: str, path: str, budget: float):
+    """Open one file and decide what happened. One process, one verdict."""
+    argv = [app, "--new-instance", path] if app == "eog" else [app, path]
+    p = subprocess.Popen(argv, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    t0 = time.time()
+
+    # 1. WINDOW: poll with a deadline. It maps in 0.11-0.55 s measured; a fixed sleep is
+    #    both far too slow and unable to tell "not yet" from "never".
+    window_ms = None
+    while time.time() - t0 < min(WINDOW_DEADLINE_S, budget):
+        if p.poll() is not None:
+            break
+        if apps(app):
+            window_ms = (time.time() - t0) * 1000.0
+            break
+        time.sleep(0.05)
+
+    # 2. QUIESCENCE, WITHOUT LOOKING. This is the step the tree walk destroys.
+    term = TerminationReason.DEADLINE
+    prev, stable = -1, 0
+    while time.time() - t0 < budget:
+        if p.poll() is not None:
+            break
+        c = ticks(p.pid)
+        if c == prev and c > 0:
+            stable += 1
+            if stable >= QUIESCE_POLLS:
+                term = TerminationReason.QUIESCED
+                break
+        else:
+            stable = 0
+        prev = c
+        time.sleep(QUIESCE_INTERVAL_S)
+
+    # 3. NOW look, once.
+    exited = p.poll() is not None
+    tree = [n for a in apps(app) for n in walk(a)]
+
+    # 4. Liveness only if it can change the answer: an error element already explains the
+    #    window, and acting on the target costs it CPU we have just finished waiting out.
+    serviced, action_ms = None, None
+    if not exited and tree:
+        from hforge.gui.linux_atspi import error_nodes
+        if not error_nodes(tree):
+            t1 = time.time()
+            for a in apps(app):
+                b = first_button(a)
+                if b is not None:
+                    try:
+                        b.do_action(0)
+                        serviced = True
+                    except Exception:                              # noqa: BLE001
+                        serviced = False
+                    break
+            action_ms = (time.time() - t1) * 1000.0
+            if serviced:
+                serviced = bool([n for a in apps(app) for n in walk(a)])
+
+    v = classify(tree=tree, exited=exited, window_ms=window_ms,
+                 serviced_action=serviced, action_ms=action_ms, termination=term)
+    p.terminate()
+    try:
+        p.wait(timeout=5)
+    except Exception:                                              # noqa: BLE001
+        p.kill()
+    for _ in range(80):                       # let it leave the tree before the next input
+        if not apps(app):
+            break
+        time.sleep(0.05)
+    return v
+
+
+def mutate(seed: bytes, rng: random.Random) -> bytes:
+    b = bytearray(seed)
+    for _ in range(rng.randint(1, 8)):
+        if not b:
+            break
+        b[rng.randrange(len(b))] = rng.randrange(256)
+    if rng.random() < 0.25 and len(b) > 32:
+        b = b[: rng.randrange(16, len(b))]
+    return bytes(b)
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--app", default="eog")
+    ap.add_argument("--seed-file", default="")
+    ap.add_argument("--n", type=int, default=10)
+    ap.add_argument("--budget", type=float, default=8.0)
+    ap.add_argument("--rng", type=int, default=1337)
+    a = ap.parse_args()
+
+    seed_path = a.seed_file
+    if not seed_path:
+        cands = sorted(Path("/usr/share/icons").rglob("*.png"))
+        seed_path = str(next(p for p in cands if p.stat().st_size > 2000))
+    seed = Path(seed_path).read_bytes()
+    rng = random.Random(a.rng)
+    work = Path("/tmp/gui-campaign")
+    work.mkdir(exist_ok=True)
+    ext = Path(seed_path).suffix or ".bin"
+
+    # ONE DIRECTORY PER INPUT, and this is the isolation boundary that actually matters.
+    #
+    # eog loads the CONTAINING FOLDER as an image collection, so with every input written
+    # to one directory each run could see every input before it: node counts climbed by
+    # exactly one per input, and a crash on input 40 might have been caused by input 3
+    # still sitting in the folder. Measured:
+    #
+    #     same directory        117, 118, 119, 120
+    #     directory per input   117, 117, 117, 117
+    #
+    # A fresh process, a fresh session bus and a fresh HOME all failed to fix this. Only
+    # the directory did. For a library harness the process is the boundary; for a GUI
+    # target the filesystem around the input is part of the input.
+    def slot(i: int) -> Path:
+        d = work / f"in{i:04d}"
+        d.mkdir(parents=True, exist_ok=True)
+        return d
+
+    # A POSITIVE CONTROL FIRST. Without it a campaign that reports nothing cannot be
+    # distinguished from a campaign that never ran -- the failure this programme keeps
+    # finding in its own tools.
+    ctl = slot(-1) / f"control{ext}" if False else (work / "control" / f"control{ext}")
+    ctl.parent.mkdir(parents=True, exist_ok=True)
+    ctl.write_bytes(seed)
+    cv = run_one(a.app, str(ctl), a.budget)
+    print(f"  control        {cv.outcome.value:12} nodes={cv.nodes:3} "
+          f"term={cv.termination.value if cv.termination else '-'}")
+    if cv.outcome is not GuiOutcome.ACCEPTED:
+        print("  REFUSING TO RUN: the unmodified seed did not open cleanly, so a null "
+              "result from this campaign would mean nothing.", file=sys.stderr)
+        return 1
+
+    tally: dict = {}
+    for i in range(a.n):
+        f = slot(i) / f"input{ext}"
+        f.write_bytes(mutate(seed, rng))
+        v = run_one(a.app, str(f), a.budget)
+        tally[v.outcome.value] = tally.get(v.outcome.value, 0) + 1
+        mark = "  <-- FINDING" if v.is_finding() else ""
+        print(f"  input {i:03d}      {v.outcome.value:12} nodes={v.nodes:3} "
+              f"term={v.termination.value if v.termination else '-':10} "
+              f"{f.stat().st_size:>6}B{mark}")
+    print(f"\n  {a.n} inputs: " + ", ".join(f"{k}={v}" for k, v in sorted(tally.items())))
+    findings = tally.get("crashed", 0) + tally.get("unresponsive", 0)
+    print(f"  findings: {findings}   (a refusal is the target working, not a finding)")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

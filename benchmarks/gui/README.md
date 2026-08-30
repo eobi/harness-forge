@@ -72,6 +72,34 @@ spinner — where quiescence is not available at any price. Whichever fired is r
 verdict, because a result reached by deadline means something different from one that
 settled.
 
+## The isolation boundary is the DIRECTORY
+
+`campaign.py` runs a seeded campaign: a positive control first, then mutated inputs, one
+verdict each. Building it surfaced the least obvious result in this lab.
+
+Node counts climbed by exactly one per input — 117, 118, 119, 120 — and the cause was not
+stale processes, a shared session bus, or a shared `HOME`. All three were eliminated and the
+drift survived every one. eog **loads the containing folder as an image collection**, so
+with all inputs written to one directory, every run could see every input before it.
+
+| | inputs 0–3 |
+|---|---|
+| same directory | 117, 118, 119, 120 |
+| one directory per input | 117, 117, 117, 117 |
+
+The drifting count was the symptom; the disease was that **the inputs were not independent**.
+A crash attributed to input 40 could have been caused by input 3 still sitting in the folder.
+
+For a library harness the process is the isolation boundary. **For a GUI target the
+filesystem around the input is part of the input**, and nothing about process, session or
+home isolation implies it.
+
+## The campaign refuses to start without a positive control
+
+If the unmodified seed does not open cleanly, the run stops. A campaign that reports nothing
+is worth nothing unless something establishes that it would have reported something — the
+failure mode this programme has now found four times in its own tools.
+
 ## Two things that cost time, recorded so they do not again
 
 **`XDG_RUNTIME_DIR` is not optional.** Without it GTK stalls before mapping and says
