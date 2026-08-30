@@ -31,6 +31,19 @@ Discrimination measured over a graded PNG corpus, one isolated session each:
 
 `truncated` is accepted because the target is right to accept it, not because the oracle
 missed it. An oracle judged only on the inputs it flags is not being judged.
+
+GENERALISED TO A SECOND TOOLKIT BEFORE BEING BELIEVED, which is what caught the one defect
+in the rule above. On evince with a ghostscript-produced PDF corpus:
+
+    valid       132 nodes   accepted
+    badhdr      132 nodes   accepted     <- poppler tolerates a corrupted header
+    truncated   141 nodes   rejected     alert 'dialog-error-symbolic' + info bar 'Error'
+    garbage     141 nodes   rejected     both spellings again
+
+evince emits BOTH spellings, so the family holds. But it also raises `alert
+'dialog-warning-symbolic'` for a malformed file it goes on to OPEN, and matching the role
+alone called that a rejection -- the mirror of the false hang: an input that was processed,
+reported as one that was refused.
 """
 from __future__ import annotations
 
@@ -43,6 +56,19 @@ ERROR_ROLES: tuple = ("info bar", "alert", "dialog", "notification", "alert dial
 
 # Names that mark an error even when the role is generic. Kept small and case-folded.
 ERROR_NAME_HINTS: tuple = ("error", "failed", "cannot", "unable", "invalid", "corrupt")
+
+# A WARNING IS NOT A REJECTION, and matching the role family alone got this wrong.
+#
+# Measured on evince: a malformed-but-openable PDF produces `alert
+# 'dialog-warning-symbolic'` while a genuinely unreadable one produces `alert
+# 'dialog-error-symbolic'`. Both carry the `alert` role. Treating the role as sufficient
+# classified a file the target had OPENED as refused -- the mirror of the false-hang this
+# module exists to prevent, and just as wrong: it turns a processed input into a pass that
+# was never processed.
+#
+# Checked before the error hints, because `dialog-warning-symbolic` contains neither an
+# error word nor anything else to disqualify it; only the warning marker distinguishes it.
+WARNING_NAME_HINTS: tuple = ("warning", "warn", "caution")
 
 
 class GuiOutcome(str, Enum):
@@ -75,9 +101,13 @@ class GuiVerdict:
 
 
 def _is_error_node(role: str, name: Optional[str]) -> bool:
+    low = (name or "").lower()
+    # A warning wearing an error role is still a warning. evince raises `alert
+    # 'dialog-warning-symbolic'` for a file it went on to open.
+    if any(h in low for h in WARNING_NAME_HINTS) and not any(h in low for h in ERROR_NAME_HINTS):
+        return False
     if role in ERROR_ROLES:
         return True
-    low = (name or "").lower()
     return any(h in low for h in ERROR_NAME_HINTS)
 
 

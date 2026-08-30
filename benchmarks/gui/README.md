@@ -32,6 +32,23 @@ rejected input return in about 29 ms with the tree intact, which is what disting
 "refused this input" from "hung" **from outside the process** — an oracle independent of the
 window behaviour that produced the false reading this track began with.
 
+## A second toolkit, which is what caught the defect
+
+`toolkits.sh` repeats the exercise with `evince` on a ghostscript-produced PDF corpus:
+
+| input | nodes | verdict |
+|---|---:|---|
+| valid | 132 | accepted |
+| bad header | 132 | accepted — poppler tolerates it |
+| truncated | 141 | rejected — `alert 'dialog-error-symbolic'` **and** `info bar 'Error'` |
+| garbage | 141 | rejected — both spellings |
+
+evince emits **both** spellings, so the role family holds. But it also raises `alert
+'dialog-warning-symbolic'` for a malformed file it goes on to **open**, and matching the
+role alone classified that as a rejection — an input that was processed, reported as one
+that was refused. That is the mirror of the false hang this track began with, and only a
+second toolkit exposed it.
+
 ## Two things that cost time, recorded so they do not again
 
 **`XDG_RUNTIME_DIR` is not optional.** Without it GTK stalls before mapping and says

@@ -66,3 +66,21 @@ def test_the_detector_matches_a_family_not_a_spelling():
     assert error_nodes([("alert", "dialog-error-symbolic")])
     assert error_nodes([("label", "Could not load image: invalid header")])
     assert not error_nodes([("drawing area", ""), ("status bar", "2055 bytes")])
+
+
+def test_a_warning_is_not_a_rejection():
+    """evince raises `alert 'dialog-warning-symbolic'` for a malformed file it goes on to
+    OPEN. Matching the role family alone called that a rejection — the mirror of the false
+    hang, and just as wrong: an input that was processed, reported as one that was refused.
+    Found by generalising to a second toolkit rather than by reasoning about it."""
+    assert not error_nodes([("alert", "dialog-warning-symbolic")])
+    v = classify(tree=[("frame", "evince"), ("alert", "dialog-warning-symbolic")],
+                 exited=False, window_ms=520.0, serviced_action=True)
+    assert v.outcome is GuiOutcome.ACCEPTED
+
+
+def test_both_toolkit_spellings_of_a_real_error_are_caught():
+    """eog: `info bar 'Error'`. evince: `alert 'dialog-error-symbolic'`, and it emits the
+    eog spelling too. The family holds across both."""
+    for node in (("info bar", "Error"), ("alert", "dialog-error-symbolic")):
+        assert error_nodes([node]), node
