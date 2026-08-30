@@ -27,6 +27,24 @@ def _ratio(ours: float | None, gold: float | None) -> str:
     return f"{ours / gold:.2f}x"
 
 
+def _gold_cell(gold, gold_measured, m) -> str:
+    """The gold figure, with ITS spread when we have repeats of it.
+
+    Printing our dispersion and not the baseline's would make a stable number look better
+    than a wobbly one for the wrong reason. On pugixml it is the DEVELOPER's harness that
+    moves (14.79-15.28 over five runs) while ours does not, and a reader has to be able to
+    see that.
+    """
+    if gold is None:
+        return "—"
+    if not gold_measured:
+        return f"{gold:.1f}"
+    cell = f"{gold:.2f}†"
+    if m and m.get("_gold_spread") is not None and m.get("_n"):
+        cell += f" <sub>n={m['_n']} ±{m['_gold_spread']:.2f}</sub>"
+    return cell
+
+
 def main(results, write: bool = False) -> int:
     # SEVERAL RESULTS FILES, LATER ONES WINNING PER CASE.
     #
@@ -42,14 +60,44 @@ def main(results, write: bool = False) -> int:
         return 1
     ref = json.loads((HERE / "reference.json").read_text())["cases"]
 
-    measured: dict[str, dict] = {}
+    # REPEATS OF THE SAME CASE BECOME A MEDIAN, NOT A LAST-ONE-WINS.
+    #
+    # Five runs of pugixml against a fixed engine put OUR harness at 14.79% every time and
+    # the developer's at 14.79, 14.79, 14.79, 15.28 -- so "both are deterministic" was an
+    # artifact of stopping at three, and whichever run happened to be read last would have
+    # become the published figure. A single sample is still printed as a single sample;
+    # only a case measured more than once is aggregated, and its spread is printed beside
+    # it so the reader can see how much the number is worth.
+    samples: dict[str, list] = {}
     for rp in paths:
         for line in rp.read_text().splitlines():
             line = line.strip()
             if not line:
                 continue
             d = json.loads(line)
-            measured[d["case"]] = d
+            samples.setdefault(d["case"], []).append(d)
+
+    measured: dict[str, dict] = {}
+    for case, ds in samples.items():
+        ok = [d for d in ds if d.get("result") == "measured" and d.get("lines_pct")]
+        if len(ok) < 2:
+            measured[case] = ds[-1]
+            continue
+        # The median SAMPLE, not a synthesised row: every other field on it stays coherent
+        # with the number in the `ours` column.
+        ok.sort(key=lambda d: float(d["lines_pct"]))
+        med = ok[len(ok) // 2]
+        med = dict(med)
+        vals = [float(d["lines_pct"]) for d in ok]
+        med["_n"] = len(ok)
+        med["_spread"] = round(max(vals) - min(vals), 2)
+        gvals = [float((d.get("gold_measured_here") or {}).get("lines_pct") or 0) for d in ok]
+        gvals = [g for g in gvals if g]
+        if gvals:
+            gv = sorted(gvals)
+            med["_gold_median"] = gv[len(gv) // 2]
+            med["_gold_spread"] = round(max(gvals) - min(gvals), 2)
+        measured[case] = med
 
     order = list(ref)
     for case in measured:                                  # cases with no reference at all
@@ -72,7 +120,7 @@ def main(results, write: bool = False) -> int:
         # compiler, same budget, same denominator. It goes in the gold column with a mark,
         # never merged with a citation.
         if m is not None and (m.get("gold_measured_here") or {}).get("lines_pct"):
-            gold = float(m["gold_measured_here"]["lines_pct"])
+            gold = float(m.get("_gold_median") or m["gold_measured_here"]["lines_pct"])
             gold_measured = True
         else:
             gold_measured = False
@@ -86,6 +134,8 @@ def main(results, write: bool = False) -> int:
         else:
             ours = float(m["lines_pct"])
             ours_s = f"**{ours:.2f}**"
+            if m.get("_n"):
+                ours_s += f" <sub>n={m['_n']} ±{m['_spread']:.2f}</sub>"
 
         if ours is not None and gold:
             comparable += 1
@@ -99,7 +149,7 @@ def main(results, write: bool = False) -> int:
 
         print(f"| {case} | {ours_s} "
               f"| {'—' if qf is None else f'{qf:.2f}'} "
-              f"| {'—' if gold is None else (f'{gold:.2f}†' if gold_measured else f'{gold:.1f}')} "
+              f"| {_gold_cell(gold, gold_measured, m)} "
               f"| {_ratio(ours, gold)} | {_ratio(qf, gold)} |")
 
     if any((m.get("gold_measured_here") or {}).get("lines_pct") for m in measured.values()):
