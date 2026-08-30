@@ -1,0 +1,183 @@
+{
+ "brotli/decode_fuzzer": {
+  "ops": [
+   "o_create",
+   "o_consume",
+   "o_finish",
+   "o_destroy"
+  ],
+  "plan": "brotli_BrotliDecoderDecompressStream",
+  "sha": "0369e817c582120d"
+ },
+ "expat/XML_Parse": {
+  "ops": [
+   "o_create",
+   "o_consume",
+   "o_destroy"
+  ],
+  "plan": "expat_XML_Parse",
+  "sha": "ce413156e53e054c"
+ },
+ "iperf/cjson_fuzzer": {
+  "ops": [
+   "o_consume",
+   "o_drop_ret_cJSON"
+  ],
+  "plan": "iperf_cJSON_Parse",
+  "sha": "9ee0976c979c8147"
+ },
+ "jansson/json_loadb": {
+  "ops": [
+   "o_consume",
+   "o_drop_ret_json_t"
+  ],
+  "plan": "jansson_json_loadb",
+  "sha": "55bd93c39049639d"
+ },
+ "jbig2dec/jbig2_data_in": {
+  "ops": [
+   "o_create",
+   "o_consume",
+   "o_finish",
+   "o_destroy"
+  ],
+  "plan": "jbig2dec_jbig2_data_in",
+  "sha": "2227b6eba9ef4ade"
+ },
+ "lcms2/cmsOpenProfileFromMem": {
+  "ops": [
+   "o_consume",
+   "o_free_owned"
+  ],
+  "plan": "lcms2_cmsOpenProfileFromMem",
+  "sha": "2852b1edeeb9dde6"
+ },
+ "leptonica/pixReadMem": {
+  "ops": [
+   "o_consume",
+   "o_free_owned"
+  ],
+  "plan": "leptonica_pixReadMem",
+  "sha": "6d4ad826ed6475d7"
+ },
+ "libde265/stream_decode": {
+  "ops": [
+   "o_create",
+   "o_consume",
+   "o_finish",
+   "o_drive",
+   "o_destroy"
+  ],
+  "plan": "libde265_de265_push_data",
+  "sha": "f0872b571b5156a3"
+ },
+ "libpng/png_image_begin_read_from_memory": {
+  "ops": [
+   "o_create",
+   "o_consume",
+   "o_drop_out_image"
+  ],
+  "plan": "libpng_png_image_begin_read_from_memory",
+  "sha": "f425010a86d88b86"
+ },
+ "libwebp/WebPDecodeRGBA": {
+  "ops": [
+   "o_consume",
+   "o_free_owned"
+  ],
+  "plan": "libwebp_WebPDecodeRGBA",
+  "sha": "d2ed473e33448a4a"
+ },
+ "libyaml/libyaml_loader_fuzzer": {
+  "ops": [
+   "o_create",
+   "o_feed",
+   "o_consume",
+   "o_drop_out_document",
+   "o_destroy"
+  ],
+  "plan": "libyaml_yaml_parser_load",
+  "sha": "a60a37ff330526e3"
+ },
+ "libyaml/libyaml_scanner_fuzzer": {
+  "ops": [
+   "o_create",
+   "o_feed",
+   "o_consume",
+   "o_drop_out_token",
+   "o_destroy"
+  ],
+  "plan": "libyaml_yaml_parser_scan",
+  "sha": "222cb314a3418568"
+ },
+ "mbedtls/mbedtls_x509_crt_parse": {
+  "ops": [
+   "o_create",
+   "o_consume",
+   "o_destroy"
+  ],
+  "plan": "mbedtls_mbedtls_x509_crt_parse",
+  "sha": "497778094073207a"
+ },
+ "pugixml/parse": {
+  "ops": [
+   "o_new",
+   "o_consume_0",
+   "o_consume_1",
+   "o_consume_2"
+  ],
+  "plan": "pugixml_xml_document_load_buffer",
+  "sha": "95adadb86cd3ea0a"
+ },
+ "wabt/read_binary_ir": {
+  "ops": [
+   "o_a3",
+   "o_a5",
+   "o_consume"
+  ],
+  "plan": "wabt_ReadBinaryIr",
+  "sha": "787990d6da14e3d4"
+ },
+ "woff2/convert": {
+  "ops": [
+   "o_a2",
+   "o_consume"
+  ],
+  "plan": "woff2_ConvertWOFF2ToTTF",
+  "sha": "3ebcea9bb40e4955"
+ },
+ "yajl-ruby/json_fuzzer": {
+  "ops": [
+   "o_create",
+   "o_consume",
+   "o_finish",
+   "o_error",
+   "o_error_free",
+   "o_destroy"
+  ],
+  "plan": "yajl-ruby_yajl_parse",
+  "sha": "a5599d774ed4f46c"
+ },
+ "zlib/zlib_uncompress2_fuzzer": {
+  "ops": [
+   "o_consume"
+  ],
+  "plan": "zlib_uncompress2",
+  "sha": "a027bb359eca17c5"
+ },
+ "zopfli/zopfli_deflate_fuzzer": {
+  "ops": [
+   "o_cfg_options",
+   "o_consume"
+  ],
+  "plan": "zopfli_ZopfliDeflate",
+  "sha": "0c7b926dfb4c1d4e"
+ },
+ "zstd/ZSTD_decompress": {
+  "ops": [
+   "o_consume"
+  ],
+  "plan": "zstd_ZSTD_decompress",
+  "sha": "e27b58ff96e89f0d"
+ }
+}
