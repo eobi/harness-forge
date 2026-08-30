@@ -269,6 +269,17 @@ def cmd_propose(args) -> int:
                      cflags=args.cflag or [],
                      seed_dirs=args.seed_dir or [])
         plats = args.platform or ["linux-x86_64-glibc"]
+        # A FLAG THAT IS SILENTLY IGNORED IS WORSE THAN ONE THAT REFUSES. The C backend
+        # emits a host build and consults the platform only to name it in a comment, so
+        # `--platform ios-arm64-simulator` produced a build.sh byte-identical to the
+        # default -- no -isysroot, no -target. Say so rather than let the caller believe a
+        # cross-build happened.
+        _ready = {q.id for q in plat.emit_ready()}
+        _not_ready = [x for x in plats if x not in _ready]
+        if _not_ready:
+            print(f"note: {', '.join(_not_ready)} is modelled but NOT emit-ready. The C "
+                  f"backend will emit a HOST build; the platform is recorded on the plan "
+                  f"and is not applied to the compiler.", file=sys.stderr)
         plans = header_graph.propose(headers, tgt, platforms=plats,
                                      knobs=Knobs(max_len=args.max_len))
     if not plans:

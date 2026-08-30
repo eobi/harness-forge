@@ -191,12 +191,16 @@ PLATFORMS: dict[str, Platform] = {p.id: p for p in [
     _p(id="ios-arm64-simulator", os="ios", arch="aarch64", variant="simulator",
        toolchain="xcode-clang", sanitizers=("asan", "ubsan", "tsan"),
        allocator="libmalloc", coverage=("libfuzzer",), crash_artifact="mach-exception",
-       trust_ceiling=TRUST_FULL, emit_ready=True,
-       notes="THE practical iOS discovery path: normal libFuzzer and ASan, no signing fight"),
+       trust_ceiling=TRUST_FULL, emit_ready=False,
+       notes="THE practical iOS discovery path in principle -- normal libFuzzer and ASan, "
+             "no signing fight -- but NOT emit-ready: the C backend produces a host build "
+             "and ignores this platform. `--platform ios-arm64-simulator` was accepted and "
+             "then dropped, emitting a build.sh byte-identical to the default, with no "
+             "-isysroot and no -target. docs/PLATFORMS.md was right and this table was not"),
     _p(id="ios-x86_64-simulator", os="ios", arch="x86_64", variant="simulator",
        toolchain="xcode-clang", sanitizers=("asan", "ubsan"), allocator="libmalloc",
        coverage=("libfuzzer",), crash_artifact="mach-exception", trust_ceiling=TRUST_FULL,
-       emit_ready=True),
+       emit_ready=False),
     _p(id="ios-arm64-device", os="ios", arch="aarch64", variant="device",
        toolchain="xcode-clang+entitlements", sanitizers=("asan-devsigned",),
        allocator="libmalloc+pac", coverage=(), crash_artifact="ips-crash-report",

@@ -64,7 +64,7 @@ On a Mac with the NDK and an emulator attached, all fourteen stages run:
 | **Linux** x86-64 glibc | verified end to end under emulation |
 | **Android** arm64-v8a API 35 | verified end to end: cross-build, push, run, differential |
 | **Windows** MSVC / MinGW | exit-code semantics implemented and unit-tested from any host; **not yet run on a Windows host** |
-| **iOS** simulator | detected via `simctl`; harness emission not yet wired |
+| **iOS** simulator | detected via `simctl`; harness emission not yet wired. The platform matrix used to claim `EMIT yes` for both simulators and that claim was wrong: `--platform ios-arm64-simulator` was accepted and then dropped, producing a build.sh byte-identical to the default with no `-isysroot` and no `-target`. The matrix now agrees with this table, and asking for a platform the backend cannot target prints a note rather than emitting a host build in silence |
 
 Nothing above claims more than was executed. Windows is honestly *implemented and
 unit-tested*, not *verified* — run `python3 -m hforge selftest` there and it will tell you
