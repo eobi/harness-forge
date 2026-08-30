@@ -596,3 +596,33 @@ namespace n {
     ms, _, _ = cx.parse_classes(str(h))
     assert next(m for m in ms if m.name == "f").is_const
     assert next(m for m in ms if m.name == "g").is_pure
+
+
+def test_a_macro_invocation_in_a_body_is_not_a_declaration(tmp_path):
+    """Chunks are cut at `;` and `{`, so one can begin mid-body, where a macro invocation
+    has exactly a declaration's shape:
+
+        SIMDJSON_IF_CONSTEXPR(std::is_same<number_type, bool>::value) {
+
+    matched with a "return type" of `} } } else` -- braces and a keyword scraped off the
+    previous statement. simdjson proposed twelve plans and every one called that macro.
+    """
+    h = tmp_path / "m.hpp"
+    h.write_text('''
+namespace n {
+  class A {
+   public:
+    A();
+    int parse(const void* d, size_t len);
+    inline void run() {
+      if (x) { y(); }
+      MY_MACRO(std::is_same<int, bool>::value) {
+        z();
+      }
+    }
+  };
+}
+''')
+    ms, _, _ = cx.parse_classes(str(h))
+    assert "MY_MACRO" not in {m.name for m in ms}
+    assert "parse" in {m.name for m in ms}

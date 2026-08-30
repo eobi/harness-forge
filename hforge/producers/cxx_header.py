@@ -306,6 +306,8 @@ def parse_classes(path: str, include_dirs=(), cflags=()) -> tuple:
           ret = (fm.group(2) or "")
           if not ret.strip() or "operator" in ret or name.startswith("operator"):
               continue
+          if not _is_declaration(ret, name, ''):
+              continue
           if _TEMPLATE.search(ret) or _TEMPLATE.search(src[max(0, pos - 120):pos]):
               skipped.append(f"{name}: a template is not a symbol until instantiated")
               continue
@@ -350,6 +352,30 @@ def _chunks(seg: str):
         yield seg[start:], start
 
 
+_NOT_A_TYPE = re.compile(r"\}|\b(?:else|do|try|catch|case|default|break|continue|goto|"
+                        r"delete|throw|new)\b")
+
+
+def _is_declaration(ret: str, name: str, cls: str) -> bool:
+    """Whether this looks like a DECLARATION rather than a statement in a body.
+
+    Chunks are cut at `;` and `{`, so a chunk can begin in the middle of a function body,
+    and a macro invocation there has exactly the shape of a declaration:
+
+        SIMDJSON_IF_CONSTEXPR(std::is_same<number_type, bool>::value) {
+
+    matched with a "return type" of `} } } else` -- closing braces and a keyword scraped
+    off the end of the previous statement. simdjson proposed TWELVE plans and every one
+    of them called that macro. A return type is a TYPE: it holds no `}` and no statement
+    keyword, and outside a constructor or destructor it is never empty.
+    """
+    if _NOT_A_TYPE.search(ret):
+        return False
+    if not ret.strip() and name != cls and not name.startswith("~"):
+        return False
+    return True
+
+
 def _methods_in(seg: str, cls: str, ns: str, skipped: list) -> list:
     out = []
     for chunk, _off in _chunks(seg):
@@ -360,6 +386,8 @@ def _methods_in(seg: str, cls: str, ns: str, skipped: list) -> list:
           is_const = bool(re.search(r"\bconst\b", _tail))
           is_pure = bool(re.search(r"=\s*0", _tail))
           if name in ("if", "for", "while", "switch", "return", "operator"):
+              continue
+          if not _is_declaration(ret, name, cls):
               continue
           if "operator" in ret or name.startswith("operator"):
               skipped.append(f"{cls}::{name}: operator overload")
