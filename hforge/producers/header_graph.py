@@ -335,6 +335,9 @@ class Decl:
     # SHIPPED with a certificate — because emit succeeded, the static gates passed, and the
     # only gates that would have caught it need a binary that never built.
     complete: frozenset = frozenset()
+    # Complete struct -> {field: macro} the library requires set before use. See
+    # _required_init_fields: zeroing a caller-allocated struct is not initialising it.
+    req_init: dict = field(default_factory=dict)
 
     @property
     def returns_pointer(self) -> bool:
@@ -638,6 +641,7 @@ def parse_header(path: str, include_dirs=(), cflags=()) -> list:
     ptr_map = _typedef_map(stmts)
     ptr_types = frozenset(ptr_map)
     complete = _complete_types(src)
+    req_init = _required_init_fields(src, macros)
 
     out = []
     for st in stmts:
@@ -675,6 +679,7 @@ def parse_header(path: str, include_dirs=(), cflags=()) -> list:
         out.append(Decl(ret=" ".join(ret.split()), name=name,
                         params=_split_params(params), header=Path(path).name,
                         ptr_types=ptr_types, ptr_map=ptr_map, complete=complete,
+                        req_init=req_init,
                         macros=macros))
     return out
 
@@ -737,6 +742,64 @@ def _complete_types(src: str) -> frozenset:
         if a:
             out.add(a.group("alias"))
     return frozenset(out)
+
+
+# Complete struct -> {field: macro}, for the target currently being proposed. Same idiom as
+# _SCALAR_ALIASES and _CONST_BYTE_PTRS: a fact about the library's types that several
+# unrelated points in the plan builder need, and that would otherwise be threaded through
+# six signatures to reach the one place that binds a caller-allocated struct.
+_REQ_INIT: dict = {}
+
+_VERSION_MEMBER = re.compile(r"\b(?:png_)?(?:uint_32|uint32_t|unsigned\s+int|int|"
+                             r"unsigned|size_t|png_uint_32)\s+(version|size)\s*;")
+
+
+def _required_init_fields(src: str, macros: dict) -> dict:
+    """Complete structs that carry a field the library checks, as type -> {field: macro}.
+
+    THE IDIOM. A library that must stay ABI-compatible puts a `version` (sometimes `size`)
+    field at the top of a caller-allocated struct and refuses any object whose value it does
+    not recognise. libpng spells it `png_image.version` against `PNG_IMAGE_VERSION`. The
+    caller is expected to set it; a memset leaves 0; the call is refused before any work
+    happens.
+
+    That cost libpng 220 million executions for 0.71% of the library, and no gate could see
+    it: the harness was correct in every respect the plan could express.
+
+    DERIVED, NOT LISTED. The field is found in the struct body and the macro is required to
+    exist in the header with a matching name -- `png_image` -> `PNG_IMAGE_VERSION`. A
+    per-library table would work today and grow once per library forever, which is the same
+    mistake the byte-spelling list made before the header was read instead.
+    """
+    out: dict = {}
+    text = src or ""
+    for m in _STRUCT_OPEN.finditer(text):
+        depth, i = 0, m.end() - 1
+        while i < len(text):
+            if text[i] == "{":
+                depth += 1
+            elif text[i] == "}":
+                depth -= 1
+                if depth == 0:
+                    break
+            i += 1
+        if i >= len(text):
+            continue
+        body = text[m.end():i]
+        fm = _VERSION_MEMBER.search(body)
+        if not fm:
+            continue
+        names = [m.group("tag")] if m.group("tag") else []
+        a = _ALIAS_AFTER.match(text[i + 1:i + 80])
+        if a:
+            names.append(a.group("alias"))
+        for nm in names:
+            if not nm:
+                continue
+            macro = f"{nm.upper()}_{fm.group(1).upper()}"
+            if macro in (macros or {}):
+                out[nm] = {fm.group(1): macro}
+    return out
 
 
 def _handle_type(decls: list) -> Optional[str]:
@@ -1115,6 +1178,8 @@ def propose(headers: list, target: Target, *, platforms: Optional[list] = None,
     for h in headers:
         _SCALAR_ALIASES.update(header_byte_aliases(h, incs, cfl))
         _CONST_BYTE_PTRS.update(header_const_byte_ptrs(h, incs, cfl))
+    for d in decls:
+        _REQ_INIT.update(getattr(d, "req_init", None) or {})
     for d in decls:
         d.ptr_types = shared
         # Keep whatever the declaring header already knew; add what the others knew.
@@ -1753,7 +1818,8 @@ def _stream_bind(api, handle, pm, slices, scratch, out_capacity=65536, teardown=
                 if "const" in ty:
                     return None
                 rid = f"out_{nm}"
-                resources.append(Resource(rid, TypeRef(base_t, "struct"), storage="out"))
+                resources.append(Resource(rid, TypeRef(base_t, "struct"), storage="out",
+                                          init_fields=dict(_REQ_INIT.get(base_t) or {})))
                 args.append(Arg(nm, "resource", rid))
                 last_buf = None
                 # AND FREE IT WHEN THE LIBRARY OFFERS A FREE.
@@ -1777,7 +1843,8 @@ def _stream_bind(api, handle, pm, slices, scratch, out_capacity=65536, teardown=
                                            targets=rid))
                 continue
             rid = f"cfg_{nm}"
-            resources.append(Resource(rid, TypeRef(base_t, "struct"), storage="inline"))
+            resources.append(Resource(rid, TypeRef(base_t, "struct"), storage="inline",
+                                      init_fields=dict(_REQ_INIT.get(base_t) or {})))
             setup.append(Op(f"o_cfg_{nm}", init.symbol,
                             [Arg(init.params[0].name, "resource", rid)], binds=rid))
             args.append(Arg(nm, "resource", rid)); last_buf = None
@@ -2477,7 +2544,8 @@ def _plans_for_handle(decls, target, handle, inline_base, init_name, fini_name,
                     rid = f"out_{nm}"
                     base_t = hkey(ty, pm)
                     extra_res.append(Resource(rid, TypeRef(base_t, "struct"),
-                                              storage="inline"))
+                                              storage="inline",
+                                              init_fields=dict(_REQ_INIT.get(base_t) or {})))
                     args.append(Arg(nm, "resource", rid))
                     d = _destroyer_of(base_t, apis, pm)
                     if d is not None:
@@ -2570,7 +2638,8 @@ def _plans_for_handle(decls, target, handle, inline_base, init_name, fini_name,
             elif inline_base:
                 # The harness owns the storage: declare the OBJECT, pass its address.
                 resources.append(Resource("h", TypeRef(inline_base, "struct"),
-                                          storage="inline"))
+                                          storage="inline",
+                                          init_fields=dict(_REQ_INIT.get(inline_base) or {})))
             else:
                 resources.append(Resource("h", TypeRef(handle, "pointer")))
             seq.append(Op("o_create", create.symbol,

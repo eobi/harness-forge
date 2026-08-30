@@ -331,6 +331,13 @@ def _emit_ops(ir: HarnessIR) -> tuple[list[str], list[str]]:
             decls.append(f"    {r.type.name} {_res_var(r.id)};")
             decls.append(f"    int {_res_ok(r.id)} = 0;")
             body.append(f"    memset(&{_res_var(r.id)}, 0, sizeof {_res_var(r.id)});")
+            # ZEROING IS NOT INITIALISING. A library that carries a version or a size field
+            # in its caller-allocated struct reads 0 from a memset and refuses the call --
+            # libpng's png_image is the case that forced this: the harness ran 220 million
+            # times against 0.71% of the library because `version` was never set, and the
+            # plan had no way to say it should be.
+            for fname, expr in sorted((r.init_fields or {}).items()):
+                body.append(f"    {_res_var(r.id)}.{fname} = {expr};")
             continue
         if not _is_pointer(r.type.name, r.type.kind):
             raise EmitError(

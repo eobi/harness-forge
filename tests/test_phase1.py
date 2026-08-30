@@ -314,3 +314,37 @@ def test_s2_accepts_input_bound_to_the_const_parameter():
     fires on the correct shape is worse than no gate."""
     codes = _blocking(run_static_gates(_two_buffer_ir(bind_to="src")))
     assert "S2.INPUT_TO_OUTPUT" not in codes, codes
+
+
+# ── zeroing a caller-allocated struct is not initialising it ──────────────────
+
+def test_required_struct_fields_are_set_after_zeroing():
+    """libpng's png_image carries a `version` field the library checks before doing any
+    work. A memset leaves 0, the call is refused, and the harness runs hundreds of millions
+    of times against 0.71% of the library — correct in every respect the plan could
+    previously express. The plan can now say it."""
+    ir = _minimal()
+    ir.resources.append(Resource("img", TypeRef("png_image", "struct"), storage="inline",
+                                 init_fields={"version": "PNG_IMAGE_VERSION"}))
+    src = emit(ir).source
+    z = src.index("memset(&hf_r_img")
+    v = src.index("hf_r_img.version = PNG_IMAGE_VERSION;")
+    assert v > z, "the field must be set AFTER the zeroing, or the memset erases it"
+
+
+def test_a_resource_without_required_fields_is_unchanged():
+    """The feature must be invisible where it does not apply: an old plan emits byte-for-byte
+    what it emitted before."""
+    ir = _minimal()
+    ir.resources.append(Resource("plain", TypeRef("yaml_parser_t", "struct"), storage="inline"))
+    src = emit(ir).source
+    assert "memset(&hf_r_plain" in src
+    assert ".version" not in src
+
+
+def test_init_fields_survive_a_round_trip_and_stay_absent_when_empty():
+    r = Resource("h", TypeRef("png_image", "struct"), storage="inline",
+                 init_fields={"version": "PNG_IMAGE_VERSION"})
+    assert Resource.from_json(r.to_json()).init_fields == {"version": "PNG_IMAGE_VERSION"}
+    # an unchanged plan must serialise unchanged, or every stored plan churns
+    assert "init_fields" not in Resource("h", TypeRef("t", "struct")).to_json()

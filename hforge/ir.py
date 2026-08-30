@@ -338,6 +338,19 @@ class Resource:
     id: str
     type: TypeRef
     storage: str = "handle"          # handle | inline | out_param
+    # FIELDS THE LIBRARY REQUIRES SET BEFORE THE OBJECT IS USABLE, as name -> C expression.
+    #
+    # Zeroing a caller-allocated struct is not the same as initialising it. libpng's
+    # png_image carries a `version` field that must equal PNG_IMAGE_VERSION, and a zeroed
+    # struct carries 0, so png_image_begin_read_from_memory refuses the call before any
+    # decoding happens: the harness compiled, passed every gate, ran 220 million times and
+    # reached 0.71% of the library. Nothing in the plan could express "set this field", so
+    # no producer could fix it and no gate could see it was missing.
+    #
+    # Kept as an expression rather than a value because the right-hand side is a MACRO the
+    # header defines. Writing 1 would be correct today and wrong at the next release, which
+    # is the whole reason the library spells it as a version check.
+    init_fields: dict = field(default_factory=dict)
 
     @property
     def by_address(self) -> bool:
@@ -358,12 +371,16 @@ class Resource:
         return self.storage in ("inline", "out")
 
     def to_json(self) -> dict:
-        return {"id": self.id, "type": self.type.to_json(), "storage": self.storage}
+        d = {"id": self.id, "type": self.type.to_json(), "storage": self.storage}
+        if self.init_fields:                 # omitted when empty: an old plan stays byte-equal
+            d["init_fields"] = dict(self.init_fields)
+        return d
 
     @staticmethod
     def from_json(d: dict) -> "Resource":
         return Resource(id=d["id"], type=TypeRef.from_json(d["type"]),
-                        storage=d.get("storage", "handle"))
+                        storage=d.get("storage", "handle"),
+                        init_fields=dict(d.get("init_fields") or {}))
 
 
 @dataclass
