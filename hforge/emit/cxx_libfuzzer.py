@@ -256,8 +256,14 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *{P}data, size_t {P}size) {{
 
     incs = [f"-I{d}" for d in ir.target.include_dirs] + list(ir.target.cflags)
     san = ",".join(ir.knobs.sanitizers)
-    common = ["$CXX", "-g", ir.knobs.optimisation, "-std=c++17",
-              "-fno-omit-frame-pointer", *incs]
+    # THE CALLER'S STANDARD WINS, and is not merely last on the command line. wabt needs
+    # C++20 (`using ByteSpan = std::span<const uint8_t>`), and emitting `-std=c++17`
+    # alongside a supplied `-std=c++20` relied on clang taking the later flag -- true, but
+    # a build line that contradicts itself is one nobody can read.
+    _std = next((c for c in ir.target.cflags if c.startswith("-std=")), "-std=c++17")
+    common = ["$CXX", "-g", ir.knobs.optimisation, _std,
+              "-fno-omit-frame-pointer",
+              *[i for i in incs if not i.startswith("-std=")]]
     build = [*common, f"-fsanitize=fuzzer{',' + san if san else ''}", "harness.cc",
              *_langed(ir.target.sources), *ir.target.link_libs, "-o",
              f"{ir.name}_fuzz"]

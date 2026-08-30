@@ -737,3 +737,19 @@ namespace lib {
     ir = next(p for p in cx.propose([str(h)], t) if "Read" in p.name)
     assert [r.type.name for r in ir.resources] == ["lib::Out"]
     assert "&*hf_o_a2" in cxx_libfuzzer.emit(ir).source
+
+
+def test_the_callers_cxx_standard_replaces_the_default(tmp_path):
+    """wabt needs C++20 (`using ByteSpan = std::span<const uint8_t>`). Emitting
+    `-std=c++17` beside a supplied `-std=c++20` worked only because clang takes the later
+    flag; a build line that contradicts itself is one nobody can read."""
+    from hforge.ir import Target
+    h = tmp_path / "s.hpp"
+    h.write_text(_FLAGS)
+    def build(cflags):
+        t = Target(name="p", public_headers=["s.hpp"], include_dirs=[str(tmp_path)],
+                   sources=[], link_libs=[], cflags=cflags, seed_dirs=[])
+        ir = next(x for x in cx.propose([str(h)], t) if "load_buffer" in x.name)
+        return [c for c in cxx_libfuzzer.emit(ir).build_command if c.startswith("-std=")]
+    assert build([]) == ["-std=c++17"]
+    assert build(["-std=c++20"]) == ["-std=c++20"]
