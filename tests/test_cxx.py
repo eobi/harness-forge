@@ -554,3 +554,45 @@ namespace lib {
                sources=[], link_libs=[], cflags=[], seed_dirs=[])
     ir = next(p for p in cx.propose([str(h)], t) if "read" in p.name)
     assert [o.id for o in ir.sequence] == ["o_new", "o_consume"]
+
+
+# ── a parser that hangs produces no result and no reason ─────────────────────
+
+def test_a_macro_invocation_followed_by_whitespace_does_not_hang(tmp_path):
+    """simdjson's amalgamated header made the parser run for over TEN MINUTES with no
+    output: no plans, no refusal, nothing to distinguish it from a slow machine. For a
+    tool whose claim is that a null is never silent, a hang is the worst possible result.
+
+    The cause was four consecutive `\\s*` runs in the declaration tail
+    (`\\)\\s*(const)?\\s*(?:noexcept)?\\s*(=\\s*0)?\\s*[;{]`), which can divide the same
+    whitespace between them combinatorially. The trigger is a macro INVOCATION -- shaped
+    exactly like a declaration but followed by no `;` and no `{` -- ahead of a long run of
+    blank, space-filled lines.
+    """
+    import time
+    h = tmp_path / "slow.hpp"
+    h.write_text("namespace n {\n" + ("\n" + " " * 90) * 12
+                 + "\nnssv_DISABLE_MSVC_WARNINGS( 4455 26481 26472 )\n"
+                 + ("\n" + " " * 90) * 12 + "\n}\n")
+    t = time.time()
+    cx.parse_classes(str(h))
+    assert time.time() - t < 5.0
+
+
+def test_qualifiers_are_still_read_from_the_declaration_tail(tmp_path):
+    """The tail became one captured run instead of separate optional groups, so `const`
+    and `= 0` are now read out of it. They must still be seen."""
+    h = tmp_path / "q.hpp"
+    h.write_text('''
+namespace n {
+  class A {
+   public:
+    A();
+    virtual int f(const void* d, size_t n) const;
+    virtual int g(const void* d, size_t n) = 0;
+  };
+}
+''')
+    ms, _, _ = cx.parse_classes(str(h))
+    assert next(m for m in ms if m.name == "f").is_const
+    assert next(m for m in ms if m.name == "g").is_pure

@@ -55,9 +55,17 @@ _ACCESS = re.compile(r"\b(public|private|protected)\s*:")
 _METHOD = re.compile(
     r"^[ \t]*(?!(?:public|private|protected|using|typedef|friend|template|return)\b)"
     r"((?:virtual\s+|static\s+|inline\s+|explicit\s+|constexpr\s+)*)"      # 1 specifiers
-    r"([^;{()]*?)"                                                        # 2 return type
+    r"([^;{()]{0,160}?)"                                                  # 2 return type
     r"([A-Za-z_~]\w*)\s*"                                                 # 3 name
-    r"\(([^;{)]*)\)\s*(const)?\s*(?:noexcept)?\s*(=\s*0)?\s*[;{]", re.M)
+    # ONE variable-width run after `)`, not four. The tail used to be
+    #     \)\s*(const)?\s*(?:noexcept)?\s*(=\s*0)?\s*[;{]
+    # and four consecutive `\s*` can divide the SAME whitespace between them in
+    # combinatorially many ways. simdjson's header has
+    #     nssv_DISABLE_MSVC_WARNINGS( 4455 26481 26472 )
+    # -- a macro invocation followed by no `;` and no `{`, then a long run of blank,
+    # space-filled lines -- and matching it never finished. The qualifiers are read out of
+    # the captured tail instead of being separate optional groups.
+    r"\(([^;{)]*)\)([^;{()]{0,40})[;{]", re.M)
 
 _STD_BYTES = re.compile(r"std::(?:vector\s*<\s*(?:uint8_t|unsigned\s+char|char)\s*>|"
                         r"string|string_view|span\s*<)", re.I)
@@ -115,9 +123,31 @@ class Method:
 
 
 def _strip(src: str) -> str:
-    """Comments and string bodies out, line structure preserved."""
+    r"""Comments, string bodies and PREPROCESSOR DIRECTIVES out, line structure preserved.
+
+    A `#define` is not a declaration, and a multi-line one is actively dangerous to the
+    declaration regex: simdjson's
+
+        #define SIMDJSON_TARGET_REGION(T)                                    \\
+          _Pragma(SIMDJSON_STRINGIFY(                                        \\
+
+    pairs long whitespace runs with continuation backslashes, and `_METHOD`'s lazy
+    `[^;{()]*?` beside `\s*` backtracks catastrophically on it. The parser did not fail on
+    simdjson -- it ran for over ten minutes with no output and no way to tell whether it
+    was working. Directives are dropped here, and `_METHOD` is bounded below as well,
+    because one defence against a hang that produces nothing is not enough.
+    """
     from ..analysis.sinks import strip_noise
-    return strip_noise(src)
+    out = []
+    joining = False
+    for line in strip_noise(src).splitlines():
+        stripped = line.lstrip()
+        if joining or stripped.startswith("#"):
+            joining = line.rstrip().endswith("\\")
+            out.append("")               # keep the line count, drop the content
+        else:
+            out.append(line)
+    return "\n".join(out)
 
 
 def _match_brace(s: str, i: int) -> int:
@@ -265,52 +295,87 @@ def parse_classes(path: str, include_dirs=(), cflags=()) -> tuple:
     # proposed nor skipped, which is the silent omission this parser's own contract
     # forbids. Declarations inside a class body are already handled above and are excluded
     # here by position.
-    for fm in _METHOD.finditer(src):
-        if any(a < fm.start() < b for a, b in class_spans):
-            continue
-        name = fm.group(3)
-        if name in ("if", "for", "while", "switch", "return", "operator"):
-            continue
-        ret = (fm.group(2) or "")
-        if not ret.strip() or "operator" in ret or name.startswith("operator"):
-            continue
-        if _TEMPLATE.search(ret) or _TEMPLATE.search(src[max(0, fm.start() - 120):fm.start()]):
-            skipped.append(f"{name}: a template is not a symbol until instantiated")
-            continue
-        ns = ns_for(fm.start())
-        methods.append(Method(cls="", ns=ns, name=name, ret=" ".join(ret.split()),
-                              params=_split_params(fm.group(4)),
-                              is_static="static" in (fm.group(1) or ""),
-                              is_const=bool(fm.group(5)), is_pure=bool(fm.group(6)),
-                              n_required=n_required(fm.group(4)),
-                              defaults=default_exprs(fm.group(4))))
+    for _chunk, _off in _chunks(src):
+      for fm in _METHOD.finditer(_chunk):
+          pos = _off + fm.start()
+          if any(a < pos < b for a, b in class_spans):
+              continue
+          name = fm.group(3)
+          if name in ("if", "for", "while", "switch", "return", "operator"):
+              continue
+          ret = (fm.group(2) or "")
+          if not ret.strip() or "operator" in ret or name.startswith("operator"):
+              continue
+          if _TEMPLATE.search(ret) or _TEMPLATE.search(src[max(0, pos - 120):pos]):
+              skipped.append(f"{name}: a template is not a symbol until instantiated")
+              continue
+          ns = ns_for(pos)
+          methods.append(Method(cls="", ns=ns, name=name, ret=" ".join(ret.split()),
+                                params=_split_params(fm.group(4)),
+                                is_static="static" in (fm.group(1) or ""),
+                                is_const=bool(re.search(r"\bconst\b", fm.group(5) or "")),
+                                is_pure=bool(re.search(r"=\s*0", fm.group(5) or "")),
+                                n_required=n_required(fm.group(4)),
+                                defaults=default_exprs(fm.group(4))))
 
     return methods, skipped, classes
 
 
+def _chunks(seg: str):
+    """The text cut after every `;` and `{`, so no match can scan past a declaration.
+
+    WHY THIS EXISTS. `_METHOD` pairs a bounded lazy run with an optional-suffix tail, and
+    on text where the tail never appears it re-tries every split across an ever-growing
+    region. simdjson's amalgamated header carries lines like
+
+        nssv_DISABLE_MSVC_WARNINGS( 4455 26481 26472 )
+
+    -- a macro INVOCATION that looks exactly like a declaration but is followed by no `;`
+    and no `{`. Against the 9 MB header the parser ran for over ten minutes and produced
+    nothing: no plans, no refusal, no way to tell it from a slow machine. A hang is the
+    worst possible result for a tool whose claim is that a null is never silent.
+
+    A declaration always ends at `;` or `{`, so cutting there bounds every match to one
+    declaration and makes the cost linear. Atomic groups would also fix it, but they need
+    Python 3.11 and this runs on 3.9.
+    """
+    start, n = 0, len(seg)
+    i = 0
+    while i < n:
+        if seg[i] in ";{":
+            yield seg[start:i + 1], start
+            start = i + 1
+        i += 1
+    if start < n:
+        yield seg[start:], start
+
+
 def _methods_in(seg: str, cls: str, ns: str, skipped: list) -> list:
     out = []
-    for m in _METHOD.finditer(seg):
-        spec, ret, name, params, is_const = (m.group(1) or ""), (m.group(2) or ""), \
-            m.group(3), m.group(4), bool(m.group(5))
-        is_pure = bool(m.group(6))
-        if name in ("if", "for", "while", "switch", "return", "operator"):
-            continue
-        if "operator" in ret or name.startswith("operator"):
-            skipped.append(f"{cls}::{name}: operator overload")
-            continue
-        if _TEMPLATE.search(ret):
-            skipped.append(f"{cls}::{name}: template method")
-            continue
-        is_dtor = name.startswith("~")
-        is_ctor = (name == cls)
-        out.append(Method(cls=cls, ns=ns, name=name,
-                          ret="void" if (is_ctor or is_dtor) else " ".join(ret.split()),
-                          params=_split_params(params),
-                          is_ctor=is_ctor, is_dtor=is_dtor,
-                          is_static="static" in spec, is_const=is_const,
-                          is_pure=is_pure, n_required=n_required(params),
-                          defaults=default_exprs(params)))
+    for chunk, _off in _chunks(seg):
+      for m in _METHOD.finditer(chunk):
+          spec, ret, name, params = (m.group(1) or ""), (m.group(2) or ""), \
+              m.group(3), m.group(4)
+          _tail = m.group(5) or ""
+          is_const = bool(re.search(r"\bconst\b", _tail))
+          is_pure = bool(re.search(r"=\s*0", _tail))
+          if name in ("if", "for", "while", "switch", "return", "operator"):
+              continue
+          if "operator" in ret or name.startswith("operator"):
+              skipped.append(f"{cls}::{name}: operator overload")
+              continue
+          if _TEMPLATE.search(ret):
+              skipped.append(f"{cls}::{name}: template method")
+              continue
+          is_dtor = name.startswith("~")
+          is_ctor = (name == cls)
+          out.append(Method(cls=cls, ns=ns, name=name,
+                            ret="void" if (is_ctor or is_dtor) else " ".join(ret.split()),
+                            params=_split_params(params),
+                            is_ctor=is_ctor, is_dtor=is_dtor,
+                            is_static="static" in spec, is_const=is_const,
+                            is_pure=is_pure, n_required=n_required(params),
+                            defaults=default_exprs(params)))
     return out
 
 
