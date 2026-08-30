@@ -1,0 +1,34 @@
+{
+ "date": "2026-08-30",
+ "source": "github.com/google/oss-fuzz, projects/*/*fuzz*.{c,cc}, shallow clone",
+ "harnesses": 372,
+ "lifted": 362,
+ "high_fidelity": 214,
+ "blocking_any_lift": 152,
+ "blocking_high_fidelity": 4,
+ "triaged": {
+  "nettle/fuzz_rsa_public_key_from_der.c": {
+   "verdict": "FALSE POSITIVE",
+   "gate": "S5.INPUT_NOT_CONSUMED",
+   "why": "data IS consumed, by asn1_der_iterator_first(&iter, size, data) -- the call sits inside an if() condition and the lifter does not read calls in conditional expressions"
+  },
+  "haproxy/fuzz_cfg_parser.c": {
+   "verdict": "FALSE POSITIVE",
+   "gate": "S5.INPUT_NOT_CONSUMED",
+   "why": "data reaches the parser through a designated struct initialiser (.content = (const char *)data); the lifter does not follow input into an aggregate initialiser"
+  },
+  "lcms/cms_cie_cam02_fuzzer.c": {
+   "verdict": "FALSE POSITIVE",
+   "gate": "S5.INPUT_NOT_CONSUMED + S1.USE_BEFORE_CREATE",
+   "why": "input is consumed byte-wise as data[0], data[1]...; and the stack struct is a plain local declaration the lifter does not count as a create"
+  },
+  "tdengine/sql-fuzzer.c": {
+   "verdict": "FALSE POSITIVE",
+   "gate": "S1.USE_BEFORE_CREATE",
+   "why": "locals passed by address are read as resources that were never created"
+  }
+ },
+ "result": "0 upstream-reportable findings; 4 flags, all four false",
+ "false_positive_rate_high_fidelity": "4/214 = 1.9%",
+ "the_actual_finding": "the HIGH-FIDELITY classifier admitted all four. The gates are correct about the IR they were handed; the LIFTER produced IR that does not match the harness, and the fidelity signal -- 'the lifter could not attribute some values' -- did not fire on any of them. A fidelity signal that misses four out of four is the defect, not the gates."
+}
