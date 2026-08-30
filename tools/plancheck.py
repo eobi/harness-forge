@@ -322,7 +322,14 @@ def c12_backends_go_through_the_router():
                 if f"emit.{b} import" not in line and f"emit import {b}" not in line:
                     continue
                 names = line.split("import", 1)[1]
-                if {n.strip() for n in names.split(",")} <= {"EmitError", "Emitted"}:
+                # A trailing comment is part of the line, not part of the import. Without
+                # stripping it, `from hforge.emit.c_libfuzzer import EmitError  # noqa`
+                # parsed as the name "EmitError  # noqa" and failed the allow-list -- so a
+                # lint-clean import of a permitted shared type was reported as a layering
+                # violation. The check was right about the rule and wrong about the text.
+                names = names.split("#", 1)[0]
+                if {n.strip() for n in names.split(",") if n.strip()} <= {"EmitError",
+                                                                          "Emitted"}:
                     continue          # the shared types, not a backend entry point
                 problems.append(f"{rel}: {line.strip()}")
     record("C12", BAD if problems else OK,
