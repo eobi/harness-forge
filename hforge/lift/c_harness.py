@@ -39,6 +39,17 @@ from ..ir import (
     SLICE_BYTES,
 )
 
+class LiftError(Exception):
+    """Why a harness could not be lifted, in the caller's words rather than a guess.
+
+    Three different conditions used to return None here and the CLI reported all of them as
+    "no LLVMFuzzerTestOneInput entry point found". Pointing this engine at a third-party
+    harness produced exactly that message for a file that plainly declares one -- the entry
+    point was found, the harness simply makes no library calls, and the diagnostic sent the
+    reader looking for a defect that was not there.
+    """
+
+
 _ENTRY = re.compile(
     r"\bLLVMFuzzerTestOneInput\s*\(\s*(?:const\s+)?(?:uint8_t|unsigned\s+char|char)\s*\*\s*"
     r"([A-Za-z_]\w*)\s*,\s*(?:size_t|unsigned\s+long|long)\s+([A-Za-z_]\w*)\s*\)")
@@ -200,11 +211,12 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
             m = cand
             break
     if not m:
-        return None
+        raise LiftError("no LLVMFuzzerTestOneInput definition found (a declaration without "
+                        "a body does not lift)")
     data, size = m.group(1), m.group(2)
     body = _body_of(src, m.end())
     if not body.strip():
-        return None
+        raise LiftError("LLVMFuzzerTestOneInput has an empty body")
 
     decl_type: dict = {}
     for dm in _DECL.finditer(body):
@@ -291,7 +303,10 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
             order += 1
 
     if not ops:
-        return None
+        raise LiftError("the entry point was found, but it makes no calls into a library: "
+                        "every call in it is a libc primitive the lift excludes. A "
+                        "self-contained harness that inlines its own bug has nothing to "
+                        "grade against an API contract")
 
     notes = (f"lifted from {Path(path).name}; {parsed.branches} branch(es) modelled by "
              f"nesting depth. Contract gates need the target's headers; without them S2 "

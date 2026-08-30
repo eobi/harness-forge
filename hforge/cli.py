@@ -32,7 +32,7 @@ from .gates.dynamic_gates import (build, d4_sink_reachability, d11_differential,
                                   run_dynamic_gates)
 from .gates.result import (BLOCK, FAIL, NOT_RUN, WARN, Violation, failed as gate_failed,
                            not_run as gate_not_run)
-from .lift.c_harness import lift as lift_c_harness
+from .lift.c_harness import LiftError, lift as lift_c_harness
 from .findings import gates as findings_gates, pipeline as findings_pipeline, report as findings_report
 from .targets import ossfuzz
 from .gates.static_gates import run_static_gates
@@ -721,11 +721,15 @@ def cmd_audit(args) -> int:
     for p in paths:
         try:
             lifted = lift_c_harness(str(p), target_name=args.name or p.stem)
+        except LiftError as e:
+            # Its own words. A wrong reason sends the reader after a defect that is not there.
+            unliftable.append((p, str(e)))
+            continue
         except Exception as e:                                   # noqa: BLE001
             unliftable.append((p, f"{type(e).__name__}: {e}"))
             continue
         if lifted is None:
-            unliftable.append((p, "no LLVMFuzzerTestOneInput entry point found"))
+            unliftable.append((p, "the lift returned nothing and gave no reason"))
             continue
         gates = list(run_static_gates(lifted.ir))
         blocks = [v for g in gates for v in g.violations if v.severity == BLOCK]

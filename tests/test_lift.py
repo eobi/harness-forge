@@ -113,14 +113,22 @@ def test_a_prototype_is_not_a_harness():
     """`ossshell.c` declares the entry point and calls it from main. Matching that prototype
     and taking the next `{` grabbed an unrelated function's body and graded it as a
     defective harness. It is not a harness at all."""
-    L = c_harness.lift(_c("""
+    src = _c("""
 int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size);
 int main(int argc, char **argv) {
     read_file(argv[1]);
     return 0;
 }
-"""))
-    assert L is None, "a prototype was lifted as though it were a definition"
+""")
+    try:
+        c_harness.lift(src)
+    except c_harness.LiftError as e:
+        # The REASON is pinned, not just the refusal. Three conditions used to return None
+        # and the CLI reported all of them as "no entry point found", which sent a reader
+        # after a defect that was not there.
+        assert "definition" in str(e), str(e)
+    else:
+        raise AssertionError("a prototype was lifted as though it were a definition")
 
 
 def test_input_survives_a_memcpy():
