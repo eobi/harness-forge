@@ -1674,6 +1674,21 @@ PHASES: tuple = (
                          "most other members. That derives exactly the three the library's "
                          "authors chose, with no per-library list. Fewer than three "
                          "members and the parameter is dropped as before."),
+        Deliverable("L.CXX_ALIAS",
+                    "a type alias resolved to the container the harness can own", DONE,
+                    modules=("hforge.producers.cxx_header",),
+                    tests=("test_an_alias_resolves_to_the_container_behind_it",
+                           "test_an_ownable_container_becomes_scratch_not_a_resource",
+                           "test_the_container_is_passed_by_address",
+                           "test_a_class_pointer_is_still_refused_when_nothing_can_build_it"),
+                    note="`using Errors = std::vector<Error>` is how modern C++ names "
+                         "things, and an alias is NOT a class -- the inheritance registry "
+                         "could not resolve `Errors*`, so the whole call was refused as "
+                         "unconstructible. A std:: container needs no constructor call "
+                         "(declaring it IS constructing it), so it becomes scratch the "
+                         "harness owns and is passed by address. A pointer to a class "
+                         "nothing can build is still refused with the parameter named: "
+                         "the alias path is not a way to smuggle one in."),
         Deliverable("L.CXX_EMIT",
                     "C++ backend: objects, new/delete, std::string and vector inputs", DONE,
                     modules=("hforge.emit.cxx_libfuzzer",),

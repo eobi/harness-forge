@@ -503,6 +503,44 @@ def _concrete_for(ty: str, classes: dict) -> list:
     return out
 
 
+_ALIAS = re.compile(r"^[ \t]*using\s+([A-Za-z_]\w*)\s*=\s*([^;]+);", re.M)
+_TYPEDEF = re.compile(r"^[ \t]*typedef\s+(.+?)\s+([A-Za-z_]\w*)\s*;", re.M)
+
+
+def parse_aliases(path: str) -> dict:
+    """Type aliases, as name -> target type.
+
+    `using Errors = std::vector<Error>;` is how modern C++ names things, and an alias is
+    not a class: the inheritance registry cannot resolve `Errors*` to anything, so a
+    parameter of that type was refused as unconstructible even though the underlying type
+    is a container the harness can simply declare.
+    """
+    src = _strip(Path(path).read_text(errors="replace"))
+    out = {}
+    for m in _ALIAS.finditer(src):
+        out[m.group(1)] = " ".join(m.group(2).split())
+    for m in _TYPEDEF.finditer(src):
+        out[m.group(2)] = " ".join(m.group(1).split())
+    return out
+
+
+def ownable_type(ty: str, aliases: dict) -> str:
+    """The declarable type behind a parameter, when the harness can own one outright.
+
+    A `std::vector<T>` or `std::string` needs no constructor call -- declaring it IS
+    constructing it -- so it becomes scratch rather than a resource. Resolved through one
+    level of alias, which is what `Errors*` needs.
+    """
+    base = _base_name(ty)
+    target = aliases.get(base, "")
+    cand = target or ty
+    cand = re.sub(r"\b(const|volatile)\b", " ", cand).replace("*", " ").replace("&", " ")
+    cand = " ".join(cand.split())
+    if re.match(r"^std::(?:vector|string|deque|list)\b", cand):
+        return cand
+    return ""
+
+
 def constructible_argument(ty: str, classes: dict, methods: list):
     """How to BUILD an object for a parameter of this type, or None.
 
@@ -527,7 +565,8 @@ def constructible_argument(ty: str, classes: dict, methods: list):
     return None
 
 
-def resolve_extras(m: "Method", b, classes: dict, methods: list):
+def resolve_extras(m: "Method", b, classes: dict, methods: list,
+                   aliases: dict = None):
     """Every required parameter that is neither the bytes nor their length.
 
     Returns (bindings, "") or (None, reason). A binding is
@@ -546,6 +585,13 @@ def resolve_extras(m: "Method", b, classes: dict, methods: list):
             continue
         if "*" not in ty and "&" not in ty:
             out.append((i, None, None, ""))          # a scalar: literal 0 is a real value
+            continue
+        own = ownable_type(ty, aliases or {})
+        if own:
+            # A container the harness can simply DECLARE. No constructor call is needed,
+            # so it becomes scratch and is passed by address -- which is what `Errors*`,
+            # spelled `using Errors = std::vector<Error>`, actually wants.
+            out.append((i, "SCRATCH", None, own))
             continue
         r = constructible_argument(ty, classes, methods)
         if r is None:
@@ -671,10 +717,12 @@ def propose(headers, target, platforms=(), knobs=None, max_plans: int = 12,
     skipped: list = skipped if skipped is not None else []
     classes: dict = {}
     consts: dict = {}
+    aliases: dict = {}
     for h in hs:
         ms, sk, cs = parse_classes(str(h))
         classes.update(cs)
         consts.update(parse_constants(str(h)))
+        aliases.update(parse_aliases(str(h)))
         for m in ms:
             m.header = Path(h).name
         methods += ms
@@ -693,7 +741,7 @@ def propose(headers, target, platforms=(), knobs=None, max_plans: int = 12,
         b = consume_binding(m)
         if b is None:
             continue
-        ex, why = resolve_extras(m, b, classes, methods)
+        ex, why = resolve_extras(m, b, classes, methods, aliases)
         if ex is None:
             skipped.append(f"{m.symbol}: {why}")
             continue
@@ -714,7 +762,7 @@ def propose(headers, target, platforms=(), knobs=None, max_plans: int = 12,
             b = consume_binding(m)
             if b is None:
                 continue
-            ex, why = resolve_extras(m, b, classes, methods)
+            ex, why = resolve_extras(m, b, classes, methods, aliases)
             if ex is None:
                 skipped.append(f"{m.symbol}: {why}")
                 continue
@@ -732,6 +780,11 @@ def propose(headers, target, platforms=(), knobs=None, max_plans: int = 12,
         # when the constructor takes a buffer, scratch the harness owns.
         built, extra_res, extra_scratch, extra_ops, extra_apis = {}, [], [], [], []
         for idx, kcls, kctor, sctype in extras:
+            if kcls == "SCRATCH":
+                sid = "b%d" % idx
+                extra_scratch.append({"id": sid, "kind": "bytes", "c_type": sctype})
+                built[idx] = ("scratch_addr", sid)
+                continue
             if kcls is None:
                 continue
             rid = "a%d" % idx
@@ -765,7 +818,11 @@ def propose(headers, target, platforms=(), knobs=None, max_plans: int = 12,
             elif i == li:
                 args.append({"param": pn, "source": "length_of", "ref": "d"})
             elif i in built:
-                args.append({"param": pn, "source": "resource", "ref": built[i]})
+                _b = built[i]
+                if isinstance(_b, tuple):
+                    args.append({"param": pn, "source": _b[0], "ref": _b[1]})
+                else:
+                    args.append({"param": pn, "source": "resource", "ref": _b})
             else:
                 args.append({"param": pn, "source": "literal", "value": 0})
 

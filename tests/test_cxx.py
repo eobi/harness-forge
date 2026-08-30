@@ -626,3 +626,65 @@ namespace n {
     ms, _, _ = cx.parse_classes(str(h))
     assert "MY_MACRO" not in {m.name for m in ms}
     assert "parse" in {m.name for m in ms}
+
+
+# ── a type alias is not a class ──────────────────────────────────────────────
+
+_ALIASED = '''
+namespace wabt {
+  using Errors = std::vector<Error>;
+  bool Read(const uint8_t* data, size_t size, Errors* errs);
+}
+'''
+
+
+def _alias_plan(tmp_path):
+    from hforge.ir import Target
+    h = tmp_path / "a.hpp"
+    h.write_text(_ALIASED)
+    t = Target(name="wabt", public_headers=["a.hpp"], include_dirs=[str(tmp_path)],
+               sources=[], link_libs=[], cflags=[], seed_dirs=[])
+    return next(p for p in cx.propose([str(h)], t) if "Read" in p.name)
+
+
+def test_an_alias_resolves_to_the_container_behind_it(tmp_path):
+    """`using Errors = std::vector<Error>` is how modern C++ names things, and an alias is
+    not a class -- so the inheritance registry could not resolve `Errors*` and the whole
+    call was refused as unconstructible."""
+    h = tmp_path / "a.hpp"
+    h.write_text(_ALIASED)
+    al = cx.parse_aliases(str(h))
+    assert al["Errors"] == "std::vector<Error>"
+    assert cx.ownable_type("Errors*", al) == "std::vector<Error>"
+
+
+def test_an_ownable_container_becomes_scratch_not_a_resource(tmp_path):
+    """Declaring a vector IS constructing it: no constructor call, so it is scratch the
+    harness owns rather than a resource with a create op."""
+    ir = _alias_plan(tmp_path)
+    assert [(s.id, s.c_type) for s in ir.scratch] == [("b2", "std::vector<Error>")]
+    assert ir.resources == []
+
+
+def test_the_container_is_passed_by_address(tmp_path):
+    src = cxx_libfuzzer.emit(_alias_plan(tmp_path)).source
+    assert "std::vector<Error> hf_x_b2{};" in src
+    assert "&hf_x_b2" in src
+
+
+def test_a_class_pointer_is_still_refused_when_nothing_can_build_it(tmp_path):
+    """The alias path must not become a way to smuggle in an unconstructible type: a
+    pointer to a class with no default constructor and no concrete descendant is still
+    refused, with the parameter named."""
+    from hforge.ir import Target
+    h = tmp_path / "b.hpp"
+    h.write_text('''
+namespace lib {
+  bool Read(const uint8_t* data, size_t size, Module* out);
+}
+''')
+    t = Target(name="lib", public_headers=["b.hpp"], include_dirs=[str(tmp_path)],
+               sources=[], link_libs=[], cflags=[], seed_dirs=[])
+    sk = []
+    assert cx.propose([str(h)], t, skipped=sk) == []
+    assert any("out" in x for x in sk)
