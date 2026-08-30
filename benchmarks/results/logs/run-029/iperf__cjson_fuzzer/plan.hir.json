@@ -1,0 +1,254 @@
+{
+  "schema_version": "1.0",
+  "name": "iperf_cJSON_Compare",
+  "producer": "header_graph",
+  "notes": "proposed from cJSON.h by signature inference; handle type inferred as 'cJSON *'. Every inference here is checked by a static gate, and the producer certifies nothing.",
+  "target": {
+    "name": "iperf",
+    "version": "",
+    "commit": "",
+    "public_headers": [
+      "/b/cjson/cJSON.h"
+    ],
+    "include_dirs": [
+      "/b/cjson"
+    ],
+    "sources": [
+      "/b/cjson/cJSON.c"
+    ],
+    "link_libs": [],
+    "cflags": [],
+    "seed_dirs": [],
+    "language": "c"
+  },
+  "platforms": [
+    "linux-aarch64-glibc"
+  ],
+  "apis": {
+    "cJSON_Compare": {
+      "symbol": "cJSON_Compare",
+      "header": "cJSON.h",
+      "params": [
+        {
+          "name": "a",
+          "type": {
+            "name": "const cJSON * const",
+            "kind": "pointer",
+            "const": true,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "b",
+          "type": {
+            "name": "const cJSON * const",
+            "kind": "pointer",
+            "const": true,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "case_sensitive",
+          "type": {
+            "name": "const cJSON_bool",
+            "kind": "scalar",
+            "const": true,
+            "resolved": ""
+          }
+        }
+      ],
+      "returns": {
+        "name": "cJSON_bool",
+        "kind": "scalar",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "consume",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [],
+        "transfers_ownership": [],
+        "requires_nonnull": [
+          "a",
+          "b"
+        ],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    },
+    "cJSON_Delete": {
+      "symbol": "cJSON_Delete",
+      "header": "cJSON.h",
+      "params": [
+        {
+          "name": "item",
+          "type": {
+            "name": "cJSON *",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        }
+      ],
+      "returns": {
+        "name": "void",
+        "kind": "void",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "destroy",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [],
+        "transfers_ownership": [],
+        "requires_nonnull": [],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    },
+    "cJSON_Parse": {
+      "symbol": "cJSON_Parse",
+      "header": "cJSON.h",
+      "params": [
+        {
+          "name": "value",
+          "type": {
+            "name": "const char *",
+            "kind": "pointer",
+            "const": true,
+            "resolved": ""
+          }
+        }
+      ],
+      "returns": {
+        "name": "cJSON *",
+        "kind": "pointer",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "create",
+      "contract": {
+        "nul_terminated": [
+          "value"
+        ],
+        "length_delimited": [],
+        "transfers_ownership": [],
+        "requires_nonnull": [],
+        "error_return": "null",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    }
+  },
+  "slices": [
+    {
+      "id": "value",
+      "kind": "cstring",
+      "remainder": true,
+      "min_len": 1,
+      "max_len": 0
+    }
+  ],
+  "resources": [
+    {
+      "id": "h",
+      "type": {
+        "name": "cJSON *",
+        "kind": "pointer",
+        "const": false,
+        "resolved": ""
+      },
+      "storage": "handle"
+    }
+  ],
+  "scratch": [],
+  "sequence": [
+    {
+      "id": "o_create",
+      "api": "cJSON_Parse",
+      "args": [
+        {
+          "param": "value",
+          "source": "input",
+          "ref": "value",
+          "value": null
+        }
+      ],
+      "binds": "h",
+      "targets": "",
+      "repeat": 0,
+      "repeat_while": "",
+      "guarded_by": []
+    },
+    {
+      "id": "o_consume",
+      "api": "cJSON_Compare",
+      "args": [
+        {
+          "param": "a",
+          "source": "resource",
+          "ref": "h",
+          "value": null
+        },
+        {
+          "param": "b",
+          "source": "resource",
+          "ref": "h",
+          "value": null
+        },
+        {
+          "param": "case_sensitive",
+          "source": "literal",
+          "ref": "",
+          "value": 0
+        }
+      ],
+      "binds": "",
+      "targets": "",
+      "repeat": 0,
+      "repeat_while": "",
+      "guarded_by": [
+        "h"
+      ]
+    },
+    {
+      "id": "o_destroy",
+      "api": "cJSON_Delete",
+      "args": [
+        {
+          "param": "item",
+          "source": "resource",
+          "ref": "h",
+          "value": null
+        }
+      ],
+      "binds": "",
+      "targets": "h",
+      "repeat": 0,
+      "repeat_while": "",
+      "guarded_by": []
+    }
+  ],
+  "knobs": {
+    "max_len": 4096,
+    "min_len": 0,
+    "timeout_s": 25,
+    "rss_limit_mb": 2048,
+    "malloc_limit_mb": 0,
+    "sanitizers": [
+      "address"
+    ],
+    "detect_leaks": false,
+    "optimisation": "-O1"
+  },
+  "format_model": null,
+  "raw_blocks": []
+}
