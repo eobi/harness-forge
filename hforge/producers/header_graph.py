@@ -459,6 +459,54 @@ def header_byte_aliases(path: str, include_dirs=(), cflags=()) -> dict:
     return _scalar_typedefs(_statements(strip_noise(text)))
 
 
+# const-qualified byte-buffer pointer typedefs: name -> the byte base it points at.
+#
+# Populated per target by propose(), the same way _SCALAR_ALIASES is, because the typedef
+# and its use routinely live in different files. Deliberately NOT derived from _typedef_map:
+# that map stores the const-STRIPPED base, and const is the entire safety argument here.
+# `typedef const void * png_const_voidp` is an input buffer; `typedef void * cmsHPROFILE`
+# is an opaque handle, and treating the second as bytes is what paired a colour profile with
+# a dictionary destructor. Only const-qualified byte pointees are ever recorded.
+_CONST_BYTE_PTRS: dict = {}
+
+_CONST_BYTE_PTR_RE = re.compile(
+    r"^typedef\s+const\s+([A-Za-z_]\w*(?:\s+[A-Za-z_]\w*)?)\s*\*\s*([A-Za-z_]\w*)$")
+
+
+def header_const_byte_ptrs(path: str, include_dirs=(), cflags=()) -> dict:
+    """Pointer typedefs of the form `typedef const <byte type> * NAME`, from one header."""
+    from ..analysis.sinks import strip_noise
+    if not Path(path).exists():
+        return {}
+    pp = _preprocess(path, include_dirs, cflags)
+    out: dict = {}
+    for st in _statements(strip_noise(
+            pp if pp is not None else Path(path).read_text(errors="replace"))):
+        m = _CONST_BYTE_PTR_RE.match(" ".join(st.split()))
+        if m and m.group(1).strip() in BYTE_BASES:
+            out[m.group(2)] = m.group(1).strip()
+    return out
+
+
+def header_ptr_map(path: str, include_dirs=(), cflags=()) -> dict:
+    """Pointer typedef -> pointee, for one header, whether or not it declares functions.
+
+    The set-returning sibling below has been shared across a target's headers since libxml2
+    needed it. The MAP was not, and that asymmetry cost libpng its entry point:
+    `png_const_voidp` is typedef'd in pngconf.h and used in png.h, so the name was known to
+    be a pointer while what it pointed AT was lost. png_image_begin_read_from_memory then
+    had a parameter the byte check could not recognise, proposed no plan, and reported
+    NO PLAN -- indistinguishable, from the outside, from a library with no fuzzable surface.
+    Splitting types into a config header is the norm in C, not an oddity of libpng.
+    """
+    from ..analysis.sinks import strip_noise
+    if not Path(path).exists():
+        return {}
+    pp = _preprocess(path, include_dirs, cflags)
+    return _typedef_map(_statements(strip_noise(
+        pp if pp is not None else Path(path).read_text(errors="replace"))))
+
+
 def header_typedefs(path: str, include_dirs=(), cflags=()) -> frozenset:
     """Pointer typedefs declared in one header, independent of whether it declares any
     functions.
@@ -946,8 +994,26 @@ def to_api(d: Decl, handle: Optional[str]) -> Api:
         bare = " ".join(re.sub(r"\b(const|volatile|struct|enum|union)\b", " ", ty)
                         .replace("*", " ").split())
         res = base_type(ty)
+        resolved = "" if res == bare else res
+        # A POINTER TYPEDEF HIDES THE STAR, AND WITH IT THE BUFFER.
+        #
+        # libpng declares `typedef const void * png_const_voidp;` and then
+        # `png_image_begin_read_from_memory(png_imagep, png_const_voidp memory, size_t)`.
+        # The parameter spelling carries no `*`, so the byte check -- which counts stars --
+        # said no, no consume op was built, and the entry point got NO PLAN at all while the
+        # from_file variant beside it proposed one. Two plans came out of the whole of png.h.
+        #
+        # ONLY THE const CASE IS EXPANDED, and that restraint is the whole safety argument.
+        # `typedef void * cmsHPROFILE;` is the opaque-handle idiom, and hkey() already
+        # refuses to resolve it because doing so made lcms2's cmsHPROFILE and cmsHANDLE the
+        # same type and paired a colour profile with a dictionary destructor. A handle is
+        # passed to functions that mutate it, so it is not const; an input buffer is. Const
+        # is what separates `const void *` the buffer from `void *` the handle, and nothing
+        # non-const is widened here.
+        if not resolved and "*" not in ty and ty.strip() in _CONST_BYTE_PTRS:
+            resolved = _CONST_BYTE_PTRS[ty.strip()]
         return TypeRef(ty, "pointer" if _is_ptr(ty, d.ptr_types) else "scalar",
-                       const="const" in ty, resolved="" if res == bare else res)
+                       const="const" in ty, resolved=resolved)
 
     return Api(symbol=d.name, header=d.header, role=role,
                params=[ParamDecl(nm, _tref(ty)) for ty, nm in d.params],
@@ -983,12 +1049,20 @@ def propose(headers: list, target: Target, *, platforms: Optional[list] = None,
     # typedefs yields no declarations and would otherwise contribute nothing.
     shared = frozenset().union(frozenset(),
                               *(header_typedefs(h, incs, cfl) for h in headers))
+    # The pointees, on the same argument. Earlier headers win on a clash so the primary
+    # header's own spelling is never overridden by a secondary one.
+    shared_map: dict = {}
+    for h in reversed(list(headers)):
+        shared_map.update(header_ptr_map(h, incs, cfl))
     # Byte spellings, from every header the target names. Same argument as `shared` above:
     # the alias may live in a file that declares no functions at all.
     for h in headers:
         _SCALAR_ALIASES.update(header_byte_aliases(h, incs, cfl))
+        _CONST_BYTE_PTRS.update(header_const_byte_ptrs(h, incs, cfl))
     for d in decls:
         d.ptr_types = shared
+        # Keep whatever the declaring header already knew; add what the others knew.
+        d.ptr_map = {**shared_map, **(d.ptr_map or {})}
 
     # Every lifecycle the library has, not just its most-used one. A single-handle
     # assumption chose libyaml's EMITTER and never proposed anything for its parser — the
@@ -1377,8 +1451,12 @@ def _byte_carrying(q) -> bool:
     """A parameter the fuzzer can fill with bytes: a single pointer to a character or void
     type. Deliberately narrow — S2 blocks bytes bound to a struct pointer the library will
     dereference, and this must not propose what that gate exists to refuse."""
-    return ("*" in q.type.name and q.type.name.count("*") == 1
-            and base_type(q.type.name) in BYTE_BASES)
+    if "*" in q.type.name:
+        return q.type.name.count("*") == 1 and base_type(q.type.name) in BYTE_BASES
+    # The star may be inside a typedef. to_api expands ONLY const byte pointees into
+    # `resolved`, so reaching this line at all means the type is a const buffer alias and
+    # not one of the void-pointer handles that must stay nominal.
+    return bool(q.type.resolved) and base_type(q.type.resolved) in BYTE_BASES
 
 
 def _path_like(name: str) -> bool:
