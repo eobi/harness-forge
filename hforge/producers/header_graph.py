@@ -434,7 +434,18 @@ def _typedef_map(stmts: list) -> dict:
             if "*" not in after:
                 continue
             tag = re.search(r"^\s*(?:struct|union|enum)\s+([A-Za-z_]\w*)", pre)
-            out[name] = tag.group(1) if tag else name
+            if tag:
+                out[name] = tag.group(1)
+            else:
+                # AN ANONYMOUS STRUCT STILL HAS A NAME -- the value typedef declared beside
+                # the pointer one. libpng writes
+                #     typedef struct { ... } png_image, *png_imagep;
+                # so there is no tag after `struct` and png_imagep used to map to ITSELF.
+                # hkey() then answered `png_imagep`, which is not in the complete-type set
+                # (`png_image` is), the caller-allocated-struct branch declined, and the
+                # parameter fell through to a literal 0.
+                m2 = re.match(r"\s*([A-Za-z_]\w*)\s*,", after)
+                out[name] = m2.group(1) if m2 else name
         elif "*" in pre:
             out[name] = base_type(pre)
     return out
@@ -936,6 +947,39 @@ def infer_role(d: Decl, handle: Optional[str]) -> str:
     if takes_handle:
         return ROLE_QUERY
     if d.returns_pointer and len(d.params) >= 1:
+        return ROLE_CONSUME
+    # A CONST BYTE BUFFER IS ITSELF THE EVIDENCE, even with no handle in sight.
+    #
+    # Every rule above reaches "consumes input" through the library's own opaque handle or
+    # through a returned pointer. libpng's simplified API has neither: the caller declares a
+    # `png_image` on its own stack and passes `png_imagep` -- a caller-allocated struct, not
+    # png_struct, which is what libpng's handle inference actually found. So
+    # png_image_begin_read_from_memory(png_imagep, png_const_voidp, size_t) fell through to
+    # `query` and no plan was ever built for the one entry point in that header that reads
+    # attacker bytes.
+    #
+    # A parameter the fuzzer can fill, marked const so the library will not write through
+    # it, is a stronger signal of an input-consuming entry point than the handle shape is.
+    # Path-like names are excluded because those are filenames, and a harness must never
+    # open a path built from fuzzer bytes.
+    # NARROWLY: the buffer must be paired with a LENGTH. `(const void *, size_t)` is the
+    # bytes-and-size idiom and it is unambiguous. Accepting a bare const buffer instead
+    # reclassified setters, out-parameter fills and config-struct initialisers as consumers
+    # and broke seven pinned tests -- those guards are load-bearing and the rule has to pass
+    # them, not be widened until they yield.
+    # NOT A SETTER. `yaml_parser_set_input_string(parser, const unsigned char *, size_t)`
+    # matches buffer-and-length exactly, and it is not an entry point -- it hands the parser
+    # its input and the work happens in the yaml_parser_load that follows. Calling it a
+    # consumer cost libyaml its drive op and four pinned tests. A setter is a step in a
+    # sequence; the rule below is only for functions that ARE the sequence.
+    if _SETTER_ISH.search(d.name or ""):
+        return ROLE_QUERY
+    _buf = any(not _path_like(nm) and "const" in ty and _byte_carrying_ty(ty)
+               and base_type(ty) != "char"
+               for ty, nm in d.params)
+    _len = any(_SIZE_ISH.search(nm or "") or base_type(ty) in ("size_t", "ssize_t")
+               for ty, nm in d.params)
+    if _buf and _len:
         return ROLE_CONSUME
     return ROLE_QUERY
 
@@ -1445,6 +1489,19 @@ def _scalar_typedefs(stmts: list) -> dict:
         if cur in BYTE_BASES and cur != "void":
             out[alias] = cur
     return out
+
+
+_SIZE_ISH = re.compile(r"(?:^|_)(size|len|length|nbytes|count|n)$", re.I)
+
+
+def _byte_carrying_ty(ty: str) -> bool:
+    """_byte_carrying, on a raw declaration spelling rather than a built TypeRef.
+
+    infer_role runs before to_api, so it has (type, name) pairs and no TypeRef to consult.
+    Kept beside its twin so the two cannot drift."""
+    if "*" in ty:
+        return ty.count("*") == 1 and base_type(ty) in BYTE_BASES
+    return ty.strip() in _CONST_BYTE_PTRS
 
 
 def _byte_carrying(q) -> bool:
@@ -2349,12 +2406,29 @@ def _plans_for_handle(decls, target, handle, inline_base, init_name, fini_name,
             elif nm in cons.contract.nul_terminated and not slices:
                 slices.append(InputSlice(nm, SLICE_CSTRING, remainder=True, min_len=1))
                 args.append(Arg(nm, "input", nm))
-            elif "*" in ty and not slices and base_type(ty) in BYTE_BASES:
+            elif not slices and (("*" in ty and base_type(ty) in BYTE_BASES)
+                                 or ty.strip() in _CONST_BYTE_PTRS):
+                # The second arm is the pointer-typedef spelling. Added rather than folded
+                # into the first so `char **` keeps whatever it did before: this is the
+                # branch that decides where the fuzzer's bytes go, and it is not the place
+                # to tidy a condition. libpng's png_const_voidp reached here with no star to
+                # match, took none of the branches below either, and the plan came out with
+                # no input slice at all -- S5.NO_INPUT, a harness that calls the parser and
+                # hands it nothing.
                 slices.append(InputSlice(nm, SLICE_BYTES, remainder=True, min_len=1))
                 args.append(Arg(nm, "input", nm))
-            elif ("*" in ty and ty.count("*") == 1
+            elif ((("*" in ty and ty.count("*") == 1) or ty.strip() in pm)
                   and hkey(ty, pm) in complete_types
                   and hkey(ty, pm) != (hkey(handle, pm) if handle else None)):
+                # `or ty.strip() in pm` is the pointer-typedef spelling again, and this is
+                # the branch where missing it did the most damage. libpng's png_imagep has
+                # no star, so the caller-allocated struct was never declared and the
+                # parameter fell through to a literal 0. The emitted harness read
+                # `png_image_begin_read_from_memory(0, buf, len)`, and libpng returns
+                # immediately on a NULL image -- a harness that compiles, passes every gate,
+                # runs 29 million times and exercises 0.03% of the library. A plan that
+                # reports a number while doing nothing is worse than one that reports
+                # NO PLAN, because only the second is obviously wrong.
                 # A pointer to a COMPLETE struct the target fills in: the caller allocates
                 # it and passes its address. `yaml_parser_load(parser, yaml_document_t
                 # *document)` ASSERTS document is non-NULL, so binding 0 aborts on every

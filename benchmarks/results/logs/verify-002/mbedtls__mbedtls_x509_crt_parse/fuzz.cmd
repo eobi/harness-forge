@@ -1,0 +1,1 @@
+/b/runs/mbedtls__mbedtls_x509_crt_parse/fuzz /b/runs/mbedtls__mbedtls_x509_crt_parse/corpus -dict=/b/runs/mbedtls__mbedtls_x509_crt_parse/target.dict -max_total_time=60 -print_final_stats=1 -max_len=65536
