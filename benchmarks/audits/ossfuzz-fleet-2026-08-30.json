@@ -85,6 +85,24 @@
    "openvpn/fuzz_proxy.c": "FALSE POSITIVE - S3.DESTROY_NO_TARGET on gc_free/free_buf. The harness frees correctly on every exit path (early return at lines 76-77, and again at 129-130). The tell is internal: op o18 resolves `gc_free(&gc)` to r_gc and op o5 does not resolve the IDENTICAL call. Same call, same argument, different answer -- a lifter that cannot resolve the target inside an early-return branch, not a defect in openvpn."
   },
   "next_lifter_gap": "resolve `&local` to its resource inside early-return branches; the same call resolves at the end of the body and not at the top.",
-  "process_note": "THIS IS THE THIRD TIME TODAY THAT A CHANGE OF MINE MOVED THESE NUMBERS: a text-scraping fidelity detector, a DOUBLE_CREATE regression that took flags 3 -> 16, and now a shadowed set that took them 2 -> 0. Each was caught by a figure moving in a direction nothing justified. An audit is only as trustworthy as the last change to the thing doing the auditing, which is an argument for re-running it after every such change rather than reporting it once."
+  "process_note": "THIS IS THE THIRD TIME TODAY THAT A CHANGE OF MINE MOVED THESE NUMBERS: a text-scraping fidelity detector, a DOUBLE_CREATE regression that took flags 3 -> 16, and now a shadowed set that took them 2 -> 0. Each was caught by a figure moving in a direction nothing justified. An audit is only as trustworthy as the last change to the thing doing the auditing, which is an argument for re-running it after every such change rather than reporting it once.",
+  "superseded_by": "end_of_session"
+ },
+ "end_of_session": {
+  "harnesses": 372,
+  "lifted": 358,
+  "high_fidelity": 44,
+  "flagged": 1,
+  "false_positives": 1,
+  "findings": 0,
+  "false_positive_rate": "1/44 = 2.3%",
+  "last_flag": {
+   "file": "openvpn/fuzz_buffer.c",
+   "gate": "S1.DOUBLE_CREATE",
+   "verdict": "FALSE POSITIVE",
+   "why": "`tmp` is assigned in MUTUALLY EXCLUSIVE switch cases and freed in each (line 48). The lifter flattens the switch into a straight line, so two assignments on paths that never both run read as a create-then-create with the first leaked."
+  },
+  "the_pattern": "EVERY false positive found today traces to one thing: the lifter reads a flat statement list, and real harnesses branch. Calls in `if` conditions, frees on early-return paths, assignments in exclusive switch cases, input reaching a call through a struct initialiser or a global -- each was patched individually and each was the same root cause wearing different clothes. The flat model is the limitation, not the rules built on it.",
+  "conclusion": "Two structural pieces of work stand between this audit and upstream findings, and neither is a patch: a C++ lifter (60% of the fleet, 7% readable) and control flow the lifter can actually follow. Until both exist, this audit is a calibration instrument -- which it now is, honestly: 0 findings, 1 false positive, 44 readable."
  }
 }

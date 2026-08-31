@@ -458,7 +458,20 @@ def s3_ordering(ir: HarnessIR) -> GateResult:
                                where=op.id, principle="P2"))
             continue
         seen_roles.append(api.role)
-        if api.role == ROLE_DESTROY and not op.targets:
+        # A HEDGED DESTROY IS NOT A BROKEN ONE. The api entry is keyed by SYMBOL, so a
+        # library's free function that appears both at top level and inside a branch gets
+        # ONE role -- destroy, from the unconditional call. The lifter deliberately
+        # withholds `targets` on the branch copy, because marking the resource dead there
+        # would report every later use as a certain use-after-free on a path that may never
+        # run. Those two correct decisions met and produced a third, wrong one:
+        # "destroy names no resource" against openvpn's harnesses, which free correctly on
+        # every exit path. The op records that it is guarded; the gate reads that instead of
+        # judging a claim the lifter did not make. Keyed on the lifter's OWN marker,
+        # `__branch`, not on "is guarded at all": exempting every guarded destroy stopped
+        # the gate intercepting a known defect class, which its own test caught
+        # immediately. A hedge is narrow or it is a hole.
+        if (api.role == ROLE_DESTROY and not op.targets
+                and "__branch" not in op.guarded_by):
             v.append(Violation("S3.DESTROY_NO_TARGET", BLOCK,
                                f"op {op.id} calls destroy-role {api.symbol} without naming "
                                f"the resource it releases", where=op.id, principle="P2"))
