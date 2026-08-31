@@ -226,11 +226,16 @@ def _classify_args(args_raw, data, size, tainted, resources, is_ptr, unread, fn,
     return args, params, out_created
 
 
-_NOT_A_CALL = {
-    "if", "for", "while", "switch", "return", "sizeof", "alignof", "defined",
-    "static_cast", "reinterpret_cast", "const_cast", "dynamic_cast", "catch",
-    "assert", "offsetof", "va_start", "va_end", "va_arg", "typeof", "__typeof__",
-    "LLVMFuzzerTestOneInput", "LLVMFuzzerInitialize", "printf", "fprintf", "sizeof",
+# NAMES THAT ARE NOT A LIBRARY CALL, for the missed-call check only. This started life as
+# a second `_NOT_A_CALL`, which SHADOWED the module's own set defined above -- so `memcpy`,
+# `malloc`, `free`, `calloc` and the rest silently dropped out of the exclusion the LIFTER
+# uses at its call loop, and began appearing as library ops in every lift. 394 tests and a
+# 20-case plan-drift check both passed through it: the tests do not assert on which
+# housekeeping calls get lifted, and drift only watches the producers. Union, never shadow.
+_NOT_A_CALLSITE = _NOT_A_CALL | {
+    "alignof", "defined", "static_cast", "reinterpret_cast", "const_cast", "dynamic_cast",
+    "catch", "offsetof", "va_start", "va_end", "va_arg", "typeof", "__typeof__",
+    "LLVMFuzzerTestOneInput", "LLVMFuzzerInitialize",
 }
 _CALLISH = re.compile(r"\b([A-Za-z_]\w*)\s*\(")
 _MEMBER_CALL = re.compile(r"(?:\.|->)\s*([A-Za-z_]\w*)\s*\(")
@@ -253,7 +258,8 @@ def _missed_calls(body: str, lifted_symbols: set) -> list:
     # this lifter cannot read has to make the lift untrusted rather than produce a verdict
     # about someone's code.
     seen |= {m.group(1) for m in _MEMBER_CALL.finditer(body)}
-    return sorted(seen - _NOT_A_CALL - {s.rsplit("::", 1)[-1] for s in lifted_symbols})
+    return sorted(seen - _NOT_A_CALLSITE
+                  - {s.rsplit("::", 1)[-1] for s in lifted_symbols})
 
 
 def lift(path: str, target_name: str = "", platforms: Optional[list] = None):

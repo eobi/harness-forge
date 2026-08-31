@@ -69,6 +69,22 @@
    "a slot the harness declares was treated as a resource awaiting a create",
    "marking those slots alive then made every ordinary out-parameter a DOUBLE_CREATE",
    "`x.push_back(y)` was lifted as a call to a C function named push_back, and graded"
-  ]
+  ],
+  "SUPERSEDED": "The '38 high-fidelity, 0 flags' line below was measured with a shadowed exclusion set: a second `_NOT_A_CALL` defined for the missed-call check overwrote the module's own, dropping malloc, free, calloc and friends from the exclusion the LIFTER uses, so housekeeping calls were lifted as library ops and changed what the gates saw. Corrected below."
+ },
+ "final_corrected": {
+  "harnesses": 372,
+  "lifted": 358,
+  "high_fidelity": 40,
+  "flagged": 2,
+  "false_positives": 2,
+  "findings": 0,
+  "false_positive_rate": "2/40 = 5.0%",
+  "triage": {
+   "openvpn/fuzz_buffer.c": "FALSE POSITIVE - S1.DOUBLE_CREATE + S3.DESTROY_NO_TARGET",
+   "openvpn/fuzz_proxy.c": "FALSE POSITIVE - S3.DESTROY_NO_TARGET on gc_free/free_buf. The harness frees correctly on every exit path (early return at lines 76-77, and again at 129-130). The tell is internal: op o18 resolves `gc_free(&gc)` to r_gc and op o5 does not resolve the IDENTICAL call. Same call, same argument, different answer -- a lifter that cannot resolve the target inside an early-return branch, not a defect in openvpn."
+  },
+  "next_lifter_gap": "resolve `&local` to its resource inside early-return branches; the same call resolves at the end of the body and not at the top.",
+  "process_note": "THIS IS THE THIRD TIME TODAY THAT A CHANGE OF MINE MOVED THESE NUMBERS: a text-scraping fidelity detector, a DOUBLE_CREATE regression that took flags 3 -> 16, and now a shadowed set that took them 2 -> 0. Each was caught by a figure moving in a direction nothing justified. An audit is only as trustworthy as the last change to the thing doing the auditing, which is an argument for re-running it after every such change rather than reporting it once."
  }
 }
