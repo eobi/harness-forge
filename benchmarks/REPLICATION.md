@@ -97,3 +97,31 @@ exactly the kind of issue we want.
 * **A case that refuses to build on your host** — also worth an issue. Nine of our platform
   claims are "emits but never run on hardware", and a build failure on a machine we do not
   have is information we cannot get any other way.
+
+## The machine is part of the experiment
+
+**Added 2026-08-31, after it invalidated a run.**
+
+Every case here is a fixed-TIME campaign: 600 seconds, however far the target gets. So
+coverage is a function of available CPU, and anything else running on the box is part of
+the measurement whether you meant it to be or not.
+
+This was found the expensive way. Three supposedly identical woff2 runs, taken while a
+372-harness audit and a 421-test suite were running on the same 10-core machine, produced
+executions of **5.1M, 22.9M and 85.6M** — a 16x spread. Coverage followed: 14.36%, 29.79%,
+29.79%, against a gold that itself swung 39.50% to 29.79%. Nothing in the driver noticed,
+and the medians looked publishable.
+
+woff2 is unusually exposed to this because it runs with **no seed corpus at all**
+(`seeds: 0`, `corpus_files_at_start: 0`): both sides start from nothing, so the result is
+whatever libFuzzer discovered in the time it was given. A case with seeds is steadier —
+pugixml, seeded, returned 14.79% five times with a spread of 0.00 — but no case is immune.
+
+**The rule: do not run anything else while a benchmark runs.** Not a test suite, not an
+audit, not a build.
+
+Each record now carries `load_average` (1/5/15-minute and CPU count) and a
+`machine_was_busy` flag, set when the 1-minute load exceeds a quarter of the cores. This is
+recorded, not enforced: refusing to start on a loaded machine would silently produce no
+data, which is worse than producing data you can filter. A sample with `machine_was_busy`
+true is not evidence and should be discarded or re-run.

@@ -790,6 +790,25 @@ def main():
     _seed = __import__("re").search(r"INFO: Seed: (\d+)", log)
     if _seed:
         out["libfuzzer_seed"] = int(_seed.group(1))
+    # THE MACHINE IS PART OF THE EXPERIMENT.
+    #
+    # A fixed-TIME campaign measures whatever the target managed to execute in 600s, so
+    # coverage is a function of available CPU. Running an audit and a test suite beside a
+    # benchmark on the same box produced woff2 executions of 5.1M, 22.9M and 85.6M across
+    # three supposedly identical runs -- a 16x spread that is the machine varying, not the
+    # harness -- and the numbers looked publishable. Nothing in this driver noticed.
+    #
+    # Recorded rather than enforced: refusing to run would make a loaded machine silently
+    # produce no data, which is worse. rank.py can now exclude a contaminated sample, and a
+    # reader can see the condition the number was taken under.
+    try:
+        _l1, _l5, _l15 = __import__("os").getloadavg()
+        out["load_average"] = {"1min": round(_l1, 2), "5min": round(_l5, 2),
+                               "15min": round(_l15, 2),
+                               "cpus": __import__("os").cpu_count()}
+        out["machine_was_busy"] = _l1 > (__import__("os").cpu_count() or 1) * 0.25
+    except (OSError, AttributeError):
+        pass
     _corp0 = __import__("re").search(r"(\d+) files found in", log)
     if _corp0:
         # What the campaign ACTUALLY started from, beside what the miner supplied.
