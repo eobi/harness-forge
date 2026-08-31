@@ -260,11 +260,19 @@ if __name__ == "__main__":
 # match the harness, and the fidelity signal -- "values the lifter could not attribute" --
 # cannot see a call or a flow that was never lifted at all. These pin the closed door.
 
-def test_a_call_the_lifter_never_read_makes_the_lift_untrusted():
-    """nettle calls `asn1_der_iterator_first(&iter, size, data)` inside an `if` condition.
-    The lifter dropped it, reported zero unattributed values because every call it DID
-    read was clean, and declared high fidelity. The gate then correctly said no op consumes
-    input -- about a harness that consumes input fine."""
+def test_a_call_inside_a_condition_is_now_read():
+    """nettle calls `asn1_der_iterator_first(&iter, size, data)` inside an `if` condition,
+    and this test used to assert the OPPOSITE of what it asserts now.
+
+    The call pattern required a call to END its statement -- `)` then `;` -- which is right
+    for a statement list and wrong for a condition, so these calls were invisible. The
+    lifter handled that honestly, recording the call as MISSED and dropping the lift out of
+    the trusted tier, and this test pinned that behaviour.
+
+    The behaviour was a limitation, not a rule. Conditions are now read, the call is
+    lifted, and the harness is trusted -- which is the point: it consumes input fine, and
+    the earlier verdict was about our blindness rather than about the harness.
+    """
     L = c_harness.lift(_c("""
 int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     struct it iter;
@@ -272,8 +280,27 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     return 0;
 }
 """))
+    assert "asn1_der_iterator_first" in [op.api for op in L.ir.sequence]
+    assert not any("asn1_der_iterator_first" in m for m in L.missed)
+    assert L.high_fidelity
+
+
+def test_an_unreadable_call_still_costs_the_lift_its_fidelity():
+    """The RULE the test above used to protect is still correct and still needs a witness:
+    a call this lifter cannot read must drop the lift out of the trusted tier, because a
+    verdict on a harness we did not fully read is not evidence.
+
+    A C++ member call is a shape this C lifter does not model, so it stands in for the
+    nettle case now that conditions are handled."""
+    L = c_harness.lift(_c("""
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    lib_parse(data, size);
+    parser.consume(data, size);
+    return 0;
+}
+"""))
+    assert "lib_parse" in [op.api for op in L.ir.sequence]
     assert not L.high_fidelity
-    assert any("asn1_der_iterator_first" in m for m in L.missed)
 
 
 def test_input_reaching_the_target_by_a_path_we_cannot_follow_is_untrusted():
@@ -992,3 +1019,18 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     assert len(arms) >= 2, arms
     codes = {v.code for g in run_static_gates(L.ir) for v in g.violations}
     assert "S1.DOUBLE_CREATE" not in codes
+
+
+def test_close_in_the_middle_of_a_name_is_not_a_teardown():
+    """`pixCloseGeneralized(pixd, pixs, sel)` is the morphological CLOSING operation and
+    releases nothing. Read as a destroy it killed leptonica's `sel` at its first use and
+    turned every later use into a use-after-free.
+
+    A name ENDING in close is a teardown; close in the middle is a modifier on some other
+    verb. Both directions pinned, because narrowing this must not lose `magic_close`.
+    """
+    from hforge.lift.c_harness import _FREE_ISH
+    for no in ("pixCloseGeneralized", "pixCloseSafe"):
+        assert not _FREE_ISH.search(no), no
+    for yes in ("magic_close", "sqlite3_close", "IedConnection_close"):
+        assert _FREE_ISH.search(yes), yes

@@ -182,11 +182,17 @@ _SCALARISH = re.compile(
 # rather than merely contain it. Trailing digits are stripped so `_del2` still reads.
 # Unambiguous enough to match as a PREFIX: `freeaddrinfo` is one segment and is plainly a
 # free, and requiring exact equality lost it.
-_FREE_VERBS_PREFIX = {"free", "destroy", "delete", "close", "cleanup", "release",
+_FREE_VERBS_PREFIX = {"free", "destroy", "delete", "cleanup", "release",
                       "dispose", "deinit", "uninit", "unref", "terminate", "shutdown"}
+# MUST BE THE LAST SEGMENT. `pixCloseGeneralized(pixd, pixs, sel)` is the morphological
+# CLOSING operation and releases nothing; read as a destroy it killed leptonica's `sel` at
+# its first use and turned every later use into a use-after-free. A name ENDING in `_close`
+# is a teardown -- `sqlite3_close`, `magic_close`, `IedConnection_close` -- while `Close`
+# in the middle is a modifier on some other verb.
+_FREE_VERBS_TERMINAL = {"close"}
 # Too short or too common to match as a prefix: "end" would claim `endian`, "del" would
 # claim `delimiter`, "fini" would claim `finish`. These must BE the segment.
-_FREE_VERBS_EXACT = {"end", "del", "fini", "term", "cleanup", "free", "close"}
+_FREE_VERBS_EXACT = {"end", "del", "fini", "term", "cleanup", "free"}
 
 
 def _name_segments(fn: str):
@@ -199,12 +205,13 @@ class _FreeIsh:
 
     @staticmethod
     def search(fn: str):
-        for seg in _name_segments(fn):
+        segs = _name_segments(fn)
+        for seg in segs:
             if seg in _FREE_VERBS_EXACT:
                 return True
             if any(seg.startswith(v) for v in _FREE_VERBS_PREFIX):
                 return True
-        return False
+        return bool(segs and segs[-1] in _FREE_VERBS_TERMINAL)
 
 
 _FREE_ISH = _FreeIsh()
@@ -469,6 +476,15 @@ _FDP_CONSUME = re.compile(
     r"(?:([A-Za-z_]\w*)\s*=\s*)?\b([A-Za-z_]\w*)\s*\.\s*(Consume\w*)\s*(?:<[^>]*>)?\s*\(")
 
 
+# A CALL IN A CONDITION IS STILL A CALL. `_CALL` requires the call to END the statement --
+# `)` then `;` -- which is right for a statement list and wrong for `if (pj_init() !=
+# PJ_SUCCESS)`. Those calls were invisible: pjsip's wav harness initialises pjlib in exactly
+# that shape, the lifter recorded `pj_init` as MISSED, the lift lost its fidelity, and a
+# protocol miner built on top then reported the harness as using pjlib without initialising
+# it. Used only on statements cflow marks as conditions, where a call is a complete
+# expression and there is no trailing semicolon to anchor on.
+_CALL_IN_COND = re.compile(r"(?:([A-Za-z_]\w*)\s*=\s*)?([A-Za-z_]\w*)\s*\(([^;()]*)\)")
+
 _ASSIGN = re.compile(
     r"^\s*(?:[A-Za-z_][\w\s:<>,]*?[\s\*&]+)?([A-Za-z_]\w*)\s*=\s*([^;]+);")
 
@@ -639,7 +655,7 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
             if ("(" not in _rhs and _lhs not in size_alias
                     and _mentions_tainted(_rhs, size_alias)):
                 size_alias.add(_lhs)
-        for cm in _CALL.finditer(text):
+        for cm in (_CALL_IN_COND if stmt.is_condition else _CALL).finditer(text):
             assigned, fn, argstr = cm.group(1), cm.group(2), cm.group(3)
             # A MEMBER CALL IS NOT A C LIBRARY CALL. `sentences.push_back(s)` matched as a
             # call to a function named `push_back`, was lifted as an op, and the gate then
