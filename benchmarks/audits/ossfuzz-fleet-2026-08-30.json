@@ -149,5 +149,23 @@
   "the_diagnosis_that_was_wrong": "C++ was identified as the ceiling, twice, from the readable split (.c 19% vs .cc 7%). C++ harnesses are now MORE readable than C ones -- 37% against 23% -- and not one of the fixes that got there was a C++ lifter. They were aliasing, copiers, casts, and two of our own checks disagreeing about the same exclusion set. The split was real and the inference from it was wrong.",
   "method_that_worked": "Reading failing harnesses. Every time the counts were aggregated by category the conclusion was wrong; every time five files were opened and read, the cause was obvious within minutes. A distribution says where to look, never what you are looking at.",
   "still_zero_findings": "117 readable production harnesses, no defect found in any of them. That is the honest result: these are maintained harnesses that have been fuzzing for years, and the instrument is now calibrated at 0% false positives rather than 'untested at scale'."
+ },
+ "why_zero_findings": {
+  "question": "QuartetFuzz found 53 protocol violations in 586 harnesses (~9%). We found 0 in 117. If their rate held we would expect ~10. Which is it: our gates check weaker things, or our fidelity filter excludes the defective ones?",
+  "gate_firing_census": {
+   "note": "counts are ALL 358 lifts / high-fidelity only",
+   "S5.INPUT_NOT_CONSUMED": "50 / 0",
+   "S1.USE_AFTER_DESTROY": "37 / 0",
+   "S1.DOUBLE_CREATE": "29 / 0",
+   "S3.NO_WORK": "17 / 0",
+   "S1.DOUBLE_DESTROY": "11 / 0",
+   "S2.MISSING_ARG": "10 / 0",
+   "S1.LEAK (warn)": "261 / 67",
+   "S0.RAW_BLOCK (warn)": "280 / 74"
+  },
+  "finding_1": "EVERY BLOCKING VIOLATION OCCURS ONLY IN LOW-FIDELITY LIFTS. Zero in trusted ones. That is consistent with triage -- every blocking flag examined today was a lifter artifact -- but it also means the trusted set currently has no blocking violation of any kind, and a filter that selects for 'the lifter understood everything' may be selecting for 'nothing looks odd'. Worth watching; not yet demonstrated either way.",
+  "finding_2": "The warning tier is NOT a pile of undiscovered findings. S1.LEAK fires on 67 of 117 trusted lifts, which looked like 67 candidate protocol violations sitting one tier below where anyone was looking. It is not. apache-httpd/fuzz_request.c calls af_gb_init() at line 65 and af_gb_cleanup() at line 139 -- a harness-local bulk allocator freed in one call. Our S1.LEAK models per-resource destroys and cannot see bulk cleanup, so every arena-allocated resource reads as leaked.",
+  "conclusion": "The 0 findings is genuine rather than an artifact of tier classification. It is not evidence the gates are strong: it is consistent both with 117 clean production harnesses and with gates that cannot yet see the defect classes QuartetFuzz reports.",
+  "next": "Model BULK CLEANUP (apr_pool_destroy, arena/talloc contexts, harness-local collectors like af_gb_cleanup) so S1.LEAK stops firing on 57% of trusted lifts. Until then the warning tier is unusable for triage, which is its own kind of silent failure: a signal so noisy nobody reads it."
  }
 }
