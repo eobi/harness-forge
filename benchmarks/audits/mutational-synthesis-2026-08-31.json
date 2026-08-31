@@ -1,0 +1,35 @@
+{
+ "date": "2026-08-31",
+ "what": "Mutational plan synthesis -- the OGHarn axis. Widening the CANDIDATE SPACE, which probe_select.py established is the gap, rather than the ranking, which it established is not (0.63 points on libyaml against 3.55 variance, 0.00 on libpng).",
+ "operators": {
+  "widen": "insert a call the plan does not make, against the object it already holds, drawn from the union of APIs across all proposed plans -- the cross-entry-point surface the header graph declines to mix",
+  "repeat": "consume the same input twice; re-entrancy and accumulated state are reached by no other shape"
+ },
+ "determinism": "Enumerated, not sampled. Same inputs, same candidates, same order, no seed to record.",
+ "measured": {
+  "jansson": {
+   "base_valid": 8,
+   "mutants": 3080,
+   "mutants_valid": 106,
+   "gate_rejection": "96.6%",
+   "valid_candidate_growth": "x14.2"
+  },
+  "expat": {
+   "base_valid": 196,
+   "mutants": 6144,
+   "mutants_valid": 3056,
+   "gate_rejection": "50.3%",
+   "valid_candidate_growth": "x16.6"
+  }
+ },
+ "TARGET_MET": "Candidate volume >= 10x: yes, 14.2x and 16.6x, counted on VALID candidates rather than raw ones. Gate rejection rate published: yes, above.",
+ "TARGET_NOT_MET": "The +14% median coverage against developer-written harnesses is NOT measured and is NOT claimed. That requires building and campaigning these candidates, which needs the benchmark container and an idle machine. Volume is a means; coverage is the result, and only the means has been demonstrated.",
+ "four_generator_gaps_the_gates_found": {
+  "type_unsound_arguments": "the first version handed the most recent resource to ANY pointer parameter; 99.3% of jansson candidates rejected, correctly. Volume of nonsense is not volume.",
+  "missing_guards": "an inserted call inherits the obligations of what it touches. 8704 S2.UNGUARDED_NONNULL and 2312 S6.UNCHECKED_ERROR, all because the mutation omitted guards the base producer emits.",
+  "c_strings": "raw fuzzer bytes are not NUL-terminated. Dropping every char* call over-corrected and cost 32 VALID candidates; the CONTRACT decides, not the spelling of the type.",
+  "lengths": "a literal 0 beside a real pointer is an out-of-bounds access the harness caused; length parameters are sourced from the slice."
+ },
+ "honest_reading": "The high rejection rate is NOT evidence the gates are too strict. Four systematic causes were traced to the GENERATOR and fixed, and each fix raised the valid yield. The residue is unexamined, and jansson's 96.6% in particular has not been accounted for. Until it is, no claim should rest on the rejection rate being meaningful.",
+ "prior": "The gates' false-rejection rate on known-good production harnesses is 1.18% on trusted lifts, which is why gating a large candidate space was worth attempting at all."
+}
