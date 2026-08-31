@@ -185,5 +185,27 @@
    "remaining_21": "dominated by destroy-pairing failures of the two shapes above, not by leaks. FINDINGS: 0."
   },
   "lesson": "The number that set the plan's top priority was a day old and already fixed. A census is a measurement and decays like one; re-run it before it is allowed to order the work."
+ },
+ "FIRST_CONFIRMED_FINDING_2026-08-31": {
+  "harness": "bluez/fuzz_gobex.c",
+  "gate": "S1.LEAK",
+  "resource": "r_err",
+  "lift": "high fidelity, 0 missed calls",
+  "defect": "GError allocated by g_obex_packet_decode on four failure paths is never freed; no g_error_free or g_clear_error anywhere in the harness",
+  "confirmed_against": "bluez gobex/gobex-packet.c -- g_set_error on INHERIT policy, len < 3 + header_offset, packet_len != len, and parse_headers failure via `goto failed`",
+  "reachability": "len < 3 + header_offset is taken by any input under three bytes, so the leak is the COMMON case under fuzzing, not an edge case",
+  "why_it_matters": "projects/bluez/build.sh sets detect_leaks=0 for fuzz_gobex, and for NO other bluez target. fuzz_gobex is also the only bluez harness touching a GError. The consequence is that this target can no longer report a leak in gobex ITSELF -- a harness defect has removed a whole bug class from the library's coverage.",
+  "fix": "if (err != NULL) { g_error_free(err); }  -- one line",
+  "fix_verified": "S1.LEAK clears on the patched harness; BEFORE ['S1.LEAK'] AFTER []",
+  "status": "NOT YET REPORTED UPSTREAM -- needs the operator's go-ahead",
+  "note": "This is the first upstream-reportable finding this engine has produced. Every prior candidate, without exception, was a false positive traced to the lifter."
+ },
+ "triage_progress_2026-08-31": {
+  "read_by_hand": 19,
+  "of": 26,
+  "false_positives": 18,
+  "confirmed_defects": 1,
+  "every_false_positive_traced_to": "a defect in this lifter, not in the harness",
+  "S1_LEAK_trusted": "26 -> 8 across three commits"
  }
 }
