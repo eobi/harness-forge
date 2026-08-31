@@ -160,6 +160,13 @@ class Api:
     role: str = ROLE_CONSUME
     contract: Contract = field(default_factory=Contract)
 
+    # CALLED WITH DIFFERENT ARITIES, so the parameter list is a floor rather
+    # than a contract. `json_unpack(root, fmt, ...)` is the shape: a lift
+    # synthesises params from a call site, and two call sites of a variadic
+    # function contradict each other. Arity checks are skipped when this is
+    # set, because neither call is wrong.
+    variadic: bool = False
+
     def to_json(self) -> dict:
         return {"symbol": self.symbol, "header": self.header,
                 "params": [p.to_json() for p in self.params],

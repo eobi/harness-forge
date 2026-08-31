@@ -183,7 +183,12 @@ _SCALARISH = re.compile(
 # Unambiguous enough to match as a PREFIX: `freeaddrinfo` is one segment and is plainly a
 # free, and requiring exact equality lost it.
 _FREE_VERBS_PREFIX = {"free", "destroy", "delete", "cleanup", "release",
-                      "dispose", "deinit", "uninit", "unref", "terminate", "shutdown"}
+                      "dispose", "deinit", "uninit", "unref", "terminate", "shutdown",
+                      # `zip_close(za)` returns -1 WITHOUT releasing, and the caller then
+                      # calls `zip_discard(za)`. Without "discard" the second call was not
+                      # a destroy at all, so it read as using an archive that close had
+                      # already taken away.
+                      "discard"}
 # MUST BE THE LAST SEGMENT. `pixCloseGeneralized(pixd, pixs, sel)` is the morphological
 # CLOSING operation and releases nothing; read as a destroy it killed leptonica's `sel` at
 # its first use and turned every later use into a use-after-free. A name ENDING in `_close`
@@ -485,6 +490,10 @@ _FDP_CONSUME = re.compile(
 # expression and there is no trailing semicolon to anchor on.
 _CALL_IN_COND = re.compile(r"(?:([A-Za-z_]\w*)\s*=\s*)?([A-Za-z_]\w*)\s*\(([^;()]*)\)")
 
+_NULL_ASSIGN = re.compile(
+    r"^\s*(?:[A-Za-z_][\w\s:<>,]*?[\s\*&]+)?([A-Za-z_]\w*)\s*=\s*"
+    r"(?:NULL|nullptr|0)\s*;")
+
 _ASSIGN = re.compile(
     r"^\s*(?:[A-Za-z_][\w\s:<>,]*?[\s\*&]+)?([A-Za-z_]\w*)\s*=\s*([^;]+);")
 
@@ -603,6 +612,7 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
     member_calls: list = []          # `x.f()` / `x->f()`: not C, not modelled
     caller_owned: dict = {}          # rid -> storage, for slots the harness declares
     created_arm: dict = {}           # rid -> the arm its create sits in
+    _cleared_pending: set = set()    # slots set to NULL since the last op
     refs: dict = {}                  # rid -> outstanding explicit refcount increments
     # Values a FuzzedDataProvider hands back ARE the fuzzer's bytes, reshaped. Taint them
     # before the call loop so a library call receiving one is seen to consume input.
@@ -633,6 +643,16 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
         _fld = _FIELD_ASSIGN.match(text)
         if _fld and _fld.group(2).strip() in resources:
             resources.setdefault(_fld.group(1), resources[_fld.group(2).strip()])
+
+        # `x = NULL;` EMPTIES THE SLOT.
+        #
+        # libsrtp destroys a policy inside a branch, sets it to NULL, and destroys it again
+        # after the branch -- which frees nothing, because the slot is empty. Without this
+        # the second call read as a double free and every later mention as a use after
+        # free. There is no CALL here, so the fact is carried to the next op.
+        _null = _NULL_ASSIGN.match(text)
+        if _null and _null.group(1) in resources:
+            _cleared_pending.add(resources[_null.group(1)])
 
         _asn = _ASSIGN.match(text)
         if _asn:
@@ -842,7 +862,23 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
             elif not binds and any(a.source == "input" for a in args):
                 role = ROLE_CONSUME
 
+            # A VARIADIC FUNCTION IS CALLED WITH DIFFERENT ARITIES.
+            #
+            # An API's parameter list is synthesised from a call site, so `json_unpack(root,
+            # "{s:i}", &x)` and `json_unpack(root, "[i,i]", &a, &b)` contradict each other
+            # and S2 reported the wider call as passing a parameter the function does not
+            # declare. jansson's pack/unpack harness does exactly this.
+            #
+            # The widest call seen wins. We cannot see the prototype from here, and a
+            # declaration narrower than an observed call is certainly wrong.
+            _prev = apis.get(fn)
+            _variadic = bool(_prev is not None
+                             and len(_prev.params) != len(params)) or (
+                _prev.variadic if _prev is not None else False)
+            if _prev is not None and len(_prev.params) < len(params):
+                params = list(_prev.params)     # the mandatory prefix is the floor
             apis[fn] = Api(symbol=fn, header=Path(path).name, role=role, params=params,
+                           variadic=_variadic,
                            returns=TypeRef("void *" if binds else "int",
                                            "pointer" if binds else "scalar"),
                            contract=Contract())
@@ -863,7 +899,9 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
                           # through a second search, and destroys it again -- which read as
                           # a use-after-free and a double free of a slot nothing refilled.
                           + [f"__refills:{r}" for r in out_created if r != binds]
-                          + (["__nulls_target"] if nulls_target else [])))
+                          + (["__nulls_target"] if nulls_target else [])
+                          + [f"__cleared:{r}" for r in sorted(_cleared_pending)]))
+            _cleared_pending.clear()
             order += 1
 
     if not ops:

@@ -1034,3 +1034,46 @@ def test_close_in_the_middle_of_a_name_is_not_a_teardown():
         assert not _FREE_ISH.search(no), no
     for yes in ("magic_close", "sqlite3_close", "IedConnection_close"):
         assert _FREE_ISH.search(yes), yes
+
+
+def test_an_explicit_null_assignment_empties_the_slot():
+    """libsrtp destroys a policy inside a branch, sets it to NULL, and destroys it again
+    after the branch. The second call frees nothing because the slot is empty; without
+    modelling the assignment it read as a double free and every later mention as a use
+    after free. There is no CALL in `x = NULL;`, so the fact rides on the next op."""
+    L = c_harness.lift(_c("""
+#include <stdint.h>
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    policy_t *p = extract_policy(data, size);
+    if (p != NULL) {
+        stream_add(p);
+        policy_destroy(p);
+        p = NULL;
+    }
+    policy_destroy(p);
+    return 0;
+}
+"""))
+    codes = {v.code for g in run_static_gates(L.ir) for v in g.violations}
+    assert "S1.DOUBLE_DESTROY" not in codes
+    assert "S1.USE_AFTER_DESTROY" not in codes
+
+
+def test_a_variadic_call_is_not_an_arity_error():
+    """An API's parameter list is synthesised from a call site, so two call sites of
+    `json_unpack` contradict each other and S2 reported one as passing an undeclared
+    parameter and the other as omitting one. Neither call is wrong."""
+    L = c_harness.lift(_c("""
+#include <stdint.h>
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    json_t *root = json_loadb(data, size, 0, 0);
+    json_unpack(root, "{s:i}", 0);
+    json_unpack(root, "[i,i]", 0, 0);
+    json_decref(root);
+    return 0;
+}
+"""))
+    assert L.ir.apis["json_unpack"].variadic
+    codes = {v.code for g in run_static_gates(L.ir) for v in g.violations}
+    assert "S2.UNKNOWN_PARAM" not in codes
+    assert "S2.MISSING_ARG" not in codes

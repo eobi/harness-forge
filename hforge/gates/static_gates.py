@@ -171,6 +171,7 @@ def s1_lifetime(ir: HarnessIR) -> GateResult:
                 if _tests(_g, names):
                     _checked.add(rid)
 
+    cleared: set = set()            # slots an explicit `x = NULL` emptied
     dead_by: dict[str, str] = {}    # ...and WHICH call did it, for two-phase teardown
     dead_exits: dict[str, bool] = {}  # ...and whether that path left the function
     dead_arm: dict[str, str] = {}   # WHERE a resource died, for the same reason born_arm exists
@@ -193,6 +194,16 @@ def s1_lifetime(ir: HarnessIR) -> GateResult:
         # alone left every sqlite3 plan blocked as use-before-create.
         inline_self_init = ({r.id for r in ir.resources if r.by_address}
                             & ({op.binds} - {""}))
+
+        # A slot explicitly set to NULL is EMPTY: destroying it again frees nothing, and
+        # mentioning it passes NULL rather than a dangling pointer. Applied before the
+        # argument checks, because the op carrying the marker is the one that follows the
+        # assignment.
+        for _x in op.guarded_by:
+            if _x.startswith("__cleared:"):
+                _rid = _x.split(":", 1)[1]
+                if state.get(_rid) == DEAD:
+                    cleared.add(_rid)
 
         # A slot the call refilled is alive again, whatever happened to its previous value.
         for _x in op.guarded_by:
@@ -241,6 +252,8 @@ def s1_lifetime(ir: HarnessIR) -> GateResult:
                 v.append(Violation("S1.USE_BEFORE_CREATE", BLOCK,
                                    f"op {op.id} uses {a.ref!r} before anything creates it",
                                    where=op.id, principle="P1"))
+            elif state[a.ref] == DEAD and a.ref in cleared:
+                pass          # the slot is empty; this passes NULL, not a dangling pointer
             elif (state[a.ref] == DEAD
                   and dead_by.get(a.ref, "") != op.api
                   and (op.api in _RAW_FREE_NAMES or _CLEANUP_NAME.search(op.api))):
@@ -321,7 +334,8 @@ def s1_lifetime(ir: HarnessIR) -> GateResult:
                 v.append(Violation("S1.DESTROY_BEFORE_CREATE", BLOCK,
                                    f"op {op.id} destroys {op.targets!r} before it exists",
                                    where=op.id, principle="P1"))
-            elif state[op.targets] == DEAD and "__nulls_target" in op.guarded_by:
+            elif state[op.targets] == DEAD and (op.targets in cleared
+                                                or "__nulls_target" in op.guarded_by):
                 # DESTROY-BY-ADDRESS NULLS THE SLOT. `pixaDestroy(&pixa)` sets the caller's
                 # pointer to NULL and returns early when it is already NULL, so a second
                 # call frees nothing -- leptonica's ccthin destroys inside a loop and once
@@ -589,14 +603,17 @@ def s2_contract(ir: HarnessIR) -> GateResult:
 
         by_param = {a.param: a for a in op.args}
 
-        # every declared parameter must be supplied
+        # every declared parameter must be supplied -- unless the function is variadic,
+        # where the declared list is one call site's shape and another call legitimately
+        # differs
+        _var = bool(getattr(api, "variadic", False))
         for pd in api.params:
-            if pd.name not in by_param:
+            if pd.name not in by_param and not _var:
                 v.append(Violation("S2.MISSING_ARG", BLOCK,
                                    f"op {op.id} omits parameter {pd.name!r} of {api.symbol}",
                                    where=op.id, principle="P2"))
         for a in op.args:
-            if ir.param_decl(api, a.param) is None:
+            if ir.param_decl(api, a.param) is None and not _var:
                 v.append(Violation("S2.UNKNOWN_PARAM", BLOCK,
                                    f"op {op.id} passes {a.param!r}, which {api.symbol} does "
                                    f"not declare", where=op.id, principle="P2"))
@@ -781,7 +798,18 @@ def s3_ordering(ir: HarnessIR) -> GateResult:
         # `__branch`, not on "is guarded at all": exempting every guarded destroy stopped
         # the gate intercepting a known defect class, which its own test caught
         # immediately. A hedge is narrow or it is a hole.
+        # ...AND NOT WHEN THE CALL NAMES NO RESOURCE AT ALL.
+        #
+        # An API's role is decided once for the whole harness, so a local wrapper like
+        # libsrtp's `fuzz_free(void *ptr)` becomes destroy-role the moment ONE call site
+        # passes it a tracked resource -- and every other call, freeing a plain buffer the
+        # lift never modelled, then read as "a destroy that names nothing".
+        #
+        # A destroy-role call carrying no resource argument is releasing memory outside the
+        # lift's model. That is a gap in what we track, not a defect in the harness, and
+        # the earlier hedge (skip when guarded) did not cover it.
         if (api.role == ROLE_DESTROY and not op.targets
+                and any(a.source == SRC_RESOURCE and a.ref for a in op.args)
                 and not any(x.startswith("__branch") for x in op.guarded_by)):
             v.append(Violation("S3.DESTROY_NO_TARGET", BLOCK,
                                f"op {op.id} calls destroy-role {api.symbol} without naming "
@@ -959,7 +987,8 @@ _GATES = {
 _RELEASE_VERBS = {"cleanup", "close", "stop", "fini", "deinit", "reset", "disconnect",
                   "shutdown", "flush", "end"}
 # PHASE TWO: frees the object itself.
-_DESTROY_VERBS = {"free", "destroy", "delete", "del", "dispose", "release", "unref"}
+_DESTROY_VERBS = {"free", "destroy", "delete", "del", "dispose", "release", "unref",
+                  "discard"}
 
 
 def _has_verb(fn: str, verbs: set) -> bool:
