@@ -801,7 +801,14 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
                                          if stmt.arm in _exiting else []))
                           # The CONDITION, not just the shape. A gate cannot ask "was this
                           # pointer checked before it was used" from an arm path alone.
-                          + ([f"__guard:{stmt.guard}"] if stmt.guard else [])))
+                          + ([f"__guard:{stmt.guard}"] if stmt.guard else [])
+                          # A CALL CAN RETURN ONE RESOURCE AND FILL ANOTHER.
+                          # `pta = pixSearchBinaryMaze(pix, .., &ppixd)` creates BOTH, and
+                          # an Op has one `binds`, so the out-parameter's creation was
+                          # dropped: leptonica's maze harness destroys ppixd, refills it
+                          # through a second search, and destroys it again -- which read as
+                          # a use-after-free and a double free of a slot nothing refilled.
+                          + [f"__refills:{r}" for r in out_created if r != binds]))
             order += 1
 
     if not ops:

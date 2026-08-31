@@ -173,6 +173,16 @@ def s1_lifetime(ir: HarnessIR) -> GateResult:
         inline_self_init = ({r.id for r in ir.resources if r.by_address}
                             & ({op.binds} - {""}))
 
+        # A slot the call refilled is alive again, whatever happened to its previous value.
+        for _x in op.guarded_by:
+            if _x.startswith("__refills:"):
+                _rid = _x.split(":", 1)[1]
+                if _rid in state:
+                    state[_rid] = ALIVE
+                    born_arm[_rid] = _arm_of(op)
+                    born_at[_rid] = op.id
+                    dead_by.pop(_rid, None)
+
         for a in op.args:
             if a.source != SRC_RESOURCE or not a.ref:
                 continue

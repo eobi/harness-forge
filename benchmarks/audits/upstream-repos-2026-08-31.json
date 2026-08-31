@@ -23,5 +23,15 @@
   "double_create_ignored_ownership": "pjsip parses twice into the same slot, both from a pool released at the end. Ownership knew; only the end-of-harness leak check was asking."
  },
  "findings": "0 new upstream-reportable defects from this corpus so far. All 8 candidates triaged by reading; all 8 were defects in this engine.",
- "standing_total": "1 confirmed finding (bluez fuzz_gobex GError leak, google/oss-fuzz#16081) from 26+8 = 34 candidates triaged."
+ "standing_total": "1 confirmed finding (bluez fuzz_gobex GError leak, google/oss-fuzz#16081) from 26+8 = 34 candidates triaged.",
+ "SECOND_CONFIRMED_FINDING": {
+  "harness": "leptonica prog/fuzzing/pix3_fuzzer.cc",
+  "gate": "S1.USE_AFTER_DESTROY + S1.DOUBLE_DESTROY, high-fidelity lift",
+  "defect": "pixAverageByRow is called with pix_pointer_payload after pixDestroy nulled it, and the block is missing the pixCopy every other block performs",
+  "verified": "pixDestroy sets *ppix = NULL (src/pix1.c); pixAverageByRow returns immediately on !pix (src/pix3.c:2447)",
+  "class": "dead coverage -- the function is never executed on any input, silently",
+  "note_on_the_label": "The gate called it a use-after-free and a double free. Both are literally wrong, because the pointer is nulled rather than dangling. The SEQUENCE was real and reading it found a genuine defect of another kind.",
+  "fix": "one line: pix_pointer_payload = pixCopy(NULL, pixs_payload);",
+  "status": "NOT YET REPORTED -- needs the operator's go-ahead"
+ }
 }
