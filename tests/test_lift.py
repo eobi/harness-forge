@@ -1077,3 +1077,59 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     codes = {v.code for g in run_static_gates(L.ir) for v in g.violations}
     assert "S2.UNKNOWN_PARAM" not in codes
     assert "S2.MISSING_ARG" not in codes
+
+
+def test_a_method_on_a_declared_cxx_object_is_an_operation_on_a_resource():
+    """2726 missed calls across the audit corpus are member calls, and their receivers are
+    library objects -- codec, db, parser, doc -- not plumbing. The receiver is the resource
+    and the method is the op, which is what the IR already holds."""
+    L = c_harness.lift(_c("""
+#include <stdint.h>
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    std::string buf;
+    woff2::WOFF2StringOut out(&buf);
+    out.SetMaxSize(1024);
+    woff2::ConvertWOFF2ToTTF(data, size, &out);
+    return 0;
+}
+"""))
+    assert L.high_fidelity, L.missed
+    assert "r_out" in [r.id for r in L.ir.resources]
+    setmax = next(op for op in L.ir.sequence if op.api == "SetMaxSize")
+    assert any(a.source == "resource" and a.ref == "r_out" for a in setmax.args)
+
+
+def test_a_constructor_is_a_create_named_for_the_type():
+    """`woff2::WOFF2StringOut out(&buf);` matches the call pattern with `out` as the
+    function name. Lifted that way it becomes an op calling a function that does not exist,
+    with the object it constructs nowhere in the IR."""
+    L = c_harness.lift(_c("""
+#include <stdint.h>
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    std::string buf;
+    woff2::WOFF2StringOut out(&buf);
+    out.SetMaxSize(1024);
+    woff2::ConvertWOFF2ToTTF(data, size, &out);
+    return 0;
+}
+"""))
+    ctor = next(op for op in L.ir.sequence if op.binds == "r_out")
+    assert ctor.api == "woff2::WOFF2StringOut"
+    assert not any(op.api == "out" for op in L.ir.sequence), "no op named for the variable"
+
+
+def test_std_and_fuzzeddataprovider_receivers_are_still_plumbing():
+    """A call on std::vector or FuzzedDataProvider is the harness fetching bytes or holding
+    a buffer. Lifting those as library ops would put push_back in front of a gate that
+    judges API contracts."""
+    L = c_harness.lift(_c("""
+#include <stdint.h>
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    std::vector<int> sink;
+    lib_parse(data, size);
+    sink.push_back(1);
+    return 0;
+}
+"""))
+    assert not any(op.api == "push_back" for op in L.ir.sequence)
+    assert "r_sink" not in [r.id for r in L.ir.resources]

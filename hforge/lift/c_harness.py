@@ -454,6 +454,21 @@ _NOT_A_CALLSITE = _NOT_A_CALL | _STD_ACCESSOR | _COPIERS | {
 _CALLISH = re.compile(r"\b([A-Za-z_]\w*)\s*\(")
 _MEMBER_CALL = re.compile(r"(?:\.|->)\s*([A-Za-z_]\w*)\s*\(")
 
+# A C++ OBJECT DECLARATION, including a qualified type and a constructor call.
+# `woff2::WOFF2StringOut out(&buf);` and `pugi::xml_document doc;` both match. The single
+# declarator patterns above cannot: they stop at `::` and at the constructor parentheses.
+_CXX_OBJ_DECL = re.compile(
+    r"^[ \t]*((?:[A-Za-z_]\w*\s*::\s*)*[A-Za-z_]\w*(?:\s*<[^;{}]*>)?)"
+    r"[ \t]+([A-Za-z_]\w*)\s*(?:\(([^;{}]*)\))?\s*;[ \t]*$", re.M)
+
+# RECEIVERS WHOSE METHODS ARE PLUMBING, NOT THE LIBRARY UNDER TEST. A call on one of these
+# is the harness fetching bytes or holding a buffer, and lifting it as a library op would
+# put std::vector::push_back in front of a gate that judges API contracts.
+_NOT_A_LIBRARY_TYPE = re.compile(
+    r"^(?:std\s*::|::std\s*::)?(?:string|wstring|vector|map|set|list|deque|array|"
+    r"unique_ptr|shared_ptr|stringstream|istringstream|ostringstream|basic_string|"
+    r"FuzzedDataProvider|span|optional|pair|tuple|u16string|u32string)\b")
+
 
 def _missed_calls(body: str, lifted_symbols: set) -> list:
     """Call names in the body that never became ops.
@@ -569,6 +584,7 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
         raise LiftError("LLVMFuzzerTestOneInput has an empty body")
 
     decl_type: dict = {}
+    cxx_objects: dict = {}           # name -> declared C++ type, for member-call lifting
     for dm in _DECL.finditer(body):
         base, stars, name = dm.group(1) or "", dm.group(2) or "", dm.group(3)
         decl_type[name] = (base + " " + stars).strip()
@@ -595,6 +611,21 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
             _nm = _m.group(2)
             if _nm not in decl_type:
                 decl_type[_nm] = (_base + " " + _m.group(1)).strip()
+
+    # C++ OBJECTS THE HARNESS DECLARES. `woff2::WOFF2StringOut out(&buf);` is a resource
+    # with a lifetime, and `out.SetMaxSize(..)` is an operation on it -- the same two ideas
+    # the IR already has, in C++ spelling. Recorded here so the call loop can resolve a
+    # receiver; std and FuzzedDataProvider types are excluded because their methods are
+    # harness plumbing rather than the library under test.
+    for _dm in _CXX_OBJ_DECL.finditer(body):
+        _ty, _nm = _dm.group(1).strip(), _dm.group(2)
+        if _ty in ("return", "else", "case", "struct", "class", "const", "static"):
+            continue
+        if _NOT_A_LIBRARY_TYPE.match(_ty.replace(" ", "")):
+            continue
+        if "::" in _ty or _dm.group(3) is not None:
+            cxx_objects.setdefault(_nm, _ty)
+            decl_type.setdefault(_nm, _ty)
 
     def is_ptr(name: str) -> bool:
         t = decl_type.get(name)
@@ -683,10 +714,44 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
             # verdict about a std::vector method, delivered against sentencepiece's
             # harness. This is a C lifter and it is routinely handed .cc files; a shape it
             # cannot model has to make the lift untrusted, not produce an opinion.
+            # A CONSTRUCTOR IS A CREATE, NOT A CALL NAMED AFTER THE VARIABLE.
+            #
+            # `woff2::WOFF2StringOut out(&buf);` matches the call pattern with `out` as the
+            # function name, and lifted that way it becomes an op calling a function that
+            # does not exist, with the object it constructs nowhere in the IR. The declared
+            # TYPE is the api and the variable is the resource it binds.
+            if fn in cxx_objects and re.search(
+                    r"(?:^|[;{}])\s*" + re.escape(cxx_objects[fn]) + r"\s+"
+                    + re.escape(fn) + r"\s*\(", text):
+                _rid = resources.setdefault(fn, f"r_{fn}")
+                caller_owned.setdefault(_rid, "inline")
+                created_arm[_rid] = stmt.arm
+                apis.setdefault(cxx_objects[fn], Api(
+                    symbol=cxx_objects[fn], header=Path(path).name, role=ROLE_CREATE,
+                    params=[], returns=TypeRef("void", "scalar"), contract=Contract()))
+                ops.append(Op(f"o{order}", cxx_objects[fn], [], binds=_rid,
+                              guarded_by=([] if stmt.depth == 0
+                                          else [f"__branch:{stmt.arm}"])))
+                order += 1
+                continue
+
             _before = text[:cm.start(2)].rstrip()
             if _before.endswith(".") or _before.endswith("->"):
-                member_calls.append(fn)
-                continue
+                # A METHOD ON A DECLARED C++ OBJECT IS AN OPERATION ON A RESOURCE.
+                #
+                # 2726 missed calls across the audit corpus are member calls, and their
+                # receivers are library objects -- codec, db, parser, doc -- not plumbing.
+                # 201 harnesses are untrusted for this reason ALONE. The receiver is the
+                # resource and the method is the op, which is exactly what the IR holds.
+                _rm = re.search(r"([A-Za-z_]\w*)\s*(?:\.|->)\s*$", _before)
+                _recv = _rm.group(1) if _rm else ""
+                if _recv and _recv in cxx_objects:
+                    _rid = resources.setdefault(_recv, f"r_{_recv}")
+                    caller_owned.setdefault(_rid, "inline")
+                    argstr = f"{_recv}, {argstr}" if argstr.strip() else _recv
+                else:
+                    member_calls.append(fn)
+                    continue
             args_raw = _split_args(argstr)
 
             if fn in _COPIERS:
@@ -953,6 +1018,11 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
         raw_blocks=blocks,
         notes=notes)
     _syms = {a.symbol for a in ir.apis.values()} if hasattr(ir, "apis") else set()
+    # A CONSTRUCTOR IS LIFTED UNDER ITS TYPE, SO THE VARIABLE NAME MUST COUNT AS SEEN.
+    # `woff2::WOFF2StringOut out(&buf);` becomes an op named for the TYPE, and the
+    # name-based missed-call check then reported `out` as a call the lifter never read --
+    # a harness losing its fidelity to the very declaration we had just modelled.
+    _syms |= set(cxx_objects)
     _missed = [x for x in _missed_calls(body, _syms) if x not in fdp_methods]
     # Member calls the lifter deliberately skips are SKIPPED, not missed. `.data()`,
     # `.size()`, `.c_str()` are already excluded from the name-based check as plumbing --

@@ -29,5 +29,13 @@
   "audited tier if member calls were modelled": "463 -> up to 664, +43%"
  },
  "what_this_licenses": "Building a member-call lift path is the single largest available increase in audit reach, and audit reach is what produced the one merged upstream fix. A receiver is a resource and a method is an op; the IR already expresses both.",
- "what_it_does_NOT_license": "Any expectation that 201 more trusted lifts yield 201 more findings. The current rate is 2 real defects in 463 trusted lifts. The honest projection is under one additional finding, and the case for doing it is compounding reach rather than a forecast."
+ "what_it_does_NOT_license": "Any expectation that 201 more trusted lifts yield 201 more findings. The current rate is 2 real defects in 463 trusted lifts. The honest projection is under one additional finding, and the case for doing it is compounding reach rather than a forecast.",
+ "OUTCOME_member_call_lifting": {
+  "built": "A receiver declared as a C++ object is a resource; a method on it is an op. Constructors lift as a create named for the TYPE. std and FuzzedDataProvider receivers stay excluded as plumbing.",
+  "projected": "up to 201 more trusted lifts (+43%)",
+  "ACTUAL": "463 -> 489, +26 (+5.6%)",
+  "why_the_projection_was_optimistic": "The census asked which lifts had NO cause other than member calls. That is the right question for an upper bound and the wrong one for a forecast: lifting the member calls exposes causes that were underneath them. simdjson and clickhouse became readable at the call level and immediately failed on unbound uses of `Data`/`Size` -- a different defect that the member-call barrier had been hiding.",
+  "false_positives": "still 0. 489 trusted lifts, 2 blocking verdicts, both correct.",
+  "what_it_is_worth": "+26 trusted lifts is real and permanent, and the ceiling is not reached: the 181 mixed cases and the newly exposed taint failures are now the next layer. But it is not the +43% the census suggested and that number should not be repeated."
+ }
 }
