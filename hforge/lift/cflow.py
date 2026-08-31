@@ -36,6 +36,15 @@ class Stmt:
     depth: int                       # 0 = runs unconditionally
     is_condition: bool = False       # text came from an if/while/for header
     kind: str = "plain"              # plain | branch | loop | return
+    # WHICH ARM, not just how deep. Depth alone cannot tell two statements in DIFFERENT
+    # branches from two in the same one, and that distinction decides whether a second
+    # assignment is a leak or an alternative. openvpn's harness assigns `tmp` in several
+    # mutually exclusive switch cases and frees it in each; read as a flat list it looks
+    # like a resource created twice with the first leaked. The arm is a dotted path --
+    # "" at the top, "1" and "2" for two sibling blocks, "1.1" for a block inside the
+    # first -- so two statements are mutually exclusive when neither path is a prefix of
+    # the other.
+    arm: str = ""
 
 
 @dataclass
@@ -43,6 +52,7 @@ class Body:
     stmts: list = field(default_factory=list)
     branches: int = 0
     early_returns: int = 0
+    arms: int = 0                    # counter for handing out distinct arm paths
 
     @property
     def unconditional(self) -> list:
@@ -75,7 +85,57 @@ def _match_paren(src: str, i: int) -> int:
     return len(src) - 1
 
 
-def parse(body: str, depth: int = 0, out: Body = None) -> Body:
+_CASE_LABEL = re.compile(r"^[ \t]*(?:case\b[^:]*|default)\s*:", re.M)
+
+
+def _split_cases(body: str) -> list:
+    """A switch body cut into its alternatives, one per `case`/`default` label.
+
+    Labels at the TOP level of the body only: a `case` inside a nested switch belongs to
+    that switch. Text before the first label (rare, unreachable in practice) rides with the
+    first alternative rather than being dropped.
+    """
+    cuts = []
+    depth = 0
+    for i, ch in enumerate(body):
+        if ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+        elif depth == 0:
+            m = _CASE_LABEL.match(body, i)
+            if m and (i == 0 or body[i - 1] == "\n"):
+                cuts.append(i)
+    if not cuts:
+        return [body]
+    out = []
+    for a, b in zip(cuts, cuts[1:] + [len(body)]):
+        piece = body[a:b]
+        # Drop the label itself. `case 1:` ends with a colon rather than a semicolon, so
+        # without this it glues onto the next statement and every statement in the arm
+        # reads as `case 1:\n  p();`. The call regex still matched, so this was cosmetic
+        # -- but a statement list that does not say what the statements are is a poor thing
+        # to debug the next false positive with.
+        piece = _CASE_LABEL.sub("", piece, count=1)
+        out.append(piece)
+    if cuts[0] > 0 and body[:cuts[0]].strip():
+        out[0] = body[:cuts[0]] + out[0]
+    return out
+
+
+def mutually_exclusive(a: str, b: str) -> bool:
+    """Whether two arm paths can never both run.
+
+    Sibling blocks diverge at some component; a nested block shares its parent's prefix and
+    is therefore NOT exclusive with it. "" (top level) is a prefix of everything and so is
+    exclusive with nothing.
+    """
+    if a == b or not a or not b:
+        return False
+    return not (a.startswith(b + ".") or b.startswith(a + "."))
+
+
+def parse(body: str, depth: int = 0, out: Body = None, arm: str = "") -> Body:
     """Split a function body into statements, tracking branch nesting.
 
     A control-flow HEADER's condition is emitted at the CURRENT depth, because it executes
@@ -93,7 +153,7 @@ def parse(body: str, depth: int = 0, out: Body = None) -> Body:
         kind = "return" if re.match(r"^\s*return\b", text) else "plain"
         if kind == "return":
             out.early_returns += 1
-        out.stmts.append(Stmt(text=text, depth=depth, kind=kind))
+        out.stmts.append(Stmt(text=text, depth=depth, kind=kind, arm=arm))
 
     while i < n:
         ch = body[i]
@@ -111,7 +171,7 @@ def parse(body: str, depth: int = 0, out: Body = None) -> Body:
                     cond = body[p + 1:q]
                     if cond.strip():
                         out.stmts.append(Stmt(text=cond, depth=depth,
-                                              is_condition=True, kind="branch"))
+                                              is_condition=True, kind="branch", arm=arm))
                     j = q + 1
                 out.branches += 1
 
@@ -121,7 +181,21 @@ def parse(body: str, depth: int = 0, out: Body = None) -> Body:
                 k += 1
             if k < n and body[k] == "{":
                 close = _match_brace(body, k)
-                parse(body[k + 1:close], depth + 1, out)
+                inner_text = body[k + 1:close]
+                if kw == "switch":
+                    # EACH `case` IS ITS OWN ARM. A switch body is not one block, it is a
+                    # set of alternatives, and treating it as one made every assignment in
+                    # it a sibling of every other -- so openvpn's `tmp`, assigned in
+                    # thirteen mutually exclusive cases and freed in each, read as a
+                    # resource created thirteen times and leaked twelve.
+                    for piece in _split_cases(inner_text):
+                        out.arms += 1
+                        parse(piece, depth + 1, out,
+                              arm=(f"{arm}.{out.arms}" if arm else str(out.arms)))
+                else:
+                    out.arms += 1
+                    parse(inner_text, depth + 1, out,
+                          arm=(f"{arm}.{out.arms}" if arm else str(out.arms)))
                 i = close + 1
             else:
                 end = body.find(";", k)

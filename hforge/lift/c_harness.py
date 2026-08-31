@@ -433,7 +433,8 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
                                            "pointer" if binds else "scalar"),
                            contract=Contract())
             ops.append(Op(f"o{order}", fn, args, binds=binds, targets=targets,
-                          guarded_by=[] if stmt.depth == 0 else ["__branch"]))
+                          guarded_by=([] if stmt.depth == 0
+                                      else [f"__branch:{stmt.arm}"])))
             order += 1
 
     if not ops:

@@ -341,3 +341,53 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 }
 """))
     assert not any("Consume" in m for m in L.missed), L.missed
+
+
+# ── branch arms: which path, not just how deep ───────────────────────────────
+
+def test_sibling_blocks_are_mutually_exclusive_and_nested_ones_are_not():
+    from hforge.lift import cflow
+    b = cflow.parse("a(); if (x) { b(); } if (y) { c(); } d();")
+    arms = {st.text.strip(): st.arm for st in b.stmts}
+    assert arms["b();"] != arms["c();"]
+    assert cflow.mutually_exclusive(arms["b();"], arms["c();"])
+    assert not cflow.mutually_exclusive("1", "1.1")     # nested shares its parent's path
+    assert not cflow.mutually_exclusive("", "1")        # top level excludes nothing
+
+
+def test_each_switch_case_is_its_own_arm():
+    """A switch body is a set of ALTERNATIVES, not one block. Treating it as one made
+    every assignment in it a sibling of every other, so openvpn's `tmp` -- assigned in
+    thirteen mutually exclusive cases and freed in each -- read as a resource created
+    thirteen times with twelve leaked."""
+    from hforge.lift import cflow
+    # Multi-line, because the label split anchors at line starts -- a `case` in the middle
+    # of a line is not how C is written and is not worth the ambiguity of matching there.
+    b = cflow.parse("switch (k) {\ncase 1:\n  p();\n  break;\ncase 2:\n  q();\n  break;\n}")
+    arms = {st.text.strip(): st.arm for st in b.stmts if st.text.strip() in ("p();", "q();")}
+    assert len(set(arms.values())) == 2, arms
+    assert cflow.mutually_exclusive(*arms.values())
+
+
+def test_two_creates_on_exclusive_paths_are_not_a_double_create():
+    L = c_harness.lift(_c("""
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    char *tmp;
+    switch (size % 2) {
+    case 0:
+        tmp = get_string();
+        use_it(tmp, data, size);
+        free(tmp);
+        break;
+    case 1:
+        tmp = get_string();
+        other(tmp, data, size);
+        free(tmp);
+        break;
+    }
+    return 0;
+}
+"""))
+    codes = {v.code for g in run_static_gates(L.ir) for v in g.violations
+             if v.severity == BLOCK}
+    assert "S1.DOUBLE_CREATE" not in codes, codes

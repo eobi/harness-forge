@@ -59,6 +59,17 @@ def s1_lifetime(ir: HarnessIR) -> GateResult:
     # the gate asks the IR instead of re-spelling it and getting it wrong again.
     state = {r.id: (ALIVE if r.by_address else UNBORN) for r in ir.resources}
     _by_addr = {r.id: r.by_address for r in ir.resources}
+    born_arm: dict = {}
+
+    def _arm_of(op) -> str:
+        for x in op.guarded_by:
+            if x.startswith("__branch:"):
+                return x.split(":", 1)[1]
+        return ""
+
+    def _exclusive(a, b) -> bool:
+        from ..lift.cflow import mutually_exclusive
+        return mutually_exclusive(a or "", b or "")
     born_at: dict[str, str] = {}
 
     for op in ir.sequence:
@@ -106,7 +117,12 @@ def s1_lifetime(ir: HarnessIR) -> GateResult:
                 v.append(Violation("S1.UNKNOWN_RESOURCE", BLOCK,
                                    f"op {op.id} binds undeclared resource {op.binds!r}",
                                    where=op.id, principle="P1"))
-            elif state[op.binds] != UNBORN and not _by_addr.get(op.binds):
+            elif (state[op.binds] != UNBORN and not _by_addr.get(op.binds)
+                  and not _exclusive(born_arm.get(op.binds), _arm_of(op))):
+                # TWO ASSIGNMENTS ON PATHS THAT NEVER BOTH RUN ARE NOT A LEAK. openvpn's
+                # harness assigns `tmp` in several mutually exclusive switch cases and
+                # frees it in each; read as a flat statement list that is a create, then
+                # another create, with the first leaked. The arms say otherwise.
                 # A CALLER-DECLARED SLOT IS ALIVE AND STILL GETS FILLED. `sqlite3 *db = 0;
                 # sqlite3_open(":memory:", &db);` -- the storage exists from the
                 # declaration AND the library writes the handle into it, and those are not
@@ -121,6 +137,7 @@ def s1_lifetime(ir: HarnessIR) -> GateResult:
                                    where=op.id, principle="P1"))
             else:
                 state[op.binds] = ALIVE
+                born_arm[op.binds] = _arm_of(op)
                 born_at[op.binds] = op.id
             if api.role != ROLE_CREATE:
                 v.append(Violation("S1.BIND_NON_CREATE", WARN,
@@ -471,7 +488,7 @@ def s3_ordering(ir: HarnessIR) -> GateResult:
         # the gate intercepting a known defect class, which its own test caught
         # immediately. A hedge is narrow or it is a hole.
         if (api.role == ROLE_DESTROY and not op.targets
-                and "__branch" not in op.guarded_by):
+                and not any(x.startswith("__branch") for x in op.guarded_by)):
             v.append(Violation("S3.DESTROY_NO_TARGET", BLOCK,
                                f"op {op.id} calls destroy-role {api.symbol} without naming "
                                f"the resource it releases", where=op.id, principle="P2"))
