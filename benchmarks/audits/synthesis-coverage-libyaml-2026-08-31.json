@@ -1,0 +1,17 @@
+{
+ "date": "2026-08-31",
+ "case": "libyaml/libyaml_loader_fuzzer",
+ "question": "Does the wider candidate space that mutational synthesis opens contain a BETTER harness? This is the OGHarn axis: they beat developer-written harnesses by +14% median through mutational stitching filtered by dynamic oracles.",
+ "setup": "14 sound base plans, 54 synthesised candidates, 48 valid and on-target after static gating. Top 8 by base rank campaigned at 90s each on an idle 8-core host.",
+ "RESULT": "ZERO viable synthesised candidates. All 8 were killed by a smoke test before campaigning: every one aborts on a valid input.",
+ "base_best": 73.38,
+ "synth_best": null,
+ "why": "libyaml is a STATEFUL API guarded by asserts, and both mutation operators violate its ordering: `yaml_parser_set_encoding` asserts !parser->encoding so it cannot follow input; repeating `yaml_parser_set_input_string` re-sets a handler the parser already has; repeating `yaml_parser_load` re-enters a consumed parser. None of these constraints is expressed in the header.",
+ "WHAT_IT_COSTS_THE_CLAIM": "The bet was that static rejection is cheap, so a candidate space an order of magnitude larger is affordable. That is HALF RIGHT and the half that is wrong matters: static gates cost microseconds and cannot see a constraint that lives in an assert. A candidate that aborts on input 1 passes every static gate, builds cleanly, and then burns a full campaign returning 0.00% that LOOKS like a measurement.",
+ "the_engineering_answer": "A three-stage pipeline rather than two: static gates (microseconds) -> smoke test on one valid input (~2 seconds) -> campaign (90+ seconds). The smoke test caught 8 of 8 here, so the cost of a bad candidate fell from a campaign to two seconds, roughly 45x.",
+ "what_this_does_NOT_say": "It does not say mutational synthesis cannot work. It says both CURRENT operators are unsound for a stateful API, and that libyaml is such an API. A different library, or operators that respect ordering, may behave differently -- pugixml is being measured next for exactly that reason.",
+ "two_experimental_errors_found_and_fixed_first": {
+  "ordering": "The synth pool was ranked by gate evidence and capped at 10, which campaigned ten mutants of two base plans that themselves score 0.00% and never reached a mutant of the base that works at 72.81%. The run reported 'gain -71.79 points', which measured only my own ordering. Candidates are now grouped under their base and taken in the base's rank order.",
+  "no_dynamic_check": "The first corrected run then reported synth best 0.00% -- true, but uninformative, because the candidates were aborting rather than under-covering. The smoke test now separates 'invalid' from 'valid but worse', which are different findings."
+ }
+}
