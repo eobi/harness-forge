@@ -226,7 +226,15 @@ def parse(body: str, depth: int = 0, out: Body = None, arm: str = "",
                 end = n - 1 if end < 0 else end
                 inner = body[k:end + 1].strip()
                 if inner:
-                    parse(inner, depth + 1, out)
+                    # A BRACELESS BODY IS STILL A BRANCH. This passed neither arm nor
+                    # guard, so `if (fa_b != NULL) fa_free(fa_b);` -- augeas frees six
+                    # resources in exactly that shape -- arrived at the gates with no
+                    # branch context at all: the null-guard rule could not see its guard
+                    # and mutual exclusion could not see its arm.
+                    out.arms += 1
+                    parse(inner, depth + 1, out,
+                          arm=(f"{arm}.{out.arms}" if arm else str(out.arms)),
+                          guard=_inner)
                 i = end + 1
             continue
 

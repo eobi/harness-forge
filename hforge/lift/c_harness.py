@@ -279,14 +279,33 @@ def _classify_args(args_raw, data, size, tainted, resources, is_ptr, unread, fn,
             _raw)
         if _cxx:
             _raw = _cxx.group(1).strip()
+        # THE C CAST MUST COME OFF FIRST. `lstrip("&*( ")` eats the cast's own opening
+        # paren, leaving `void *)data`, and the cast pattern then cannot match because it
+        # needs a leading `(`. So `cmsCreateContext(NULL, (void *)data)` bound its input as
+        # a LITERAL -- the harness read as consuming nothing, and lcms reported eight uses
+        # of `data` the lifter could not bind.
+        _raw = re.sub(r"^\([^)]*\)\s*", "", _raw).strip()          # drop a C cast
         bare = _raw.lstrip("&*( ").rstrip(" )")
-        bare = re.sub(r"^\([^)]*\)\s*", "", bare).strip()          # drop a C cast
+        bare = re.sub(r"^\([^)]*\)\s*", "", bare).strip()          # ...and a nested one
         # `s.data()` IS `s`. A C++ harness reaches a C API through an accessor, and the
         # value it yields carries whatever taint the object had.
         _acc = re.match(r"^([A-Za-z_]\w*)\s*(?:\.|->)\s*([A-Za-z_]\w*)\s*\(\s*\)$", bare)
         if _acc and _acc.group(2) in _STD_ACCESSOR and _acc.group(1) in tainted:
             bare = _acc.group(1)
-        if bare in tainted:
+        if bare in resources and not a.strip().startswith("&"):
+            # A NAMED RESOURCE IS A RESOURCE EVEN WHEN TAINTED. Taint spreads through
+            # handles: `cmsCreateContext(NULL, (void *)data)` taints `context`, which
+            # taints `hDict`, and every later call taking hDict then classified it as
+            # INPUT -- so ownership was invisible and `entry = cmsDictGetEntryList(hDict)`
+            # read as an owned handle that leaks, rather than a borrowed pointer released
+            # when hDict is freed.
+            #
+            # Taint tracking exists to follow the BUFFER: `parse(payload, len)` where
+            # payload aliases data. A handle is not a buffer, and S5 still sees the direct
+            # use of `data` that started the cascade.
+            args.append(Arg(pname, "resource", resources[bare]))
+            params.append(ParamDecl(pname, TypeRef("void *", "pointer")))
+        elif bare in tainted:
             args.append(Arg(pname, "input", "s_data"))
             params.append(ParamDecl(pname, TypeRef("const uint8_t *", "pointer")))
         elif (bare in (size_alias or {size})

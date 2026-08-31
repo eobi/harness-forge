@@ -733,3 +733,61 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     codes = {v.code for g in run_static_gates(L.ir) for v in g.violations}
     assert "S1.DOUBLE_DESTROY" not in codes
     assert "S1.USE_AFTER_DESTROY" not in codes
+
+
+def test_a_braceless_branch_body_still_carries_its_guard():
+    """`if (fa != NULL) fa_free(fa);` -- augeas frees six resources in exactly that shape.
+
+    The braceless path passed neither arm nor guard, so these statements reached the gates
+    with no branch context at all: the null-guard rule could not see the guard, and mutual
+    exclusion could not see the arm.
+    """
+    L = c_harness.lift(_c("""
+#include <stdint.h>
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    struct fa *fa1 = NULL;
+    fa_compile(data, size, &fa1);
+    if (fa1 != NULL)	fa_free(fa1);
+    return 0;
+}
+"""))
+    codes = {v.code for g in run_static_gates(L.ir) for v in g.violations}
+    assert "S1.LEAK" not in codes
+
+
+def test_a_named_resource_beats_taint_so_ownership_stays_visible():
+    """Taint spreads through handles: a context built over `data` taints every handle
+    derived from it, and classifying those as INPUT hid ownership entirely -- so a borrowed
+    pointer obtained from a dictionary read as an owned handle that leaks."""
+    L = c_harness.lift(_c("""
+#include <stdint.h>
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    cmsContext context = cmsCreateContext(0, (void *)data);
+    cmsHANDLE hDict = cmsDictAlloc(context);
+    const cmsDICTentry* entry = cmsDictGetEntryList(hDict);
+    cmsDictNextEntry(entry);
+    cmsDictFree(hDict);
+    cmsDeleteContext(context);
+    return 0;
+}
+"""))
+    assert any(a.source == "resource" and a.ref == "r_hDict"
+               for op in L.ir.sequence if op.api == "cmsDictGetEntryList"
+               for a in op.args), "hDict must reach the gates as a resource, not as input"
+    codes = {v.code for g in run_static_gates(L.ir) for v in g.violations}
+    assert "S1.LEAK" not in codes
+
+
+def test_a_cast_input_is_still_input():
+    """`(void *)data` bound as a LITERAL: lstrip eats the cast's own opening paren, and the
+    cast pattern then cannot match because it needs a leading `(`. The harness read as
+    consuming nothing at all."""
+    L = c_harness.lift(_c("""
+#include <stdint.h>
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    parse_it(0, (void *)data, size);
+    return 0;
+}
+"""))
+    assert any(a.source == "input" for op in L.ir.sequence for a in op.args), \
+        "the cast argument is the only input this harness has"
