@@ -361,7 +361,12 @@ def _classify_args(args_raw, data, size, tainted, resources, is_ptr, unread, fn,
             # use of `data` that started the cascade.
             args.append(Arg(pname, "resource", resources[bare]))
             params.append(ParamDecl(pname, TypeRef("void *", "pointer")))
-        elif bare in tainted:
+        elif bare in tainted and not (a.strip().startswith("&") and is_ptr(bare)):
+            # `&x` WHERE x IS A POINTER SLOT IS NOT INPUT BYTES. Taint spreads to handles,
+            # and the taint test ran before the out-parameter test, so `pixDestroy(&pixd)`
+            # on a tainted pixd bound the ADDRESS OF A POINTER as raw fuzzer bytes -- and
+            # S2 then objected that a `void **` parameter is being filled with input,
+            # against four correct leptonica harnesses.
             args.append(Arg(pname, "input", "s_data"))
             params.append(ParamDecl(pname, TypeRef("const uint8_t *", "pointer")))
         elif (bare in (size_alias or {size})

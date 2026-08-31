@@ -36,5 +36,17 @@
   "filed": "DanBloomberg/leptonica#813",
   "scope_correction": "The first patch fixed ONE of three instances and the gate still flagged two more. Filing it would have been a partial fix presented as complete. The file has three: a missing pixCopy before pixAverageByRow, a missing pixCopy before pixVarianceInRect, and pixVarianceByColumn passed `pix2` -- destroyed ten lines earlier -- while the pix_pointer_payload created directly above it goes unused."
  },
- "FIRST_CONFIRMED_FINDING_2026-08-31": {}
+ "FIRST_CONFIRMED_FINDING_2026-08-31": {},
+ "GATE_FALSE_REJECTION_RATE": {
+  "why": "This is the PREREQUISITE for mutational plan synthesis. If static gating rejects candidates a dynamic-oracle system would have kept, we lose on the coverage axis AND the findings axis at once. It was unmeasured until now.",
+  "method": "Production harnesses are presumed-good by construction -- they are running in Google's fuzzing fleet. So a BLOCKING verdict on one is a false rejection unless triage proves the harness is actually defective.",
+  "corpora": "OSS-Fuzz tree (420) + upstream project repositories (2273) = 2693 harnesses",
+  "all_lifted": "560 of 1942 carry a blocking violation = 28.8%",
+  "trusted_lifts": "6 of 422 = 1.42%",
+  "confirmed_real_defects_among_those": 1,
+  "FALSE_REJECTION_ON_TRUSTED_LIFTS": "5/422 = 1.18%",
+  "comparison": "QuartetFuzz reports a 4.8% false-positive rate. Ours is 1.18% -- but the denominators are NOT comparable and the difference is the whole point: we trust only 422 of 1942 lifts, 22%, and DECLINE TO OPINE on the rest. Their figure covers everything they judged. A fair reading is that we buy precision by abstaining, which is the design, not an accident.",
+  "the_honest_caveat": "28.8% blocking across ALL lifted harnesses is the number that would matter if the fidelity filter were removed. The filter is doing the work, and it is a filter over OUR OWN comprehension, not over harness quality. For synthesis the relevant question is slightly different -- candidates will be OUR plans, not third-party code -- so this is the best available prior rather than a direct answer.",
+  "defect_found_while_measuring": "S2.TYPE_CONFUSION fired on four leptonica harnesses because taint spreads to handles and the taint test ran BEFORE the out-parameter test: `pixDestroy(&pixd)` on a tainted pixd bound the ADDRESS OF A POINTER as raw fuzzer bytes. Fixed; the rate above is post-fix."
+ }
 }

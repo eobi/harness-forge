@@ -894,3 +894,23 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 """))
     codes = {v.code for g in run_static_gates(L.ir) for v in g.violations}
     assert "S1.DOUBLE_CREATE" not in codes
+
+
+def test_the_address_of_a_pointer_slot_is_not_input():
+    """Taint spreads to handles, and the taint test ran BEFORE the out-parameter test, so
+    `pixDestroy(&pixd)` on a tainted pixd bound the address of a pointer as raw fuzzer
+    bytes -- and S2 objected that a `void **` parameter was being filled with input,
+    against four correct leptonica harnesses."""
+    L = c_harness.lift(_c("""
+#include <stdint.h>
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    PIX *pixs = pixReadMem(data, size);
+    PIX *pixd = NULL;
+    dewarpSinglePage(pixs, 0, 1, 1, 0, &pixd, NULL, 0);
+    pixDestroy(&pixd);
+    pixDestroy(&pixs);
+    return 0;
+}
+"""))
+    codes = {v.code for g in run_static_gates(L.ir) for v in g.violations}
+    assert "S2.TYPE_CONFUSION" not in codes
