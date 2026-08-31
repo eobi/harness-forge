@@ -97,3 +97,25 @@ def test_synthesis_is_deterministic():
     a = [c.name for c in mutate.synthesize([_plan()])[0]]
     b = [c.name for c in mutate.synthesize([_plan()])[0]]
     assert a == b and a
+
+
+def test_only_a_sound_base_is_widened():
+    """Mutating an invalid plan cannot make it valid, and measuring the result reports the
+    base plan's quality rather than the mutation's.
+
+    jansson proposes 90 base plans and 8 pass the gates. Widening all 90 produced 3080
+    candidates with 96.6% rejected -- and the dominant violation sat on an op of the BASE
+    plan, not on the inserted call. Widening only the 8 gives the same 106 valid candidates
+    from 160 attempts: identical yield, 19x less waste, and a rejection rate that finally
+    measures the mutation.
+    """
+    broken = _plan()
+    # A destroy with nothing to destroy: blocking, and nothing downstream can repair it.
+    broken.sequence[2].targets = "r_missing"
+    cands, stats = mutate.synthesize([broken])
+    assert stats["valid_bases"] == 0
+    assert cands == []
+
+    ok, stats_ok = mutate.synthesize([_plan()])
+    assert stats_ok["valid_bases"] == 1
+    assert ok

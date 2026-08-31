@@ -31,5 +31,25 @@
   "lengths": "a literal 0 beside a real pointer is an out-of-bounds access the harness caused; length parameters are sourced from the slice."
  },
  "honest_reading": "The high rejection rate is NOT evidence the gates are too strict. Four systematic causes were traced to the GENERATOR and fixed, and each fix raised the valid yield. The residue is unexamined, and jansson's 96.6% in particular has not been accounted for. Until it is, no claim should rest on the rejection rate being meaningful.",
- "prior": "The gates' false-rejection rate on known-good production harnesses is 1.18% on trusted lifts, which is why gating a large candidate space was worth attempting at all."
+ "prior": "The gates' false-rejection rate on known-good production harnesses is 1.18% on trusted lifts, which is why gating a large candidate space was worth attempting at all.",
+ "CORRECTION_the_rejection_rate_measured_the_wrong_thing": {
+  "what_was_published_an_hour_earlier": "jansson 96.6% gate rejection, expat 50.3%",
+  "the_error": "Every proposed base plan was being widened, including the ones that already fail the gates. jansson proposes 90 and 8 pass. A candidate inherits every defect of what it was grown from, so mutating an invalid plan cannot make it valid -- and the dominant violation on the rejected candidates sat on op o0, an op of the BASE plan, not on the inserted call. The rate was reporting base-plan quality and saying nothing about the mutation.",
+  "corrected": {
+   "jansson": {
+    "mutants": 160,
+    "valid": 106,
+    "gate_rejection": "33.8%"
+   },
+   "expat": {
+    "mutants": 3082,
+    "valid": 3056,
+    "gate_rejection": "0.8%"
+   }
+  },
+  "what_did_NOT_change": "The valid candidate counts are identical -- 114 and 3252, so x14.2 and x16.6 stand. The invalid bases were only ever producing invalid mutants; they were waste, not yield.",
+  "what_it_costs_and_saves": "19x fewer candidates generated on jansson for the same result. Static rejection is cheap, but generating what is known-doomed is still waste.",
+  "what_it_means": "expat at 0.8% is the number that matters for the OGHarn comparison: on sound bases the static gates barely reject at all, so gating a large candidate space costs almost nothing in lost candidates. The earlier 50.3% would have argued the opposite, and it was wrong.",
+  "how_it_was_caught": "By doing what the previous commit said was still owed -- the residue was recorded as unexamined and 'nothing should rest on the rejection rate being meaningful' until it was. It was examined and the rate was indeed not meaningful."
+ }
 }

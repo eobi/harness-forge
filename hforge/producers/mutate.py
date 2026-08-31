@@ -135,7 +135,16 @@ def _satisfiable(api, ir: HarnessIR, live: list) -> Optional[list]:
     return args
 
 
-def synthesize(plans: list, *, max_per_plan: int = 40) -> tuple:
+def _passes(ir) -> bool:
+    """Imported lazily: producers do not otherwise depend on the gates, and the dependency
+    is worth keeping one-directional and visible."""
+    from ..gates.static_gates import run_static_gates
+    return not any(v.severity == "block"
+                   for g in run_static_gates(ir) for v in (g.violations or []))
+
+
+def synthesize(plans: list, *, max_per_plan: int = 40,
+               only_valid_bases: bool = True) -> tuple:
     """Widen a set of proposed plans into a larger candidate set.
 
     Returns `(candidates, stats)`. Candidates are IR, not verdicts: every one still has to
@@ -148,9 +157,21 @@ def synthesize(plans: list, *, max_per_plan: int = 40) -> tuple:
     for p in plans:
         catalogue.update(p.apis)
 
-    out, stats = [], {"base_plans": len(plans), "catalogue": len(catalogue),
-                      "widen": 0, "repeat": 0}
-    for base in plans:
+    # MUTATING AN INVALID PLAN CANNOT MAKE IT VALID.
+    #
+    # This was measured the wrong way round at first. jansson proposes 90 base plans and
+    # only 8 pass the gates; mutating all 90 produced 3080 candidates of which 96.6% were
+    # rejected -- and the dominant violation was on op o0, an op of the BASE plan, not on
+    # the inserted call. The rejection rate was reporting the quality of the base plans and
+    # saying nothing whatever about the mutation.
+    #
+    # A candidate inherits every defect of what it was grown from, so the base must be
+    # sound before widening it means anything.
+    bases = [p for p in plans if _passes(p)] if only_valid_bases else list(plans)
+
+    out, stats = [], {"base_plans": len(plans), "valid_bases": len(bases),
+                      "catalogue": len(catalogue), "widen": 0, "repeat": 0}
+    for base in bases:
         lo, hi = _window(base)
         called = {op.api for op in base.sequence}
         live = [r.id for r in base.resources]
