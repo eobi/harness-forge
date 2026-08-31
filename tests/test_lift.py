@@ -610,3 +610,126 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     codes = {v.code for g in run_static_gates(L.ir) for v in g.violations}
     assert "S1.USE_AFTER_DESTROY" not in codes
     assert "S1.DOUBLE_DESTROY" not in codes
+
+
+def test_a_plain_free_is_a_destroy():
+    """`free(p)` is the most common cleanup in C. It is excluded from callsites so that
+    allocator noise does not become ops, and that exclusion made every resource released
+    by a plain free read as leaked -- s2geometry mallocs through a local wrapper and frees
+    the result two lines later."""
+    L = c_harness.lift(_c("""
+#include <stdint.h>
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    char *nt = null_terminated(data, size);
+    if (nt == NULL) { return 0; }
+    parse_it(nt);
+    free(nt);
+    return 0;
+}
+"""))
+    codes = {v.code for g in run_static_gates(L.ir) for v in g.violations}
+    assert "S1.LEAK" not in codes
+
+
+def test_auto_bound_to_a_new_ish_call_is_a_handle():
+    """`auto d = exif_data_new_from_data(..)` is a handle somebody must release; `auto opts
+    = set_options()` is a value. `auto` hides the difference, so the NAME decides."""
+    handle = c_harness.lift(_c("""
+#include <stdint.h>
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    auto d = exif_data_new_from_data(data, size);
+    dump(d);
+    return 0;
+}
+"""))
+    assert "S1.LEAK" in {v.code for g in run_static_gates(handle.ir) for v in g.violations}
+
+    value = c_harness.lift(_c("""
+#include <stdint.h>
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    auto opts = set_options();
+    parse_config(data, size, opts);
+    return 0;
+}
+"""))
+    assert "S1.LEAK" not in {v.code for g in run_static_gates(value.ir) for v in g.violations}
+
+
+def test_a_smart_pointer_factory_is_not_a_handle():
+    """`make_unique` matches the new-ish vocabulary but its whole point is that the
+    destructor runs, so it must not be promoted to a handle.
+
+    Written WITHOUT template arguments on purpose. `absl::make_unique<T>()` is not lifted
+    as a call at all -- the angle brackets defeat the call pattern -- so in s2geometry's
+    own harness `index` becomes a resource through the `&index` out-parameter on the line
+    after, and a test using that form would pass without ever reaching this rule.
+    """
+    L = c_harness.lift(_c("""
+#include <stdint.h>
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    auto index = make_unique(data, size);
+    build_index(index);
+    return 0;
+}
+"""))
+    assert [r.storage for r in L.ir.resources if r.id == "r_index"] == ["inline"]
+    assert "S1.LEAK" not in {v.code for g in run_static_gates(L.ir) for v in g.violations}
+
+
+def test_a_balanced_ref_and_unref_is_not_a_destroy():
+    """`ref(md); unref(md); count(md);` leaves md exactly as it was. Reading the unref as
+    a destroy reported the count as a use-after-free. Regression for libexif's loader."""
+    L = c_harness.lift(_c("""
+#include <stdint.h>
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    ExifData *d = exif_data_new_from_data(data, size);
+    ExifMnoteData *md = exif_data_get_mnote_data(d);
+    exif_mnote_data_ref(md);
+    exif_mnote_data_unref(md);
+    exif_mnote_data_count(md);
+    exif_data_unref(d);
+    return 0;
+}
+"""))
+    codes = {v.code for g in run_static_gates(L.ir) for v in g.violations}
+    assert "S1.USE_AFTER_DESTROY" not in codes
+    assert "S1.DOUBLE_DESTROY" not in codes
+
+
+def test_an_unmatched_unref_still_releases():
+    """An unref with no ref before it is the release. libexif's from_data harness ends in
+    `exif_data_unref(image)` and must not read as a leak."""
+    L = c_harness.lift(_c("""
+#include <stdint.h>
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    ExifData *d = exif_data_new_from_data(data, size);
+    if (d) {
+        dump(d);
+        exif_data_unref(d);
+    }
+    return 0;
+}
+"""))
+    assert "S1.LEAK" not in {v.code for g in run_static_gates(L.ir) for v in g.violations}
+
+
+def test_cleanup_on_an_early_return_path_is_not_a_double_free():
+    """openvpn/fuzz_proxy.c frees everything and RETURNS on each validation failure, then
+    frees again on the normal path. Control never reaches both -- but the early arm is a
+    DESCENDANT of the top level, not a sibling, so mutual exclusion alone cannot see it."""
+    L = c_harness.lift(_c("""
+#include <stdint.h>
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    char *user = get_string(data, size);
+    if (strlen(user) == 0) {
+        free(user);
+        return 0;
+    }
+    use_it(user);
+    free(user);
+    return 0;
+}
+"""))
+    codes = {v.code for g in run_static_gates(L.ir) for v in g.violations}
+    assert "S1.DOUBLE_DESTROY" not in codes
+    assert "S1.USE_AFTER_DESTROY" not in codes

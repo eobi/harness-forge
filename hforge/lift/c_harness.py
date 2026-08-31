@@ -60,6 +60,30 @@ _DECL = re.compile(r"^\s*([A-Za-z_][\w\s]*?[\w\s\*]*?)\s+(\*+\s*)?([A-Za-z_]\w*)
 
 # Functions that return owned heap memory whatever the declared type says. `auto` and
 # `std::string` hide a pointer; these do not.
+_RAW_DEALLOCATORS = {"free", "cfree"}
+
+# C++ FACTORIES THAT RETURN AN OWNING WRAPPER. The object is heap-allocated but the
+# wrapper's destructor releases it at scope exit, so `auto p = make_unique<T>()` is a value
+# local and not a handle. Named explicitly because `make_unique` matches _NEW_ISH.
+_SMART_FACTORIES = {"make_unique", "make_shared", "unique_ptr", "shared_ptr",
+                    "allocate_shared", "absl::make_unique", "std::make_unique",
+                    "std::make_shared"}
+
+
+def _returns_an_owned_handle(fn: str) -> bool:
+    """Does a call bound to `auto` yield something the harness must release?
+
+    `auto` hides pointer-ness, so the declaration cannot answer it. The name can, using the
+    same new-ish vocabulary the producer already ranks with: `exif_data_new_from_data`
+    returns a handle, `set_options` returns a value. Smart-pointer factories match new-ish
+    on "make" and are carved out, since their whole point is that the destructor runs.
+    """
+    base = fn.rsplit("::", 1)[-1]
+    if base in _SMART_FACTORIES or fn in _SMART_FACTORIES:
+        return False
+    return bool(_NEW_ISH.search(fn))
+
+
 _RAW_ALLOCATORS = {"malloc", "calloc", "realloc", "strdup", "strndup", "new",
                    "aligned_alloc", "memalign", "posix_memalign", "valloc", "reallocarray"}
 
@@ -126,8 +150,14 @@ _SCALARISH = re.compile(
     r"(?:int|long|short|char|size_t|ssize_t|unsigned|sqlite3_int64|int64_t|int32_t|"
     r"uint64_t|uint32_t|uint8_t|u8|u32|i64|float|double|_Bool|bool)\b")
 
-_FREE_ISH = re.compile(r"(free|destroy|delete|close|cleanup|release|dispose|fini|end)",
-                       re.I)
+_FREE_ISH = re.compile(
+    r"(free|destroy|delete|close|cleanup|release|dispose|fini|end|unref)", re.I)
+
+# REFCOUNTS COME IN PAIRS. `exif_mnote_data_ref(md); ...; exif_mnote_data_unref(md);` leaves
+# md exactly as it found it, and reading the unref as a destroy would report every later use
+# as a use-after-free. An unref releases the resource only when nothing took a ref first.
+_REF_ISH = re.compile(r"(?:^|_)ref$", re.I)
+_UNREF_ISH = re.compile(r"unref|deref", re.I)
 _NEW_ISH = re.compile(r"(new|create|open|init|alloc|make|parse|load|decode|read)", re.I)
 
 
@@ -446,6 +476,7 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
     by_address: set = set()          # resources created through an out-parameter
     member_calls: list = []          # `x.f()` / `x->f()`: not C, not modelled
     caller_owned: dict = {}          # rid -> storage, for slots the harness declares
+    refs: dict = {}                  # rid -> outstanding explicit refcount increments
     # Values a FuzzedDataProvider hands back ARE the fuzzer's bytes, reshaped. Taint them
     # before the call loop so a library call receiving one is seen to consume input.
     fdp_methods = set(_fdp_taint(body, data, tainted))
@@ -453,6 +484,7 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
     order = 0
 
     parsed = cflow.parse(body)
+    _exiting = cflow.returning_arms(parsed)
     for stmt in parsed.stmts:
         if stmt.kind == "return":
             continue
@@ -494,6 +526,32 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
                     dstv = args_raw[0].strip().lstrip("&*( ").rstrip(" )")
                     if any(t in srcv for t in tainted):
                         tainted.add(re.sub(r"^\([^)]*\)\s*", "", dstv).strip())
+                continue
+            # `free(x)` IS A DESTROY, even though free is not a library API worth
+            # modelling. It is excluded from callsites so that allocator noise does not
+            # become ops -- but that exclusion also erased the single most common cleanup
+            # in C, so every resource released by a plain free read as leaked.
+            # s2geometry's harness mallocs through a local wrapper and frees the result
+            # two lines later; the gate called it a leak.
+            #
+            # Admitted ONLY when it names a known resource, so `free(buf)` on a plain
+            # buffer still contributes nothing.
+            if (fn in _RAW_DEALLOCATORS and _resources_named_at(argstr, resources)):
+                _rid = _resources_named_at(argstr, resources)[0]
+                apis.setdefault(fn, Api(symbol=fn, header="stdlib.h", role=ROLE_DESTROY,
+                                        params=[ParamDecl("p", TypeRef("void *",
+                                                                       "pointer"))],
+                                        returns=TypeRef("void", "scalar"),
+                                        contract=Contract()))
+                ops.append(Op(f"o{order}", fn,
+                              [Arg("p", "resource", _rid)], binds="", targets=_rid,
+                              guarded_by=([] if stmt.depth == 0
+                                          or _guarded_by_own_liveness(stmt.guard, [],
+                                                                      resources, _rid)
+                                          else [f"__branch:{stmt.arm}"]
+                                          + ([f"__exits:{stmt.arm}"]
+                                             if stmt.arm in _exiting else []))))
+                order += 1
                 continue
             if fn in _NOT_A_CALL or fn.startswith("__"):
                 continue
@@ -549,19 +607,37 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
                 # which is the direction to fail in -- a missed leak costs a finding, a
                 # false leak costs the whole tier's triageability.
                 _t = (decl_type or {}).get(assigned) or ""
+                # `auto` is the hard case: it hides whether the initialiser returned a
+                # pointer. Treating every `auto` as a value local suppressed a real class
+                # of leak -- `auto d = exif_data_new_from_data(..)` is a handle somebody
+                # has to release -- so the name decides, not the declaration.
+                _auto = _t.strip() == "auto"
                 if (caller_owned is not None and _t and "*" not in _t
+                        and not (_auto and _returns_an_owned_handle(fn))
                         and not _SCALARISH.match(_t) and fn not in _RAW_ALLOCATORS):
                     caller_owned[rid] = "inline"
             elif assigned:
                 role = (ROLE_CONSUME if any(a.source == "input" for a in args)
                         else ROLE_QUERY)
+            elif (not binds and _REF_ISH.search(fn)
+                  and _resources_named_at(argstr, resources)):
+                # Taking a ref is not creating and not destroying; record it so the
+                # matching unref can be recognised as balanced.
+                refs[_resources_named_at(argstr, resources)[0]] = refs.get(
+                    _resources_named_at(argstr, resources)[0], 0) + 1
             elif not binds and _FREE_ISH.search(fn) and (
                     any(a.source == "resource" for a in args)
                     or _resources_named_at(argstr, resources)):
                 rid = next((a.ref for a in args if a.source == "resource"), None) \
                     or _resources_named_at(argstr, resources)[0]
-                if stmt.depth == 0 or _guarded_by_own_liveness(stmt.guard, args,
-                                                               resources, rid):
+                if _UNREF_ISH.search(fn) and refs.get(rid, 0) > 0:
+                    # Balanced against an earlier ref: the resource outlives this call.
+                    refs[rid] -= 1
+                    rid = None
+                if rid is None:
+                    pass
+                elif stmt.depth == 0 or _guarded_by_own_liveness(stmt.guard, args,
+                                                                 resources, rid):
                     role, targets = ROLE_DESTROY, rid
                 else:
                     # A destroy on ONE branch only. Marking the resource dead would report
@@ -583,7 +659,9 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
                            contract=Contract())
             ops.append(Op(f"o{order}", fn, args, binds=binds, targets=targets,
                           guarded_by=([] if stmt.depth == 0
-                                      else [f"__branch:{stmt.arm}"])))
+                                      else [f"__branch:{stmt.arm}"]
+                                      + ([f"__exits:{stmt.arm}"]
+                                         if stmt.arm in _exiting else []))))
             order += 1
 
     if not ops:

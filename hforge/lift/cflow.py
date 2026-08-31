@@ -51,6 +51,17 @@ class Stmt:
     guard: str = ""
 
 
+def returning_arms(b) -> set:
+    """Arms that leave the function, so nothing after the branch is reachable from them.
+
+    `if (bad) { free(a); free(b); return 0; }` cleans up and LEAVES. The frees on the
+    normal path further down are not second frees of the same objects, because control
+    never arrives at both -- but the arm path of the early return is a DESCENDANT of the
+    top level, not a sibling, so mutual exclusion alone cannot see it.
+    """
+    return {st.arm for st in b.stmts if st.kind == "return" and st.arm}
+
+
 @dataclass
 class Body:
     stmts: list = field(default_factory=list)

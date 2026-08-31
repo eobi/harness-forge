@@ -67,10 +67,25 @@ def s1_lifetime(ir: HarnessIR) -> GateResult:
                 return x.split(":", 1)[1]
         return ""
 
+    def _exits(op) -> bool:
+        return any(x.startswith("__exits:") for x in op.guarded_by)
+
+    def _unreachable_from(dead_in: str, dead_exits: bool, here: str) -> bool:
+        """Did the destroy happen on a path that cannot reach HERE?
+
+        Either the two arms are mutually exclusive, or the destroying arm left the
+        function -- in which case only statements inside that same arm follow it.
+        """
+        if _exclusive(dead_in or "", here or ""):
+            return True
+        return bool(dead_exits and dead_in
+                    and not (here or "").startswith(dead_in))
+
     def _exclusive(a, b) -> bool:
         from ..lift.cflow import mutually_exclusive
         return mutually_exclusive(a or "", b or "")
     born_at: dict[str, str] = {}
+    dead_exits: dict[str, bool] = {}  # ...and whether that path left the function
     dead_arm: dict[str, str] = {}   # WHERE a resource died, for the same reason born_arm exists
 
     for op in ir.sequence:
@@ -106,7 +121,8 @@ def s1_lifetime(ir: HarnessIR) -> GateResult:
                 v.append(Violation("S1.USE_BEFORE_CREATE", BLOCK,
                                    f"op {op.id} uses {a.ref!r} before anything creates it",
                                    where=op.id, principle="P1"))
-            elif state[a.ref] == DEAD and _exclusive(dead_arm.get(a.ref), _arm_of(op)):
+            elif state[a.ref] == DEAD and _unreachable_from(
+                    dead_arm.get(a.ref), dead_exits.get(a.ref, False), _arm_of(op)):
                 # DESTROYED ON A PATH THIS ONE EXCLUDES. openvpn's fuzz_list.c is a state
                 # machine: a `switch` inside a `for`, freeing the hash in one case and
                 # iterating it in another. The cases never both run, so the free does not
@@ -162,10 +178,13 @@ def s1_lifetime(ir: HarnessIR) -> GateResult:
                                    f"op {op.id} destroys {op.targets!r} before it exists",
                                    where=op.id, principle="P1"))
             elif (state[op.targets] == DEAD
-                  and _exclusive(dead_arm.get(op.targets), _arm_of(op))):
+                  and _unreachable_from(dead_arm.get(op.targets),
+                                        dead_exits.get(op.targets, False),
+                                        _arm_of(op))):
                 # Two frees in mutually exclusive arms are one free, whichever path runs.
                 state[op.targets] = DEAD
                 dead_arm[op.targets] = _arm_of(op)
+                dead_exits[op.targets] = _exits(op)
             elif state[op.targets] == DEAD:
                 v.append(Violation("S1.DOUBLE_DESTROY", BLOCK,
                                    f"resource {op.targets!r} is destroyed twice; the second "
@@ -174,6 +193,7 @@ def s1_lifetime(ir: HarnessIR) -> GateResult:
             else:
                 state[op.targets] = DEAD
                 dead_arm[op.targets] = _arm_of(op)
+                dead_exits[op.targets] = _exits(op)
 
     # STORAGE DECIDES WHETHER A LIVE RESOURCE IS A LEAK. Only a `handle` -- memory the
     # LIBRARY allocated and handed back -- can leak. An object the harness owns inline is
