@@ -598,6 +598,36 @@ reading its output.
 
 ---
 
+## What these harnesses cannot find
+
+[`tools/bounds.py`](tools/bounds.py). This is the half of the thesis that had never been
+published: a certificate should state what a harness **cannot** find, because a campaign
+reporting nothing is otherwise ambiguous — the library may be clean, or the harness may
+never have been able to see the defect. Coverage does not settle it, since a harness can
+execute a function thoroughly with the detector for its whole bug class switched off.
+
+Surveyed across the OSS-Fuzz tree, reading build configuration rather than inferring:
+
+| bound | projects | what becomes invisible |
+|---|---:|---|
+| `detect_leaks=0` | **115** | memory leaks in the library |
+| `max_len=N` | 24 | any defect needing a longer input |
+| `allocator_may_return_null=1` | 5 | allocation-failure handling |
+| `detect_odr_violation=0` | 1 | one-definition-rule mismatches |
+
+**115 of 1,374 projects — 8.4% — cannot report a leak**, and nothing in their campaign
+output says so.
+
+This is not an accusation: a project may disable a detector for a good reason, and often
+does. What is not reasonable is a campaign reporting nothing while a whole class is off and
+no artifact records it. Every signal above is a literal setting in a build file, never an
+inference — a bound nobody can check is worth nothing.
+
+**It found the case that motivated it.** bluez appears in the leaks-disabled list, and
+[finding 0001](findings/) is a `GError` leaked on every failed decode in the one bluez
+harness that touches a `GError` — the same target whose leak detection is off. The bound and
+the defect are the same fact seen from two sides.
+
 ## Widening the candidate space
 
 [`hforge/producers/mutate.py`](hforge/producers/mutate.py). OGHarn (ICSE 2025) beats

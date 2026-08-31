@@ -1,0 +1,1334 @@
+{
+ "projects_surveyed": 1374,
+ "with_a_bound": 134,
+ "by_signal": {
+  "leaks_disabled": [
+   "ansible",
+   "apache-logging-log4cxx",
+   "arrow",
+   "augeas",
+   "binutils",
+   "bluez",
+   "brpc",
+   "c-blosc",
+   "c-blosc2",
+   "cirq",
+   "clib",
+   "cpython3",
+   "crow",
+   "cryptofuzz",
+   "cups",
+   "dnsmasq",
+   "elfutils",
+   "espeak-ng",
+   "fio",
+   "firefox",
+   "flac",
+   "flex",
+   "freerdp",
+   "frr",
+   "git",
+   "glaze",
+   "gnutls",
+   "grok",
+   "gstreamer",
+   "hoextdown",
+   "hwloc",
+   "hyperium",
+   "icu",
+   "irssi",
+   "janet",
+   "java-example",
+   "jpegoptim",
+   "leveldb",
+   "libarchive",
+   "libidn",
+   "libidn2",
+   "libiec61850",
+   "libmicrohttpd2",
+   "libpg_query",
+   "libplist",
+   "libprotobuf-mutator",
+   "libpsl",
+   "libredwg",
+   "librsvg",
+   "libsodium",
+   "libtasn1",
+   "libtorrent",
+   "libucl",
+   "libxls",
+   "libyaml",
+   "linkerd2-proxy",
+   "llamacpp",
+   "lldb-eval",
+   "lua",
+   "lxml",
+   "lz4",
+   "matplotlib",
+   "memcached",
+   "mercurial",
+   "minizip",
+   "monero",
+   "net-snmp",
+   "ninja",
+   "oatpp",
+   "openbabel",
+   "opendnp3",
+   "ots",
+   "ox-ruby",
+   "pandas",
+   "pcapplusplus",
+   "pffft",
+   "plan9port",
+   "pyodbc",
+   "python-multipart",
+   "python3-libraries",
+   "qemu",
+   "radare2",
+   "rauc",
+   "relic",
+   "ruby",
+   "simdjson",
+   "sqlite3",
+   "sudoers",
+   "tarantool",
+   "tdengine",
+   "tensorflow",
+   "tensorflow-py",
+   "thrift-c_glib",
+   "thrift-cpp",
+   "thrift-go",
+   "thrift-java",
+   "thrift-js",
+   "thrift-py",
+   "thrift-rb",
+   "thrift-rust",
+   "tidy-html5",
+   "tor",
+   "u-boot",
+   "unicorn",
+   "unit",
+   "varnish",
+   "vlc",
+   "wasmer",
+   "wazuh",
+   "wget",
+   "wget2",
+   "xerces-c",
+   "xmlsec",
+   "xpdf",
+   "yoga"
+  ],
+  "alloc_null_ok": [
+   "augeas",
+   "grok",
+   "libarchive",
+   "ox-ruby",
+   "thrift-rb"
+  ],
+  "input_truncated": [
+   "dcmtk",
+   "fabric",
+   "ffmpeg",
+   "firefox",
+   "ghostscript",
+   "golang",
+   "h2o",
+   "irssi",
+   "jackson-databind",
+   "json",
+   "jsoup",
+   "libass",
+   "libprotobuf-mutator",
+   "libressl",
+   "moby",
+   "ms-tpm-20-ref",
+   "nghttp2",
+   "openssl",
+   "ots",
+   "pjsip",
+   "qemu",
+   "skcms",
+   "skia",
+   "woff2"
+  ],
+  "odr_disabled": [
+   "tensorflow"
+  ]
+ },
+ "detail": {
+  "ansible": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "fuzz_encrypt.sh"
+    ]
+   }
+  },
+  "apache-logging-log4cxx": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "run_tests.sh"
+    ]
+   }
+  },
+  "arrow": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "run_tests.sh"
+    ]
+   }
+  },
+  "augeas": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh",
+     "replay_build.sh",
+     "run_tests.sh",
+     "augeas_lens_fuzzer.options"
+    ]
+   },
+   "alloc_null_ok": {
+    "why": "allocation-failure handling: an over-large allocation returns NULL instead of reporting, so the library's own OOM path is exercised rather than flagged",
+    "seen_in": [
+     "run_tests.sh"
+    ]
+   }
+  },
+  "binutils": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "bluez": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "brpc": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "run_tests.sh"
+    ]
+   }
+  },
+  "c-blosc": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "run_tests.sh"
+    ]
+   }
+  },
+  "c-blosc2": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "run_tests.sh"
+    ]
+   }
+  },
+  "cirq": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "clib": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "cpython3": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh",
+     "run_tests.sh"
+    ]
+   }
+  },
+  "crow": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "run_tests.sh"
+    ]
+   }
+  },
+  "cryptofuzz": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "cups": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "run_tests.sh"
+    ]
+   }
+  },
+  "dcmtk": {
+   "input_truncated": {
+    "why": "any defect needing more than 131072 bytes of input: libFuzzer is capped at max_len=131072",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "dnsmasq": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "elfutils": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "espeak-ng": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "fabric": {
+   "input_truncated": {
+    "why": "any defect needing more than 1800000 bytes of input: libFuzzer is capped at max_len=1800000",
+    "seen_in": [
+     "FuzzExtractFileEntries.options",
+     "FuzzParseChaincodePackage.options",
+     "FuzzPersistence.options"
+    ]
+   }
+  },
+  "ffmpeg": {
+   "input_truncated": {
+    "why": "any defect needing more than 1000000 bytes of input: libFuzzer is capped at max_len=1000000",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "fio": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "run_tests.sh"
+    ]
+   }
+  },
+  "firefox": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   },
+   "input_truncated": {
+    "why": "any defect needing more than 25600 bytes of input: libFuzzer is capped at max_len=25600",
+    "seen_in": [
+     "SdpParser.options"
+    ]
+   }
+  },
+  "flac": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "flex": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh",
+     "fuzz-main.options"
+    ]
+   }
+  },
+  "freerdp": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "frr": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh",
+     "run_tests.sh"
+    ]
+   }
+  },
+  "ghostscript": {
+   "input_truncated": {
+    "why": "any defect needing more than 16834 bytes of input: libFuzzer is capped at max_len=16834",
+    "seen_in": [
+     "gstoraster_ps_fuzzer.options",
+     "gs_pxl_fuzzer.options",
+     "gstoraster_fuzzer_all_colors.options",
+     "gs_pcl_fuzzer.options",
+     "gs_xps_fuzzer.options"
+    ]
+   }
+  },
+  "git": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "glaze": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "run_tests.sh"
+    ]
+   }
+  },
+  "gnutls": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "golang": {
+   "input_truncated": {
+    "why": "any defect needing more than 1500000 bytes of input: libFuzzer is capped at max_len=1500000",
+    "seen_in": [
+     "fuzz_tar_reader.options",
+     "glob_fuzzer.options",
+     "fuzz_tiff_decode.options",
+     "fuzz_x_h2c.options"
+    ]
+   }
+  },
+  "grok": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "run_tests.sh"
+    ]
+   },
+   "alloc_null_ok": {
+    "why": "allocation-failure handling: an over-large allocation returns NULL instead of reporting, so the library's own OOM path is exercised rather than flagged",
+    "seen_in": [
+     "run_tests.sh"
+    ]
+   }
+  },
+  "gstreamer": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "h2o": {
+   "input_truncated": {
+    "why": "any defect needing more than 16384 bytes of input: libFuzzer is capped at max_len=16384",
+    "seen_in": [
+     "h2o-fuzzer-http3.options",
+     "h2o-fuzzer-http2.options",
+     "h2o-fuzzer-http1.options"
+    ]
+   }
+  },
+  "hoextdown": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "run_tests.sh"
+    ]
+   }
+  },
+  "hwloc": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "hwloc_fuzzer.options"
+    ]
+   }
+  },
+  "hyperium": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "icu": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "irssi": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "run_tests.sh"
+    ]
+   },
+   "input_truncated": {
+    "why": "any defect needing more than 2048 bytes of input: libFuzzer is capped at max_len=2048",
+    "seen_in": [
+     "irssi-fuzz.options"
+    ]
+   }
+  },
+  "jackson-databind": {
+   "input_truncated": {
+    "why": "any defect needing more than 1500000 bytes of input: libFuzzer is capped at max_len=1500000",
+    "seen_in": [
+     "AdaLObjectReader3Fuzzer.options"
+    ]
+   }
+  },
+  "janet": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "run_tests.sh"
+    ]
+   }
+  },
+  "java-example": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "jpegoptim": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "Dockerfile"
+    ]
+   }
+  },
+  "json": {
+   "input_truncated": {
+    "why": "any defect needing more than 456 bytes of input: libFuzzer is capped at max_len=456",
+    "seen_in": [
+     "fuzzer-parse.options"
+    ]
+   }
+  },
+  "jsoup": {
+   "input_truncated": {
+    "why": "any defect needing more than 1024 bytes of input: libFuzzer is capped at max_len=1024",
+    "seen_in": [
+     "HtmlFuzzer.options",
+     "FragmentHtmlFuzzer.options",
+     "XmlFuzzer.options",
+     "CssHtmlFuzzer.options"
+    ]
+   }
+  },
+  "leveldb": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "fuzz_db.options"
+    ]
+   }
+  },
+  "libarchive": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "run_tests.sh"
+    ]
+   },
+   "alloc_null_ok": {
+    "why": "allocation-failure handling: an over-large allocation returns NULL instead of reporting, so the library's own OOM path is exercised rather than flagged",
+    "seen_in": [
+     "run_tests.sh"
+    ]
+   }
+  },
+  "libass": {
+   "input_truncated": {
+    "why": "any defect needing more than 8192 bytes of input: libFuzzer is capped at max_len=8192",
+    "seen_in": [
+     "libass_fuzzer.options"
+    ]
+   }
+  },
+  "libidn": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "libidn2": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "libiec61850": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "libmicrohttpd2": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh",
+     "default.options"
+    ]
+   }
+  },
+  "libpg_query": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "libplist": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "run_tests.sh"
+    ]
+   }
+  },
+  "libprotobuf-mutator": {
+   "input_truncated": {
+    "why": "any defect needing more than 1024 bytes of input: libFuzzer is capped at max_len=1024",
+    "seen_in": [
+     "expat_example.options",
+     "libxml2_example.options"
+    ]
+   },
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "libxml2_example.options"
+    ]
+   }
+  },
+  "libpsl": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "libredwg": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "llvmfuzz.options"
+    ]
+   }
+  },
+  "libressl": {
+   "input_truncated": {
+    "why": "any defect needing more than 2048 bytes of input: libFuzzer is capped at max_len=2048",
+    "seen_in": [
+     "bignum.options"
+    ]
+   }
+  },
+  "librsvg": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "render_document.options"
+    ]
+   }
+  },
+  "libsodium": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "run_tests.sh"
+    ]
+   }
+  },
+  "libtasn1": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "libtorrent": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "libucl": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "run_tests.sh",
+     "ucl_add_string_fuzzer.options",
+     "ucl_msgpack_fuzzer.options"
+    ]
+   }
+  },
+  "libxls": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "run_tests.sh"
+    ]
+   }
+  },
+  "libyaml": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "run_tests.sh"
+    ]
+   }
+  },
+  "linkerd2-proxy": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "llamacpp": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "lldb-eval": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "lldb_vs_lldb_eval_libfuzzer_test.options"
+    ]
+   }
+  },
+  "lua": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "lxml": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "lz4": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "run_tests.sh"
+    ]
+   }
+  },
+  "matplotlib": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "memcached": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "fuzzer_proxy.options"
+    ]
+   }
+  },
+  "mercurial": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "minizip": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "run_tests.sh"
+    ]
+   }
+  },
+  "moby": {
+   "input_truncated": {
+    "why": "any defect needing more than 1800000 bytes of input: libFuzzer is capped at max_len=1800000",
+    "seen_in": [
+     "FuzzAdd.options"
+    ]
+   }
+  },
+  "monero": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "fuzz_rpc.options",
+     "fuzz_rpc_full_no_exceptions.options",
+     "fuzz_rpc_full.options",
+     "fuzz_zmq.options"
+    ]
+   }
+  },
+  "ms-tpm-20-ref": {
+   "input_truncated": {
+    "why": "any defect needing more than 8192 bytes of input: libFuzzer is capped at max_len=8192",
+    "seen_in": [
+     "tpm_cmd.options"
+    ]
+   }
+  },
+  "net-snmp": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "nghttp2": {
+   "input_truncated": {
+    "why": "any defect needing more than 1024 bytes of input: libFuzzer is capped at max_len=1024",
+    "seen_in": [
+     "nghttp2_fuzzer.options"
+    ]
+   }
+  },
+  "ninja": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "run_tests.sh"
+    ]
+   }
+  },
+  "oatpp": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "run_tests.sh"
+    ]
+   }
+  },
+  "openbabel": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "run_tests.sh"
+    ]
+   }
+  },
+  "opendnp3": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "openssl": {
+   "input_truncated": {
+    "why": "any defect needing more than 2048 bytes of input: libFuzzer is capped at max_len=2048",
+    "seen_in": [
+     "bignum.options"
+    ]
+   }
+  },
+  "ots": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "run_tests.sh"
+    ]
+   },
+   "input_truncated": {
+    "why": "any defect needing more than 1000000 bytes of input: libFuzzer is capped at max_len=1000000",
+    "seen_in": [
+     "ots-fuzzer.options"
+    ]
+   }
+  },
+  "ox-ruby": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   },
+   "alloc_null_ok": {
+    "why": "allocation-failure handling: an over-large allocation returns NULL instead of reporting, so the library's own OOM path is exercised rather than flagged",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "pandas": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "pcapplusplus": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "run_tests.sh"
+    ]
+   }
+  },
+  "pffft": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "run_tests.sh"
+    ]
+   }
+  },
+  "pjsip": {
+   "input_truncated": {
+    "why": "any defect needing more than 16384 bytes of input: libFuzzer is capped at max_len=16384",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "plan9port": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh",
+     "fuzz_libsec.options"
+    ]
+   }
+  },
+  "pyodbc": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "python-multipart": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "fuzz_form.options"
+    ]
+   }
+  },
+  "python3-libraries": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh",
+     "run_tests.sh"
+    ]
+   }
+  },
+  "qemu": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "replay_build.sh",
+     "default.options"
+    ]
+   },
+   "input_truncated": {
+    "why": "any defect needing more than 8192 bytes of input: libFuzzer is capped at max_len=8192",
+    "seen_in": [
+     "default.options"
+    ]
+   }
+  },
+  "radare2": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "default.options"
+    ]
+   }
+  },
+  "rauc": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "run_tests.sh"
+    ]
+   }
+  },
+  "relic": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "run_tests.sh"
+    ]
+   }
+  },
+  "ruby": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "ruby.options"
+    ]
+   }
+  },
+  "simdjson": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "run_tests.sh"
+    ]
+   }
+  },
+  "skcms": {
+   "input_truncated": {
+    "why": "any defect needing more than 200000 bytes of input: libFuzzer is capped at max_len=200000",
+    "seen_in": [
+     "iccprofile.options"
+    ]
+   }
+  },
+  "skia": {
+   "input_truncated": {
+    "why": "any defect needing more than 10024 bytes of input: libFuzzer is capped at max_len=10024",
+    "seen_in": [
+     "image_filter_deserialize_width.options"
+    ]
+   }
+  },
+  "sqlite3": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh",
+     "run_tests.sh"
+    ]
+   }
+  },
+  "sudoers": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "run_tests.sh"
+    ]
+   }
+  },
+  "tarantool": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "tdengine": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "sql-fuzzer.options"
+    ]
+   }
+  },
+  "tensorflow": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   },
+   "odr_disabled": {
+    "why": "one-definition-rule violations: two definitions of the same symbol can silently disagree, and the resulting mismatch is never reported",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "tensorflow-py": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "thrift-c_glib": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh",
+     "default.options"
+    ]
+   }
+  },
+  "thrift-cpp": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "thrift-go": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "thrift-java": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "thrift-js": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "thrift-py": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "thrift-rb": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   },
+   "alloc_null_ok": {
+    "why": "allocation-failure handling: an over-large allocation returns NULL instead of reporting, so the library's own OOM path is exercised rather than flagged",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "thrift-rust": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "tidy-html5": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "run_tests.sh",
+     "tidy_config_fuzzer.options"
+    ]
+   }
+  },
+  "tor": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "u-boot": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "unicorn": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "run_tests.sh"
+    ]
+   }
+  },
+  "unit": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "run_tests.sh"
+    ]
+   }
+  },
+  "varnish": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "run_tests.sh"
+    ]
+   }
+  },
+  "vlc": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "wasmer": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "default.options"
+    ]
+   }
+  },
+  "wazuh": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "fuzz_xml.options"
+    ]
+   }
+  },
+  "wget": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "wget2": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "build.sh"
+    ]
+   }
+  },
+  "woff2": {
+   "input_truncated": {
+    "why": "any defect needing more than 1000000 bytes of input: libFuzzer is capped at max_len=1000000",
+    "seen_in": [
+     "convert_woff2ttf_fuzzer.options",
+     "convert_woff2ttf_fuzzer_new_entry.options"
+    ]
+   }
+  },
+  "xerces-c": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "run_tests.sh"
+    ]
+   }
+  },
+  "xmlsec": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "run_tests.sh"
+    ]
+   }
+  },
+  "xpdf": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "fuzz_JBIG2.options",
+     "fuzz_pdfload.options"
+    ]
+   }
+  },
+  "yoga": {
+   "leaks_disabled": {
+    "why": "memory leaks in the library: LeakSanitizer is off for this target",
+    "seen_in": [
+     "run_tests.sh"
+    ]
+   }
+  }
+ }
+}
