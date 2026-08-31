@@ -554,7 +554,7 @@ here under identical conditions:
 
 | case | ours | its own harness | ratio |
 |---|---:|---:|---:|
-| woff2/convert | 29.46% → see below | 29.79% | *single sample — do not rely on it* |
+| woff2/convert | 41.49% (n=5) | 29.88% (n=5) | *no significant difference, p=0.55* |
 | pugixml/parse | **14.79%** (n=5, ±0.00) | 14.79% (n=5, ±0.49) | **1.00x** |
 
 **woff2 is the one that shows what the producer is doing.** Its entry point is
@@ -574,16 +574,28 @@ side had a seed corpus, so both started cold -- fair against each other, and **n
 comparable to the 87.3% `dataset_v2` publishes for that harness, which had OSS-Fuzz's
 accumulated corpus behind it.
 
-**The woff2 number is being re-measured and the single sample above should not be relied
-on.** A repeat of the byte-identical harness, with a byte-identical fuzz command, produced
-**38.76%** against the first run's 29.46% — a 9.3-point swing with nothing changed. The
-campaign starts from an EMPTY corpus and libFuzzer is not given a fixed seed, so on a
-format where a valid container must be constructed before the decoder is reached at all,
-run-to-run luck dominates. That is a property of this target: pugixml's coverage does not
-move across five runs, libyaml's spans 3.55 points across nine, and woff2 moves further
-than either. A distribution is being collected; until it exists, the honest statement is
-that we are somewhere around the developer harness on woff2 and the ratio is not yet
-pinned down.
+**woff2, measured five times each under the corrected driver — and the answer is "we
+cannot tell".**
+
+| | samples | median | spread |
+|---|---|---:|---:|
+| ours | 29.46, 32.86, 41.49, 44.23, 45.89 | 41.49% | 16.4 |
+| its own harness | 26.89, 29.71, 29.88, 41.16, 46.80 | 29.88% | 19.9 |
+
+The ratio of medians is **1.39x**, and reporting that as a 39% advantage would be wrong.
+The two distributions almost completely overlap, 64% of pairwise comparisons favour us,
+and an exact two-sided Mann-Whitney test gives **p = 0.55**. On this target, five runs
+cannot distinguish our harness from the developer's. The campaign starts from an empty
+corpus with no fixed libFuzzer seed, and on a format where a valid container must be
+constructed before the decoder is reached at all, run-to-run luck dominates everything
+else.
+
+**This is the single most useful number on this page**, because it is the one that would
+have been easiest to publish wrongly. A median is not a result; a median with a spread
+wider than the difference it is being used to claim is not even a hint. pugixml's coverage
+does not move at all across five runs, libyaml's spans 3.55 points across nine, and woff2
+spans sixteen — so there is no such thing as "fuzzing variance" as a number you measure
+once and reuse.
 
 **The pugixml case is a prediction that was tested.** The first measurement put our
 harness at **13.47%** against the project's own `tests/fuzz_parse.cpp` at 14.79% — 0.91x —

@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import json
 import sys
+from typing import Optional
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -25,6 +26,39 @@ def _ratio(ours: float | None, gold: float | None) -> str:
     if ours is None or not gold:
         return ""
     return f"{ours / gold:.2f}x"
+
+
+def _mannwhitney_p(a: list, b: list) -> Optional[float]:
+    """Exact two-sided Mann-Whitney p for the small samples this suite produces.
+
+    WHY THE TABLE NEEDS THIS. woff2 measured five times each way gives medians of 41.49%
+    and 29.88% -- a ratio of 1.39x that reads as a 39% win. The distributions almost
+    entirely overlap and p is 0.55: five runs cannot tell the two harnesses apart on that
+    target. A ratio of medians with a spread wider than the difference it claims is not a
+    weak result, it is not a result, and the table should say so rather than leave a reader
+    to assume the number means what it looks like.
+
+    Exact by enumeration while that is cheap; None when either side has too few samples to
+    say anything, because "no test" must not read as "no difference".
+    """
+    import itertools
+    n1, n2 = len(a), len(b)
+    if n1 < 3 or n2 < 3 or n1 + n2 > 20:
+        return None
+    def U(x, y):
+        return (sum(1 for p in x for q in y if p > q)
+                + 0.5 * sum(1 for p in x for q in y if p == q))
+    u = U(a, b)
+    pool = a + b
+    hit = tot = 0
+    for combo in itertools.combinations(range(n1 + n2), n1):
+        x = [pool[i] for i in combo]
+        y = [pool[i] for i in range(n1 + n2) if i not in combo]
+        uu = U(x, y)
+        tot += 1
+        if uu >= u or uu <= n1 * n2 - u:
+            hit += 1
+    return hit / tot
 
 
 def _gold_cell(gold, gold_measured, m) -> str:
@@ -102,6 +136,8 @@ def main(results, write: bool = False) -> int:
         med["_spread"] = round(max(vals) - min(vals), 2)
         gvals = [float((d.get("gold_measured_here") or {}).get("lines_pct") or 0) for d in ok]
         gvals = [g for g in gvals if g]
+        med["_ours_samples"] = vals
+        med["_gold_samples"] = gvals
         if gvals:
             gv = sorted(gvals)
             med["_gold_median"] = gv[len(gv) // 2]
@@ -156,10 +192,16 @@ def main(results, write: bool = False) -> int:
             if ours > qf:
                 wins += 1
 
+        # A RATIO THE SAMPLES CANNOT SUPPORT IS NOT REPORTED AS A RATIO.
+        _ratio_s = _ratio(ours, gold)
+        if m and m.get("_ours_samples") and m.get("_gold_samples"):
+            _p = _mannwhitney_p(m["_ours_samples"], m["_gold_samples"])
+            if _p is not None and _p > 0.05:
+                _ratio_s = f"*n.s. (p={_p:.2f})*"
         print(f"| {case} | {ours_s} "
               f"| {'—' if qf is None else f'{qf:.2f}'} "
               f"| {_gold_cell(gold, gold_measured, m)} "
-              f"| {_ratio(ours, gold)} | {_ratio(qf, gold)} |")
+              f"| {_ratio_s} | {_ratio(qf, gold)} |")
 
     if any((m.get("gold_measured_here") or {}).get("lines_pct") for m in measured.values()):
         print("")
