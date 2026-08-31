@@ -1,0 +1,47 @@
+{
+ "date": "2026-08-31",
+ "what": "woff2/convert, n=5, on a quiet host: the run that was void on the Mac.",
+ "host": "Ubuntu 22.04 aarch64 guest, 8 vCPU, load ~1. Every record carries machine_was_busy: false. Same benchmark image as every other run in this repository, transferred rather than rebuilt, so the toolchain is identical.",
+ "runs": [
+  {
+   "ours": 29.79,
+   "gold": 22.66,
+   "ratio": 1.31
+  },
+  {
+   "ours": 13.86,
+   "gold": 45.39,
+   "ratio": 0.31
+  },
+  {
+   "ours": 21.66,
+   "gold": 14.52,
+   "ratio": 1.49
+  },
+  {
+   "ours": 29.29,
+   "gold": 24.73,
+   "ratio": 1.18
+  },
+  {
+   "ours": 37.84,
+   "gold": 37.68,
+   "ratio": 1.0
+  }
+ ],
+ "ours": {
+  "median": 29.29,
+  "spread": 23.98
+ },
+ "gold": {
+  "median": 24.73,
+  "spread": 30.87
+ },
+ "median_ratio": 1.18,
+ "exact_mann_whitney_p": 1.0,
+ "VERDICT": "NOT SIGNIFICANT. p = 1.0 -- the two samples interleave perfectly. There is no measurable difference between the generated harness and the library's own on this case, and the 1.18x median is noise.",
+ "why_this_case_cannot_measure_anything": "seeds: 0, corpus_files_at_start: 0. woff2 runs with NO seed corpus on either side, so each campaign is a random walk from nothing. The spreads -- 23.98 and 30.87 points -- are an order of magnitude larger than the difference being looked for.",
+ "what_a_single_sample_would_have_said": "Run 3 alone: 1.49x, 'we beat the hand-written harness by half again'. Run 2 alone: 0.31x, 'we lose by a factor of three'. Same two harnesses, same machine, one hour apart.",
+ "the_earlier_diagnosis_was_incomplete": "The machine-load section of REPLICATION.md blamed woff2's spread on other work sharing the host. That was a contributing factor, not the cause: the spread is just as large with nothing else running.",
+ "what_this_costs_the_paper": "woff2 was the second of two C++ head-to-head cases. It cannot carry a ratio. pugixml -- seeded, n=5, spread 0.00 -- still can, and is now the only C++ case with a defensible number."
+}
