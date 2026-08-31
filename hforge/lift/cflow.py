@@ -241,7 +241,16 @@ def parse(body: str, depth: int = 0, out: Body = None, arm: str = "",
         if ch == "{":
             flush()
             close = _match_brace(body, i)
-            parse(body[i + 1:close], depth, out)
+            # A BARE BLOCK IS THE SAME PATH, SO IT KEEPS THE ARM IT IS IN.
+            #
+            # `case 4: { ... }` wraps the case body in a block, and passing neither arm nor
+            # guard here RESET both -- so fluent-bit's three `entry = mk_list_entry(..)`
+            # assignments, sitting in three mutually exclusive switch cases, all arrived
+            # with an empty arm and read as one resource created three times.
+            #
+            # A block introduces a SCOPE, not a choice. Nothing decides whether to enter
+            # it, so the guards and the arm of the enclosing path still hold.
+            parse(body[i + 1:close], depth, out, arm=arm, guard=guard)
             i = close + 1
             continue
 

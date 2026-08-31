@@ -958,3 +958,37 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 """))
     assert any(a.source == "length_of" for op in L.ir.sequence for a in op.args), \
         "n aliases size and must bind as its length"
+
+
+def test_a_bare_block_keeps_the_arm_it_is_in():
+    """`case 4: { ... }` wraps the case body in a block. Passing neither arm nor guard
+    through a bare block RESET both, so fluent-bit's three `entry = mk_list_entry(..)`
+    assignments -- in three mutually exclusive switch cases -- all arrived with an empty
+    arm and read as one resource created three times.
+
+    A block introduces a SCOPE, not a choice: nothing decides whether to enter it, so the
+    enclosing arm and guards still hold.
+    """
+    L = c_harness.lift(_c("""
+#include <stdint.h>
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    switch (pick(data, size)) {
+    case 0: {
+            entry_t *e = list_entry(head);
+            use_it(e);
+        }
+        break;
+    case 1: {
+            entry_t *e = list_entry(head);
+            use_it(e);
+        }
+        break;
+    }
+    return 0;
+}
+"""))
+    arms = {x.split(":", 1)[1]
+            for op in L.ir.sequence for x in op.guarded_by if x.startswith("__branch:")}
+    assert len(arms) >= 2, arms
+    codes = {v.code for g in run_static_gates(L.ir) for v in g.violations}
+    assert "S1.DOUBLE_CREATE" not in codes

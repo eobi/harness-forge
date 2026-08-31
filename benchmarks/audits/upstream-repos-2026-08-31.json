@@ -64,5 +64,18 @@
    },
    "what_it_demonstrates": "The gate bank now flags exactly one leptonica harness out of the fourteen in the corpus, and it is the one with the real defect (pix3, filed as leptonica#813). Before this pass it flagged five of them."
   }
+ },
+ "FINAL_gate_calibration_2026-08-31": {
+  "trusted_lifts": 412,
+  "blocking_verdicts": 2,
+  "false_positives": 0,
+  "false_rejection_rate": "0/412 = 0.00%",
+  "both_verdicts_are_correct": {
+   "leptonica/pix3_fuzzer.cc": "REAL. pixAverageByRow, pixVarianceByColumn and pixVarianceInRect are each handed a destroyed (NULLed) pix, so all three are never executed. Filed as leptonica#813.",
+   "bazel-rules-fuzzing/oom_fuzz_test.cc": "REAL, and deliberately so. Its own header says 'A fuzz target that creates a memory leak and causes OOM errors.' It calls no library function and consumes no input, which is exactly what S3.NO_WORK and S5.INPUT_NOT_CONSUMED say. A test fixture designed to be broken, correctly identified."
+  },
+  "the_honest_denominator": "412 of 1942 lifted harnesses, 21%. On the other 79% the engine declines to opine. The 0.00% is a rate on the tier it trusts, NOT on everything it sees, and it must never be quoted without that. QuartetFuzz's 4.8% covers everything they judged.",
+  "session_arc": "26 leak candidates -> 5; 6 blocking -> 2; false rejection 1.18% -> 0.49% -> 0.00%. Roughly 45 candidates read by hand across the session, 2 real, the rest defects in this engine.",
+  "last_defect_of_the_session": "A bare block reset the arm and the guard. `case N: { .. }` is the commonest place that matters, and it made three mutually exclusive switch cases look like one path."
  }
 }
