@@ -1,0 +1,40 @@
+{
+ "date": "2026-08-31",
+ "question": "Does mutational plan synthesis reach OGHarn's +14% median coverage over developer-written harnesses?",
+ "answer": "NO, on the evidence available. Two C cases were measured on an idle host.",
+ "libyaml": {
+  "bases": 14,
+  "synthesised": 54,
+  "valid_after_static_gates": 48,
+  "campaigned": 0,
+  "result": "ZERO viable candidates -- all 8 top-ranked were killed by a smoke test, every one aborting on a valid input",
+  "why": "libyaml is a stateful API guarded by asserts. yaml_parser_set_encoding asserts !parser->encoding; repeating set_input_string or yaml_parser_load re-enters a consumed parser. No header expresses any of it."
+ },
+ "brotli": {
+  "n": 5,
+  "base_median": 84.53,
+  "base_spread": 2.52,
+  "synth_median": 84.8,
+  "synth_spread": 0.73,
+  "gains": [
+   2.13,
+   0.58,
+   0.34,
+   0.27,
+   0.27
+  ],
+  "median_gain_points": 0.34,
+  "median_gain_pct": 0.4,
+  "direction": "positive in 5 of 5 runs",
+  "exact_mann_whitney_p": 0.0556,
+  "winning_operator": "repeat -- the decompress-stream call run twice"
+ },
+ "VERDICT": "The effect on brotli is CONSISTENT IN DIRECTION (5/5) and REAL in the sense that the synthesised candidate is never worse. It is also TINY: +0.34 points, +0.40%, against a target of +14%. At n=5 it does not reach significance (p = 0.056). On libyaml the same operators produce nothing usable at all.",
+ "what_this_means_for_the_axis": "Mutational synthesis as implemented here does NOT reach OGHarn's result. Two operators -- widen and repeat -- are not enough, and one of them is unsound for stateful APIs. The candidate space widens (x14-x16 valid candidates, reachable surface 8%->52% on jansson) but the extra reach does not convert into coverage at anything like the rate the target requires.",
+ "what_is_worth_keeping": "The synthesised candidate has a SMALLER spread than the base on brotli, 0.73 against 2.52. A harness that is never worse and varies less is worth something even at +0.4%, and it is a different claim from beating a baseline.",
+ "the_honest_limits": [
+  "Two cases, both C. pugixml and the C++ cases need the cxx_header producer, which probe_synth does not use.",
+  "n=5 per case, and p = 0.056 is not significance however consistent the direction looks.",
+  "The smoke test admits candidates that survive ONE valid input; a candidate that aborts on the second is still counted viable."
+ ]
+}
