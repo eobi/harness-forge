@@ -539,10 +539,16 @@ distinct outcome** so an absent check never reads as a passed one.
 Updated 2026-08-31. **Two upstream-reportable defects, both filed, both verified against the
 library's own source before filing rather than against our own verdict.**
 
-| | defect | filed |
+| | defect | status |
 |---|---|---|
-| 0001 | bluez `fuzz_gobex.c` leaks a `GError` on every failed decode | [google/oss-fuzz#16081](https://github.com/google/oss-fuzz/pull/16081) |
-| 0002 | leptonica `pix3_fuzzer.cc` passes NULL to three functions it means to test | [DanBloomberg/leptonica#813](https://github.com/DanBloomberg/leptonica/pull/813) |
+| 0001 | bluez `fuzz_gobex.c` leaks a `GError` on every failed decode | [oss-fuzz#16081](https://github.com/google/oss-fuzz/pull/16081) — open |
+| 0002 | leptonica `pix3_fuzzer.cc` passes NULL to three functions it means to test | **[leptonica#813](https://github.com/DanBloomberg/leptonica/pull/813) — MERGED** |
+
+**One upstream fix has landed.** leptonica#813 was merged on 2026-08-31; the maintainer's
+comment was *"Thank you for finding these errors and providing excellent documentation."*
+Three functions in that harness — `pixAverageByRow`, `pixVarianceByColumn` and
+`pixVarianceInRect` — were each handed a destroyed pix and had never executed on any
+input.
 
 Write-ups with full evidence are in [`findings/`](findings/).
 

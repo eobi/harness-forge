@@ -32,7 +32,7 @@
   "class": "dead coverage -- the function is never executed on any input, silently",
   "note_on_the_label": "The gate called it a use-after-free and a double free. Both are literally wrong, because the pointer is nulled rather than dangling. The SEQUENCE was real and reading it found a genuine defect of another kind.",
   "fix": "one line: pix_pointer_payload = pixCopy(NULL, pixs_payload);",
-  "status": "NOT YET REPORTED -- needs the operator's go-ahead",
+  "status": "MERGED into leptonica master 2026-08-31 21:28 UTC as PR #813. Maintainer: 'Thank you for finding these errors and providing excellent documentation.'",
   "filed": "DanBloomberg/leptonica#813",
   "scope_correction": "The first patch fixed ONE of three instances and the gate still flagged two more. Filing it would have been a partial fix presented as complete. The file has three: a missing pixCopy before pixAverageByRow, a missing pixCopy before pixVarianceInRect, and pixVarianceByColumn passed `pix2` -- destroyed ten lines earlier -- while the pix_pointer_payload created directly above it goes unused."
  },
@@ -77,5 +77,11 @@
   "the_honest_denominator": "412 of 1942 lifted harnesses, 21%. On the other 79% the engine declines to opine. The 0.00% is a rate on the tier it trusts, NOT on everything it sees, and it must never be quoted without that. QuartetFuzz's 4.8% covers everything they judged.",
   "session_arc": "26 leak candidates -> 5; 6 blocking -> 2; false rejection 1.18% -> 0.49% -> 0.00%. Roughly 45 candidates read by hand across the session, 2 real, the rest defects in this engine.",
   "last_defect_of_the_session": "A bare block reset the arm and the guard. `case N: { .. }` is the commonest place that matters, and it made three mutually exclusive switch cases look like one path."
+ },
+ "MILESTONE": {
+  "what": "First upstream fix LANDED from this engine.",
+  "pr": "DanBloomberg/leptonica#813",
+  "why_it_counts": "QuartetFuzz's currency is 29 fixes landed upstream. This is one, and it is the difference between a tool that reports and a tool whose reports are accepted by the people who own the code.",
+  "the_denominator_stays_attached": "~55 candidates read by hand, 2 real, 1 merged. The other ~53 were defects in this engine, and fixing them is what made these two visible."
  }
 }

@@ -48,7 +48,7 @@ Coverage work needs genuinely separate hardware: another physical box or a cloud
 | # | what | where | status |
 |---|---|---|---|
 | 0001 | bluez `fuzz_gobex.c` leaks a `GError` on every failed decode | [google/oss-fuzz#16081](https://github.com/google/oss-fuzz/pull/16081) | open |
-| 0002 | leptonica `pix3_fuzzer.cc` passes NULL to three functions it means to test | [DanBloomberg/leptonica#813](https://github.com/DanBloomberg/leptonica/pull/813) | open |
+| 0002 | leptonica `pix3_fuzzer.cc` passes NULL to three functions it means to test | [DanBloomberg/leptonica#813](https://github.com/DanBloomberg/leptonica/pull/813) | **MERGED 2026-08-31** |
 
 Write-ups with full evidence are in `harness-forge/findings/`. Both were verified against
 the library's own source before filing, not merely against our gate.

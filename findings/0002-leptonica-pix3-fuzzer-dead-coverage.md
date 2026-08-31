@@ -1,6 +1,8 @@
 # Finding 0002 — leptonica `pix3_fuzzer.cc` tests `pixAverageByRow` with NULL on every input
 
-**Status:** confirmed against leptonica `main`. NOT yet reported upstream.
+**Status:** **MERGED** into leptonica `master`, 2026-08-31 21:28 UTC, as [PR #813](https://github.com/DanBloomberg/leptonica/pull/813). The maintainer's comment: *"Thank you for finding these errors and providing excellent documentation."*
+
+**Scope grew during filing.** The first patch fixed one of three instances and the gate still flagged two more; the merged change fixes all three.
 **Found by:** `S1.USE_AFTER_DESTROY` + `S1.DOUBLE_DESTROY` on a high-fidelity lift.
 **Class:** dead coverage — the harness believes it is testing a function it never executes.
 **Fix:** one line.
