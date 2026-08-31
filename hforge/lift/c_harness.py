@@ -251,7 +251,11 @@ _STD_ACCESSOR = {
     "push_back", "emplace_back", "clear", "substr", "find", "append",
 }
 
-_NOT_A_CALLSITE = _NOT_A_CALL | _STD_ACCESSOR | {
+# Copiers are READ, not missed. `memcpy(buf, data, size)` is handled specially -- it moves
+# taint from the source to the destination and is deliberately not lifted as a library
+# operation -- and then it was reported as a call the lifter failed to read, which made
+# every harness that copies its input before parsing it untrusted. Handled is not missed.
+_NOT_A_CALLSITE = _NOT_A_CALL | _STD_ACCESSOR | _COPIERS | {
     "alignof", "defined", "static_cast", "reinterpret_cast", "const_cast", "dynamic_cast",
     "catch", "offsetof", "va_start", "va_end", "va_arg", "typeof", "__typeof__",
     "LLVMFuzzerTestOneInput", "LLVMFuzzerInitialize",
