@@ -32,6 +32,9 @@
   "class": "dead coverage -- the function is never executed on any input, silently",
   "note_on_the_label": "The gate called it a use-after-free and a double free. Both are literally wrong, because the pointer is nulled rather than dangling. The SEQUENCE was real and reading it found a genuine defect of another kind.",
   "fix": "one line: pix_pointer_payload = pixCopy(NULL, pixs_payload);",
-  "status": "NOT YET REPORTED -- needs the operator's go-ahead"
- }
+  "status": "NOT YET REPORTED -- needs the operator's go-ahead",
+  "filed": "DanBloomberg/leptonica#813",
+  "scope_correction": "The first patch fixed ONE of three instances and the gate still flagged two more. Filing it would have been a partial fix presented as complete. The file has three: a missing pixCopy before pixAverageByRow, a missing pixCopy before pixVarianceInRect, and pixVarianceByColumn passed `pix2` -- destroyed ten lines earlier -- while the pix_pointer_payload created directly above it goes unused."
+ },
+ "FIRST_CONFIRMED_FINDING_2026-08-31": {}
 }
