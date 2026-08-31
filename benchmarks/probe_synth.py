@@ -74,7 +74,25 @@ def main() -> int:
     # cannot run for a day. The cap is PRINTED, because a silent truncation reads as
     # "we tried everything" when it is not.
     base_ranked = sorted(base, key=lambda x: rank_key(x, c["fn"]))
-    synth_ranked = sorted(synth, key=lambda x: rank_key(x, c["fn"]))[:cap]
+
+    # A MUTANT IS ONLY AS GOOD AS WHAT IT GREW FROM, SO ORDER BY THE BASE.
+    #
+    # The first version of this ranked the synth pool by gate evidence alone and capped it
+    # at ten. On libyaml that campaigned ten mutants of `yaml_parser_scan_setup` and
+    # `yaml_parser_parse_setup` -- two base plans that themselves score 0.00% -- and never
+    # reached a single mutant of `yaml_parser_load`, the base that works at 71.79%. The run
+    # reported "synth best 0.00%, gain -71.79 points", which measured nothing except my own
+    # ordering.
+    #
+    # Candidates are named `{base}__widen_x` / `{base}__repeat_x`, so each one is grouped
+    # under its base and the groups are taken in the base's own rank order.
+    _order = {pl.name: i for i, pl in enumerate(base_ranked)}
+
+    def _from(pl):
+        stem = pl.name.split("__widen_")[0].split("__repeat_")[0]
+        return _order.get(stem, len(_order))
+
+    synth_ranked = sorted(synth, key=lambda x: (_from(x), rank_key(x, c["fn"])))[:cap]
     if len(synth) > cap:
         print(f"  NOTE: {len(synth) - cap} synthesised candidate(s) NOT campaigned "
               f"(cap {cap}); the comparison is against the first {cap} by gate evidence")
