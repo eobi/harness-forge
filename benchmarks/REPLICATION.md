@@ -125,3 +125,33 @@ Each record now carries `load_average` (1/5/15-minute and CPU count) and a
 recorded, not enforced: refusing to start on a loaded machine would silently produce no
 data, which is worse than producing data you can filter. A sample with `machine_was_busy`
 true is not evidence and should be discarded or re-run.
+
+## An idle machine is not enough: woff2 has no seed corpus
+
+**Added 2026-08-31, correcting the section above.**
+
+That section blamed woff2's 16x execution spread on other work sharing the machine, and
+that diagnosis was incomplete. Re-run on a quiet host — load ~1 on 8 idle cores, every
+record carrying `machine_was_busy: false` — the first two runs gave:
+
+| run | ours | gold | ratio |
+|---|---:|---:|---:|
+| 1 | 29.79% | 22.66% | 1.31x |
+| 2 | 13.86% | 45.39% | 0.31x |
+
+**ours spread 15.93 points, gold spread 22.73 points, on a machine with nothing else on
+it.** The host was a contributing factor and not the cause.
+
+The cause is in the record and was read past: `seeds: 0`, `corpus_files_at_start: 0`.
+**woff2 runs with no seed corpus on either side**, so each campaign is a random walk from
+nothing and lands wherever libFuzzer happens to get. A seeded case is far steadier —
+pugixml returned 14.79% five times with a spread of 0.00.
+
+**What this costs.** A single woff2 sample carries no information about which harness is
+better. Run 1 alone reads as "we beat the hand-written harness by 31%"; run 2 alone reads
+as "we lose by a factor of three". Both are the same two harnesses, an hour apart, on an
+idle box.
+
+**The rule this adds to the one above.** Do not run anything else while a benchmark runs —
+AND do not report a case with an empty seed corpus from fewer than five runs, however quiet
+the machine was. `machine_was_busy: false` is necessary and not sufficient.
