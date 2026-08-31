@@ -630,6 +630,31 @@ inference — a bound nobody can check is worth nothing.
 harness that touches a `GError` — the same target whose leak detection is off. The bound and
 the defect are the same fact seen from two sides.
 
+### The same question, per plan
+
+[`tools/reachbound.py`](tools/reachbound.py). A library exports N functions, a plan calls K
+of them, and it can find nothing in the other N−K however long it runs. Coverage over the
+project says how much code ran; this says how much of what the harness could **ever** touch
+it touches at all, and the gap between them is the harness's bound rather than the fuzzer's
+failure.
+
+| library | exports | reachable, base plans | with synthesis |
+|---|---:|---:|---:|
+| jansson | 83 | 7 (8%) | **43 (52%)** |
+| expat | 68 | 52 (76%) | 53 (78%) |
+
+jansson's widest single plan calls **3 of 83** exported functions. Mutational synthesis
+widens the reachable surface **6×**.
+
+**That is a ceiling, not coverage.** You cannot cover what you cannot call, but calling is
+necessary rather than sufficient — whether coverage follows still needs a campaign, and is
+still unmeasured.
+
+**expat is the control that keeps this honest.** Its base plans already reach 76% of the
+surface and synthesis adds two points. The 6× on jansson is a property of a library whose
+entry points are narrow, not of the technique; reporting only jansson would have been a
+selected result.
+
 ### Turning the bound into a query
 
 `--cross-reference` asks the obvious follow-up: which harnesses do the gates say **leak**,

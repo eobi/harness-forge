@@ -1,0 +1,26 @@
+{
+ "date": "2026-08-31",
+ "what": "The per-plan reachability bound: what a harness CANNOT find, from the API surface rather than from build configuration.",
+ "why": "tools/bounds.py answers this at corpus scale by reading build settings. This answers it for one harness: a library exports N functions, a plan calls K, and it can find nothing in the other N-K however long it runs. That is the number a campaign's silence needs beside it.",
+ "measured": {
+  "jansson": {
+   "exports": 83,
+   "widest_single_plan_calls": 3,
+   "reachable_fraction_widest": "3.6%",
+   "union_over_all_valid_base_plans": 7,
+   "union_with_mutational_synthesis": 43,
+   "surface_reached": "8% -> 52%"
+  },
+  "expat": {
+   "exports": 68,
+   "widest_single_plan_calls": 4,
+   "union_over_all_valid_base_plans": 52,
+   "union_with_mutational_synthesis": 53,
+   "surface_reached": "76% -> 78%"
+  }
+ },
+ "what_this_licenses": "Mutational synthesis widens jansson's REACHABLE API SURFACE 6x, from 7 exported functions to 43. That is a ceiling, not coverage: you cannot cover what you cannot call, and calling it is necessary rather than sufficient. Whether coverage follows is still unmeasured and still needs a campaign.",
+ "what_it_does_NOT_license": "Any claim about +14% median coverage. This measures the candidate set's reach, not a fuzzer's result.",
+ "the_honest_limit": "A floor, not a prediction. These functions are unreachable through the plan's OWN calls; the library may reach them internally, and the tool never claims otherwise. Every symbol comes from the header and every call from the plan.",
+ "expat_is_the_useful_control": "Its base plans already reach 76% of the surface, and synthesis adds 2 points. The 6x on jansson is not a property of the technique, it is a property of a library whose entry points are narrow. Reporting only jansson would have been a selected result."
+}
