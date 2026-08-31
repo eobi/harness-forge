@@ -1,0 +1,33 @@
+{
+ "date": "2026-08-31",
+ "question": "The audit trusts 463 of 1947 lifts, 24%. On the other 76% the engine declines to opine, so those harnesses can never produce a finding. WHY are they untrusted, and which cause is worth fixing?",
+ "untrusted": 1485,
+ "of": 1947,
+ "pct": 76,
+ "first_cut": {
+  "missed calls": 4364,
+  "unbound uses of data/size": 1827,
+  "unattributed arguments only": 54
+ },
+ "two_hypotheses_that_were_WRONG": {
+  "libc_and_local_noise": "The top missed names are getpid, memcmp, read, __builtin_trap, _cleanup_, and harness-local helpers, which looked like the lifter penalising itself for calls it correctly ignores. Measured: only 9% of missed calls. 88% are GENUINE EXTERNAL CALLS.",
+  "fuzzeddataprovider_plumbing": "The dominant shape is member calls, and the first example was `stream.PickValueInArray(..)` -- harness plumbing rather than a library call. Measured across all receivers: `fdp` accounts for 60 of 2726. The rest are real library objects -- codec, db, parser, doc, options, phone_util."
+ },
+ "why_a_genuine_call_is_missed": {
+  "member call obj.f() / p->f()": "2726 (62%)",
+  "nested in another call's arguments": "793 (18%)",
+  "plain statement, unexplained": "526 (12%)",
+  "call spans multiple lines": "294 (6%)",
+  "inside a return statement": 9,
+  "inside a control-flow condition": 1
+ },
+ "THE_ANSWER": "The gap is not a bug. It is a C lifter meeting C++ class-API harnesses. The untrusted verdict on those is CORRECT -- the engine cannot model `codec.decode(data, size)` and says so rather than guessing.",
+ "the_prize": {
+  "lifts whose EVERY missed call is a member call": 201,
+  "mixed member and free function": 181,
+  "no member calls involved": 1103,
+  "audited tier if member calls were modelled": "463 -> up to 664, +43%"
+ },
+ "what_this_licenses": "Building a member-call lift path is the single largest available increase in audit reach, and audit reach is what produced the one merged upstream fix. A receiver is a resource and a method is an op; the IR already expresses both.",
+ "what_it_does_NOT_license": "Any expectation that 201 more trusted lifts yield 201 more findings. The current rate is 2 real defects in 463 trusted lifts. The honest projection is under one additional finding, and the case for doing it is compounding reach rather than a forecast."
+}
