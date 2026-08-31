@@ -54,5 +54,19 @@
   },
   "the_trade_stated_plainly": "The wrong fix bought +55 trusted lifts by manufacturing 17 false accusations against correct harnesses. The right fix bought +7 with none. +7 is the honest number.",
   "what_is_still_unread": "h3 remains untrusted, and correctly: `H3_EXPORT(cellToLatLng)(args->index, &geo)` is a MACRO-GENERATED CALL, a blind spot the field-taint fix does not touch. That is the next shape, not this one."
+ },
+ "STOPPING_POINT": {
+  "session_arc": "trusted lifts 117 -> 496, false positives 0 throughout",
+  "what_is_left": {
+   "mixed unbound uses + missed calls": 643,
+   "only unbound uses of data/size": 533,
+   "missed calls only": 246,
+   "no recorded reason": 47,
+   "total": 1469
+  },
+  "why_stop": "The remaining causes are a LONG TAIL. Among the 419 lifts short by exactly one occurrence, the most common syntactic skeleton appears 10 times; the next appears 7. There is no dominant shape left to fix, so each further fix buys a handful of lifts rather than a tier.",
+  "macro_calls_were_checked_and_rejected": "H3_EXPORT(fn)(args) looked like the next lever after it kept h3 untrusted. Measured: 19 lifts across two macro families. Sized before building, and not built.",
+  "the_lesson_that_cost_the_most": "Two projections in one session were far too optimistic -- 201 member-call lifts became 26, and an alias-counter 'fix' promising +55 delivered 17 false positives instead. A census that asks 'which lifts have NO other cause' gives an upper bound, and fixing one layer exposes the next. Upper bounds should be labelled as such the moment they are computed.",
+  "recommendation": "The compounding value of audit reach is real -- it produced the one merged upstream fix -- but it is no longer the cheapest source of it. Move to the GUI track, which is the weakest asset this project owns and is newly unblocked by a Linux host with Xvfb."
  }
 }
