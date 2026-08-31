@@ -561,9 +561,9 @@ coverage report and the maintainer all believe they are under test.
 
 | corpus | harnesses | lifted | trusted | blocking |
 |---|---:|---:|---:|---:|
-| OSS-Fuzz tree | 420 | 400 | 126 | 0 |
-| upstream project repositories | 2,273 | 1,542 | 286 | 2 |
-| **total** | **2,693** | 1,942 | **412** | 2 |
+| OSS-Fuzz tree | 420 | 400 | 139 | 0 |
+| upstream project repositories | 2,273 | 1,542 | 324 | 2 |
+| **total** | **2,693** | 1,942 | **463** | 2 |
 
 QuartetFuzz audited 586 harnesses across 70 projects. The upstream corpus is harvested by
 shallow-cloning each OSS-Fuzz project's own repository, copying out its harnesses and
@@ -573,7 +573,7 @@ deleting the clone, so disk stays flat.
 
 **Zero on trusted lifts.** Production harnesses are presumed-good by construction, so a
 blocking verdict on one is a false rejection unless triage shows the harness is genuinely
-defective. After reading every one: **412 trusted lifts, 2 blocking verdicts, 0 false
+defective. After reading every one: **463 trusted lifts, 2 blocking verdicts, 0 false
 positives.**
 
 Both survivors are correct. `leptonica/pix3_fuzzer.cc` is the real defect above.
@@ -583,7 +583,7 @@ which is exactly what the gates say about it, and exactly what its own header de
 broken, correctly identified.
 
 QuartetFuzz reports 4.8%. **The denominators are not comparable and the difference is the
-point:** we trust 412 of 1,942 lifts, 21%, and decline to opine on the rest, while their
+point:** we trust 463 of 1,942 lifts, 24%, and decline to opine on the rest, while their
 figure covers everything they judged. **0.00% is a rate on the tier this engine trusts, not
 on everything it sees, and it should never be quoted without that sentence.** We buy precision by abstaining. Across *all* lifted
 harnesses 28.8% carry a blocking violation, and that number is recorded beside the good one
@@ -591,8 +591,10 @@ deliberately — the fidelity filter measures our own comprehension, not harness
 
 ### What the triage actually cost
 
-Roughly 45 candidates have been read by hand. **Two were real; the rest were defects in
-this engine**, and fixing them is what made the two visible. That ratio is the honest
+Roughly 55 candidates have been read by hand. **Two were real; the rest were defects in
+this engine**, and fixing them is what made the two visible. Each fix also widened what the
+engine can read: the trusted tier grew from 117 to 463 across the same work, so the
+false-positive count fell while the denominator rose. That ratio is the honest
 headline: a gate bank is an instrument, and most of the work is calibrating it rather than
 reading its output.
 
