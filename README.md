@@ -534,6 +534,87 @@ distinct outcome** so an absent check never reads as a passed one.
 
 ---
 
+## Findings: harnesses this engine graded, and the defects it found
+
+Updated 2026-08-31. **Two upstream-reportable defects, both filed, both verified against the
+library's own source before filing rather than against our own verdict.**
+
+| | defect | filed |
+|---|---|---|
+| 0001 | bluez `fuzz_gobex.c` leaks a `GError` on every failed decode | [google/oss-fuzz#16081](https://github.com/google/oss-fuzz/pull/16081) |
+| 0002 | leptonica `pix3_fuzzer.cc` passes NULL to three functions it means to test | [DanBloomberg/leptonica#813](https://github.com/DanBloomberg/leptonica/pull/813) |
+
+Write-ups with full evidence are in [`findings/`](findings/).
+
+**0001 is worth a second look.** `projects/bluez/build.sh` sets `detect_leaks=0` for that
+target and for no other bluez target, and it is the only bluez harness touching a `GError`.
+The workaround and the defect line up, and the cost is that the target can no longer report
+a leak *in gobex itself*. A harness defect had quietly removed a whole bug class from the
+library's coverage — which is the negative-capability argument this project exists to make,
+found in the wild rather than argued from a bench.
+
+**0002 is silent rather than loud.** `pixDestroy` nulls the pointer and each entry point
+returns on `!pix`, so three functions are never executed on any input while the fuzzer, the
+coverage report and the maintainer all believe they are under test.
+
+### The corpus
+
+| corpus | harnesses | lifted | trusted | blocking |
+|---|---:|---:|---:|---:|
+| OSS-Fuzz tree | 420 | 400 | 130 | 0 |
+| upstream project repositories | 2,273 | 1,542 | 292 | 6 |
+| **total** | **2,693** | 1,942 | **422** | 6 |
+
+QuartetFuzz audited 586 harnesses across 70 projects. The upstream corpus is harvested by
+shallow-cloning each OSS-Fuzz project's own repository, copying out its harnesses and
+deleting the clone, so disk stays flat.
+
+### The gates' false-rejection rate
+
+**1.18% on trusted lifts.** Production harnesses are presumed-good by construction, so a
+blocking verdict on one is a false rejection unless triage shows the harness is genuinely
+defective: 6 of 422 blocking, of which 1 is a confirmed real defect, leaving 5.
+
+QuartetFuzz reports 4.8%. **The denominators are not comparable and the difference is the
+point:** we trust 422 of 1,942 lifts, 22%, and decline to opine on the rest, while their
+figure covers everything they judged. We buy precision by abstaining. Across *all* lifted
+harnesses 28.8% carry a blocking violation, and that number is recorded beside the good one
+deliberately — the fidelity filter measures our own comprehension, not harness quality.
+
+### What the triage actually cost
+
+Roughly 40 candidates have been read by hand. **Two were real; the rest were defects in
+this engine**, and fixing them is what made the two visible. That ratio is the honest
+headline: a gate bank is an instrument, and most of the work is calibrating it rather than
+reading its output.
+
+---
+
+## Widening the candidate space
+
+[`hforge/producers/mutate.py`](hforge/producers/mutate.py). OGHarn (ICSE 2025) beats
+developer-written harnesses by **+14% median coverage** through mutational stitching
+filtered by dynamic oracles — compilation, execution, coverage — so every rejected candidate
+has already cost a compile and a campaign slot.
+
+`benchmarks/probe_select.py` established that our gap is **not the ranking**: the static
+rule is 0.63 points behind the best available candidate on libyaml, against a run-to-run
+variance of 3.55 on that same case, and 0.00 behind on libpng. It is the **candidate
+space**. The header graph proposes one plan per consuming entry point and never calls a
+function belonging to a different entry point against the same object.
+
+| library | valid base plans | with mutation | growth | gate rejection |
+|---|---:|---:|---:|---:|
+| jansson | 8 | **114** | **14.2x** | 33.8% |
+| expat | 196 | **3,252** | **16.6x** | 0.8% |
+
+Mutations are **enumerated, not sampled**: same inputs, same candidates, same order, no seed
+to record.
+
+**The coverage target is not met and is not claimed.** +14% median against developer-written
+harnesses requires building and campaigning these candidates. Volume is the means; coverage
+is the result, and only the means is demonstrated.
+
 ## Measured against the state of the art
 
 Against **QuartetFuzz** — the strongest published LLM-driven harness generator, 3 CVEs, 29
@@ -746,13 +827,16 @@ product.
 hforge/
   ir.py            the Harness IR — resources, lifetimes, ops, slices, scratch
   manifest.py      every deliverable, its status, and what backs it
-  producers/       header_graph (C) · cxx_header · java_api · rank
+  producers/       header_graph (C) · cxx_header · java_api · rank · mutate
   emit/            the language router, then c_libfuzzer · cxx_libfuzzer · java_jazzer
   gates/           static_gates S1..S6 · dynamic_gates D1..D11
   findings/        F1..F8, the exploitability ladder, our own false-positive rate
   java/            the parallel JVM track   lift/  grade someone else's C
   analysis/        sink map, mined dictionaries, mined seeds
+findings/          upstream-reportable defects, with the evidence for each
 benchmarks/        drive.py · rank.py · run.sh · reference.json · results/logs/
+benchmarks/audits/ fleet audits: what the gate bank said about somebody else's harnesses
+tools/             plancheck · plandrift · fleet_audit
 examples/lib/      a tiny demo library, so this runs on a clean clone
 docs/              EVIDENCE.md — the measured claims   PLATFORMS.md — the matrix
 ```
