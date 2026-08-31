@@ -360,6 +360,21 @@ def _classify_args(args_raw, data, size, tainted, resources, is_ptr, unread, fn,
         _acc = re.match(r"^([A-Za-z_]\w*)\s*(?:\.|->)\s*([A-Za-z_]\w*)\s*\(\s*\)$", bare)
         if _acc and _acc.group(2) in _STD_ACCESSOR and _acc.group(1) in tainted:
             bare = _acc.group(1)
+        # A FIELD OF A TAINTED OBJECT IS TAINTED. h3's harness casts the input to a struct
+        # and passes `args->index`; the input reaches the library through a field, and
+        # reading only the base name left it bound as a literal -- so a harness that
+        # consumes input fine was reported as consuming none.
+        #
+        # This replaces an earlier attempt that subtracted alias occurrences from the
+        # fidelity counter instead. That silenced the symptom while the flow stayed
+        # unfollowed, which turned "we cannot read this" into "we read it and the harness
+        # is broken" -- 13 false S5.INPUT_NOT_CONSUMED verdicts. Follow the flow, and the
+        # counter balances by itself.
+        _fld = re.match(r"^([A-Za-z_]\w*)\s*(?:\.|->)\s*[A-Za-z_][\w.>-]*$", bare)
+        if _fld and _fld.group(1) in tainted:
+            bare = _fld.group(1)
+        elif _fld and _fld.group(1) in (size_alias or {size}):
+            bare = _fld.group(1)
         if bare in resources and not a.strip().startswith("&"):
             # A NAMED RESOURCE IS A RESOURCE EVEN WHEN TAINTED. Taint spreads through
             # handles: `cmsCreateContext(NULL, (void *)data)` taints `context`, which
@@ -690,6 +705,7 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
             _lhs, _rhs = _asn.group(1), _asn.group(2)
             if _lhs not in tainted and _mentions_tainted(_rhs, tainted):
                 tainted.add(_lhs)
+
             # `size_t payload_len = size;` is the same aliasing on the LENGTH side, and
             # binding it as a literal leaves a call reading `parse(payload, 0)` -- input
             # bound, length thrown away, which is worse than either alone.

@@ -37,5 +37,22 @@
   "why_the_projection_was_optimistic": "The census asked which lifts had NO cause other than member calls. That is the right question for an upper bound and the wrong one for a forecast: lifting the member calls exposes causes that were underneath them. simdjson and clickhouse became readable at the call level and immediately failed on unbound uses of `Data`/`Size` -- a different defect that the member-call barrier had been hiding.",
   "false_positives": "still 0. 489 trusted lifts, 2 blocking verdicts, both correct.",
   "what_it_is_worth": "+26 trusted lifts is real and permanent, and the ceiling is not reached: the 181 mixed cases and the newly exposed taint failures are now the next layer. But it is not the +43% the census suggested and that number should not be repeated."
+ },
+ "OUTCOME_taint_through_fields": {
+  "census": "After member-call lifting, 539 lifts failed on unbound uses of data/size ALONE, and 419 of those were short by EXACTLY ONE occurrence.",
+  "the_wrong_fix_and_what_it_cost": {
+   "idea": "An alias assignment `const uint8_t *data2 = data;` consumes an occurrence of `data` that can never become a bound argument, because the ALIAS is what later calls take. Subtracting those from the counter looked like correcting an accounting error.",
+   "result": "trusted 489 -> 544, and flagged 2 -> 19.",
+   "why_it_was_wrong": "The counter was doing its job. It reports that a flow was not followed, and the flows really were not followed -- h3 casts the input to a struct and passes `args->index`, which the lifter never bound. Silencing the counter turned 'we cannot read this' into 'we read it and the harness is broken': 13 false S5.INPUT_NOT_CONSUMED verdicts against harnesses that consume input fine.",
+   "reverted": true
+  },
+  "the_right_fix": "Follow the flow instead. A field of a tainted object is tainted, so `args->index` carries the input. The counter then balances by itself.",
+  "measured": {
+   "trusted": "489 -> 496 (+7)",
+   "flagged": "2, both correct",
+   "false_positives": 0
+  },
+  "the_trade_stated_plainly": "The wrong fix bought +55 trusted lifts by manufacturing 17 false accusations against correct harnesses. The right fix bought +7 with none. +7 is the honest number.",
+  "what_is_still_unread": "h3 remains untrusted, and correctly: `H3_EXPORT(cellToLatLng)(args->index, &geo)` is a MACRO-GENERATED CALL, a blind spot the field-taint fix does not touch. That is the next shape, not this one."
  }
 }

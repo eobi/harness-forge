@@ -1133,3 +1133,38 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 """))
     assert not any(op.api == "push_back" for op in L.ir.sequence)
     assert "r_sink" not in [r.id for r in L.ir.resources]
+
+
+def test_a_field_of_a_tainted_object_is_tainted():
+    """A harness that casts the input to a struct and passes `args->index` reaches the
+    library through a FIELD. Reading only the base name bound it as a literal, so a harness
+    that consumes input fine was reported as consuming none."""
+    L = c_harness.lift(_c("""
+#include <stdint.h>
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    const args_t *args = (const args_t *)data;
+    lib_use(args->index, 0);
+    return 0;
+}
+"""))
+    assert any(a.source == "input" for op in L.ir.sequence for a in op.args), \
+        "the field carries the input into the library"
+
+
+def test_the_fidelity_counter_is_not_silenced_instead_of_followed():
+    """An earlier attempt subtracted alias occurrences from the counter so the tally
+    balanced. It made 55 lifts trustworthy and produced 17 FALSE S5.INPUT_NOT_CONSUMED
+    verdicts against harnesses that consume input fine -- turning "we cannot read this"
+    into "we read it and the harness is broken", which is the worse error by far.
+
+    A harness whose input flow this lifter genuinely cannot follow must stay UNTRUSTED.
+    """
+    L = c_harness.lift(_c("""
+#include <stdint.h>
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    const uint8_t *copy = data;
+    OPAQUE_MACRO(handler)(copy, size);
+    return 0;
+}
+"""))
+    assert not L.high_fidelity, "an unfollowed flow must cost the lift its fidelity"
