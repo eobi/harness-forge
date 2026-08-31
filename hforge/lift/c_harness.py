@@ -523,7 +523,13 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
         notes=notes)
     _syms = {a.symbol for a in ir.apis.values()} if hasattr(ir, "apis") else set()
     _missed = [x for x in _missed_calls(body, _syms) if x not in fdp_methods]
-    _missed += sorted(set(member_calls) - fdp_methods)
+    # Member calls the lifter deliberately skips are SKIPPED, not missed. `.data()`,
+    # `.size()`, `.c_str()` are already excluded from the name-based check as plumbing --
+    # and were then re-added here through the member-call path, which subtracted only the
+    # FuzzedDataProvider methods. Thirty-three harnesses were untrusted because a std
+    # accessor was both recognised and reported as unrecognised, by two checks that
+    # disagreed about the same set.
+    _missed += sorted(set(member_calls) - fdp_methods - _NOT_A_CALLSITE)
 
     # AN INPUT USE WE DID NOT BIND IS A FLOW WE DID NOT FOLLOW.
     #

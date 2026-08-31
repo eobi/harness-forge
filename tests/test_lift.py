@@ -441,3 +441,18 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
 """))
     got = {a.param: a.source for a in L.ir.sequence[0].args}
     assert got == {"a0": "input", "a1": "length_of"}, got
+
+
+def test_a_skipped_accessor_is_not_also_reported_as_unread():
+    """`strings.back().data()` -- `.data()` is excluded from the name-based check as std
+    plumbing, and was re-added through the member-call path, which subtracted only the
+    FuzzedDataProvider methods. Thirty-three harnesses were untrusted because two checks
+    disagreed about the same set."""
+    L = c_harness.lift(_c("""
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    std::string s(reinterpret_cast<const char*>(data), size);
+    parse_it(s.data(), s.size());
+    return 0;
+}
+"""))
+    assert "data" not in L.missed and "size" not in L.missed, L.missed

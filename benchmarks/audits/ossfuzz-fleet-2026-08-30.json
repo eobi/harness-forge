@@ -131,6 +131,23 @@
   },
   "what_changed": "The lifter now propagates taint through a plain assignment. `const uint8_t *payload = data; size_t payload_len = size;` was the most common shape it could not follow: both arguments bound as LITERALS and the harness read as consuming no input.",
   "correction": "THIS CORRECTS AN EARLIER CONCLUSION IN THIS FILE. The bottleneck was diagnosed as 'a C lifter cannot read C++ harnesses' on the strength of the .c/.cc readable split, and that was measured twice and stated confidently. It was partly wrong. The largest single category was plain ALIASING, which is not a C++ construct at all -- fixing it took .cc from 7% to 17% and .c from 19% to 22%. The split was real; the cause attributed to it was not. Reading five failing harnesses would have shown this in minutes, and counting them by extension did not.",
-  "still_true": "C++ remains under-read relative to C, and a C++ lifter is still the larger structural piece. But it is now worth about 5 points of the gap rather than all of it."
+  "still_true": "C++ remains under-read relative to C, and a C++ lifter is still the larger structural piece. But it is now worth about 5 points of the gap rather than all of it.",
+  "superseded_by": "end_of_session_final"
+ },
+ "end_of_session_final": {
+  "harnesses": 372,
+  "lifted": 358,
+  "high_fidelity": 117,
+  "flagged": 0,
+  "false_positives": 0,
+  "findings": 0,
+  "readable_by_language": {
+   ".c": "34/150 = 23%",
+   ".cc": "83/222 = 37%"
+  },
+  "session_arc": "44 readable -> 117 readable, 4 flags -> 0, across ~17 defects in the lifter and gates. No findings at any point.",
+  "the_diagnosis_that_was_wrong": "C++ was identified as the ceiling, twice, from the readable split (.c 19% vs .cc 7%). C++ harnesses are now MORE readable than C ones -- 37% against 23% -- and not one of the fixes that got there was a C++ lifter. They were aliasing, copiers, casts, and two of our own checks disagreeing about the same exclusion set. The split was real and the inference from it was wrong.",
+  "method_that_worked": "Reading failing harnesses. Every time the counts were aggregated by category the conclusion was wrong; every time five files were opened and read, the cause was obvious within minutes. A distribution says where to look, never what you are looking at.",
+  "still_zero_findings": "117 readable production harnesses, no defect found in any of them. That is the honest result: these are maintained harnesses that have been fuzzing for years, and the instrument is now calibrated at 0% false positives rather than 'untested at scale'."
  }
 }
