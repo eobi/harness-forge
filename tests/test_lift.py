@@ -325,3 +325,19 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     codes = {v.code for g in run_static_gates(L.ir) for v in g.violations
              if v.severity == BLOCK}
     assert "S1.USE_BEFORE_CREATE" not in codes, codes
+
+
+def test_input_is_followed_through_a_fuzzed_data_provider():
+    """`FuzzedDataProvider fdp(data, size); auto s = fdp.ConsumeRandomLengthString(64);`
+    is how most modern harnesses shape their input. Every value it returns IS the fuzzer's
+    bytes, so a library call receiving one consumes input -- without this the parameter
+    looked used-once-and-dropped and the harness looked inert."""
+    L = c_harness.lift(_c("""
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    FuzzedDataProvider fdp(data, size);
+    std::string s = fdp.ConsumeRandomLengthString(64);
+    parse_it(s);
+    return 0;
+}
+"""))
+    assert not any("Consume" in m for m in L.missed), L.missed

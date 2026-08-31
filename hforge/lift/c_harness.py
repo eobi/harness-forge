@@ -262,6 +262,43 @@ def _missed_calls(body: str, lifted_symbols: set) -> list:
                   - {s.rsplit("::", 1)[-1] for s in lifted_symbols})
 
 
+_FDP_DECL = re.compile(r"\bFuzzedDataProvider\s+([A-Za-z_]\w*)\s*\(\s*([A-Za-z_]\w*)\s*,")
+_FDP_CONSUME = re.compile(
+    r"(?:([A-Za-z_]\w*)\s*=\s*)?\b([A-Za-z_]\w*)\s*\.\s*(Consume\w*)\s*(?:<[^>]*>)?\s*\(")
+
+
+def _fdp_taint(body: str, data: str, tainted: set) -> list:
+    """Follow the fuzzer's bytes through FuzzedDataProvider.
+
+    927 files in the OSS-Fuzz tree build their inputs this way:
+
+        FuzzedDataProvider fdp(data, size);
+        std::string s = fdp.ConsumeRandomLengthString(1024);
+        int n         = fdp.ConsumeIntegralInRange<int>(0, 5);
+
+    Every value it hands back IS the fuzzer's input, reshaped. Without this the lifter sees
+    a `data` that is used once and never reaches a library call, and every such harness is
+    untrusted -- which was most of the fleet. Returns the Consume* names so they can be
+    excluded from "calls the lifter did not read": they are read, they are just not library
+    calls.
+    """
+    names = set()
+    for m in _FDP_DECL.finditer(body):
+        if m.group(2) == data or m.group(2) in tainted:
+            names.add(m.group(1))
+    if not names:
+        return []
+    consumed = []
+    for m in _FDP_CONSUME.finditer(body):
+        assigned, obj, meth = m.group(1), m.group(2), m.group(3)
+        if obj not in names:
+            continue
+        consumed.append(meth)
+        if assigned:
+            tainted.add(assigned)          # the value came from the fuzzer's bytes
+    return consumed
+
+
 def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
     """Read a C harness and produce an IR plan plus a record of what could not be read."""
     raw = Path(path).read_text(errors="replace")
@@ -302,6 +339,9 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
     by_address: set = set()          # resources created through an out-parameter
     member_calls: list = []          # `x.f()` / `x->f()`: not C, not modelled
     caller_owned: dict = {}          # rid -> storage, for slots the harness declares
+    # Values a FuzzedDataProvider hands back ARE the fuzzer's bytes, reshaped. Taint them
+    # before the call loop so a library call receiving one is seen to consume input.
+    fdp_methods = set(_fdp_taint(body, data, tainted))
     order = 0
 
     parsed = cflow.parse(body)
@@ -412,7 +452,8 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
         raw_blocks=blocks,
         notes=notes)
     _syms = {a.symbol for a in ir.apis.values()} if hasattr(ir, "apis") else set()
-    _missed = _missed_calls(body, _syms) + sorted(set(member_calls))
+    _missed = [x for x in _missed_calls(body, _syms) if x not in fdp_methods]
+    _missed += sorted(set(member_calls) - fdp_methods)
 
     # AN INPUT USE WE DID NOT BIND IS A FLOW WE DID NOT FOLLOW.
     #
@@ -442,6 +483,10 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
         _guards = len(re.findall(r"\b" + _n + r"\b\s*(?:<|>|<=|>=|==|!=)", body)) \
             + len(re.findall(r"(?:<|>|<=|>=|==|!=)\s*\b" + _n + r"\b", body))
         _uses = _all - _guards
+        if _name == data and fdp_methods:
+            # `FuzzedDataProvider fdp(data, size)` consumes the parameter once, in full,
+            # and everything downstream flows from the provider rather than from `data`.
+            _uses -= 1
         _bound = sum(1 for o in ops for a in o.args if a.source == _src)
         if _uses > _bound:
             _missed.append(f"{_uses - _bound} use(s) of {_name!r} the lifter did not bind")
