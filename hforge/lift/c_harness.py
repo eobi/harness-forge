@@ -101,8 +101,17 @@ def _resources_named_at(argstr: str, resources: dict) -> list:
     input, and S5 depends on saying so. Ownership is the question destroy-detection asks,
     and it is answered by the name.
     """
-    return [resources[n] for n in dict.fromkeys(re.findall(r"[A-Za-z_]\w*", argstr or ""))
-            if n in resources]
+    argstr = argstr or ""
+    # IN A DOTTED EXPRESSION THE FIELD IS THE TARGET, NOT THE BASE. `free(pi.proxy_auth)`
+    # frees what the field holds; reading left to right picked `pi` -- itself a resource --
+    # and the value parked in the field stayed marked live.
+    names = []
+    for chain in re.findall(r"[A-Za-z_]\w*(?:\s*(?:\.|->)\s*[A-Za-z_]\w*)+", argstr):
+        last = re.split(r"\.|->", chain)[-1].strip()
+        if last in resources:
+            names.append(last)
+    names += [n for n in re.findall(r"[A-Za-z_]\w*", argstr) if n in resources]
+    return [resources[n] for n in dict.fromkeys(names)]
 
 # `if (x) free(x);` and `if (x != NULL) free(x);` -- the shape of nearly every cleanup in C.
 _LIVE_TEST = (
@@ -411,6 +420,13 @@ _FDP_CONSUME = re.compile(
 _ASSIGN = re.compile(
     r"^\s*(?:[A-Za-z_][\w\s:<>,]*?[\s\*&]+)?([A-Za-z_]\w*)\s*=\s*([^;]+);")
 
+# `pi.proxy_authenticate = tmp;` -- a resource parked in a struct field and freed through
+# that field later. _ASSIGN cannot match it: its left side is a bare identifier, and the
+# dot stops the pattern dead.
+_FIELD_ASSIGN = re.compile(
+    r"^\s*(?:[A-Za-z_][\w\s:<>,]*?[\s\*&]+)?"
+    r"[A-Za-z_]\w*(?:\s*(?:\.|->)\s*([A-Za-z_]\w*))+\s*=\s*([^;]+);")
+
 
 def _mentions_tainted(expr: str, tainted: set) -> bool:
     """Whether an expression is derived from the fuzzer's bytes.
@@ -515,6 +531,17 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
         # reported that the harness consumes no input. It is not a C++ problem and not an
         # exotic one: it is an assignment. Handled here, in statement order, so a name
         # tainted later does not appear tainted earlier.
+        # A RESOURCE PARKED IN A STRUCT FIELD IS STILL THAT RESOURCE. openvpn's proxy
+        # harness does `pi.proxy_authenticate = tmp_authenticate;` and frees it later as
+        # `free(pi.proxy_authenticate)` -- the free names the FIELD, the create named the
+        # variable, and nothing connected them, so the resource read as leaked.
+        #
+        # The field name is registered as another way to say the same resource. Keyed on
+        # the field alone, since callsite arguments are read as bare identifiers.
+        _fld = _FIELD_ASSIGN.match(text)
+        if _fld and _fld.group(2).strip() in resources:
+            resources.setdefault(_fld.group(1), resources[_fld.group(2).strip()])
+
         _asn = _ASSIGN.match(text)
         if _asn:
             _lhs, _rhs = _asn.group(1), _asn.group(2)

@@ -830,3 +830,28 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 """))
     codes = {v.code for g in run_static_gates(L.ir) for v in g.violations}
     assert "S1.LEAK" in codes, "msg is genuinely leaked and msg_free_unpacked names a target"
+
+
+def test_a_resource_parked_in_a_struct_field_is_still_that_resource():
+    """openvpn's proxy harness does `pi.proxy_authenticate = tmp;` and later
+    `free(pi.proxy_authenticate)`. The free names the FIELD, the create named the variable,
+    and nothing connected them.
+
+    Two halves are needed and both are pinned here: the field assignment registers the
+    alias, and the dotted expression resolves to the FIELD rather than the base -- reading
+    left to right picked `pi`, itself a resource, and left the parked value marked live.
+    """
+    L = c_harness.lift(_c("""
+#include <stdint.h>
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    struct proxy_info pi;
+    setup(&pi, data, size);
+    char *tmp_auth = get_random_string();
+    pi.proxy_authenticate = tmp_auth;
+    send_it(&pi);
+    free(pi.proxy_authenticate);
+    return 0;
+}
+"""))
+    codes = {v.code for g in run_static_gates(L.ir) for v in g.violations}
+    assert "S1.LEAK" not in codes
