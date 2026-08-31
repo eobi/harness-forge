@@ -1,0 +1,29 @@
+{
+ "harnesses": 463,
+ "min_support": 4,
+ "max_violation_rate": 0.15,
+ "rules": [
+  {
+   "before": "buf_new",
+   "after": "buf_free",
+   "support": 24,
+   "callers_of_after": 9,
+   "violations": 2,
+   "violation_rate": 0.222,
+   "violators": [
+    "/tmp/corpus2/dropbear/fuzz__fuzzer-cliconf.c",
+    "/tmp/corpus2/dropbear/fuzz__fuzzer-pubkey.c"
+   ]
+  }
+ ],
+ "verdict": {
+  "conventions_with_exceptions": 1,
+  "violators": 2,
+  "triaged_by_reading": 2,
+  "real_defects": 0,
+  "why": "Both dropbear harnesses build their buffer with `buf_getstringbuf(fuzz.input)` and free it with `buf_free`, which is correct. The initialiser vocabulary does not recognise a constructor named `get`, and widening it to include `get` would suppress genuine violations -- `get` usually means borrow.",
+  "the_honest_conclusion": "The technique produces almost no noise on this corpus and also finds nothing. That is a NULL RESULT for corpus-mined protocol checking here, not a tuning problem, and the thresholds were deliberately not adjusted further: continuing until a finding appears would be fitting the instrument to the desired answer.",
+  "what_it_DID_produce": "Two engine defects, found by watching it report nonsense: calls inside `if` conditions were invisible to the lifter (trusted lifts 412 -> 463, +12%), and `pixCloseGeneralized` was read as a teardown because `close` matched anywhere in a name. The miner earned its place as an instrument for finding OUR bugs, which is not what it was built for.",
+  "when_it_might_work": "The corpus has 463 trusted lifts spread over roughly a thousand libraries, so almost no module has enough harnesses to establish a convention. 23 candidate conventions reached support >= 4 and only 6 had any exception at all. This needs either a much larger trusted tier or a corpus concentrated on fewer libraries."
+ }
+}

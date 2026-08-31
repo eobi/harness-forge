@@ -113,10 +113,28 @@ def mine(seqs, *, min_support: int = 10, max_violation_rate: float = 0.15) -> li
         # between constructors, not a sequence.
         if _INIT_ISH.search(b):
             continue
+        # A LIBRARY HAS MORE THAN ONE CONSTRUCTOR. dropbear builds its buffer with
+        # `buf_getstringbuf(..)` and frees it with `buf_free`, which is correct -- but the
+        # pair `buf_new -> buf_free` then reports it as freeing something it never made.
+        # leptonica showed the same shape with `pixReadMemSpix -> pixDestroy`.
+        #
+        # So the question is not "did this harness call A" but "did it call ANY initialiser
+        # of A's module". A harness that called none of them, and still calls B, is the one
+        # worth reading.
         callers_of_b = has[b]
-        violators = sorted(callers_of_b - has[a])
+        any_init = set()
+        for sym, idxs in has.items():
+            if _module(sym) == _module(a) and _INIT_ISH.search(sym):
+                any_init |= idxs
+        violators = sorted(callers_of_b - any_init)
         rate = len(violators) / max(len(callers_of_b), 1)
-        if violators and rate <= max_violation_rate:
+        # A RATE IS THE WRONG INSTRUMENT AT SMALL N. `buf_new -> buf_free` holds for 24
+        # harness pairs but only 9 harnesses call buf_free at all, so two exceptions are
+        # 22% and the rate filter discarded a rule worth reading. Few exceptions in
+        # ABSOLUTE terms is the signal when the denominator is small; the rate still guards
+        # the large ones. Both numbers print, so the reader judges rather than the
+        # threshold.
+        if violators and (rate <= max_violation_rate or len(violators) <= 2):
             rules.append({"before": a, "after": b, "support": support,
                           "callers_of_after": len(callers_of_b),
                           "violations": len(violators),
