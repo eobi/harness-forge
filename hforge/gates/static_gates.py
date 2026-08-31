@@ -116,6 +116,27 @@ def s1_lifetime(ir: HarnessIR) -> GateResult:
     #   `if (p) { use(p); }`        -- the use sits under a positive test
     #   `if (!p) return 0;`         -- an earlier arm tested it and LEFT
     # The second is why guard text and the exiting-arm marker both had to reach the gates.
+    def _is_a_null_fallback(op) -> bool:
+        """`x = parse(..); if (x == NULL) x = new_object();` is a FALLBACK, not a second
+        create.
+
+        The second assignment runs only when the first produced nothing, so there is no
+        first value to leak. The mirror image of the rule that a destroy guarded by a
+        POSITIVE null-test is unconditional cleanup -- json-c's pointer fuzzer uses this
+        shape and read as a double create.
+        """
+        g = ""
+        for x in op.guarded_by:
+            if x.startswith("__guard:"):
+                g = x.split(":", 1)[1]
+        if not g or "||" in g or not op.binds:
+            return False
+        name = op.binds[2:] if op.binds.startswith("r_") else op.binds
+        n = re.escape(name)
+        return bool(re.search(r"!\s*" + n + r"\b", g)
+                    or re.search(r"\b" + n + r"\s*==\s*(?:NULL|nullptr|0)\b", g)
+                    or re.search(r"\b(?:NULL|nullptr|0)\s*==\s*" + n + r"\b", g))
+
     def _guard_of(op) -> str:
         for x in op.guarded_by:
             if x.startswith("__guard:"):
@@ -250,9 +271,16 @@ def s1_lifetime(ir: HarnessIR) -> GateResult:
                 v.append(Violation("S1.UNKNOWN_RESOURCE", BLOCK,
                                    f"op {op.id} binds undeclared resource {op.binds!r}",
                                    where=op.id, principle="P1"))
-            elif (state[op.binds] != UNBORN and not _by_addr.get(op.binds)
+            elif (state[op.binds] == ALIVE and not _by_addr.get(op.binds)
+                  # A CREATE ON A DEAD RESOURCE IS A NEW LIFETIME, NOT A DOUBLE CREATE.
+                  # `pixa = pixaReadMem(..); pixaDestroy(&pixa); pixa = pixaReadMem(..);`
+                  # leaks nothing -- the slot was empty when it was refilled. Only a create
+                  # over a LIVE value loses that value. The test was `!= UNBORN`, which
+                  # treats a released slot exactly like an occupied one, and leptonica's
+                  # ccthin harness does this twice per loop iteration.
                   and not _exclusive(born_arm.get(op.binds), _arm_of(op))
-                  and not _owned_by_a_released_arena(op.binds)):
+                  and not _owned_by_a_released_arena(op.binds)
+                  and not _is_a_null_fallback(op)):
                 # A SLOT REFILLED FROM AN ARENA LEAKS NOTHING. pjsip's auth harness parses
                 # twice into the same `msg`, both allocations taken from a pool that
                 # `pjsip_endpt_release_pool` returns; the first value is not leaked because
@@ -292,6 +320,15 @@ def s1_lifetime(ir: HarnessIR) -> GateResult:
             elif state[op.targets] == UNBORN:
                 v.append(Violation("S1.DESTROY_BEFORE_CREATE", BLOCK,
                                    f"op {op.id} destroys {op.targets!r} before it exists",
+                                   where=op.id, principle="P1"))
+            elif state[op.targets] == DEAD and "__nulls_target" in op.guarded_by:
+                # DESTROY-BY-ADDRESS NULLS THE SLOT. `pixaDestroy(&pixa)` sets the caller's
+                # pointer to NULL and returns early when it is already NULL, so a second
+                # call frees nothing -- leptonica's ccthin destroys inside a loop and once
+                # more after it. Redundant, and worth saying, but not a double free.
+                v.append(Violation("S1.REDUNDANT_DESTROY", INFO,
+                                   f"{op.targets!r} is already released and "
+                                   f"{op.api} takes its address, so this call is a no-op",
                                    where=op.id, principle="P1"))
             elif (state[op.targets] == DEAD
                   and dead_by.get(op.targets, "") != op.api

@@ -47,6 +47,22 @@
   "FALSE_REJECTION_ON_TRUSTED_LIFTS": "5/422 = 1.18%",
   "comparison": "QuartetFuzz reports a 4.8% false-positive rate. Ours is 1.18% -- but the denominators are NOT comparable and the difference is the whole point: we trust only 422 of 1942 lifts, 22%, and DECLINE TO OPINE on the rest. Their figure covers everything they judged. A fair reading is that we buy precision by abstaining, which is the design, not an accident.",
   "the_honest_caveat": "28.8% blocking across ALL lifted harnesses is the number that would matter if the fidelity filter were removed. The filter is doing the work, and it is a filter over OUR OWN comprehension, not over harness quality. For synthesis the relevant question is slightly different -- candidates will be OUR plans, not third-party code -- so this is the best available prior rather than a direct answer.",
-  "defect_found_while_measuring": "S2.TYPE_CONFUSION fired on four leptonica harnesses because taint spreads to handles and the taint test ran BEFORE the out-parameter test: `pixDestroy(&pixd)` on a tainted pixd bound the ADDRESS OF A POINTER as raw fuzzer bytes. Fixed; the rate above is post-fix."
+  "defect_found_while_measuring": "S2.TYPE_CONFUSION fired on four leptonica harnesses because taint spreads to handles and the taint test ran BEFORE the out-parameter test: `pixDestroy(&pixd)` on a tainted pixd bound the ADDRESS OF A POINTER as raw fuzzer bytes. Fixed; the rate above is post-fix.",
+  "UPDATE_after_triaging_the_residue": {
+   "trusted_lifts": 412,
+   "blocking": 3,
+   "rate": "0.73%",
+   "confirmed_real": 1,
+   "false_rejection": "2/412 = 0.49%",
+   "was": "1.18% (6 of 422)",
+   "five_more_engine_defects_found_by_reading_the_residue": {
+    "null_fallback_create": "`x = parse(..); if (x == NULL) x = new_object();` is a FALLBACK, not a second create -- the mirror of the rule that a destroy under a POSITIVE null-test is unconditional cleanup. json-c.",
+    "create_on_a_dead_slot": "the test was `state != UNBORN`, which treats a RELEASED slot exactly like an occupied one. Only a create over a LIVE value loses that value.",
+    "same_arm_lifetimes": "the hedge for a destroy on one branch of a CHOICE was firing on LOOP bodies. If the resource was created in the same arm, whatever decided to enter the arm decided both.",
+    "redundant_destroy_by_address": "`pixaDestroy(&p)` nulls the caller's variable, so a second call frees nothing. INFO, not a double free.",
+    "size_alias_through_a_call": "THE BIG ONE. `pixa = pixaReadMem(data, size)` mentions size, so `pixa` became a LENGTH alias -- and `pixaDestroy(&pixa)` then classified its argument as a length and never reached the out-parameter branch. leptonica's destroys lifted with NO TARGET AT ALL. A call result is a new value whatever it was computed from."
+   },
+   "what_it_demonstrates": "The gate bank now flags exactly one leptonica harness out of the fourteen in the corpus, and it is the one with the real defect (pix3, filed as leptonica#813). Before this pass it flagged five of them."
+  }
  }
 }

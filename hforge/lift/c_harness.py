@@ -586,6 +586,7 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
     by_address: set = set()          # resources created through an out-parameter
     member_calls: list = []          # `x.f()` / `x->f()`: not C, not modelled
     caller_owned: dict = {}          # rid -> storage, for slots the harness declares
+    created_arm: dict = {}           # rid -> the arm its create sits in
     refs: dict = {}                  # rid -> outstanding explicit refcount increments
     # Values a FuzzedDataProvider hands back ARE the fuzzer's bytes, reshaped. Taint them
     # before the call loop so a library call receiving one is seen to consume input.
@@ -625,7 +626,18 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
             # `size_t payload_len = size;` is the same aliasing on the LENGTH side, and
             # binding it as a literal leaves a call reading `parse(payload, 0)` -- input
             # bound, length thrown away, which is worse than either alone.
-            if _lhs not in size_alias and _mentions_tainted(_rhs, size_alias):
+            # ...BUT A CALL THAT TAKES `size` IS NOT A LENGTH.
+            #
+            # `pixa = pixaReadMem(data, size)` mentions size and returns a PIXA. Treating
+            # every RHS that mentions a length as itself a length made `pixa` a size alias,
+            # so `pixaDestroy(&pixa)` classified its argument as a LENGTH and never reached
+            # the out-parameter branch -- leptonica's destroys lifted with no target at all.
+            #
+            # An alias is an assignment of the length, possibly with arithmetic:
+            # `size_t n = size;` or `size - 1`. A call result is a new value, whatever it
+            # was computed from.
+            if ("(" not in _rhs and _lhs not in size_alias
+                    and _mentions_tainted(_rhs, size_alias)):
                 size_alias.add(_lhs)
         for cm in _CALL.finditer(text):
             assigned, fn, argstr = cm.group(1), cm.group(2), cm.group(3)
@@ -684,6 +696,7 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
                 size_alias=size_alias)
 
             role, binds, targets = ROLE_QUERY, "", ""
+            nulls_target = False
             # DESTROY BY ADDRESS. `pixDestroy(&pix)` takes the pointer's ADDRESS so the
             # library can NULL the caller's variable -- leptonica does this throughout, and
             # so do g_clear_object and most APIs that clear what they free. Read as an
@@ -696,6 +709,12 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
                                 if _FREE_ISH.search(fn) else [])
             if _destroy_by_addr:
                 role, targets, binds = ROLE_DESTROY, _destroy_by_addr[-1], ""
+                # NOT `by_address`: that field means the CREATE receives the address,
+                # which is a different property of a different call. Marked on the OP,
+                # where it belongs -- a destroy taking the address nulls the caller's
+                # variable, which is the entire reason the API is shaped that way, so
+                # calling it twice frees nothing.
+                nulls_target = True
             elif out_created and not (assigned and is_ptr(assigned)):
                 # WHICH `&x` IS THE OUT-PARAMETER. Taking the first one is wrong whenever a
                 # call is handed an input struct by address before the slot it fills:
@@ -778,8 +797,20 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
                     rid = None
                 if rid is None:
                     pass
-                elif stmt.depth == 0 or _guarded_by_own_liveness(stmt.guard, args,
-                                                                 resources, rid):
+                elif (stmt.depth == 0
+                      or _guarded_by_own_liveness(stmt.guard, args, resources, rid)
+                      # CREATED AND DESTROYED IN THE SAME ARM IS A MATCHED LIFETIME.
+                      #
+                      # The hedge exists for a destroy on ONE branch of a choice, where a
+                      # later use may still run. It was firing on loop bodies too:
+                      # leptonica's ccthin does `pixa = pixaReadMem(..); ...;
+                      # pixaDestroy(&pixa);` twice inside a for, and the destroys were
+                      # withheld, so both creates read as overwriting a live value.
+                      #
+                      # If the resource was CREATED in this same arm, the destroy is not
+                      # conditional relative to it -- whatever decided to enter the arm
+                      # decided both.
+                      or created_arm.get(rid) == stmt.arm):
                     role, targets = ROLE_DESTROY, rid
                 else:
                     # A destroy on ONE branch only. Marking the resource dead would report
@@ -799,6 +830,8 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
                            returns=TypeRef("void *" if binds else "int",
                                            "pointer" if binds else "scalar"),
                            contract=Contract())
+            if binds:
+                created_arm[binds] = stmt.arm
             ops.append(Op(f"o{order}", fn, args, binds=binds, targets=targets,
                           guarded_by=([] if stmt.depth == 0
                                       else [f"__branch:{stmt.arm}"]
@@ -813,7 +846,8 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
                           # dropped: leptonica's maze harness destroys ppixd, refills it
                           # through a second search, and destroys it again -- which read as
                           # a use-after-free and a double free of a slot nothing refilled.
-                          + [f"__refills:{r}" for r in out_created if r != binds]))
+                          + [f"__refills:{r}" for r in out_created if r != binds]
+                          + (["__nulls_target"] if nulls_target else [])))
             order += 1
 
     if not ops:

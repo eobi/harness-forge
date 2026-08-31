@@ -914,3 +914,47 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 """))
     codes = {v.code for g in run_static_gates(L.ir) for v in g.violations}
     assert "S2.TYPE_CONFUSION" not in codes
+
+
+def test_a_call_that_takes_size_is_not_a_length_alias():
+    """`pixa = pixaReadMem(data, size)` mentions size and returns a PIXA.
+
+    Treating every right-hand side that MENTIONS a length as itself a length made `pixa` a
+    size alias, so `pixaDestroy(&pixa)` classified its argument as a LENGTH and never
+    reached the out-parameter branch: leptonica's destroys lifted with no target at all,
+    and four harnesses reported double creates and double destroys they do not have.
+
+    An alias is an assignment of the length, possibly with arithmetic. A call result is a
+    new value, whatever it was computed from.
+    """
+    L = c_harness.lift(_c("""
+#include <stdint.h>
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    PIXA *pixa, *out;
+    pixa = pixaReadMem(data, size);
+    out = pixaThinConnected(pixa, 1, 2, 3);
+    pixaDestroy(&pixa);
+    pixaDestroy(&out);
+    return 0;
+}
+"""))
+    destroys = [op.targets for op in L.ir.sequence if op.targets]
+    assert "r_pixa" in destroys and "r_out" in destroys, destroys
+    codes = {v.code for g in run_static_gates(L.ir) for v in g.violations}
+    assert "S1.DOUBLE_CREATE" not in codes
+    assert "S1.LEAK" not in codes
+
+
+def test_a_plain_length_alias_still_works():
+    """The rule above must not break what it narrows: `size_t n = size;` is still a length,
+    and binding it as a literal would leave a call reading `parse(buf, 0)`."""
+    L = c_harness.lift(_c("""
+#include <stdint.h>
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    size_t n = size;
+    parse_it(data, n);
+    return 0;
+}
+"""))
+    assert any(a.source == "length_of" for op in L.ir.sequence for a in op.args), \
+        "n aliases size and must bind as its length"
