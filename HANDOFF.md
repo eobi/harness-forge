@@ -25,9 +25,21 @@ filed; gate false-rejection driven from 1.18% to **0.00% on 412 trusted lifts**;
 plan synthesis built (14-17x more valid candidates); and the negative-capability bound
 finally published — **115 of 1,374 OSS-Fuzz projects cannot report a leak.**
 
-**Not done, and blocked on the same thing:** campaigning the synthesised candidates for the
-+14% coverage claim, and woff2's n=5. Both need an IDLE MACHINE. Do not run them beside
-anything else; see the woff2 warning below.
+**Not done, and blocked on hardware this project does not have:** campaigning the
+synthesised candidates for the +14% coverage claim, and woff2's n=5.
+
+**THE MACHINE IS NEVER IDLE.** Checked 2026-08-31: load average 37-41 on ten cores, with a
+Jackalope fuzzing campaign nine days into its run and a VM three days into its. That is a
+standing floor, not a passing spike. A fixed-TIME campaign measures spare CPU, so this box
+cannot produce a valid coverage number at all -- not later, not overnight.
+
+**THE "SECOND MACHINE" IS NOT ONE.** The Ubuntu VM at 192.168.68.2 answers on `bridge100`,
+the macOS Virtualization.framework bridge. It is a guest on the same Mac, sharing the same
+cores and the same load. It cannot serve the purpose PAPERS.md asks of it -- separating
+campaign variance from host effects -- because it is the host. It CAN serve the GUI track,
+which needs Linux and AT-SPI rather than CPU isolation.
+
+Coverage work needs genuinely separate hardware: another physical box or a cloud instance.
 
 ---
 
