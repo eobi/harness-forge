@@ -223,6 +223,37 @@ def s1_lifetime(ir: HarnessIR) -> GateResult:
                 _owner[op.binds] = a.ref
                 break
 
+    # A HARNESS-LOCAL COLLECTOR FREES IN BULK, UNDER ITS OWN NAME.
+    #
+    # openvpn's harnesses allocate through `gb_get_random_string()` and release everything
+    # with `gb_cleanup()`; apache-httpd pairs `af_gb_init()` with `af_gb_cleanup()`. The
+    # resource is never named at the free, so pairing by resource cannot see it -- and this
+    # is the shape that made S1.LEAK unreadable in the first place.
+    #
+    # The link is the MODULE PREFIX: a creating function and a cleanup function that share
+    # their first underscore-separated token belong to the same collector. Weaker evidence
+    # than an argument, so it reports at INFO and never blocks.
+    # The prefix alone is far too weak: `msg_unpack` and `msg_free_unpacked` share one
+    # too, and keying on that suppressed leaks across every well-named C library -- caught
+    # by the test pinning `if (x == NULL) free(x)` as a real defect, which stopped firing.
+    #
+    # What distinguishes a COLLECTOR is that it names no resource: `gb_cleanup()` and
+    # `af_gb_cleanup()` take nothing, because their whole job is to free what the harness
+    # can no longer name. A free that takes its target is ordinary pairing, not bulk.
+    _bulk_prefixes = {op.api.split("_", 1)[0]
+                      for op in ir.sequence
+                      if "_" in op.api and _FREEISH_NAME.search(op.api)
+                      and not op.targets
+                      and not any(a.source == SRC_RESOURCE for a in op.args)}
+
+    def _freed_in_bulk(rid: str) -> str:
+        for op in ir.sequence:
+            if op.binds == rid and "_" in op.api:
+                pre = op.api.split("_", 1)[0]
+                if pre in _bulk_prefixes:
+                    return pre
+        return ""
+
     def _freed_with_owner(rid: str, seen=None) -> bool:
         seen = seen or set()
         own = _owner.get(rid)
@@ -233,6 +264,13 @@ def s1_lifetime(ir: HarnessIR) -> GateResult:
 
     for rid, st in state.items():
         if st == ALIVE and _owned.get(rid, "handle") == "inline":
+            continue
+        if st == ALIVE and _freed_in_bulk(rid):
+            v.append(Violation("S1.FREED_IN_BULK", INFO,
+                               f"resource {rid!r} is allocated by a {_freed_in_bulk(rid)}_* "
+                               f"function and the harness calls a {_freed_in_bulk(rid)}_* "
+                               f"cleanup; it is released in bulk rather than by name",
+                               where=rid, principle="P1"))
             continue
         if st == ALIVE and _freed_with_owner(rid):
             v.append(Violation("S1.FREED_WITH_OWNER", INFO,
@@ -724,6 +762,13 @@ _GATES = {
     "S5": s5_input_flow,
     "S6": s6_error_handling,
 }
+
+
+# `apr_pool_terminate()` ends the whole pool subsystem and releases every pool with it,
+# which is why apache-httpd's harness needs no per-pool destroy. "terminate" and "shutdown"
+# are cleanup verbs a collector uses and a per-resource free does not.
+_FREEISH_NAME = re.compile(
+    r"(free|destroy|cleanup|release|fini|dispose|terminate|shutdown)", re.I)
 
 
 def run_static_gates(ir: HarnessIR, only: tuple = ALL_STATIC) -> list[GateResult]:

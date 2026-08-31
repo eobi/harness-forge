@@ -791,3 +791,42 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 """))
     assert any(a.source == "input" for op in L.ir.sequence for a in op.args), \
         "the cast argument is the only input this harness has"
+
+
+def test_a_harness_local_collector_frees_in_bulk():
+    """openvpn allocates through `gb_get_random_string()` and releases everything with
+    `gb_cleanup()`; apache-httpd pairs `af_gb_*` with `af_gb_cleanup()`. The resource is
+    never named at the free, so pairing by resource cannot see it -- and this is the shape
+    that made S1.LEAK unreadable in the first place."""
+    L = c_harness.lift(_c("""
+#include <stdint.h>
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    gb_init();
+    char *s = gb_get_random_string(data, size);
+    use_it(s);
+    gb_cleanup();
+    return 0;
+}
+"""))
+    codes = {v.code for g in run_static_gates(L.ir) for v in g.violations}
+    assert "S1.LEAK" not in codes
+    assert "S1.FREED_IN_BULK" in codes
+
+
+def test_a_shared_prefix_alone_does_not_excuse_a_leak():
+    """The narrowing that makes the rule above safe. `msg_unpack` and `msg_free_unpacked`
+    share a prefix too, so keying on the prefix alone suppressed leaks across every
+    well-named C library. A collector is distinguished by naming NO resource: it frees what
+    the harness can no longer name. A free that takes its target is ordinary pairing."""
+    L = c_harness.lift(_c("""
+#include <stdint.h>
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    Msg *msg = msg_unpack(data, size);
+    Msg *other = msg_unpack(data, size);
+    if (other != NULL) { msg_free_unpacked(other, 0); }
+    use_it(msg);
+    return 0;
+}
+"""))
+    codes = {v.code for g in run_static_gates(L.ir) for v in g.violations}
+    assert "S1.LEAK" in codes, "msg is genuinely leaked and msg_free_unpacked names a target"
