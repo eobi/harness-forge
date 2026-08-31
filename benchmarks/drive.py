@@ -420,6 +420,13 @@ CASES = {
  #
  # C++20 is REQUIRED: `using ByteSpan = std::span<const uint8_t>` in base-types.h does not
  # compile under C++17. Run benchmarks/targets/wabt.sh first for include/wabt/config.h.
+ #
+ # PINNED AT 1.0.41, NOT 1.0.36. The first pin was wrong in two ways at once: 1.0.36 has no
+ # `fuzzers/` directory at all, so the gold harness this case names does not exist there --
+ # the harnesses were read from a clone of `main` and the tag was chosen separately. And
+ # targets/wabt.sh writes WABT_VERSION_STRING "1.0.41" into the generated config.h, because
+ # those values were also taken from that clone. A case whose sources, generated header and
+ # gold harness come from three different revisions is not a measurement of anything.
  "wabt/read_binary_ir": dict(
     lang="c++", cxx=True, std="c++20",
     hdr="/b/wabt/include/wabt/binary-reader-ir.h",

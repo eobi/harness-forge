@@ -39,7 +39,7 @@ leptonica https://github.com/DanBloomberg/leptonica   1.85.0
 libde265  https://github.com/strukturag/libde265      v1.0.15
 pugixml   https://github.com/zeux/pugixml             v1.15
 woff2     https://github.com/google/woff2             main
-wabt      https://github.com/WebAssembly/wabt         1.0.36
+wabt      https://github.com/WebAssembly/wabt         1.0.41
 libpng    https://github.com/pnggroup/libpng          v1.6.44
 libwebp   https://github.com/webmproject/libwebp      v1.4.0
 expat     https://github.com/libexpat/libexpat        R_2_6_4
