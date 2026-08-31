@@ -105,6 +105,51 @@ def s1_lifetime(ir: HarnessIR) -> GateResult:
         seen.add(own)
         return own in _destroyed_anywhere or _owned_by_a_released_arena(own, seen)
 
+    # AN ALLOCATION THAT MIGHT FAIL, USED AS IF IT CANNOT.
+    #
+    # `p = thing_new(); thing_use(p);` dereferences NULL on every out-of-memory input, and
+    # under a fuzzer that is a crash attributed to the LIBRARY when it belongs to the
+    # harness. This is the first check here that is about the harness's own logic rather
+    # than about resource lifetime, and it is the class QuartetFuzz calls logic correctness.
+    #
+    # A pointer counts as checked if EITHER shape appears:
+    #   `if (p) { use(p); }`        -- the use sits under a positive test
+    #   `if (!p) return 0;`         -- an earlier arm tested it and LEFT
+    # The second is why guard text and the exiting-arm marker both had to reach the gates.
+    def _guard_of(op) -> str:
+        for x in op.guarded_by:
+            if x.startswith("__guard:"):
+                return x.split(":", 1)[1]
+        return ""
+
+    def _tests(guard: str, names) -> bool:
+        for n in names:
+            if re.search(r"(?<![\w.>])" + re.escape(n) + r"\b", guard or ""):
+                return True
+        return False
+
+    _names_of = {}
+    for _r in ir.resources:
+        _names_of[_r.id] = [_r.id[2:]] if _r.id.startswith("r_") else [_r.id]
+
+    # Only a handle the harness CREATED can be NULL from a failed allocation. A slot the
+    # caller declared has storage from its declaration, and an inline object cannot be NULL
+    # at all.
+    _storage_of = {r.id: (r.storage or "handle") for r in ir.resources}
+    _created_by_call = {op.binds for op in ir.sequence if op.binds}
+
+    # The lifter answers this from the control flow, because the commonest check --
+    # `if (p == NULL) return 0;` -- has a body containing only a return and therefore
+    # produces no op for a gate to read.
+    _checked: set = {r.id for r in ir.resources if getattr(r, "null_checked", False)}
+    for op in ir.sequence:
+        _g = _guard_of(op)
+        if _g and any(x.startswith("__exits:") for x in op.guarded_by):
+            # An arm that tested something and left makes it safe below.
+            for rid, names in _names_of.items():
+                if _tests(_g, names):
+                    _checked.add(rid)
+
     dead_by: dict[str, str] = {}    # ...and WHICH call did it, for two-phase teardown
     dead_exits: dict[str, bool] = {}  # ...and whether that path left the function
     dead_arm: dict[str, str] = {}   # WHERE a resource died, for the same reason born_arm exists
@@ -133,6 +178,29 @@ def s1_lifetime(ir: HarnessIR) -> GateResult:
                 continue
             if a.ref in inline_self_init:
                 continue
+            if (a.ref not in _checked and a.ref in _created_by_call
+                    and _storage_of.get(a.ref, "handle") == "handle"
+                    and not _tests(_guard_of(op), _names_of.get(a.ref, []))):
+                # INFO, NOT WARN, AND THE REASON IS A MEASUREMENT.
+                #
+                # This fires on 43 of 340 trusted lifts, 12%, and it cannot tell an
+                # unchecked return from one that CANNOT FAIL. tidy-html5 calls
+                # `fuzzer_get_tmpfile`, which aborts on every failure path and never
+                # returns NULL, so the missing check there is correct -- and nothing short
+                # of reading the callee could establish that. It also needs an allocation
+                # failure to matter, which fuzzers do not inject by default.
+                #
+                # So it is advisory and explicitly NOT a finding source. The warning tier
+                # is where upstream-reportable defects live and it stays clean.
+                v.append(Violation("S1.UNCHECKED_ALLOCATION", INFO,
+                                   f"{a.ref!r} is used by {op.api} without anything having "
+                                   f"established it is non-NULL; an allocation failure "
+                                   f"crashes the harness and the crash is attributed to "
+                                   f"the library",
+                                   where=op.id, principle="P1",
+                                   fix=f"test {a.ref!r} after it is created, or return "
+                                       f"early when it is NULL"))
+                _checked.add(a.ref)   # report the FIRST unchecked use only
             if a.ref not in state:
                 v.append(Violation("S1.UNKNOWN_RESOURCE", BLOCK,
                                    f"op {op.id} uses undeclared resource {a.ref!r}",
@@ -143,8 +211,12 @@ def s1_lifetime(ir: HarnessIR) -> GateResult:
                                    f"op {op.id} uses {a.ref!r} before anything creates it",
                                    where=op.id, principle="P1"))
             elif (state[a.ref] == DEAD
-                  and _CLEANUP_NAME.search(dead_by.get(a.ref, ""))
-                  and op.api in _RAW_FREE_NAMES):
+                  and dead_by.get(a.ref, "") != op.api
+                  and (op.api in _RAW_FREE_NAMES or _CLEANUP_NAME.search(op.api))):
+                # Only a RELEASE call gets this exemption. `magic_close(m);
+                # magic_buffer(m, ..)` is a use-after-free and must keep firing -- the
+                # first version of this test asked only whether the NAME differed, which
+                # every ordinary use-after-free also satisfies, and it silenced three.
                 # The second phase of a teardown names the resource it is releasing; that
                 # is not a use-after-free. Reported once, as TWO_PHASE_TEARDOWN, when the
                 # destroy is handled below.
@@ -212,8 +284,22 @@ def s1_lifetime(ir: HarnessIR) -> GateResult:
                                    f"op {op.id} destroys {op.targets!r} before it exists",
                                    where=op.id, principle="P1"))
             elif (state[op.targets] == DEAD
-                  and _CLEANUP_NAME.search(dead_by.get(op.targets, ""))
-                  and op.api in _RAW_FREE_NAMES):
+                  and dead_by.get(op.targets, "") != op.api
+                  and (_CLEANUP_NAME.search(dead_by.get(op.targets, ""))
+                       or op.api in _RAW_FREE_NAMES)):
+                # TWO DIFFERENT RELEASE FUNCTIONS ARE A TEARDOWN; THE SAME ONE TWICE IS A
+                # DOUBLE FREE.
+                #
+                # `kdc_free_lookaside(context)` frees a component OF the context and
+                # `krb5_free_context(context)` frees the context, and telling "frees X"
+                # from "frees part of X" apart needs the callee, which an audit of
+                # third-party harnesses does not have. `IedConnection_close(con);
+                # IedConnection_destroy(con);` is the same question in another spelling.
+                #
+                # So the distinguishing signal is the NAME: a genuine double free is
+                # `free(p); free(p);` or the same destroy called twice, and that still
+                # blocks. Two different functions is a sequence we cannot resolve, and it
+                # is reported rather than asserted.
                 # TWO-PHASE TEARDOWN, NOT A DOUBLE FREE. `lldpd_port_cleanup(port, 1);
                 # free(port);` is the correct sequence: cleanup releases the members and
                 # the caller releases the object. lldpd's four harnesses do exactly this,
@@ -821,8 +907,37 @@ _GATES = {
 # `apr_pool_terminate()` ends the whole pool subsystem and releases every pool with it,
 # which is why apache-httpd's harness needs no per-pool destroy. "terminate" and "shutdown"
 # are cleanup verbs a collector uses and a per-resource free does not.
-_CLEANUP_NAME = re.compile(r"cleanup|_fini|deinit|reset", re.I)
-_RAW_FREE_NAMES = {"free", "cfree", "delete"}
+# PHASE ONE: releases what the object HOLDS, without freeing the object.
+# `lldpd_port_cleanup(port, 1)`, `IedConnection_close(con)`, `x_stop()`, `x_disconnect()`.
+_RELEASE_VERBS = {"cleanup", "close", "stop", "fini", "deinit", "reset", "disconnect",
+                  "shutdown", "flush", "end"}
+# PHASE TWO: frees the object itself.
+_DESTROY_VERBS = {"free", "destroy", "delete", "del", "dispose", "release", "unref"}
+
+
+def _has_verb(fn: str, verbs: set) -> bool:
+    from ..lift.c_harness import _name_segments
+    return any(seg in verbs for seg in _name_segments(fn))
+
+
+class _CleanupName:
+    """Phase one of a teardown: it must be a release verb and NOT itself a destroy, or
+    `x_destroy` would count as its own first phase and mask a genuine double free."""
+
+    @staticmethod
+    def search(fn: str):
+        return _has_verb(fn, _RELEASE_VERBS) and not _has_verb(fn, _DESTROY_VERBS)
+
+
+_CLEANUP_NAME = _CleanupName()
+
+
+class _RawFreeNames:
+    def __contains__(self, fn: str):
+        return _has_verb(fn, _DESTROY_VERBS)
+
+
+_RAW_FREE_NAMES = _RawFreeNames()
 
 def _FREEISH_NAME_search(fn: str):
     """Shares the lifter's vocabulary and its segment rule, rather than keeping a second

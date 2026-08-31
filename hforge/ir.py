@@ -338,6 +338,13 @@ class Resource:
     id: str
     type: TypeRef
     storage: str = "handle"          # handle | inline | out_param
+    # DID THE HARNESS TEST THIS FOR NULL BEFORE USING IT?
+    #
+    # Recorded on the resource rather than inferred from the ops, because the commonest
+    # shape produces no op at all: `if (p == NULL) return 0;` has a body containing only a
+    # return, so nothing carries the guard and the check is invisible to a gate reading the
+    # sequence. Set by the lifter, which can see the control flow.
+    null_checked: bool = False
     # FIELDS THE LIBRARY REQUIRES SET BEFORE THE OBJECT IS USABLE, as name -> C expression.
     #
     # Zeroing a caller-allocated struct is not the same as initialising it. libpng's

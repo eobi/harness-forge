@@ -148,6 +148,13 @@ def _guarded_by_own_liveness(guard: str, args, resources, rid: str) -> bool:
                 return True
     return False
 
+# Head of a declaration: the type, then everything up to the semicolon. Deliberately NOT
+# a pattern that describes the declarator list -- the version that did nested two
+# quantifiers and backtracked without terminating on two real harnesses (freetype2,
+# openexr). The list is split in Python, which cannot backtrack at all.
+_DECL_HEAD = re.compile(
+    r"^[ \t]*((?:const |struct |unsigned |signed )*[A-Za-z_]\w*)[ \t]+([^;{}()]*)$")
+
 _NOT_A_CALL = {"if", "for", "while", "switch", "return", "sizeof", "assert", "static_assert",
                "printf", "fprintf", "abort", "exit", "memset", "malloc", "free",
                "calloc", "realloc", "strlen", "strcpy", "puts", "fwrite"}
@@ -536,6 +543,29 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
         base, stars, name = dm.group(1) or "", dm.group(2) or "", dm.group(3)
         decl_type[name] = (base + " " + stars).strip()
 
+    # ONE DECLARATION CAN DECLARE SEVERAL NAMES. `PIX *pix1, *pix2, *return_pix,
+    # *pix_copy;` does not match the single-declarator pattern at all -- the comma stops it
+    # -- so NONE of the four got a declared type, `is_ptr` answered False for every one,
+    # and leptonica's 14 harnesses lifted with no resources and a destroy that named
+    # nothing. Each declarator carries its own stars: `int a, *b;` makes only `b` a
+    # pointer.
+    for _line in body.splitlines():
+        _line = _line.strip()
+        if "," not in _line or not _line.endswith(";"):
+            continue
+        _dm = _DECL_HEAD.match(_line[:-1])
+        if not _dm:
+            continue
+        _base, _rest = _dm.group(1).strip(), _dm.group(2)
+        for _decl in _rest.split(","):
+            _d = _decl.strip()
+            _m = re.match(r"^(\**)\s*([A-Za-z_]\w*)", _d)
+            if not _m:
+                continue
+            _nm = _m.group(2)
+            if _nm not in decl_type:
+                decl_type[_nm] = (_base + " " + _m.group(1)).strip()
+
     def is_ptr(name: str) -> bool:
         t = decl_type.get(name)
         if t is None:
@@ -642,13 +672,26 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
             if fn in _NOT_A_CALL or fn.startswith("__"):
                 continue
 
+            _known_before = set(resources.values())
             args, params, out_created = _classify_args(
                 args_raw, data, size, tainted, resources, is_ptr, unread, fn,
                 decl_type=decl_type, caller_owned=caller_owned,
                 size_alias=size_alias)
 
             role, binds, targets = ROLE_QUERY, "", ""
-            if out_created and not (assigned and is_ptr(assigned)):
+            # DESTROY BY ADDRESS. `pixDestroy(&pix)` takes the pointer's ADDRESS so the
+            # library can NULL the caller's variable -- leptonica does this throughout, and
+            # so do g_clear_object and most APIs that clear what they free. Read as an
+            # out-parameter it became a CREATE, and S3 then objected that the destroy named
+            # no resource, against 14 correct leptonica harnesses.
+            #
+            # Only when the slot ALREADY held a resource: `f(&out)` filling a fresh slot is
+            # a create whatever the function is called.
+            _destroy_by_addr = ([r for r in out_created if r in _known_before]
+                                if _FREE_ISH.search(fn) else [])
+            if _destroy_by_addr:
+                role, targets, binds = ROLE_DESTROY, _destroy_by_addr[-1], ""
+            elif out_created and not (assigned and is_ptr(assigned)):
                 # WHICH `&x` IS THE OUT-PARAMETER. Taking the first one is wrong whenever a
                 # call is handed an input struct by address before the slot it fills:
                 # `evutil_getaddrinfo_common_(NULL, s, &hints, &res, &portnum)` binds
@@ -714,8 +757,16 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
             elif not binds and _FREE_ISH.search(fn) and (
                     any(a.source == "resource" for a in args)
                     or _resources_named_at(argstr, resources)):
-                rid = next((a.ref for a in args if a.source == "resource"), None) \
-                    or _resources_named_at(argstr, resources)[0]
+                # THE LAST RESOURCE ARGUMENT IS THE ONE BEING FREED.
+                #
+                # `krb5_pac_free(context, pac)` frees the pac, not the context, and C APIs
+                # conventionally pass the context or allocator FIRST and the object last:
+                # `pjsip_endpt_release_pool(endpt, pool)`, `krb5_free_principal(context,
+                # princ)`. Taking the first made three krb5 harnesses and libiec61850
+                # report a double free of the context they then correctly free once.
+                _named = [a.ref for a in args if a.source == "resource"] \
+                    or _resources_named_at(argstr, resources)
+                rid = _named[-1]
                 if _UNREF_ISH.search(fn) and refs.get(rid, 0) > 0:
                     # Balanced against an earlier ref: the resource outlives this call.
                     refs[rid] -= 1
@@ -747,7 +798,10 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
                           guarded_by=([] if stmt.depth == 0
                                       else [f"__branch:{stmt.arm}"]
                                       + ([f"__exits:{stmt.arm}"]
-                                         if stmt.arm in _exiting else []))))
+                                         if stmt.arm in _exiting else []))
+                          # The CONDITION, not just the shape. A gate cannot ask "was this
+                          # pointer checked before it was used" from an arm path alone.
+                          + ([f"__guard:{stmt.guard}"] if stmt.guard else [])))
             order += 1
 
     if not ops:
@@ -763,6 +817,21 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
     if unread:
         blocks.append(RawBlock(id="unread", where="prologue", code="\n".join(unread),
                                reason="values the lifter could not attribute; UNCERTIFIED"))
+    # WHICH RESOURCES DID THE HARNESS TEST BEFORE USING?
+    #
+    # Two shapes count, and neither can be read from the op sequence: `if (p) { use(p); }`
+    # guards the use, and `if (!p) return 0;` guards everything after it -- and the second
+    # has a body containing only a return, so it produces NO OP and the check is invisible
+    # to any gate reading ops. Read from the control flow directly.
+    _null_checked: set = set()
+    for _st in parsed.stmts:
+        _g = _st.guard or ("" if not _st.is_condition else _st.text)
+        if not _g:
+            continue
+        for _nm, _rid in resources.items():
+            if re.search(r"(?<![\w.>])" + re.escape(_nm) + r"\b", _g):
+                _null_checked.add(_rid)
+
     if hedged:
         blocks.append(RawBlock(id="hedged", where="prologue", code="\n".join(hedged),
                                reason="conditional lifetime effects, recorded not asserted"))
@@ -774,7 +843,8 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
         slices=[InputSlice("s_data", SLICE_BYTES, remainder=True, min_len=0)],
         resources=[Resource(rid, TypeRef("void *", "pointer"),
                             storage=caller_owned.get(
-                                rid, "out_param" if rid in by_address else "handle"))
+                                rid, "out_param" if rid in by_address else "handle"),
+                            null_checked=(rid in _null_checked))
                    for rid in dict.fromkeys(resources.values())],
         sequence=ops,
         knobs=Knobs(),
