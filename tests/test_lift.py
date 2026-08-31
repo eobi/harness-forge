@@ -855,3 +855,42 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 """))
     codes = {v.code for g in run_static_gates(L.ir) for v in g.violations}
     assert "S1.LEAK" not in codes
+
+
+def test_a_free_verb_must_be_a_segment_not_a_substring():
+    """"send" contains "end". A substring search made `nghttp2_session_mem_send2(session,
+    &data)` a DESTROY of the session, and nghttp2's harness reported a double free and a
+    use-after-free it does not have.
+
+    Both directions matter: `freeaddrinfo` is a single segment and must still read as a
+    free, so strong verbs match as a prefix while short ones must be the whole segment --
+    otherwise "end" claims `endian` and "del" claims `delimiter`.
+    """
+    from hforge.lift.c_harness import _FREE_ISH
+    for yes in ("freeaddrinfo", "evutil_freeaddrinfo", "g_obex_packet_free",
+                "nghttp2_session_callbacks_del", "lldpd_port_cleanup", "exif_data_unref"):
+        assert _FREE_ISH.search(yes), yes
+    for no in ("nghttp2_session_mem_send2", "endian_swap", "delimiter_parse",
+               "finish_parse", "xmlBufferAppend"):
+        assert not _FREE_ISH.search(no), no
+
+
+def test_a_slot_refilled_from_an_arena_leaks_nothing():
+    """pjsip's auth harness parses twice into the same `msg`, both allocations taken from a
+    pool that is released at the end. The first value is not leaked because nothing owned
+    it individually -- ownership already knew this, and only the end-of-harness leak check
+    was consulting it."""
+    L = c_harness.lift(_c("""
+#include <stdint.h>
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    pj_pool_t *pool = create_pool(1000);
+    pjsip_msg *msg = parse_sip_message(pool, data, size);
+    handle(msg);
+    msg = parse_sip_message(pool, data, size);
+    handle(msg);
+    release_pool(pool);
+    return 0;
+}
+"""))
+    codes = {v.code for g in run_static_gates(L.ir) for v in g.violations}
+    assert "S1.DOUBLE_CREATE" not in codes

@@ -35,7 +35,12 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 
-def audit(root: Path, patterns=("*/*fuzz*.c", "*/*fuzz*.cc")) -> list:
+def audit(root: Path,
+          # `.cpp` is not optional: a harvest of 30 upstream repositories returned
+          # 54 .cpp harnesses against 54 .c and 14 .cc, so omitting it drops nearly
+          # half the corpus without reporting that it did.
+          patterns=("*/*fuzz*.c", "*/*fuzz*.cc", "*/*fuzz*.cpp",
+                    "*/*Fuzz*.c", "*/*Fuzz*.cc", "*/*Fuzz*.cpp")) -> list:
     from hforge.lift import c_harness
     from hforge.gates.static_gates import run_static_gates
 

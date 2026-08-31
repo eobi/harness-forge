@@ -1,0 +1,27 @@
+{
+ "date": "2026-08-31",
+ "what": "Second audit corpus: harnesses harvested from the PROJECTS OWN REPOSITORIES, not just the OSS-Fuzz tree.",
+ "method": "For each OSS-Fuzz C/C++ project with a github main_repo (478 of them), shallow-clone, copy out *fuzz*.{c,cc,cpp}, delete the clone. Disk stays flat.",
+ "oss_fuzz_tree": {
+  "harnesses": 420,
+  "lifted": 400,
+  "high_fidelity": 130,
+  "flagged": 0
+ },
+ "upstream_repos": {
+  "harnesses": 1001,
+  "lifted": 716,
+  "high_fidelity": 148,
+  "flagged": 0
+ },
+ "scale_note": "QuartetFuzz audited 586 harnesses across 70 projects. This is 1401 across both corpora, 278 of them at high fidelity.",
+ "oss_fuzz_tree_grew": "372 -> 420 purely from globbing .cpp, which the audit tool had never matched. 54 of the first 122 upstream harnesses were .cpp, so the omission was dropping nearly half a corpus without reporting it.",
+ "defects_found_in_the_ENGINE_by_this_corpus": {
+  "free_verb_was_a_substring": "\"send\" contains \"end\", so nghttp2_session_mem_send2 read as a DESTROY of the session. Now matched on underscore/camel segments, with strong verbs allowed as a prefix (freeaddrinfo) and short ones required to be the whole segment (endian, delimiter).",
+  "member_free_attributed_to_the_struct": "free(ctx.certificates.list[i].base) and free(ctx.certificates.list) both fell back to , so two member frees read as a double free of the struct (h2o/picotls).",
+  "two_phase_teardown": "lldpd_port_cleanup(port,1) then free(port) is correct -- cleanup releases members, the caller releases the object. Verified in lldpd src/lldpd-structs.c: port_cleanup does NOT free the port, chassis_cleanup DOES, which is why the same harness frees one and not the other. Reported at INFO.",
+  "double_create_ignored_ownership": "pjsip parses twice into the same slot, both from a pool released at the end. Ownership knew; only the end-of-harness leak check was asking."
+ },
+ "findings": "0 new upstream-reportable defects from this corpus so far. All 8 candidates triaged by reading; all 8 were defects in this engine.",
+ "standing_total": "1 confirmed finding (bluez fuzz_gobex GError leak, google/oss-fuzz#16081) from 26+8 = 34 candidates triaged."
+}

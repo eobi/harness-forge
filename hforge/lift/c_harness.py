@@ -110,7 +110,14 @@ def _resources_named_at(argstr: str, resources: dict) -> list:
         last = re.split(r"\.|->", chain)[-1].strip()
         if last in resources:
             names.append(last)
-    names += [n for n in re.findall(r"[A-Za-z_]\w*", argstr) if n in resources]
+    # ...and FREEING A MEMBER IS NOT FREEING THE STRUCT. Falling back to the base made
+    # `free(ctx.certificates.list[i].base)` and `free(ctx.certificates.list)` both resolve
+    # to `ctx`, so two frees of different members read as a double free of the struct --
+    # h2o's picotls harness, flagged with two blocking violations it does not have.
+    _bases = {re.split(r"\.|->", c)[0].strip()
+              for c in re.findall(r"[A-Za-z_]\w*(?:\s*(?:\.|->)\s*[A-Za-z_]\w*)+", argstr)}
+    names += [n for n in re.findall(r"[A-Za-z_]\w*", argstr)
+              if n in resources and n not in _bases]
     return [resources[n] for n in dict.fromkeys(names)]
 
 # `if (x) free(x);` and `if (x != NULL) free(x);` -- the shape of nearly every cleanup in C.
@@ -159,8 +166,41 @@ _SCALARISH = re.compile(
     r"(?:int|long|short|char|size_t|ssize_t|unsigned|sqlite3_int64|int64_t|int32_t|"
     r"uint64_t|uint32_t|uint8_t|u8|u32|i64|float|double|_Bool|bool)\b")
 
-_FREE_ISH = re.compile(
-    r"(free|destroy|delete|close|cleanup|release|dispose|fini|end|unref)", re.I)
+# A SUBSTRING MATCH IS NOT A VERB. This was a plain substring search, and "send" contains
+# "end" -- so `nghttp2_session_mem_send2(session, &data)` read as a DESTROY of the session,
+# and nghttp2's harness reported a double free and a use-after-free it does not have.
+# "fini" inside "definition" and "end" inside "append" are the same mistake waiting.
+#
+# The name is split on underscores and camel-case humps, and a segment must BE the verb
+# rather than merely contain it. Trailing digits are stripped so `_del2` still reads.
+# Unambiguous enough to match as a PREFIX: `freeaddrinfo` is one segment and is plainly a
+# free, and requiring exact equality lost it.
+_FREE_VERBS_PREFIX = {"free", "destroy", "delete", "close", "cleanup", "release",
+                      "dispose", "deinit", "uninit", "unref", "terminate", "shutdown"}
+# Too short or too common to match as a prefix: "end" would claim `endian`, "del" would
+# claim `delimiter`, "fini" would claim `finish`. These must BE the segment.
+_FREE_VERBS_EXACT = {"end", "del", "fini", "term", "cleanup", "free", "close"}
+
+
+def _name_segments(fn: str):
+    return [seg.lower().rstrip("0123456789")
+            for seg in re.split(r"_|(?<=[a-z0-9])(?=[A-Z])", fn) if seg]
+
+
+class _FreeIsh:
+    """Kept callable as `.search(fn)` so the call sites read unchanged."""
+
+    @staticmethod
+    def search(fn: str):
+        for seg in _name_segments(fn):
+            if seg in _FREE_VERBS_EXACT:
+                return True
+            if any(seg.startswith(v) for v in _FREE_VERBS_PREFIX):
+                return True
+        return False
+
+
+_FREE_ISH = _FreeIsh()
 
 # REFCOUNTS COME IN PAIRS. `exif_mnote_data_ref(md); ...; exif_mnote_data_unref(md);` leaves
 # md exactly as it found it, and reading the unref as a destroy would report every later use

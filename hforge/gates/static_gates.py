@@ -85,6 +85,27 @@ def s1_lifetime(ir: HarnessIR) -> GateResult:
         from ..lift.cflow import mutually_exclusive
         return mutually_exclusive(a or "", b or "")
     born_at: dict[str, str] = {}
+    # Ownership is needed at CREATE time, not only at the end: a slot refilled from an
+    # arena is not a leak of the first value. Built up-front from the sequence.
+    _owner_early: dict = {}
+    for _op in ir.sequence:
+        if not _op.binds:
+            continue
+        for _a in _op.args:
+            if _a.source == SRC_RESOURCE and _a.ref != _op.binds:
+                _owner_early[_op.binds] = _a.ref
+                break
+    _destroyed_anywhere = {o.targets for o in ir.sequence if o.targets}
+
+    def _owned_by_a_released_arena(rid: str, seen=None) -> bool:
+        seen = seen or set()
+        own = _owner_early.get(rid)
+        if not own or own in seen:
+            return False
+        seen.add(own)
+        return own in _destroyed_anywhere or _owned_by_a_released_arena(own, seen)
+
+    dead_by: dict[str, str] = {}    # ...and WHICH call did it, for two-phase teardown
     dead_exits: dict[str, bool] = {}  # ...and whether that path left the function
     dead_arm: dict[str, str] = {}   # WHERE a resource died, for the same reason born_arm exists
 
@@ -121,6 +142,13 @@ def s1_lifetime(ir: HarnessIR) -> GateResult:
                 v.append(Violation("S1.USE_BEFORE_CREATE", BLOCK,
                                    f"op {op.id} uses {a.ref!r} before anything creates it",
                                    where=op.id, principle="P1"))
+            elif (state[a.ref] == DEAD
+                  and _CLEANUP_NAME.search(dead_by.get(a.ref, ""))
+                  and op.api in _RAW_FREE_NAMES):
+                # The second phase of a teardown names the resource it is releasing; that
+                # is not a use-after-free. Reported once, as TWO_PHASE_TEARDOWN, when the
+                # destroy is handled below.
+                pass
             elif state[a.ref] == DEAD and _unreachable_from(
                     dead_arm.get(a.ref), dead_exits.get(a.ref, False), _arm_of(op)):
                 # DESTROYED ON A PATH THIS ONE EXCLUDES. openvpn's fuzz_list.c is a state
@@ -141,7 +169,13 @@ def s1_lifetime(ir: HarnessIR) -> GateResult:
                                    f"op {op.id} binds undeclared resource {op.binds!r}",
                                    where=op.id, principle="P1"))
             elif (state[op.binds] != UNBORN and not _by_addr.get(op.binds)
-                  and not _exclusive(born_arm.get(op.binds), _arm_of(op))):
+                  and not _exclusive(born_arm.get(op.binds), _arm_of(op))
+                  and not _owned_by_a_released_arena(op.binds)):
+                # A SLOT REFILLED FROM AN ARENA LEAKS NOTHING. pjsip's auth harness parses
+                # twice into the same `msg`, both allocations taken from a pool that
+                # `pjsip_endpt_release_pool` returns; the first value is not leaked because
+                # nothing owned it individually. Ownership already knew this, and only the
+                # end-of-harness leak check was consulting it.
                 # TWO ASSIGNMENTS ON PATHS THAT NEVER BOTH RUN ARE NOT A LEAK. openvpn's
                 # harness assigns `tmp` in several mutually exclusive switch cases and
                 # frees it in each; read as a flat statement list that is a create, then
@@ -178,6 +212,24 @@ def s1_lifetime(ir: HarnessIR) -> GateResult:
                                    f"op {op.id} destroys {op.targets!r} before it exists",
                                    where=op.id, principle="P1"))
             elif (state[op.targets] == DEAD
+                  and _CLEANUP_NAME.search(dead_by.get(op.targets, ""))
+                  and op.api in _RAW_FREE_NAMES):
+                # TWO-PHASE TEARDOWN, NOT A DOUBLE FREE. `lldpd_port_cleanup(port, 1);
+                # free(port);` is the correct sequence: cleanup releases the members and
+                # the caller releases the object. lldpd's four harnesses do exactly this,
+                # and lldpd_port_cleanup does NOT free the port -- verified in
+                # src/lldpd-structs.c -- while lldpd_chassis_cleanup DOES, which is why the
+                # same harness frees the port and not the chassis.
+                #
+                # Reported at INFO rather than dropped. Without the callee we cannot prove
+                # the cleanup did not also free, so this is a judgement the reader should
+                # see rather than one the gate should make silently.
+                v.append(Violation("S1.TWO_PHASE_TEARDOWN", INFO,
+                                   f"{op.targets!r} is released in two phases: "
+                                   f"{dead_by.get(op.targets)} then {op.api}; correct if "
+                                   f"the cleanup frees members only",
+                                   where=op.id, principle="P1"))
+            elif (state[op.targets] == DEAD
                   and _unreachable_from(dead_arm.get(op.targets),
                                         dead_exits.get(op.targets, False),
                                         _arm_of(op))):
@@ -185,6 +237,7 @@ def s1_lifetime(ir: HarnessIR) -> GateResult:
                 state[op.targets] = DEAD
                 dead_arm[op.targets] = _arm_of(op)
                 dead_exits[op.targets] = _exits(op)
+                dead_by[op.targets] = op.api
             elif state[op.targets] == DEAD:
                 v.append(Violation("S1.DOUBLE_DESTROY", BLOCK,
                                    f"resource {op.targets!r} is destroyed twice; the second "
@@ -194,6 +247,7 @@ def s1_lifetime(ir: HarnessIR) -> GateResult:
                 state[op.targets] = DEAD
                 dead_arm[op.targets] = _arm_of(op)
                 dead_exits[op.targets] = _exits(op)
+                dead_by[op.targets] = op.api
 
     # STORAGE DECIDES WHETHER A LIVE RESOURCE IS A LEAK. Only a `handle` -- memory the
     # LIBRARY allocated and handed back -- can leak. An object the harness owns inline is
@@ -767,8 +821,22 @@ _GATES = {
 # `apr_pool_terminate()` ends the whole pool subsystem and releases every pool with it,
 # which is why apache-httpd's harness needs no per-pool destroy. "terminate" and "shutdown"
 # are cleanup verbs a collector uses and a per-resource free does not.
-_FREEISH_NAME = re.compile(
-    r"(free|destroy|cleanup|release|fini|dispose|terminate|shutdown)", re.I)
+_CLEANUP_NAME = re.compile(r"cleanup|_fini|deinit|reset", re.I)
+_RAW_FREE_NAMES = {"free", "cfree", "delete"}
+
+def _FREEISH_NAME_search(fn: str):
+    """Shares the lifter's vocabulary and its segment rule, rather than keeping a second
+    copy that can drift. The substring form matched "end" inside "send"; a bulk-collector
+    check would have matched "fini" inside "definition" the same way."""
+    from ..lift.c_harness import _FREE_ISH
+    return _FREE_ISH.search(fn)
+
+
+class _FreeishName:
+    search = staticmethod(_FREEISH_NAME_search)
+
+
+_FREEISH_NAME = _FreeishName()
 
 
 def run_static_gates(ir: HarnessIR, only: tuple = ALL_STATIC) -> list[GateResult]:
