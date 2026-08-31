@@ -1,0 +1,16 @@
+diff --git a/projects/bluez/fuzz_gobex.c b/projects/bluez/fuzz_gobex.c
+index 0000000..1111111 100644
+--- a/projects/bluez/fuzz_gobex.c
++++ b/projects/bluez/fuzz_gobex.c
+@@
+   if (pkt != NULL) {
+     /* Anything that decodes must encode */
+     g_obex_packet_encode(pkt, buf, sizeof(buf));
+     g_obex_packet_free(pkt);
+   }
++  if (err != NULL) {
++    g_error_free(err);
++  }
+ 
+   return 0;
+ }
