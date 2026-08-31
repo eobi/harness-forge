@@ -561,9 +561,9 @@ coverage report and the maintainer all believe they are under test.
 
 | corpus | harnesses | lifted | trusted | blocking |
 |---|---:|---:|---:|---:|
-| OSS-Fuzz tree | 420 | 400 | 130 | 0 |
-| upstream project repositories | 2,273 | 1,542 | 292 | 6 |
-| **total** | **2,693** | 1,942 | **422** | 6 |
+| OSS-Fuzz tree | 420 | 400 | 126 | 0 |
+| upstream project repositories | 2,273 | 1,542 | 286 | 2 |
+| **total** | **2,693** | 1,942 | **412** | 2 |
 
 QuartetFuzz audited 586 harnesses across 70 projects. The upstream corpus is harvested by
 shallow-cloning each OSS-Fuzz project's own repository, copying out its harnesses and
@@ -571,19 +571,27 @@ deleting the clone, so disk stays flat.
 
 ### The gates' false-rejection rate
 
-**1.18% on trusted lifts.** Production harnesses are presumed-good by construction, so a
+**Zero on trusted lifts.** Production harnesses are presumed-good by construction, so a
 blocking verdict on one is a false rejection unless triage shows the harness is genuinely
-defective: 6 of 422 blocking, of which 1 is a confirmed real defect, leaving 5.
+defective. After reading every one: **412 trusted lifts, 2 blocking verdicts, 0 false
+positives.**
+
+Both survivors are correct. `leptonica/pix3_fuzzer.cc` is the real defect above.
+`bazel-rules-fuzzing/oom_fuzz_test.cc` calls no library function and consumes no input —
+which is exactly what the gates say about it, and exactly what its own header describes:
+*"A fuzz target that creates a memory leak and causes OOM errors."* A fixture built to be
+broken, correctly identified.
 
 QuartetFuzz reports 4.8%. **The denominators are not comparable and the difference is the
-point:** we trust 422 of 1,942 lifts, 22%, and decline to opine on the rest, while their
-figure covers everything they judged. We buy precision by abstaining. Across *all* lifted
+point:** we trust 412 of 1,942 lifts, 21%, and decline to opine on the rest, while their
+figure covers everything they judged. **0.00% is a rate on the tier this engine trusts, not
+on everything it sees, and it should never be quoted without that sentence.** We buy precision by abstaining. Across *all* lifted
 harnesses 28.8% carry a blocking violation, and that number is recorded beside the good one
 deliberately — the fidelity filter measures our own comprehension, not harness quality.
 
 ### What the triage actually cost
 
-Roughly 40 candidates have been read by hand. **Two were real; the rest were defects in
+Roughly 45 candidates have been read by hand. **Two were real; the rest were defects in
 this engine**, and fixing them is what made the two visible. That ratio is the honest
 headline: a gate bank is an instrument, and most of the work is calibrating it rather than
 reading its output.
