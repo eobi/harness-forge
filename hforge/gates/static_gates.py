@@ -71,6 +71,7 @@ def s1_lifetime(ir: HarnessIR) -> GateResult:
         from ..lift.cflow import mutually_exclusive
         return mutually_exclusive(a or "", b or "")
     born_at: dict[str, str] = {}
+    dead_arm: dict[str, str] = {}   # WHERE a resource died, for the same reason born_arm exists
 
     for op in ir.sequence:
         api = ir.api_of(op)
@@ -105,6 +106,12 @@ def s1_lifetime(ir: HarnessIR) -> GateResult:
                 v.append(Violation("S1.USE_BEFORE_CREATE", BLOCK,
                                    f"op {op.id} uses {a.ref!r} before anything creates it",
                                    where=op.id, principle="P1"))
+            elif state[a.ref] == DEAD and _exclusive(dead_arm.get(a.ref), _arm_of(op)):
+                # DESTROYED ON A PATH THIS ONE EXCLUDES. openvpn's fuzz_list.c is a state
+                # machine: a `switch` inside a `for`, freeing the hash in one case and
+                # iterating it in another. The cases never both run, so the free does not
+                # reach the use -- and read as a flat list it was a use-after-free.
+                pass
             elif state[a.ref] == DEAD:
                 v.append(Violation("S1.USE_AFTER_DESTROY", BLOCK,
                                    f"op {op.id} uses {a.ref!r} after it was destroyed"
@@ -154,6 +161,11 @@ def s1_lifetime(ir: HarnessIR) -> GateResult:
                 v.append(Violation("S1.DESTROY_BEFORE_CREATE", BLOCK,
                                    f"op {op.id} destroys {op.targets!r} before it exists",
                                    where=op.id, principle="P1"))
+            elif (state[op.targets] == DEAD
+                  and _exclusive(dead_arm.get(op.targets), _arm_of(op))):
+                # Two frees in mutually exclusive arms are one free, whichever path runs.
+                state[op.targets] = DEAD
+                dead_arm[op.targets] = _arm_of(op)
             elif state[op.targets] == DEAD:
                 v.append(Violation("S1.DOUBLE_DESTROY", BLOCK,
                                    f"resource {op.targets!r} is destroyed twice; the second "
@@ -161,6 +173,7 @@ def s1_lifetime(ir: HarnessIR) -> GateResult:
                                    where=op.id, principle="P1"))
             else:
                 state[op.targets] = DEAD
+                dead_arm[op.targets] = _arm_of(op)
 
     # STORAGE DECIDES WHETHER A LIVE RESOURCE IS A LEAK. Only a `handle` -- memory the
     # LIBRARY allocated and handed back -- can leak. An object the harness owns inline is

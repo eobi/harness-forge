@@ -45,6 +45,10 @@ class Stmt:
     # first -- so two statements are mutually exclusive when neither path is a prefix of
     # the other.
     arm: str = ""
+    # The `if` conditions this statement sits under, innermost last, joined by " && ".
+    # Only `if` contributes: an `else` runs under the NEGATION of its condition, and a
+    # loop body may not run at all, so neither may claim the guard as a fact.
+    guard: str = ""
 
 
 @dataclass
@@ -135,7 +139,8 @@ def mutually_exclusive(a: str, b: str) -> bool:
     return not (a.startswith(b + ".") or b.startswith(a + "."))
 
 
-def parse(body: str, depth: int = 0, out: Body = None, arm: str = "") -> Body:
+def parse(body: str, depth: int = 0, out: Body = None, arm: str = "",
+          guard: str = "") -> Body:
     """Split a function body into statements, tracking branch nesting.
 
     A control-flow HEADER's condition is emitted at the CURRENT depth, because it executes
@@ -153,7 +158,8 @@ def parse(body: str, depth: int = 0, out: Body = None, arm: str = "") -> Body:
         kind = "return" if re.match(r"^\s*return\b", text) else "plain"
         if kind == "return":
             out.early_returns += 1
-        out.stmts.append(Stmt(text=text, depth=depth, kind=kind, arm=arm))
+        out.stmts.append(Stmt(text=text, depth=depth, kind=kind, arm=arm,
+                              guard=guard))
 
     while i < n:
         ch = body[i]
@@ -165,17 +171,22 @@ def parse(body: str, depth: int = 0, out: Body = None, arm: str = "") -> Body:
             j = i + m.end()
             if kw != "else" and kw != "do":
                 # The condition runs at THIS depth: `if (f(x))` calls f unconditionally.
+                cond_text = ""
                 p = body.find("(", j)
                 if p >= 0:
                     q = _match_paren(body, p)
-                    cond = body[p + 1:q]
+                    cond = cond_text = body[p + 1:q]
                     if cond.strip():
                         out.stmts.append(Stmt(text=cond, depth=depth,
-                                              is_condition=True, kind="branch", arm=arm))
+                                              is_condition=True, kind="branch", arm=arm,
+                                              guard=guard))
                     j = q + 1
                 out.branches += 1
 
             # The controlled statement or block sits one level deeper.
+            _inner = guard
+            if kw == "if" and cond_text.strip():
+                _inner = f"{guard} && {cond_text}" if guard else cond_text
             k = j
             while k < n and body[k] in " \t\r\n":
                 k += 1
@@ -191,11 +202,13 @@ def parse(body: str, depth: int = 0, out: Body = None, arm: str = "") -> Body:
                     for piece in _split_cases(inner_text):
                         out.arms += 1
                         parse(piece, depth + 1, out,
-                              arm=(f"{arm}.{out.arms}" if arm else str(out.arms)))
+                              arm=(f"{arm}.{out.arms}" if arm else str(out.arms)),
+                              guard=_inner)
                 else:
                     out.arms += 1
                     parse(inner_text, depth + 1, out,
-                          arm=(f"{arm}.{out.arms}" if arm else str(out.arms)))
+                          arm=(f"{arm}.{out.arms}" if arm else str(out.arms)),
+                          guard=_inner)
                 i = close + 1
             else:
                 end = body.find(";", k)

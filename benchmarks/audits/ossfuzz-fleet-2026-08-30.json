@@ -167,5 +167,23 @@
   "finding_2": "The warning tier is NOT a pile of undiscovered findings. S1.LEAK fires on 67 of 117 trusted lifts, which looked like 67 candidate protocol violations sitting one tier below where anyone was looking. It is not. apache-httpd/fuzz_request.c calls af_gb_init() at line 65 and af_gb_cleanup() at line 139 -- a harness-local bulk allocator freed in one call. Our S1.LEAK models per-resource destroys and cannot see bulk cleanup, so every arena-allocated resource reads as leaked.",
   "conclusion": "The 0 findings is genuine rather than an artifact of tier classification. It is not evidence the gates are strong: it is consistent both with 117 clean production harnesses and with gates that cannot yet see the defect classes QuartetFuzz reports.",
   "next": "Model BULK CLEANUP (apr_pool_destroy, arena/talloc contexts, harness-local collectors like af_gb_cleanup) so S1.LEAK stops firing on 57% of trusted lifts. Until then the warning tier is unusable for triage, which is its own kind of silent failure: a signal so noisy nobody reads it."
+ },
+ "CORRECTION_2026-08-31_leak_census": {
+  "claim_corrected": "gate_firing_census recorded S1.LEAK at 261 / 67-of-117-trusted (57%). That figure drove 'model bulk cleanup' to the top of the plan as the gate on the findings campaign.",
+  "remeasured_same_corpus_same_method": "114 / 26-of-117-trusted (22%)",
+  "why_it_is_the_census_that_was_stale_and_not_the_method": "S0.RAW_BLOCK reproduces EXACTLY through the same script: 280 / 74, both runs. A method change would have moved both codes. S1.LEAK honouring `inline` storage landed AFTER that census and had already done most of the work.",
+  "after_todays_two_rules": "77 / 21-of-117-trusted (18%)",
+  "rules_added": {
+   "S1.FREED_WITH_OWNER": "arena ownership, derived from the call graph rather than an allocator name list. 16 harnesses, 0 trusted -- INERT on the tier that matters. Kept for correctness, not for its effect.",
+   "automatic_storage": "a C++ value local is destroyed at scope exit; marked `inline`. This did the actual work, 26 -> 21 trusted."
+  },
+  "triage_of_the_26_by_reading_each": {
+   "pffft/pffft_fuzzer.cc": "FALSE POSITIVE - all three resources ARE freed, but the creates go through a wrapper (AllocatePffftBuffer) so pffft_aligned_free never pairs with them",
+   "protobuf-c/unpack_fuzzer.c": "FALSE POSITIVE - freed by protobuf_c_message_free_unpacked inside `if (msg != NULL)`; the destroy sits in a branch arm so it does not count as unconditional",
+   "boost/boost_programoptions_fuzzer.cc": "FALSE POSITIVE - every object is a stack local with a destructor; fixed by the automatic-storage rule",
+   "nsmd/decode_nsm_get_event_log_record_resp_fuzzer.cc": "FALSE POSITIVE - std::vector locals throughout; fuzz_payload_ptr is borrowed",
+   "remaining_21": "dominated by destroy-pairing failures of the two shapes above, not by leaks. FINDINGS: 0."
+  },
+  "lesson": "The number that set the plan's top priority was a day old and already fixed. A census is a measurement and decays like one; re-run it before it is allowed to order the work."
  }
 }

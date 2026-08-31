@@ -63,6 +63,51 @@ _DECL = re.compile(r"^\s*([A-Za-z_][\w\s]*?[\w\s\*]*?)\s+(\*+\s*)?([A-Za-z_]\w*)
 _RAW_ALLOCATORS = {"malloc", "calloc", "realloc", "strdup", "strndup", "new",
                    "aligned_alloc", "memalign", "posix_memalign", "valloc", "reallocarray"}
 
+
+
+def _resources_named_at(argstr: str, resources: dict) -> list:
+    """The resources a callsite names, read from its ARGUMENT TEXT rather than from the
+    lifted args.
+
+    A resource can be tainted -- `msg` in `msg = protobuf_c_message_unpack(.., data)`
+    carries the input's taint -- and argument classification checks taint FIRST, so the
+    free that follows saw an `input` argument and no `resource` argument, lifted as a
+    consume, and the resource read as leaked. Reordering the classifier would be the wider
+    fix and the wrong one here: a call that takes a tainted object really does consume
+    input, and S5 depends on saying so. Ownership is the question destroy-detection asks,
+    and it is answered by the name.
+    """
+    return [resources[n] for n in dict.fromkeys(re.findall(r"[A-Za-z_]\w*", argstr or ""))
+            if n in resources]
+
+# `if (x) free(x);` and `if (x != NULL) free(x);` -- the shape of nearly every cleanup in C.
+_LIVE_TEST = (
+    r"^\s*(?:{n}\s*(?:!=\s*(?:NULL|nullptr|0))?"          # x   /   x != NULL
+    r"|(?:NULL|nullptr|0)\s*!=\s*{n})\s*$")
+
+
+def _guarded_by_own_liveness(guard: str, args, resources, rid: str) -> bool:
+    """Is this destroy guarded by a POSITIVE null-test of the very resource it frees?
+
+    `if (msg != NULL) protobuf_c_message_free_unpacked(msg, NULL);` is not conditional
+    cleanup. The arm where the free does not run is the arm where the resource was never
+    created, so across both paths nothing survives the return -- and reading it as a branch
+    made protobuf-c/unpack_fuzzer.c report a leak it does not have.
+
+    Deliberately strict. `||` is rejected outright: under `if (a || x)` the free can run
+    with x null, or not run with x live, and neither reading is safe. `x == NULL` and `!x`
+    are rejected because they guard the arm where the resource is ABSENT -- a free there is
+    a real defect and must keep reaching the gates.
+    """
+    if not guard or "||" in guard:
+        return False
+    names = [n for n, r in resources.items() if r == rid]
+    for clause in guard.split("&&"):
+        for n in names:
+            if re.match(_LIVE_TEST.format(n=re.escape(n)), clause):
+                return True
+    return False
+
 _NOT_A_CALL = {"if", "for", "while", "switch", "return", "sizeof", "assert", "static_assert",
                "printf", "fprintf", "abort", "exit", "memset", "malloc", "free",
                "calloc", "realloc", "strlen", "strcpy", "puts", "fwrite"}
@@ -219,11 +264,15 @@ def _classify_args(args_raw, data, size, tainted, resources, is_ptr, unread, fn,
                      for a in (size_alias or {size}) if a)):
             args.append(Arg(pname, "length_of", "s_data"))
             params.append(ParamDecl(pname, TypeRef("size_t", "scalar")))
-        elif bare in resources:
-            args.append(Arg(pname, "resource", resources[bare]))
-            params.append(ParamDecl(pname, TypeRef("void *", "pointer")))
         elif a.strip().startswith("&") and is_ptr(bare):
             # An OUT-parameter: the library allocates and writes the pointer back.
+            #
+            # THIS MUST BE TESTED BEFORE `bare in resources`. A slot can be filled more
+            # than once -- libevent's harness does `getaddrinfo_common_(.., &res, ..);
+            # freeaddrinfo(res); res = NULL; getaddrinfo_common_(.., &res, ..);` -- and
+            # once `res` was known, the second `&res` matched the plain-resource branch,
+            # so the SECOND create bound nothing and its free read as a double destroy of
+            # the first lifetime.
             rid = f"r_{bare}"
             # ...UNLESS THE HARNESS DECLARED IT, in which case the storage exists from the
             # declaration and no call needs to create it. `yajl_parser_config cfg = {...};`
@@ -237,6 +286,9 @@ def _classify_args(args_raw, data, size, tainted, resources, is_ptr, unread, fn,
             out_created.append(rid)
             args.append(Arg(pname, "resource", rid))
             params.append(ParamDecl(pname, TypeRef("void **", "pointer")))
+        elif bare in resources:
+            args.append(Arg(pname, "resource", resources[bare]))
+            params.append(ParamDecl(pname, TypeRef("void *", "pointer")))
         elif re.fullmatch(r"-?\d+|NULL|nullptr|0|true|false", bare):
             val = 0 if bare in ("NULL", "nullptr", "0", "false") else (
                 1 if bare == "true" else int(bare))
@@ -453,7 +505,21 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
 
             role, binds, targets = ROLE_QUERY, "", ""
             if out_created and not (assigned and is_ptr(assigned)):
-                binds, role = out_created[0], ROLE_CREATE
+                # WHICH `&x` IS THE OUT-PARAMETER. Taking the first one is wrong whenever a
+                # call is handed an input struct by address before the slot it fills:
+                # `evutil_getaddrinfo_common_(NULL, s, &hints, &res, &portnum)` binds
+                # `hints`, a struct the harness memsets and fills itself, and leaves `res`
+                # -- the handle actually returned -- created by nothing. libevent's harness
+                # then read as destroying `res` twice and using it after free, three
+                # blocking violations from one mis-chosen argument.
+                #
+                # `caller_owned` already separates them: a slot DECLARED by the harness
+                # with a non-pointer type is storage it owns and passes IN, while a
+                # declared pointer is a slot for the library to fill. Prefer the first
+                # argument that is not caller-owned inline storage.
+                _out = next((r for r in out_created
+                             if caller_owned.get(r) != "inline"), out_created[0])
+                binds, role = _out, ROLE_CREATE
                 # `sqlite3_open(":memory:", &db)` both CREATES db and takes it as an
                 # argument. Without recording that, S1 reads the argument as a use of a
                 # resource nothing has created yet — the same exemption the producer side
@@ -489,10 +555,13 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
             elif assigned:
                 role = (ROLE_CONSUME if any(a.source == "input" for a in args)
                         else ROLE_QUERY)
-            elif not binds and _FREE_ISH.search(fn) and any(a.source == "resource"
-                                                            for a in args):
-                rid = next(a.ref for a in args if a.source == "resource")
-                if stmt.depth == 0:
+            elif not binds and _FREE_ISH.search(fn) and (
+                    any(a.source == "resource" for a in args)
+                    or _resources_named_at(argstr, resources)):
+                rid = next((a.ref for a in args if a.source == "resource"), None) \
+                    or _resources_named_at(argstr, resources)[0]
+                if stmt.depth == 0 or _guarded_by_own_liveness(stmt.guard, args,
+                                                               resources, rid):
                     role, targets = ROLE_DESTROY, rid
                 else:
                     # A destroy on ONE branch only. Marking the resource dead would report

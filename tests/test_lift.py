@@ -495,3 +495,118 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 }
 """))
     assert [r.storage for r in L.ir.resources if r.id == "r_q"] == ["handle"]
+
+
+def test_destroy_guarded_by_its_own_null_check_is_unconditional():
+    """`if (msg != NULL) free_msg(msg);` is cleanup, not a conditional free.
+
+    The arm where the free does not run is the arm where the resource was never created,
+    so nothing survives the return either way. Regression for
+    protobuf-c/unpack_fuzzer.c, which reported a leak it does not have.
+    """
+    L = c_harness.lift(_c("""
+#include <stdint.h>
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    Msg *msg = msg_unpack(data, size);
+    if (msg != NULL) {
+        msg_free_unpacked(msg, 0);
+    }
+    return 0;
+}
+"""))
+    assert L.ir.apis["msg_free_unpacked"].role == "destroy"
+    codes = {v.code for g in run_static_gates(L.ir) for v in g.violations}
+    assert "S1.LEAK" not in codes
+
+
+def test_a_negative_null_guard_still_reports():
+    """`if (x == NULL) free(x);` guards the arm where the resource is ABSENT. Freeing
+    there is a real defect and must keep reaching the gates."""
+    L = c_harness.lift(_c("""
+#include <stdint.h>
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    Msg *msg = msg_unpack(data, size);
+    if (msg == NULL) {
+        msg_free_unpacked(msg, 0);
+    }
+    return 0;
+}
+"""))
+    codes = {v.code for g in run_static_gates(L.ir) for v in g.violations}
+    assert "S1.LEAK" in codes
+
+
+def test_the_out_parameter_is_not_the_input_struct_beside_it():
+    """`f(&hints, &res)` fills `res`; `hints` is a struct the harness owns and passes IN.
+
+    Binding the first `&x` bound `hints` and left `res` created by nothing, so libevent's
+    utils_fuzzer.cc reported a double destroy and two use-after-frees of a resource no op
+    had ever created -- three blocking violations from one mis-chosen argument.
+    """
+    L = c_harness.lift(_c("""
+#include <stdint.h>
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    struct addrinfo hints;
+    struct addrinfo *res = NULL;
+    memset(&hints, 0, sizeof(hints));
+    lookup_common(data, size, &hints, &res);
+    if (res != NULL) {
+        freeaddrinfo(res);
+    }
+    return 0;
+}
+"""))
+    assert [op.binds for op in L.ir.sequence if op.api == "lookup_common"] == ["r_res"]
+    codes = {v.code for g in run_static_gates(L.ir) for v in g.violations}
+    assert not [c for c in codes if c.startswith("S1.")], codes
+
+
+def test_a_slot_can_be_filled_twice():
+    """Create, free, create again through the SAME out-parameter is two lifetimes.
+
+    Once `res` was a known resource the second `&res` matched the plain-resource branch,
+    so the second create bound nothing and its free read as a double destroy of the first.
+    """
+    L = c_harness.lift(_c("""
+#include <stdint.h>
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    struct addrinfo *res = NULL;
+    lookup(data, size, &res);
+    if (res != NULL) { freeaddrinfo(res); }
+    res = NULL;
+    lookup(data, size, &res);
+    if (res != NULL) { freeaddrinfo(res); }
+    return 0;
+}
+"""))
+    codes = {v.code for g in run_static_gates(L.ir) for v in g.violations}
+    assert "S1.DOUBLE_DESTROY" not in codes
+    assert "S1.USE_AFTER_DESTROY" not in codes
+
+
+def test_a_free_in_one_switch_arm_does_not_reach_a_use_in_another():
+    """openvpn/fuzz_list.c is a state machine: a switch inside a for, freeing the hash in
+    one case and iterating it in another. The cases never both run."""
+    L = c_harness.lift(_c("""
+#include <stdint.h>
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    struct hash *h = NULL;
+    for (int i = 0; i < 4; i++) {
+        switch (pick(data, size)) {
+        case 0:
+            h = hash_init(8);
+            break;
+        case 1:
+            if (h) { hash_free(h); h = NULL; }
+            break;
+        case 2:
+            if (h) { hash_iterator_init(h); }
+            break;
+        }
+    }
+    return 0;
+}
+"""))
+    codes = {v.code for g in run_static_gates(L.ir) for v in g.violations}
+    assert "S1.USE_AFTER_DESTROY" not in codes
+    assert "S1.DOUBLE_DESTROY" not in codes
