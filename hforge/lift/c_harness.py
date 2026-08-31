@@ -189,6 +189,11 @@ def _classify_args(args_raw, data, size, tainted, resources, is_ptr, unread, fn,
         pname = f"a{i}"
         bare = a.strip().lstrip("&*( ").rstrip(" )")
         bare = re.sub(r"^\([^)]*\)\s*", "", bare).strip()          # drop a cast
+        # `s.data()` IS `s`. A C++ harness reaches a C API through an accessor, and the
+        # value it yields carries whatever taint the object had.
+        _acc = re.match(r"^([A-Za-z_]\w*)\s*(?:\.|->)\s*([A-Za-z_]\w*)\s*\(\s*\)$", bare)
+        if _acc and _acc.group(2) in _STD_ACCESSOR and _acc.group(1) in tainted:
+            bare = _acc.group(1)
         if bare in tainted:
             args.append(Arg(pname, "input", "s_data"))
             params.append(ParamDecl(pname, TypeRef("const uint8_t *", "pointer")))
@@ -232,7 +237,19 @@ def _classify_args(args_raw, data, size, tainted, resources, is_ptr, unread, fn,
 # uses at its call loop, and began appearing as library ops in every lift. 394 tests and a
 # 20-case plan-drift check both passed through it: the tests do not assert on which
 # housekeeping calls get lifted, and drift only watches the producers. Union, never shadow.
-_NOT_A_CALLSITE = _NOT_A_CALL | {
+# STANDARD CONTAINER PLUMBING, not the library under test. `s.data()`, `v.size()`,
+# `s.c_str()` are how a C++ harness hands its bytes to a C API; counting them as calls the
+# lifter failed to read made them the top blocker in .cc harnesses -- 85 occurrences of
+# `data` alone. They are excluded here AND their taint is propagated below, because
+# excluding them without following the value through would trade false positives for the
+# worse kind: a lift trusted while a flow went unfollowed.
+_STD_ACCESSOR = {
+    "data", "size", "c_str", "begin", "end", "empty", "length", "at", "front", "back",
+    "remaining_bytes", "str", "get", "value", "count", "capacity", "resize", "reserve",
+    "push_back", "emplace_back", "clear", "substr", "find", "append",
+}
+
+_NOT_A_CALLSITE = _NOT_A_CALL | _STD_ACCESSOR | {
     "alignof", "defined", "static_cast", "reinterpret_cast", "const_cast", "dynamic_cast",
     "catch", "offsetof", "va_start", "va_end", "va_arg", "typeof", "__typeof__",
     "LLVMFuzzerTestOneInput", "LLVMFuzzerInitialize",
