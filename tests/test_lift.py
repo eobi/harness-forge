@@ -456,3 +456,42 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 }
 """))
     assert "data" not in L.missed and "size" not in L.missed, L.missed
+
+
+def test_cxx_value_local_is_not_a_leak():
+    """`auto opts = set_options();` is destroyed at scope exit, not leaked.
+
+    Regression for boost/boost_programoptions_fuzzer.cc, in which every object is a stack
+    local and S1 reported each one as leaking. `is_ptr` says True for a class type because
+    it asks about argument shape, which is the wrong question for ownership.
+    """
+    L = c_harness.lift(_c("""
+#include <stdint.h>
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    auto opts = set_options();
+    parse_config(data, size, opts);
+    return 0;
+}
+"""))
+    assert [r.storage for r in L.ir.resources if r.id == "r_opts"] == ["inline"]
+    codes = {v.code for g in run_static_gates(L.ir) for v in g.violations}
+    assert "S1.LEAK" not in codes
+
+
+def test_auto_hiding_malloc_still_leaks():
+    """The hole in the rule above, pinned: `auto` can hide a pointer, so a raw allocator
+    keeps its handle no matter how the slot was declared.
+
+    `strdup` rather than `malloc` deliberately -- malloc is excluded from callsites
+    altogether, so a malloc version of this test asserts against a resource that does not
+    exist and passes whatever the rule does.
+    """
+    L = c_harness.lift(_c("""
+#include <stdint.h>
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    auto q = strdup("x");
+    parse_config(data, size, q);
+    return 0;
+}
+"""))
+    assert [r.storage for r in L.ir.resources if r.id == "r_q"] == ["handle"]

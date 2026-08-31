@@ -169,8 +169,44 @@ def s1_lifetime(ir: HarnessIR) -> GateResult:
     # that constructs nothing: the warning count is part of the ranking, so a spurious
     # warning does not merely add noise, it picks the wrong harness.
     _owned = {r.id: (r.storage or "handle") for r in ir.resources}
+
+    # A RESOURCE ALLOCATED FROM AN ARENA IS FREED WHEN THE ARENA IS.
+    #
+    # `apr_pool_create(&pool, NULL); p = apr_palloc(pool, n); ... apr_pool_destroy(pool);`
+    # frees `p` without ever naming it. So does talloc, so do obstacks, and so does any
+    # harness-local collector. S1 pairs each resource with a destroy that NAMES it, so
+    # every arena allocation read as leaked -- and S1.LEAK fired on 67 of the 117 OSS-Fuzz
+    # harnesses this engine can read, 57%, which is not a signal anyone can triage.
+    #
+    # The rule is derivable rather than a list of allocator names: a resource whose CREATE
+    # op took another resource as an argument is owned by that resource, and if the owner
+    # is destroyed, so is it. Transitive, because arenas nest.
+    _owner: dict = {}
+    for op in ir.sequence:
+        if not op.binds:
+            continue
+        for a in op.args:
+            if a.source == SRC_RESOURCE and a.ref != op.binds:
+                _owner[op.binds] = a.ref
+                break
+
+    def _freed_with_owner(rid: str, seen=None) -> bool:
+        seen = seen or set()
+        own = _owner.get(rid)
+        if not own or own in seen:
+            return False
+        seen.add(own)
+        return state.get(own) == DEAD or _freed_with_owner(own, seen)
+
     for rid, st in state.items():
         if st == ALIVE and _owned.get(rid, "handle") == "inline":
+            continue
+        if st == ALIVE and _freed_with_owner(rid):
+            v.append(Violation("S1.FREED_WITH_OWNER", INFO,
+                               f"resource {rid!r} was allocated from {_owner[rid]!r}, which "
+                               f"is destroyed; it is released with its owner rather than "
+                               f"by a destroy of its own",
+                               where=rid, principle="P1"))
             continue
         if st == ALIVE:
             v.append(Violation("S1.LEAK", BLOCK if ir.knobs.detect_leaks else WARN,

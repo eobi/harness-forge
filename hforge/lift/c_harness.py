@@ -58,6 +58,11 @@ _CALL = re.compile(r"(?:([A-Za-z_]\w*)\s*=\s*)?([A-Za-z_]\w*)\s*\(([^;]*?)\)\s*;
 _DECL = re.compile(r"^\s*([A-Za-z_][\w\s]*?[\w\s\*]*?)\s+(\*+\s*)?([A-Za-z_]\w*)\s*"
                    r"(?:=\s*[^;]+)?;", re.M)
 
+# Functions that return owned heap memory whatever the declared type says. `auto` and
+# `std::string` hide a pointer; these do not.
+_RAW_ALLOCATORS = {"malloc", "calloc", "realloc", "strdup", "strndup", "new",
+                   "aligned_alloc", "memalign", "posix_memalign", "valloc", "reallocarray"}
+
 _NOT_A_CALL = {"if", "for", "while", "switch", "return", "sizeof", "assert", "static_assert",
                "printf", "fprintf", "abort", "exit", "memset", "malloc", "free",
                "calloc", "realloc", "strlen", "strcpy", "puts", "fwrite"}
@@ -458,6 +463,29 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
                 rid = f"r_{assigned}"
                 resources[assigned] = rid
                 binds, role = rid, ROLE_CREATE
+                # A C++ VALUE LOCAL IS DESTROYED AT SCOPE EXIT AND CANNOT LEAK.
+                #
+                # `auto opts = set_options();` binds a class object with automatic
+                # storage; its destructor runs on return, including when the harness
+                # returns through an exception. `is_ptr` answers True for it because it
+                # asks "is this type non-scalar", which is the right question for
+                # argument passing and the wrong one for ownership -- so S1 read
+                # boost/boost_programoptions_fuzzer.cc, whose every object is a stack
+                # local, as leaking.
+                #
+                # Marked `inline`, reusing the storage exemption S1 already honours,
+                # rather than by changing `is_ptr` -- that predicate decides argument
+                # shape in four other places.
+                #
+                # `auto p = malloc(n)` is the hole in this: `auto` hides the pointer. So
+                # a raw allocator keeps its handle regardless of how the slot was
+                # declared. That leaves a false NEGATIVE for allocators not on the list,
+                # which is the direction to fail in -- a missed leak costs a finding, a
+                # false leak costs the whole tier's triageability.
+                _t = (decl_type or {}).get(assigned) or ""
+                if (caller_owned is not None and _t and "*" not in _t
+                        and not _SCALARISH.match(_t) and fn not in _RAW_ALLOCATORS):
+                    caller_owned[rid] = "inline"
             elif assigned:
                 role = (ROLE_CONSUME if any(a.source == "input" for a in args)
                         else ROLE_QUERY)
