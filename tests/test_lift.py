@@ -426,3 +426,18 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 """))
     first = L.ir.sequence[0]
     assert all(a.source != "input" for a in first.args), [(a.param, a.source) for a in first.args]
+
+
+def test_a_cxx_cast_is_unwrapped_before_the_argument_is_read():
+    """`readJson(reinterpret_cast<const char*>(Data), Size)` is how a C++ harness hands
+    bytes to a C API. The first version of this fix unwrapped the cast AFTER a strip that
+    removes the trailing `)`, so the expression no longer ended in one, the pattern never
+    matched, and the fix changed nothing while looking correct."""
+    L = c_harness.lift(_c("""
+int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
+    readJson(reinterpret_cast<const char*>(Data), Size);
+    return 0;
+}
+"""))
+    got = {a.param: a.source for a in L.ir.sequence[0].args}
+    assert got == {"a0": "input", "a1": "length_of"}, got

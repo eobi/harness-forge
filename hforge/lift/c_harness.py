@@ -187,8 +187,20 @@ def _classify_args(args_raw, data, size, tainted, resources, is_ptr, unread, fn,
     args, params, out_created = [], [], []
     for i, a in enumerate(args_raw):
         pname = f"a{i}"
-        bare = a.strip().lstrip("&*( ").rstrip(" )")
-        bare = re.sub(r"^\([^)]*\)\s*", "", bare).strip()          # drop a cast
+        # A C++ CAST IS UNWRAPPED FIRST, on the raw text. `readJson(reinterpret_cast<const
+        # char*>(Data), Size)` is how a C++ harness hands bytes to a C API. Doing this
+        # after the character-strip below does not work and quietly did nothing: that strip
+        # removes the trailing `)`, so the cast expression no longer ends in one and the
+        # pattern never matched. The fix looked correct, changed no behaviour, and was only
+        # caught by re-checking the harness it was written for.
+        _raw = a.strip()
+        _cxx = re.match(
+            r"^(?:reinterpret_cast|static_cast|const_cast|dynamic_cast)\s*<[^>]*>\s*\((.*)\)\s*$",
+            _raw)
+        if _cxx:
+            _raw = _cxx.group(1).strip()
+        bare = _raw.lstrip("&*( ").rstrip(" )")
+        bare = re.sub(r"^\([^)]*\)\s*", "", bare).strip()          # drop a C cast
         # `s.data()` IS `s`. A C++ harness reaches a C API through an accessor, and the
         # value it yields carries whatever taint the object had.
         _acc = re.match(r"^([A-Za-z_]\w*)\s*(?:\.|->)\s*([A-Za-z_]\w*)\s*\(\s*\)$", bare)
