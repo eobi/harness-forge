@@ -335,6 +335,16 @@ CASES = {
  # common shape for codecs and the one that matters most: the header producer can read the
  # C declarations, and only the build has to change to clang++.
  #
+ # GOLD IS CURRENTLY UNMEASURABLE HERE, and the comment below overstates it until that is
+ # fixed. `fuzzing/stream_fuzzer.cc` does NOT exist at v1.0.15, the tag fetch.sh pins --
+ # the directory was added later -- so every run of this case reports
+ # "gold: build failed" and the gold column has never been measured at this pin. Found by
+ # the 2026-08-30 re-baseline, which reported the failure instead of a zero.
+ #
+ # The same defect as the wabt case: a harness read from the project's main branch and a
+ # tag chosen separately, with nobody checking the two agreed. Fix is to pin a tag that
+ # HAS fuzzing/ (v1.0.16 or later; not yet verified which) and re-measure.
+ #
  # It is here for a second reason. libde265 ships its OWN hand-written fuzz harness at
  # fuzzing/stream_fuzzer.cc, so the gold column for this case is MEASURED on this machine
  # at this budget rather than cited from somebody's paper. Same compiler, same corpus
@@ -435,8 +445,13 @@ CASES = {
     inc=["/b/wabt/include"],
     # tools/ and interp/ are applications and a separate library; the decode path is what
     # this harness reaches and what the denominator should count.
+    # sha256.cc includes picosha2.h, a VENDORED SUBMODULE header a shallow clone does not
+    # fetch, and ReadBinaryIr does not need it. This is exactly the guessed link set the
+    # case was committed without a number for -- the guess was wrong in one file, and the
+    # run said "build failed" rather than reporting a zero, which is the behaviour that
+    # made it findable.
     src=[f for f in sorted(glob.glob("/b/wabt/src/*.cc"))
-         if not f.endswith(("emscripten-helpers.cc", "config.cc"))],
+         if not f.endswith(("emscripten-helpers.cc", "config.cc", "sha256.cc"))],
     fn="wabt::ReadBinaryIr",
     cflags=["-std=c++20"], max_len=65536,
     gold_harness="/b/wabt/fuzzers/wasm2wat_fuzzer.cc",

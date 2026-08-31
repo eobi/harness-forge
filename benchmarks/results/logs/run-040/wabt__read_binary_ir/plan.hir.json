@@ -1,0 +1,329 @@
+{
+  "schema_version": "1.0",
+  "name": "wabt_ReadBinaryIr",
+  "producer": "cxx_header",
+  "notes": "",
+  "target": {
+    "name": "wabt",
+    "version": "",
+    "commit": "",
+    "public_headers": [
+      "/b/wabt/include/wabt/binary-reader-ir.h",
+      "/b/wabt/include/wabt/error.h",
+      "/b/wabt/include/wabt/binary-reader.h",
+      "/b/wabt/include/wabt/ir.h"
+    ],
+    "include_dirs": [
+      "/b/wabt/include"
+    ],
+    "sources": [
+      "/b/wabt/src/apply-names.cc",
+      "/b/wabt/src/binary-reader-ir.cc",
+      "/b/wabt/src/binary-reader-logging.cc",
+      "/b/wabt/src/binary-reader-objdump.cc",
+      "/b/wabt/src/binary-reader-stats.cc",
+      "/b/wabt/src/binary-reader.cc",
+      "/b/wabt/src/binary-writer-spec.cc",
+      "/b/wabt/src/binary-writer.cc",
+      "/b/wabt/src/binary.cc",
+      "/b/wabt/src/binding-hash.cc",
+      "/b/wabt/src/c-writer.cc",
+      "/b/wabt/src/color.cc",
+      "/b/wabt/src/common.cc",
+      "/b/wabt/src/decompiler.cc",
+      "/b/wabt/src/error-formatter.cc",
+      "/b/wabt/src/expr-visitor.cc",
+      "/b/wabt/src/feature.cc",
+      "/b/wabt/src/filenames.cc",
+      "/b/wabt/src/generate-names.cc",
+      "/b/wabt/src/ir-util.cc",
+      "/b/wabt/src/ir.cc",
+      "/b/wabt/src/leb128.cc",
+      "/b/wabt/src/lexer-source-line-finder.cc",
+      "/b/wabt/src/lexer-source.cc",
+      "/b/wabt/src/literal.cc",
+      "/b/wabt/src/opcode.cc",
+      "/b/wabt/src/option-parser.cc",
+      "/b/wabt/src/resolve-names.cc",
+      "/b/wabt/src/sha256.cc",
+      "/b/wabt/src/shared-validator.cc",
+      "/b/wabt/src/stream.cc",
+      "/b/wabt/src/test-binary-reader.cc",
+      "/b/wabt/src/test-filenames.cc",
+      "/b/wabt/src/test-hexfloat.cc",
+      "/b/wabt/src/test-interp.cc",
+      "/b/wabt/src/test-intrusive-list.cc",
+      "/b/wabt/src/test-literal.cc",
+      "/b/wabt/src/test-option-parser.cc",
+      "/b/wabt/src/test-utf8.cc",
+      "/b/wabt/src/test-wast-parser.cc",
+      "/b/wabt/src/token.cc",
+      "/b/wabt/src/tracing.cc",
+      "/b/wabt/src/type-checker.cc",
+      "/b/wabt/src/utf8.cc",
+      "/b/wabt/src/validator.cc",
+      "/b/wabt/src/wast-lexer.cc",
+      "/b/wabt/src/wast-parser.cc",
+      "/b/wabt/src/wat-writer.cc"
+    ],
+    "link_libs": [],
+    "cflags": [
+      "-std=c++20"
+    ],
+    "seed_dirs": [],
+    "language": "c++"
+  },
+  "platforms": [
+    "linux-aarch64-glibc"
+  ],
+  "apis": {
+    "wabt::ReadBinaryIr": {
+      "symbol": "wabt::ReadBinaryIr",
+      "header": "binary-reader-ir.h",
+      "params": [
+        {
+          "name": "filename",
+          "type": {
+            "name": "const char*",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "data",
+          "type": {
+            "name": "const void*",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "size",
+          "type": {
+            "name": "size_t",
+            "kind": "scalar",
+            "const": false,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "options",
+          "type": {
+            "name": "const ReadBinaryOptions&",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "arg4",
+          "type": {
+            "name": "Errors*",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "out_module",
+          "type": {
+            "name": "Module*",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        }
+      ],
+      "returns": {
+        "name": "Result",
+        "kind": "scalar",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "consume",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [],
+        "transfers_ownership": [],
+        "requires_nonnull": [],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    },
+    "wabt::ReadBinaryOptions::ReadBinaryOptions": {
+      "symbol": "wabt::ReadBinaryOptions::ReadBinaryOptions",
+      "header": "binary-reader.h",
+      "params": [],
+      "returns": {
+        "name": "void",
+        "kind": "void",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "create",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [],
+        "transfers_ownership": [],
+        "requires_nonnull": [],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    },
+    "wabt::Module::Module": {
+      "symbol": "wabt::Module::Module",
+      "header": "",
+      "params": [],
+      "returns": {
+        "name": "void",
+        "kind": "void",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "create",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [],
+        "transfers_ownership": [],
+        "requires_nonnull": [],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    }
+  },
+  "slices": [
+    {
+      "id": "d",
+      "kind": "bytes",
+      "remainder": true,
+      "min_len": 1,
+      "max_len": 0
+    }
+  ],
+  "resources": [
+    {
+      "id": "a3",
+      "type": {
+        "name": "wabt::ReadBinaryOptions",
+        "kind": "pointer",
+        "const": false,
+        "resolved": ""
+      },
+      "storage": "inline"
+    },
+    {
+      "id": "a5",
+      "type": {
+        "name": "wabt::Module",
+        "kind": "pointer",
+        "const": false,
+        "resolved": ""
+      },
+      "storage": "inline"
+    }
+  ],
+  "scratch": [
+    {
+      "id": "b4",
+      "kind": "bytes",
+      "capacity": 65536,
+      "c_type": "std::vector<wabt::Error>",
+      "init_from": "",
+      "owns": false
+    }
+  ],
+  "sequence": [
+    {
+      "id": "o_a3",
+      "api": "wabt::ReadBinaryOptions::ReadBinaryOptions",
+      "args": [],
+      "binds": "a3",
+      "targets": "",
+      "repeat": 0,
+      "repeat_while": "",
+      "guarded_by": []
+    },
+    {
+      "id": "o_a5",
+      "api": "wabt::Module::Module",
+      "args": [],
+      "binds": "a5",
+      "targets": "",
+      "repeat": 0,
+      "repeat_while": "",
+      "guarded_by": []
+    },
+    {
+      "id": "o_consume",
+      "api": "wabt::ReadBinaryIr",
+      "args": [
+        {
+          "param": "filename",
+          "source": "literal",
+          "ref": "",
+          "value": "\"\""
+        },
+        {
+          "param": "data",
+          "source": "input",
+          "ref": "d",
+          "value": null
+        },
+        {
+          "param": "size",
+          "source": "length_of",
+          "ref": "d",
+          "value": null
+        },
+        {
+          "param": "options",
+          "source": "resource",
+          "ref": "a3",
+          "value": null
+        },
+        {
+          "param": "arg4",
+          "source": "scratch_addr",
+          "ref": "b4",
+          "value": null
+        },
+        {
+          "param": "out_module",
+          "source": "resource",
+          "ref": "a5",
+          "value": null
+        }
+      ],
+      "binds": "",
+      "targets": "",
+      "repeat": 0,
+      "repeat_while": "",
+      "guarded_by": []
+    }
+  ],
+  "knobs": {
+    "max_len": 65536,
+    "min_len": 0,
+    "timeout_s": 25,
+    "rss_limit_mb": 2048,
+    "malloc_limit_mb": 0,
+    "sanitizers": [
+      "address"
+    ],
+    "detect_leaks": false,
+    "optimisation": "-O1"
+  },
+  "format_model": null,
+  "raw_blocks": []
+}

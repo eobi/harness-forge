@@ -1,0 +1,328 @@
+{
+  "schema_version": "1.0",
+  "name": "zopfli_ZopfliDeflate",
+  "producer": "header_graph",
+  "notes": "free function: no handle, caller-owned buffers",
+  "target": {
+    "name": "zopfli",
+    "version": "",
+    "commit": "",
+    "public_headers": [
+      "/b/zopfli/src/zopfli/deflate.h",
+      "/b/zopfli/src/zopfli/zopfli.h"
+    ],
+    "include_dirs": [
+      "/b/zopfli/src/zopfli"
+    ],
+    "sources": [
+      "/b/zopfli/src/zopfli/blocksplitter.c",
+      "/b/zopfli/src/zopfli/cache.c",
+      "/b/zopfli/src/zopfli/deflate.c",
+      "/b/zopfli/src/zopfli/gzip_container.c",
+      "/b/zopfli/src/zopfli/hash.c",
+      "/b/zopfli/src/zopfli/katajainen.c",
+      "/b/zopfli/src/zopfli/lz77.c",
+      "/b/zopfli/src/zopfli/squeeze.c",
+      "/b/zopfli/src/zopfli/tree.c",
+      "/b/zopfli/src/zopfli/util.c",
+      "/b/zopfli/src/zopfli/zlib_container.c",
+      "/b/zopfli/src/zopfli/zopfli_lib.c"
+    ],
+    "link_libs": [],
+    "cflags": [],
+    "seed_dirs": [],
+    "language": "c"
+  },
+  "platforms": [
+    "linux-aarch64-glibc"
+  ],
+  "apis": {
+    "ZopfliDeflate": {
+      "symbol": "ZopfliDeflate",
+      "header": "deflate.h",
+      "params": [
+        {
+          "name": "options",
+          "type": {
+            "name": "const ZopfliOptions*",
+            "kind": "pointer",
+            "const": true,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "btype",
+          "type": {
+            "name": "int",
+            "kind": "scalar",
+            "const": false,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "final",
+          "type": {
+            "name": "int",
+            "kind": "scalar",
+            "const": false,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "in",
+          "type": {
+            "name": "const unsigned char*",
+            "kind": "pointer",
+            "const": true,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "insize",
+          "type": {
+            "name": "size_t",
+            "kind": "scalar",
+            "const": false,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "bp",
+          "type": {
+            "name": "unsigned char*",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "out",
+          "type": {
+            "name": "unsigned char**",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "outsize",
+          "type": {
+            "name": "size_t*",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        }
+      ],
+      "returns": {
+        "name": "void",
+        "kind": "void",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "query",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [
+          [
+            "in",
+            "insize"
+          ]
+        ],
+        "transfers_ownership": [],
+        "requires_nonnull": [],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    },
+    "ZopfliInitOptions": {
+      "symbol": "ZopfliInitOptions",
+      "header": "zopfli.h",
+      "params": [
+        {
+          "name": "options",
+          "type": {
+            "name": "ZopfliOptions*",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        }
+      ],
+      "returns": {
+        "name": "void",
+        "kind": "void",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "query",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [],
+        "transfers_ownership": [],
+        "requires_nonnull": [],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    }
+  },
+  "slices": [
+    {
+      "id": "mode_final",
+      "kind": "u8",
+      "remainder": false,
+      "min_len": 0,
+      "max_len": 1
+    },
+    {
+      "id": "mode_btype",
+      "kind": "u8",
+      "remainder": false,
+      "min_len": 0,
+      "max_len": 1
+    },
+    {
+      "id": "in",
+      "kind": "bytes",
+      "remainder": true,
+      "min_len": 1,
+      "max_len": 0
+    }
+  ],
+  "resources": [
+    {
+      "id": "cfg_options",
+      "type": {
+        "name": "ZopfliOptions",
+        "kind": "struct",
+        "const": false,
+        "resolved": ""
+      },
+      "storage": "inline"
+    }
+  ],
+  "scratch": [
+    {
+      "id": "outbuf_bp",
+      "kind": "bytes",
+      "capacity": 65536,
+      "c_type": "",
+      "init_from": "",
+      "owns": false
+    },
+    {
+      "id": "own_out",
+      "kind": "ptr",
+      "capacity": 65536,
+      "c_type": "unsigned char *",
+      "init_from": "",
+      "owns": true
+    },
+    {
+      "id": "len_outsize",
+      "kind": "size",
+      "capacity": 0,
+      "c_type": "size_t",
+      "init_from": "",
+      "owns": false
+    }
+  ],
+  "sequence": [
+    {
+      "id": "o_cfg_options",
+      "api": "ZopfliInitOptions",
+      "args": [
+        {
+          "param": "options",
+          "source": "resource",
+          "ref": "cfg_options",
+          "value": null
+        }
+      ],
+      "binds": "cfg_options",
+      "targets": "",
+      "repeat": 0,
+      "repeat_while": "",
+      "guarded_by": []
+    },
+    {
+      "id": "o_consume",
+      "api": "ZopfliDeflate",
+      "args": [
+        {
+          "param": "options",
+          "source": "resource",
+          "ref": "cfg_options",
+          "value": null
+        },
+        {
+          "param": "btype",
+          "source": "input",
+          "ref": "mode_btype",
+          "value": null
+        },
+        {
+          "param": "final",
+          "source": "input",
+          "ref": "mode_final",
+          "value": null
+        },
+        {
+          "param": "in",
+          "source": "input",
+          "ref": "in",
+          "value": null
+        },
+        {
+          "param": "insize",
+          "source": "length_of",
+          "ref": "in",
+          "value": null
+        },
+        {
+          "param": "bp",
+          "source": "scratch",
+          "ref": "outbuf_bp",
+          "value": null
+        },
+        {
+          "param": "out",
+          "source": "scratch_addr",
+          "ref": "own_out",
+          "value": null
+        },
+        {
+          "param": "outsize",
+          "source": "scratch_addr",
+          "ref": "len_outsize",
+          "value": null
+        }
+      ],
+      "binds": "",
+      "targets": "",
+      "repeat": 0,
+      "repeat_while": "",
+      "guarded_by": []
+    }
+  ],
+  "knobs": {
+    "max_len": 4096,
+    "min_len": 0,
+    "timeout_s": 25,
+    "rss_limit_mb": 2048,
+    "malloc_limit_mb": 0,
+    "sanitizers": [
+      "address"
+    ],
+    "detect_leaks": false,
+    "optimisation": "-O1"
+  },
+  "format_model": null,
+  "raw_blocks": []
+}

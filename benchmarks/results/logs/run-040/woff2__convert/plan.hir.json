@@ -1,0 +1,223 @@
+{
+  "schema_version": "1.0",
+  "name": "woff2_ConvertWOFF2ToTTF",
+  "producer": "cxx_header",
+  "notes": "",
+  "target": {
+    "name": "woff2",
+    "version": "",
+    "commit": "",
+    "public_headers": [
+      "/b/woff2/include/woff2/decode.h",
+      "/b/woff2/include/woff2/output.h"
+    ],
+    "include_dirs": [
+      "/b/woff2/include",
+      "/b/woff2/src",
+      "/b/brotli/c/include"
+    ],
+    "sources": [
+      "/b/woff2/src/woff2_dec.cc",
+      "/b/woff2/src/woff2_common.cc",
+      "/b/woff2/src/woff2_out.cc",
+      "/b/woff2/src/variable_length.cc",
+      "/b/woff2/src/table_tags.cc",
+      "/b/brotli/c/dec/bit_reader.c",
+      "/b/brotli/c/dec/decode.c",
+      "/b/brotli/c/dec/huffman.c",
+      "/b/brotli/c/dec/state.c",
+      "/b/brotli/c/common/constants.c",
+      "/b/brotli/c/common/context.c",
+      "/b/brotli/c/common/dictionary.c",
+      "/b/brotli/c/common/platform.c",
+      "/b/brotli/c/common/shared_dictionary.c",
+      "/b/brotli/c/common/transform.c"
+    ],
+    "link_libs": [],
+    "cflags": [],
+    "seed_dirs": [],
+    "language": "c++"
+  },
+  "platforms": [
+    "linux-aarch64-glibc"
+  ],
+  "apis": {
+    "woff2::ConvertWOFF2ToTTF": {
+      "symbol": "woff2::ConvertWOFF2ToTTF",
+      "header": "decode.h",
+      "params": [
+        {
+          "name": "data",
+          "type": {
+            "name": "const uint8_t *",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "length",
+          "type": {
+            "name": "size_t",
+            "kind": "scalar",
+            "const": false,
+            "resolved": ""
+          }
+        },
+        {
+          "name": "out",
+          "type": {
+            "name": "WOFF2Out*",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        }
+      ],
+      "returns": {
+        "name": "bool",
+        "kind": "scalar",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "consume",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [],
+        "transfers_ownership": [],
+        "requires_nonnull": [],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    },
+    "woff2::WOFF2StringOut::WOFF2StringOut": {
+      "symbol": "woff2::WOFF2StringOut::WOFF2StringOut",
+      "header": "output.h",
+      "params": [
+        {
+          "name": "buf",
+          "type": {
+            "name": "std::string *",
+            "kind": "pointer",
+            "const": false,
+            "resolved": ""
+          }
+        }
+      ],
+      "returns": {
+        "name": "void",
+        "kind": "void",
+        "const": false,
+        "resolved": ""
+      },
+      "role": "create",
+      "contract": {
+        "nul_terminated": [],
+        "length_delimited": [],
+        "transfers_ownership": [],
+        "requires_nonnull": [],
+        "error_return": "none",
+        "reentrant": true,
+        "thread_affinity": "any",
+        "internal_only": false,
+        "declared_exceptions": []
+      }
+    }
+  },
+  "slices": [
+    {
+      "id": "d",
+      "kind": "bytes",
+      "remainder": true,
+      "min_len": 1,
+      "max_len": 0
+    }
+  ],
+  "resources": [
+    {
+      "id": "a2",
+      "type": {
+        "name": "woff2::WOFF2StringOut",
+        "kind": "pointer",
+        "const": false,
+        "resolved": ""
+      },
+      "storage": "inline"
+    }
+  ],
+  "scratch": [
+    {
+      "id": "b2",
+      "kind": "bytes",
+      "capacity": 65536,
+      "c_type": "std::string",
+      "init_from": "",
+      "owns": false
+    }
+  ],
+  "sequence": [
+    {
+      "id": "o_a2",
+      "api": "woff2::WOFF2StringOut::WOFF2StringOut",
+      "args": [
+        {
+          "param": "buf",
+          "source": "scratch_addr",
+          "ref": "b2",
+          "value": null
+        }
+      ],
+      "binds": "a2",
+      "targets": "",
+      "repeat": 0,
+      "repeat_while": "",
+      "guarded_by": []
+    },
+    {
+      "id": "o_consume",
+      "api": "woff2::ConvertWOFF2ToTTF",
+      "args": [
+        {
+          "param": "data",
+          "source": "input",
+          "ref": "d",
+          "value": null
+        },
+        {
+          "param": "length",
+          "source": "length_of",
+          "ref": "d",
+          "value": null
+        },
+        {
+          "param": "out",
+          "source": "resource",
+          "ref": "a2",
+          "value": null
+        }
+      ],
+      "binds": "",
+      "targets": "",
+      "repeat": 0,
+      "repeat_while": "",
+      "guarded_by": []
+    }
+  ],
+  "knobs": {
+    "max_len": 65536,
+    "min_len": 0,
+    "timeout_s": 25,
+    "rss_limit_mb": 2048,
+    "malloc_limit_mb": 0,
+    "sanitizers": [
+      "address"
+    ],
+    "detect_leaks": false,
+    "optimisation": "-O1"
+  },
+  "format_model": null,
+  "raw_blocks": []
+}

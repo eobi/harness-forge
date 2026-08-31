@@ -1,0 +1,44 @@
+/b/runs/wabt__read_binary_ir/harness.cc:38:13: warning: compound assignment to object of volatile-qualified type 'volatile long' is deprecated [-Wdeprecated-volatile]
+    hf_sink += (long)wabt::ReadBinaryIr("", reinterpret_cast<const void*>(hf_s_d.data()), hf_s_d.size(), *hf_o_a3, &hf_x_b4, &*hf_o_a5);
+            ^
+1 warning generated.
+/b/wabt/src/sha256.cc:22:10: fatal error: 'picosha2.h' file not found
+#include "picosha2.h"
+         ^~~~~~~~~~~~
+1 error generated.
+/b/wabt/src/test-binary-reader.cc:17:10: fatal error: 'gtest/gtest.h' file not found
+#include "gtest/gtest.h"
+         ^~~~~~~~~~~~~~~
+1 error generated.
+/b/wabt/src/test-filenames.cc:17:10: fatal error: 'gtest/gtest.h' file not found
+#include "gtest/gtest.h"
+         ^~~~~~~~~~~~~~~
+1 error generated.
+/b/wabt/src/test-hexfloat.cc:21:10: fatal error: 'gtest/gtest.h' file not found
+#include "gtest/gtest.h"
+         ^~~~~~~~~~~~~~~
+1 error generated.
+/b/wabt/src/test-interp.cc:17:10: fatal error: 'gtest/gtest.h' file not found
+#include "gtest/gtest.h"
+         ^~~~~~~~~~~~~~~
+1 error generated.
+/b/wabt/src/test-intrusive-list.cc:17:10: fatal error: 'gtest/gtest.h' file not found
+#include "gtest/gtest.h"
+         ^~~~~~~~~~~~~~~
+1 error generated.
+/b/wabt/src/test-literal.cc:22:10: fatal error: 'gtest/gtest.h' file not found
+#include "gtest/gtest.h"
+         ^~~~~~~~~~~~~~~
+1 error generated.
+/b/wabt/src/test-option-parser.cc:15:10: fatal error: 'gtest/gtest.h' file not found
+#include "gtest/gtest.h"
+         ^~~~~~~~~~~~~~~
+1 error generated.
+/b/wabt/src/test-utf8.cc:17:10: fatal error: 'gtest/gtest.h' file not found
+#include "gtest/gtest.h"
+         ^~~~~~~~~~~~~~~
+1 error generated.
+/b/wabt/src/test-wast-parser.cc:17:10: fatal error: 'gtest/gtest.h' file not found
+#include "gtest/gtest.h"
+         ^~~~~~~~~~~~~~~
+1 error generated.
