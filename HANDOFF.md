@@ -16,6 +16,21 @@ reversal are recorded in `plans/HOW-WE-WIN.md` under "DECISION, 2026-08-31".
 
 ---
 
+## Session close: 2026-08-31
+
+Everything below was true at the end of the 2026-08-31 session. Repo pushed, CI green.
+
+**Done this session:** corpus scaled to 2,693 harnesses; two defects found, verified and
+filed; gate false-rejection driven from 1.18% to **0.00% on 412 trusted lifts**; mutational
+plan synthesis built (14-17x more valid candidates); and the negative-capability bound
+finally published — **115 of 1,374 OSS-Fuzz projects cannot report a leak.**
+
+**Not done, and blocked on the same thing:** campaigning the synthesised candidates for the
++14% coverage claim, and woff2's n=5. Both need an IDLE MACHINE. Do not run them beside
+anything else; see the woff2 warning below.
+
+---
+
 ## What is FILED upstream (real, verifiable)
 
 | # | what | where | status |
@@ -40,15 +55,44 @@ attempt fixed one of three instances; the gate caught the other two before filin
 
 ## The numbers that are real
 
-    corpus              harnesses   lifted   trusted   flagged
-    OSS-Fuzz tree             420      400       130         0
-    upstream repos          2,262    1,542       294        ~9
+    corpus              harnesses   lifted   trusted   blocking
+    OSS-Fuzz tree             420      400       126          0
+    upstream repos          2,273    1,542       286          2
                             -----
-    total                   2,682                 424
+    total                   2,693    1,942       412          2
 
-QuartetFuzz audited 586. Roughly 40 candidates have been triaged BY READING THEM; 2 were
-real. Every other one was a defect in our own engine, and fixing them is what took the
-leak tier from 26 trusted reports to single digits while the trusted tier GREW.
+QuartetFuzz audited 586. About 45 candidates have been triaged BY READING THEM; **2 were
+real, and both surviving blocking verdicts are correct** — leptonica/pix3 (filed) and
+bazel-rules-fuzzing/oom_fuzz_test, a fixture whose own header says it is deliberately
+broken. **False rejection: 0 of 412 = 0.00%.**
+
+**The denominator must travel with that number.** 412 of 1,942 lifted harnesses is 21%; on
+the other 79% the engine declines to opine. QuartetFuzz's 4.8% covers everything they
+judged. Quoting 0.00% without that sentence would be dishonest.
+
+Every other candidate was a defect in our own engine. Fixing them is what made the two real
+ones visible.
+
+## Negative capability, published
+
+`tools/bounds.py`. **115 of 1,374 projects (8.4%) have `detect_leaks=0`** and cannot report
+a leak; 24 cap input length; 5 allow allocations to return NULL silently. Every signal is a
+literal build setting, never an inference.
+
+`--cross-reference` asks which harnesses the gates say LEAK inside projects whose detector
+is off. Answer across the tree: **one, bluez/fuzz_gobex — the one already filed.** The
+method reproduces the hand-found case and finds nothing else, which is worth knowing: that
+seam is not rich.
+
+## Mutational synthesis
+
+`hforge/producers/mutate.py`. Valid candidates **x14.2 (jansson), x16.6 (expat)**; gate
+rejection **33.8% and 0.8%** on sound bases. Enumerated, not sampled — no seed to record.
+
+**The +14% median coverage is NOT measured and NOT claimed.** Volume is the means; coverage
+is the result. Only widen plans that already PASS the gates: mutating an invalid base
+cannot make it valid, and measuring it reports base-plan quality instead of the mutation's
+(that error was made and corrected in-session).
 
 **pugixml is 1.00x, n=5**, five distinct libFuzzer seeds, gold measured in the same
 container each run: ours 14.79 spread 0.00, gold 14.79 spread 0.49. We are more
@@ -97,17 +141,17 @@ class.
 
 ## Next, in order
 
-1. **Triage the remaining ~9 flagged candidates** in the upstream corpus. `pix4_fuzzer.cc`
-   is mid-triage: `na1` reports a double destroy and the cause is not yet established.
-2. **woff2 n=5 on an idle machine** — the last single-sample row.
-3. **Gate false-rejection rate against known-good harnesses.** This is the PREREQUISITE for
-   mutational synthesis and it is unmeasured. Starting synthesis without it is flying blind
-   into the item most likely to fail.
-4. **Mutational plan synthesis** — the OGHarn axis. Measured fact: our RANKING is not the
-   bottleneck (selection costs 0.63 points on libyaml, 0.00 on libpng); the CANDIDATE SPACE
-   is. Target: candidate volume 10x, gate rejection rate published, >= +14% median.
-5. **Publish the reachability bound.** It is computed in `certificate.py` and recorded in
-   NO benchmark result. Half the differentiator, sitting unused.
+1. **Campaign the synthesised candidates.** The +14% median is the only unmet target on the
+   coverage axis, and the mechanism is built. NEEDS AN IDLE MACHINE.
+2. **woff2 n=5 on an idle machine** — the last single-sample row. Same constraint.
+3. **Chase the two open PRs.** oss-fuzz#16081 and leptonica#813. The findings-axis target
+   was >=5 PRs with >=1 merged; we have 2 open, 0 merged.
+4. **More bound signals.** `tools/bounds.py` currently reads four settings. Missing
+   sanitizers, absent seed corpora and unbuilt code paths are all literal, checkable
+   facts in the same vein.
+5. **Wire the bound into the benchmark record.** `certificate.py` computes an unreachable
+   list per plan; no benchmark result carries it. The corpus survey is published, the
+   per-plan bound still is not.
 
 ---
 

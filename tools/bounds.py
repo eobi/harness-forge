@@ -22,6 +22,11 @@ import re
 import sys
 from pathlib import Path
 
+# The cross-reference needs the engine; the survey itself does not. Same convention as the
+# other tools here.
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
+
 # Each entry: (name, pattern, what the target consequently cannot find).
 SIGNALS = [
     ("leaks_disabled", re.compile(r"detect_leaks\s*=\s*0"),
@@ -63,10 +68,46 @@ def survey(root: Path) -> dict:
     return out
 
 
+def cross_reference(root: Path, blind: set) -> list:
+    """Harnesses our gates say LEAK, in projects whose leak detector is OFF.
+
+    This is the bluez shape as a query. A leak the gates can see, in a target that could not
+    report it anyway, is the case where a harness defect has silently removed a bug class
+    from a library's coverage -- and it is worth a maintainer's attention precisely because
+    the campaign will never raise it.
+
+    Restricted to lifts the engine trusts, because a leak report on a harness it could not
+    read is not evidence of anything.
+    """
+    from hforge.gates.static_gates import run_static_gates
+    from hforge.lift import c_harness
+
+    out = []
+    for pat in ("*/*fuzz*.c", "*/*fuzz*.cc", "*/*fuzz*.cpp"):
+        for f in sorted(root.glob(pat)):
+            if f.parent.name not in blind:
+                continue
+            try:
+                lifted = c_harness.lift(str(f))
+            except Exception:
+                continue
+            if not lifted.high_fidelity:
+                continue
+            leaks = [v.where for g in run_static_gates(lifted.ir)
+                     for v in (g.violations or []) if v.code == "S1.LEAK"]
+            if leaks:
+                out.append({"project": f.parent.name, "harness": f.name,
+                            "resources": leaks})
+    return out
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("root", help="an oss-fuzz projects/ directory")
     ap.add_argument("-o", "--out")
+    ap.add_argument("--cross-reference", action="store_true",
+                    help="also report harnesses the gates say LEAK inside projects whose "
+                         "leak detector is off -- the shape of finding 0001")
     a = ap.parse_args(argv)
 
     root = Path(a.root)
@@ -89,10 +130,22 @@ def main(argv=None) -> int:
           "reason.\nWhat is NOT reasonable is a campaign reporting nothing while a whole "
           "class is off\nand nobody says so.")
 
+    xref = []
+    if a.cross_reference:
+        blind = set(per.get("leaks_disabled", []))
+        xref = cross_reference(root, blind)
+        print()
+        print(f"leaking harnesses inside leak-blind projects: {len(xref)}")
+        for h in xref:
+            print(f"    {h['project']}/{h['harness']}  {h['resources']}")
+        if not xref:
+            print("    none. The class is not a rich seam here, which is worth knowing.")
+
     if a.out:
         Path(a.out).write_text(json.dumps(
             {"projects_surveyed": total, "with_a_bound": len(found),
              "by_signal": {k: sorted(v) for k, v in per.items()},
+             "leaking_inside_leak_blind_projects": xref,
              "detail": found}, indent=1))
         print(f"\nwritten to {a.out}")
     return 0

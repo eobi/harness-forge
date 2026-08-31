@@ -628,6 +628,20 @@ inference — a bound nobody can check is worth nothing.
 harness that touches a `GError` — the same target whose leak detection is off. The bound and
 the defect are the same fact seen from two sides.
 
+### Turning the bound into a query
+
+`--cross-reference` asks the obvious follow-up: which harnesses do the gates say **leak**,
+inside projects whose leak detector is **off**? That is finding 0001 expressed as a search,
+and it is the case most worth a maintainer's attention, because the campaign will never
+raise it.
+
+Across the OSS-Fuzz tree the answer is **one — bluez/fuzz_gobex, the harness already
+filed.** The method reproduces the hand-found case and turns up nothing else.
+
+That is a useful negative result and it is reported as one. It says the seam is not rich:
+whatever else is wrong in this corpus, it is not another leak sitting behind a disabled
+leak detector where our gates can already see it.
+
 ## Widening the candidate space
 
 [`hforge/producers/mutate.py`](hforge/producers/mutate.py). OGHarn (ICSE 2025) beats

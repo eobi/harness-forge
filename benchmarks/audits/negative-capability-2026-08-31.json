@@ -156,6 +156,15 @@
    "tensorflow"
   ]
  },
+ "leaking_inside_leak_blind_projects": [
+  {
+   "project": "bluez",
+   "harness": "fuzz_gobex.c",
+   "resources": [
+    "r_err"
+   ]
+  }
+ ],
  "detail": {
   "ansible": {
    "leaks_disabled": {
