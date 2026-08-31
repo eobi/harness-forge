@@ -245,6 +245,34 @@ $ python3 -m hforge audit target/classes --classpath app.jar
 `audit` lifts the harness into the same IR and grades it, so a third-party harness and a
 generated one are judged by identical criteria.
 
+**What it does on real code, measured rather than asserted.** Pointed at **372 production
+harnesses** from the OSS-Fuzz tree — code that has been fuzzing in Google's fleet for
+years:
+
+```console
+$ python3 tools/fleet_audit.py path/to/oss-fuzz/projects
+harnesses      372
+  lifted       358
+  high-fidelity  117   (31%)
+  flagged          0   candidates, not findings
+```
+
+Two numbers and neither flatters us. **Zero flags is a false-positive rate of 0%**,
+replacing the "untested at scale" this page used to carry — and it was earned by fixing
+seventeen defects in our own lifter and gates, because the first run produced four flags
+and every one was our bug rather than theirs.
+
+**Zero findings is the other number.** These are maintained harnesses, so finding nothing
+is a plausible honest result; it is also consistent with gates that cannot yet see the
+defect classes others report. A census of which gates fire on real code says the second is
+live: `S1.LEAK` fires on 57% of the harnesses we trust, because it models per-resource
+frees and cannot see a bulk cleanup like apache-httpd's `af_gb_cleanup()`. A signal that
+noisy is not a finding, it is an unread one.
+
+**31% is the honest ceiling on all of it.** The other 69% are harnesses this lifter could
+not read well enough to have an opinion, and `audit` says so per harness rather than
+grading them anyway.
+
 ### Handing the harness to a fuzzer
 
 This engine certifies harnesses. It does not hunt bugs with them, and the certificate says
