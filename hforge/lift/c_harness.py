@@ -182,7 +182,7 @@ def _split_args(s: str) -> list:
 
 
 def _classify_args(args_raw, data, size, tainted, resources, is_ptr, unread, fn,
-                   decl_type=None, caller_owned=None):
+                   decl_type=None, caller_owned=None, size_alias=None):
     """Turn a call's textual arguments into IR Args, and say what could not be attributed."""
     args, params, out_created = [], [], []
     for i, a in enumerate(args_raw):
@@ -197,7 +197,9 @@ def _classify_args(args_raw, data, size, tainted, resources, is_ptr, unread, fn,
         if bare in tainted:
             args.append(Arg(pname, "input", "s_data"))
             params.append(ParamDecl(pname, TypeRef("const uint8_t *", "pointer")))
-        elif bare == size or re.fullmatch(rf"{re.escape(size)}\s*[-+]\s*\d+", bare):
+        elif (bare in (size_alias or {size})
+              or any(re.fullmatch(rf"{re.escape(a)}\s*[-+]\s*\d+", bare)
+                     for a in (size_alias or {size}) if a)):
             args.append(Arg(pname, "length_of", "s_data"))
             params.append(ParamDecl(pname, TypeRef("size_t", "scalar")))
         elif bare in resources:
@@ -284,6 +286,21 @@ _FDP_CONSUME = re.compile(
     r"(?:([A-Za-z_]\w*)\s*=\s*)?\b([A-Za-z_]\w*)\s*\.\s*(Consume\w*)\s*(?:<[^>]*>)?\s*\(")
 
 
+_ASSIGN = re.compile(
+    r"^\s*(?:[A-Za-z_][\w\s:<>,]*?[\s\*&]+)?([A-Za-z_]\w*)\s*=\s*([^;]+);")
+
+
+def _mentions_tainted(expr: str, tainted: set) -> bool:
+    """Whether an expression is derived from the fuzzer's bytes.
+
+    A cast, a `+ offset`, an accessor -- the value is still attacker-controlled, and the
+    point of this check is the plan's INPUT binding rather than an exact dataflow. It is
+    deliberately generous in one direction only: a name that is not tainted can never make
+    an expression tainted, so this cannot invent an input binding out of nothing.
+    """
+    return any(re.search(r"\b" + re.escape(t) + r"\b", expr) for t in tainted if t)
+
+
 def _fdp_taint(body: str, data: str, tainted: set) -> list:
     """Follow the fuzzer's bytes through FuzzedDataProvider.
 
@@ -359,6 +376,7 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
     # Values a FuzzedDataProvider hands back ARE the fuzzer's bytes, reshaped. Taint them
     # before the call loop so a library call receiving one is seen to consume input.
     fdp_methods = set(_fdp_taint(body, data, tainted))
+    size_alias: set = {size} if size else set()
     order = 0
 
     parsed = cflow.parse(body)
@@ -366,6 +384,23 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
         if stmt.kind == "return":
             continue
         text = stmt.text if stmt.text.rstrip().endswith(";") else stmt.text + ";"
+
+        # AN ALIAS CARRIES THE TAINT. `const uint8_t *payload = data; size_t payload_len =
+        # size; parse(payload, payload_len);` is the single most common shape among
+        # harnesses this lifter could not follow -- it bound both arguments as LITERALS and
+        # reported that the harness consumes no input. It is not a C++ problem and not an
+        # exotic one: it is an assignment. Handled here, in statement order, so a name
+        # tainted later does not appear tainted earlier.
+        _asn = _ASSIGN.match(text)
+        if _asn:
+            _lhs, _rhs = _asn.group(1), _asn.group(2)
+            if _lhs not in tainted and _mentions_tainted(_rhs, tainted):
+                tainted.add(_lhs)
+            # `size_t payload_len = size;` is the same aliasing on the LENGTH side, and
+            # binding it as a literal leaves a call reading `parse(payload, 0)` -- input
+            # bound, length thrown away, which is worse than either alone.
+            if _lhs not in size_alias and _mentions_tainted(_rhs, size_alias):
+                size_alias.add(_lhs)
         for cm in _CALL.finditer(text):
             assigned, fn, argstr = cm.group(1), cm.group(2), cm.group(3)
             # A MEMBER CALL IS NOT A C LIBRARY CALL. `sentences.push_back(s)` matched as a
@@ -392,7 +427,8 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
 
             args, params, out_created = _classify_args(
                 args_raw, data, size, tainted, resources, is_ptr, unread, fn,
-                decl_type=decl_type, caller_owned=caller_owned)
+                decl_type=decl_type, caller_owned=caller_owned,
+                size_alias=size_alias)
 
             role, binds, targets = ROLE_QUERY, "", ""
             if out_created and not (assigned and is_ptr(assigned)):

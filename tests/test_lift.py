@@ -391,3 +391,38 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     codes = {v.code for g in run_static_gates(L.ir) for v in g.violations
              if v.severity == BLOCK}
     assert "S1.DOUBLE_CREATE" not in codes, codes
+
+
+def test_an_alias_carries_the_taint():
+    """`const uint8_t *payload = data; size_t payload_len = size; parse(payload, len);`
+    was the single most common shape this lifter could not follow. Both arguments bound as
+    LITERALS and the harness was reported as consuming no input. It is not a C++ problem
+    and not an exotic one -- it is an assignment."""
+    L = c_harness.lift(_c("""
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    const uint8_t *payload = data;
+    size_t payload_len = size;
+    parse_it(payload, payload_len);
+    return 0;
+}
+"""))
+    op = L.ir.sequence[0]
+    got = {a.param: a.source for a in op.args}
+    assert got == {"a0": "input", "a1": "length_of"}, got
+    assert L.high_fidelity, L.why_low_fidelity
+
+
+def test_an_untainted_name_cannot_invent_an_input_binding():
+    """The alias rule is generous in ONE direction only. A local with no relationship to
+    the fuzzer's bytes must not become an input, or the lifter would claim a harness
+    consumes input that never touches it."""
+    L = c_harness.lift(_c("""
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    const char *fixed = "constant";
+    parse_it(fixed, 7);
+    consume(data, size);
+    return 0;
+}
+"""))
+    first = L.ir.sequence[0]
+    assert all(a.source != "input" for a in first.args), [(a.param, a.source) for a in first.args]

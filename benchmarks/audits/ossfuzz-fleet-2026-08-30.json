@@ -115,6 +115,22 @@
   "findings": 0,
   "false_positive_rate": "0/44",
   "what_changed": "The lifter now tracks WHICH ARM a statement is in, not just how deep it is nested, and a switch body is cut into one arm per case label. Two creates on paths that never both run are no longer a leak. That cleared the last flag -- openvpn's `tmp`, assigned in thirteen mutually exclusive cases and freed in each.",
-  "reading": "Zero flags on 44 readable lifts of production harnesses. Every false positive this audit produced has now been traced to a cause and fixed, and the causes were all one thing: a flat statement model applied to branching code. Still zero findings -- the instrument is calibrated, and 44 of 372 is what it can currently read."
+  "reading": "Zero flags on 44 readable lifts of production harnesses. Every false positive this audit produced has now been traced to a cause and fixed, and the causes were all one thing: a flat statement model applied to branching code. Still zero findings -- the instrument is calibrated, and 44 of 372 is what it can currently read.",
+  "superseded_by": "after_alias_taint"
+ },
+ "after_alias_taint": {
+  "harnesses": 372,
+  "lifted": 358,
+  "high_fidelity": 70,
+  "flagged": 0,
+  "false_positives": 0,
+  "findings": 0,
+  "readable_by_language": {
+   ".c": "33/150 = 22%",
+   ".cc": "37/222 = 17%"
+  },
+  "what_changed": "The lifter now propagates taint through a plain assignment. `const uint8_t *payload = data; size_t payload_len = size;` was the most common shape it could not follow: both arguments bound as LITERALS and the harness read as consuming no input.",
+  "correction": "THIS CORRECTS AN EARLIER CONCLUSION IN THIS FILE. The bottleneck was diagnosed as 'a C lifter cannot read C++ harnesses' on the strength of the .c/.cc readable split, and that was measured twice and stated confidently. It was partly wrong. The largest single category was plain ALIASING, which is not a C++ construct at all -- fixing it took .cc from 7% to 17% and .c from 19% to 22%. The split was real; the cause attributed to it was not. Reading five failing harnesses would have shown this in minutes, and counting them by extension did not.",
+  "still_true": "C++ remains under-read relative to C, and a C++ lifter is still the larger structural piece. But it is now worth about 5 points of the gap rather than all of it."
  }
 }
