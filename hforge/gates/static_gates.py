@@ -50,7 +50,15 @@ def s1_lifetime(ir: HarnessIR) -> GateResult:
     # S1.USE_BEFORE_CREATE against a correct plan, and jansson's only entry point was
     # refused. There is also nothing to destroy: it is storage, not a lifetime the library
     # manages. The IR says which kind it is; the gate reads that rather than inferring it.
-    state = {r.id: (ALIVE if r.storage == "out" else UNBORN) for r in ir.resources}
+    # THIS TEST WAS WRITTEN AGAINST A STORAGE VALUE THAT DOES NOT EXIST. The IR spells the
+    # kinds `handle | inline | out_param`; this read `== "out"`, which never matches, so the
+    # jansson fix the comment above describes has never once fired. Every caller-declared
+    # slot has been scored UNBORN since it was written, and that single mismatch produced
+    # the USE_BEFORE_CREATE flags against yajl-ruby, bluez, lcms and tdengine in the
+    # OSS-Fuzz fleet audit. `Resource.by_address` is the IR's own name for the property, so
+    # the gate asks the IR instead of re-spelling it and getting it wrong again.
+    state = {r.id: (ALIVE if r.by_address else UNBORN) for r in ir.resources}
+    _by_addr = {r.id: r.by_address for r in ir.resources}
     born_at: dict[str, str] = {}
 
     for op in ir.sequence:
@@ -98,7 +106,14 @@ def s1_lifetime(ir: HarnessIR) -> GateResult:
                 v.append(Violation("S1.UNKNOWN_RESOURCE", BLOCK,
                                    f"op {op.id} binds undeclared resource {op.binds!r}",
                                    where=op.id, principle="P1"))
-            elif state[op.binds] != UNBORN:
+            elif state[op.binds] != UNBORN and not _by_addr.get(op.binds):
+                # A CALLER-DECLARED SLOT IS ALIVE AND STILL GETS FILLED. `sqlite3 *db = 0;
+                # sqlite3_open(":memory:", &db);` -- the storage exists from the
+                # declaration AND the library writes the handle into it, and those are not
+                # in conflict. Marking such slots alive without this exemption turned every
+                # ordinary out-parameter into a DOUBLE_CREATE: the fleet's flagged count
+                # went from 3 to 16 on a change meant to REMOVE false positives, which is
+                # what caught it.
                 v.append(Violation("S1.DOUBLE_CREATE", BLOCK,
                                    f"resource {op.binds!r} is created twice "
                                    f"(first at {born_at.get(op.binds)}, again at {op.id}); "

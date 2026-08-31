@@ -50,5 +50,25 @@
   "a call in the body that never became an op now makes the lift untrusted",
   "a use of the data or size parameter that was never bound now makes it untrusted",
   "comparison guards (`if (size < 4)`) are excluded, because counting them rejected a correctly lifted branching harness -- fail closed, but not shut"
- ]
+ ],
+ "final": {
+  "harnesses": 372,
+  "lifted": 358,
+  "high_fidelity": 38,
+  "blocking_on_high_fidelity": 0,
+  "false_positives": 0,
+  "findings": 0,
+  "reading": "The gate bank, restricted to lifts it can be trusted on, finds NO defects in 38 production OSS-Fuzz harnesses. Both numbers matter: zero false positives is the calibration this project never had, and zero findings is the honest cost of only grading what we can read.",
+  "coverage_limit": "38 of 372 is 10%. The bottleneck is no longer the gates, it is how much of a real harness this lifter can read. Raising the high-fidelity rate is what would turn this from a calibration into a search.",
+  "defects_fixed_getting_here": [
+   "fidelity could not see a call that was never lifted",
+   "fidelity could not see an input flow that was never bound",
+   "the flow count treated `if (size < 4)` guards as unfollowed flows",
+   "the flow count compared data-uses against data+size bindings, so a length binding masked an unbound input",
+   "S1 tested `storage == 'out'`, a value the IR never uses -- so the caller-declared slot exemption it documents had never once fired",
+   "a slot the harness declares was treated as a resource awaiting a create",
+   "marking those slots alive then made every ordinary out-parameter a DOUBLE_CREATE",
+   "`x.push_back(y)` was lifted as a call to a C function named push_back, and graded"
+  ]
+ }
 }

@@ -298,3 +298,30 @@ def test_a_size_guard_is_not_a_missed_flow():
     filter."""
     L = c_harness.lift(_c(BRANCHING))
     assert L.high_fidelity, L.why_low_fidelity
+
+
+def test_a_slot_the_harness_declares_needs_no_create_call():
+    """`yajl_parser_config cfg = {...}; yajl_alloc(&callbacks, &cfg, NULL, &ctx);`
+
+    The config is filled in BY THE CALLER and passed by address. Treating it as a resource
+    awaiting a create reported S1.USE_BEFORE_CREATE against four correct production
+    harnesses in the OSS-Fuzz fleet. Storage that the harness declares exists from its
+    declaration; a pointer local is an out slot the library fills, and both are alive
+    before the first call.
+    """
+    L = c_harness.lift(_c("""
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    yajl_parser_config cfg = { .allowComments = 1 };
+    GError *err = NULL;
+    yajl_handle parser = yajl_alloc(&cfg, &err);
+    yajl_parse(parser, data, size);
+    yajl_free(parser);
+    return 0;
+}
+"""))
+    kinds = {r.id: r.storage for r in L.ir.resources}
+    assert kinds["r_cfg"] == "inline", kinds
+    assert kinds["r_err"] == "out_param", kinds
+    codes = {v.code for g in run_static_gates(L.ir) for v in g.violations
+             if v.severity == BLOCK}
+    assert "S1.USE_BEFORE_CREATE" not in codes, codes

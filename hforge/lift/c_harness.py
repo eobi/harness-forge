@@ -181,7 +181,8 @@ def _split_args(s: str) -> list:
     return out
 
 
-def _classify_args(args_raw, data, size, tainted, resources, is_ptr, unread, fn):
+def _classify_args(args_raw, data, size, tainted, resources, is_ptr, unread, fn,
+                   decl_type=None, caller_owned=None):
     """Turn a call's textual arguments into IR Args, and say what could not be attributed."""
     args, params, out_created = [], [], []
     for i, a in enumerate(args_raw):
@@ -200,6 +201,14 @@ def _classify_args(args_raw, data, size, tainted, resources, is_ptr, unread, fn)
         elif a.strip().startswith("&") and is_ptr(bare):
             # An OUT-parameter: the library allocates and writes the pointer back.
             rid = f"r_{bare}"
+            # ...UNLESS THE HARNESS DECLARED IT, in which case the storage exists from the
+            # declaration and no call needs to create it. `yajl_parser_config cfg = {...};`
+            # passed as `&cfg` is a config the CALLER fills in, not a handle the library
+            # returns; scoring it as a resource awaiting a create reported
+            # S1.USE_BEFORE_CREATE against four correct production harnesses.
+            if caller_owned is not None and (decl_type or {}).get(bare) is not None:
+                caller_owned[rid] = ("out_param" if "*" in (decl_type or {})[bare]
+                                     else "inline")
             resources.setdefault(bare, rid)
             out_created.append(rid)
             args.append(Arg(pname, "resource", rid))
@@ -224,6 +233,7 @@ _NOT_A_CALL = {
     "LLVMFuzzerTestOneInput", "LLVMFuzzerInitialize", "printf", "fprintf", "sizeof",
 }
 _CALLISH = re.compile(r"\b([A-Za-z_]\w*)\s*\(")
+_MEMBER_CALL = re.compile(r"(?:\.|->)\s*([A-Za-z_]\w*)\s*\(")
 
 
 def _missed_calls(body: str, lifted_symbols: set) -> list:
@@ -236,6 +246,13 @@ def _missed_calls(body: str, lifted_symbols: set) -> list:
     `asn1_der_iterator_first` be reported as "this harness consumes no input".
     """
     seen = {m.group(1) for m in _CALLISH.finditer(body)}
+    # MEMBER CALLS TOO. This is a C lifter, and it is routinely handed `.cc` files:
+    # sentencepiece's harness calls `push_back` on a std::vector and the gate then
+    # complained that `push_back` does not declare the parameter it was passed -- a C++
+    # method the lifter never modelled, graded as though it were a C function. A shape
+    # this lifter cannot read has to make the lift untrusted rather than produce a verdict
+    # about someone's code.
+    seen |= {m.group(1) for m in _MEMBER_CALL.finditer(body)}
     return sorted(seen - _NOT_A_CALL - {s.rsplit("::", 1)[-1] for s in lifted_symbols})
 
 
@@ -277,6 +294,8 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
     apis: dict = {}
     tainted: set = {data}
     by_address: set = set()          # resources created through an out-parameter
+    member_calls: list = []          # `x.f()` / `x->f()`: not C, not modelled
+    caller_owned: dict = {}          # rid -> storage, for slots the harness declares
     order = 0
 
     parsed = cflow.parse(body)
@@ -286,6 +305,16 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
         text = stmt.text if stmt.text.rstrip().endswith(";") else stmt.text + ";"
         for cm in _CALL.finditer(text):
             assigned, fn, argstr = cm.group(1), cm.group(2), cm.group(3)
+            # A MEMBER CALL IS NOT A C LIBRARY CALL. `sentences.push_back(s)` matched as a
+            # call to a function named `push_back`, was lifted as an op, and the gate then
+            # objected that push_back does not declare the parameter it was passed -- a
+            # verdict about a std::vector method, delivered against sentencepiece's
+            # harness. This is a C lifter and it is routinely handed .cc files; a shape it
+            # cannot model has to make the lift untrusted, not produce an opinion.
+            _before = text[:cm.start(2)].rstrip()
+            if _before.endswith(".") or _before.endswith("->"):
+                member_calls.append(fn)
+                continue
             args_raw = _split_args(argstr)
 
             if fn in _COPIERS:
@@ -299,7 +328,8 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
                 continue
 
             args, params, out_created = _classify_args(
-                args_raw, data, size, tainted, resources, is_ptr, unread, fn)
+                args_raw, data, size, tainted, resources, is_ptr, unread, fn,
+                decl_type=decl_type, caller_owned=caller_owned)
 
             role, binds, targets = ROLE_QUERY, "", ""
             if out_created and not (assigned and is_ptr(assigned)):
@@ -366,7 +396,8 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
         apis=apis,
         slices=[InputSlice("s_data", SLICE_BYTES, remainder=True, min_len=0)],
         resources=[Resource(rid, TypeRef("void *", "pointer"),
-                            storage="out_param" if rid in by_address else "handle")
+                            storage=caller_owned.get(
+                                rid, "out_param" if rid in by_address else "handle"))
                    for rid in dict.fromkeys(resources.values())],
         sequence=ops,
         knobs=Knobs(),
@@ -375,7 +406,7 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
         raw_blocks=blocks,
         notes=notes)
     _syms = {a.symbol for a in ir.apis.values()} if hasattr(ir, "apis") else set()
-    _missed = _missed_calls(body, _syms)
+    _missed = _missed_calls(body, _syms) + sorted(set(member_calls))
 
     # AN INPUT USE WE DID NOT BIND IS A FLOW WE DID NOT FOLLOW.
     #
