@@ -214,8 +214,8 @@
   },
   "honest_rating": {
    "oracle": "7/10",
-   "search": "3/10",
-   "caveat": "GUIFUZZ++ is grey-box and found 23 bugs across 11-12 applications."
+   "search": "now has coverage feedback; unproven",
+   "caveat": "The search gained the input it was missing. Whether that finds bugs is unmeasured: 7000 blind inputs across two applications found none, and coverage changes the search rather than the oracle."
   },
   "applications": {
    "tested": 8,
@@ -240,6 +240,18 @@
    "inputs": 7000,
    "applications": 2,
    "findings": 0
+  },
+  "coverage_feedback": {
+   "status": "WORKING as of 2026-09-01, previously the track's stated gap",
+   "value": "25.64% region coverage read back from a running desktop application; the campaign keeps inputs that reach a region nothing else did and mutates from them",
+   "source": "benchmarks/gui/COVERAGE.md, campaign.py behind HF_GUI_COVERAGE",
+   "mechanism": "instrumented eog -> open mutated file -> wait for quiescence -> xdotool ctrl+w for a CLEAN EXIT -> .profraw -> llvm-profdata -> llvm-cov export",
+   "caveat": "Coverage is of EOG'S OWN SOURCES, not of the image decoder. Most of what a viewer does with a corrupt PNG happens inside gdk-pixbuf and libpng, which are not instrumented. Application coverage is a loose proxy for depth reached, and the guided-versus-blind comparison has NOT been run, so no claim is made that guidance improves the search.",
+   "three_approaches_that_failed": {
+    "kill_the_process": "clang writes the profile in an atexit handler; SIGTERM skips it and leaves a ZERO-BYTE profile indistinguishable from 'covered nothing'.",
+    "continuous_mode": "LLVM_PROFILE_FILE=%c needs clang 17; jammy ships 14.",
+    "LD_PRELOAD_flush_shim": "A SIGUSR1 handler calling __llvm_profile_write_file fails twice -- undefined symbol when linked, NULL from dlsym(RTLD_DEFAULT). `nm` shows compiler-rt marks the writer LOCAL, so --export-dynamic cannot export it. Rebuilding eog with --export-dynamic was wasted effort; the nm check should have come first."
+   }
   }
  },
  "NEGATIVE_RESULTS_WORTH_PUBLISHING": [
@@ -275,5 +287,13 @@
   "A synthesis probe reported 'gain -71.79 points' that measured only my own candidate ordering.",
   "Two regexes did not terminate; both were caught by timing the corpus, neither by the test suite.",
   "The eog/evince acceptance comparison was confounded: it varied the mutator and the format together. A PDF-aware mutator was written to control it, and most of the 97% turned out to be a mutator too gentle to be refused."
- ]
+ ],
+ "INFRASTRUCTURE": {
+  "second_machine": {
+   "value": "Ubuntu 22.04 aarch64 guest, 8 vCPU, disk extended 30G -> 60G",
+   "source": "HANDOFF.md",
+   "caveat": "It is a GUEST on the same Mac. It runs benchmarks FASTER and 2.5x more stably than the host (25% vs 64% spread over 7 identical runs), but it cannot serve the purpose PAPERS.md asks of a second machine -- separating campaign variance from HOST effects -- because it is the host. A guest also reports itself idle while its host is saturated, so an in-guest load check gives a false all-clear.",
+   "how_the_space_was_found": "No VM resize was needed. The Ubuntu installer had allocated only 30G of a 61G disk to the logical volume; 30.47G of free extents were already in the volume group. lvextend + resize2fs, ten seconds, no downtime."
+  }
+ }
 }
