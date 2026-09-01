@@ -1,0 +1,3081 @@
+{
+ "generated_utc": "2026-09-01T21:17:02Z",
+ "attempted": 420,
+ "with_harnesses": 124,
+ "harnesses": 879,
+ "headers": 7422,
+ "by_status": {
+  "ok": 124,
+  "no-harness": 287,
+  "error": 7,
+  "clone-failed": 2
+ },
+ "rows": [
+  {
+   "project": "abseil-cpp",
+   "repo": "https://github.com/abseil/abseil-cpp.git",
+   "harnesses": 2,
+   "headers": 120,
+   "status": "ok",
+   "harness_source": "oss-fuzz-tree"
+  },
+  {
+   "project": "abseil-py",
+   "repo": "https://github.com/abseil/abseil-py",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "ada-url",
+   "repo": "https://github.com/ada-url/ada.git",
+   "harnesses": 2,
+   "headers": 44,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "adal",
+   "repo": "https://github.com/AzureAD/azure-activedirectory-library-for-python",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "aiohttp",
+   "repo": "https://github.com/aio-libs/aiohttp",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "airflow",
+   "repo": "https://github.com/apache/airflow",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "alembic",
+   "repo": "https://github.com/alembic/alembic",
+   "harnesses": 1,
+   "headers": 120,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "ampproject",
+   "repo": "https://github.com/ampproject/amphtml",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "angular",
+   "repo": "https://github.com/angular/angular.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "angus-mail",
+   "repo": "https://github.com/eclipse-ee4j/angus-mail.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "anise",
+   "repo": "https://github.com/nyx-space/anise.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "ansible",
+   "repo": "https://github.com/ansible/ansible",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "antlr3-java",
+   "repo": "https://github.com/antlr/antlr3.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "antlr4-java",
+   "repo": "https://github.com/antlr/antlr4.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "apache-axis2",
+   "repo": "https://github.com/apache/axis-axis2-java-core.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "apache-commons-bcel",
+   "repo": "https://github.com/apache/commons-bcel.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "apache-commons-beanutils",
+   "repo": "https://github.com/apache/commons-beanutils.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "apache-commons-cli",
+   "repo": "https://github.com/apache/commons-cli.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "apache-commons-collections",
+   "repo": "https://github.com/apache/commons-collections.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "apache-commons-compress",
+   "repo": "https://github.com/apache/commons-compress",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "apache-commons-csv",
+   "repo": "https://github.com/apache/commons-csv.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "apache-commons-fileupload",
+   "repo": "https://github.com/apache/commons-fileupload.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "apache-commons-geometry",
+   "repo": "https://github.com/apache/commons-geometry",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "apache-commons-imaging",
+   "repo": "https://github.com/apache/commons-imaging",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "apache-commons-jxpath",
+   "repo": "https://github.com/apache/commons-jxpath.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "apache-commons-lang",
+   "repo": "https://github.com/apache/commons-lang.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "apache-commons-math",
+   "repo": "https://github.com/apache/commons-math",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "apache-commons-net",
+   "repo": "https://github.com/apache/commons-net.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "apache-commons-text",
+   "repo": "https://github.com/apache/commons-text/",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "apache-commons-validator",
+   "repo": "https://github.com/apache/commons-validator.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "apache-cxf",
+   "repo": "https://github.com/apache/cxf/",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "apache-doris",
+   "status": "error",
+   "error": "Command '['git', 'clone', '--depth', '1', '--quiet', '--filter=blob:none', 'https://github.com/apache/doris.git', '/var/",
+   "harnesses": 0,
+   "headers": 0
+  },
+  {
+   "project": "apache-felix-dev",
+   "repo": "https://github.com/apache/felix-dev.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "apache-httpd",
+   "repo": "https://github.com/apache/httpd",
+   "harnesses": 7,
+   "headers": 120,
+   "status": "ok",
+   "harness_source": "oss-fuzz-tree"
+  },
+  {
+   "project": "apache-logging-log4cxx",
+   "repo": "https://github.com/apache/logging-log4cxx",
+   "harnesses": 10,
+   "headers": 120,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "apache-poi",
+   "repo": "https://github.com/apache/poi.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "apache-shiro",
+   "repo": "https://github.com/apache/shiro",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "apache-tika",
+   "status": "error",
+   "error": "Command '['git', 'clone', '--depth', '1', '--quiet', '--filter=blob:none', 'https://github.com/apache/tika/', '/var/fold",
+   "harnesses": 0,
+   "headers": 0
+  },
+  {
+   "project": "aptos-core",
+   "repo": "https://github.com/aptos-labs/aptos-core",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "archaius-core",
+   "repo": "https://github.com/Netflix/archaius.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "arduinojson",
+   "repo": "https://github.com/bblanchon/ArduinoJson.git",
+   "harnesses": 3,
+   "headers": 1,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "argcomplete",
+   "repo": "https://github.com/kislyuk/argcomplete",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "argo",
+   "repo": "https://github.com/argoproj/argo-cd",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "args",
+   "repo": "https://github.com/Taywee/args",
+   "harnesses": 2,
+   "headers": 0,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "args4j",
+   "repo": "https://github.com/kohsuke/args4j",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "arrow",
+   "repo": "https://github.com/apache/arrow.git",
+   "harnesses": 14,
+   "headers": 120,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "arrow-java",
+   "repo": "https://github.com/apache/arrow-java",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "arrow-py",
+   "repo": "https://github.com/arrow-py/arrow",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "askama",
+   "repo": "https://github.com/askama-rs/askama",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "asn1crypto",
+   "repo": "https://github.com/wbond/asn1crypto",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "aspectj",
+   "repo": "https://github.com/eclipse/org.aspectj",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "aspell",
+   "repo": "https://github.com/gnuaspell/aspell.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "assimp",
+   "repo": "https://github.com/assimp/assimp",
+   "harnesses": 19,
+   "headers": 120,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "astc-encoder",
+   "repo": "https://github.com/ARM-software/astc-encoder",
+   "harnesses": 3,
+   "headers": 17,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "asteval",
+   "repo": "https://github.com/newville/asteval",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "astro-compiler",
+   "repo": "https://github.com/withastro/compiler",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "astroid",
+   "repo": "https://github.com/pylint-dev/astroid",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "asttokens",
+   "repo": "https://github.com/gristlabs/asttokens",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "async-http-client",
+   "repo": "https://github.com/AsyncHttpClient/async-http-client/",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "atomic",
+   "repo": "https://github.com/uber-go/atomic",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "attrs",
+   "repo": "https://github.com/python-attrs/attrs.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "augeas",
+   "repo": "https://github.com/hercules-team/augeas",
+   "harnesses": 4,
+   "headers": 15,
+   "status": "ok",
+   "harness_source": "oss-fuzz-tree"
+  },
+  {
+   "project": "autopep8",
+   "repo": "https://github.com/hhatto/autopep8",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "avahi",
+   "repo": "https://github.com/avahi/avahi",
+   "harnesses": 6,
+   "headers": 95,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "avro",
+   "repo": "https://github.com/apache/avro",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "azure-sdk-for-python",
+   "repo": "https://github.com/azure/azure-sdk-for-python",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "babel",
+   "repo": "https://github.com/python-babel/babel",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "bad_example",
+   "repo": "https://github.com/madler/zlib",
+   "harnesses": 1,
+   "headers": 28,
+   "status": "ok",
+   "harness_source": "oss-fuzz-tree"
+  },
+  {
+   "project": "bazel-rules-fuzzing-test",
+   "repo": "https://github.com/bazelbuild/rules_fuzzing",
+   "harnesses": 15,
+   "headers": 2,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "bazel-rules-fuzzing-test-java",
+   "repo": "https://github.com/bazelbuild/rules_fuzzing",
+   "harnesses": 15,
+   "headers": 2,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "bc-gh",
+   "repo": "https://github.com/gavinhoward/bc",
+   "harnesses": 2,
+   "headers": 19,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "bc-java",
+   "repo": "https://github.com/bcgit/bc-java.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "behaviortreecpp",
+   "repo": "https://github.com/BehaviorTree/BehaviorTree.CPP",
+   "harnesses": 3,
+   "headers": 69,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "bignum-fuzzer",
+   "repo": "https://github.com/sjamaan/bignum-fuzzer",
+   "harnesses": 1,
+   "headers": 8,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "bios-bmc-smm-error-logger",
+   "repo": "https://github.com/javanlacerda/bios-bmc-smm-error-logger",
+   "harnesses": 1,
+   "headers": 0,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "bitcoin-core",
+   "status": "error",
+   "error": "Command '['git', 'clone', '--depth', '1', '--quiet', '--filter=blob:none', 'https://github.com/bitcoin/bitcoin.git', '/v",
+   "harnesses": 0,
+   "headers": 0
+  },
+  {
+   "project": "black",
+   "repo": "https://github.com/psf/black",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "blackfriday",
+   "repo": "https://github.com/russross/blackfriday",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "bleach",
+   "repo": "https://github.com/mozilla/bleach",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "bloaty",
+   "repo": "https://github.com/google/bloaty.git",
+   "harnesses": 2,
+   "headers": 10,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "bls-signatures",
+   "repo": "https://github.com/supranational/blst.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "bluez",
+   "repo": "https://github.com/bluez/bluez",
+   "harnesses": 5,
+   "headers": 120,
+   "status": "ok",
+   "harness_source": "oss-fuzz-tree"
+  },
+  {
+   "project": "bmcweb",
+   "repo": "https://github.com/openbmc/bmcweb.git",
+   "harnesses": 1,
+   "headers": 1,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "boost",
+   "repo": "https://github.com/boostorg/boost.git",
+   "harnesses": 14,
+   "headers": 0,
+   "status": "ok",
+   "harness_source": "oss-fuzz-tree"
+  },
+  {
+   "project": "boost-beast",
+   "repo": "https://github.com/boostorg/beast.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "boost-json",
+   "repo": "https://github.com/boostorg/json.git",
+   "harnesses": 4,
+   "headers": 0,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "botan",
+   "repo": "https://github.com/randombit/botan.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "botocore",
+   "repo": "https://github.com/boto/botocore",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "bottleneck",
+   "repo": "https://github.com/pydata/bottleneck",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "brotli",
+   "repo": "https://github.com/google/brotli.git",
+   "harnesses": 2,
+   "headers": 72,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "brotli-java",
+   "repo": "https://github.com/google/brotli",
+   "harnesses": 2,
+   "headers": 72,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "brpc",
+   "repo": "https://github.com/apache/incubator-brpc",
+   "harnesses": 18,
+   "headers": 120,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "brunsli",
+   "repo": "https://github.com/google/brunsli.git",
+   "harnesses": 3,
+   "headers": 42,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "bson-rust",
+   "repo": "https://github.com/mongodb/bson-rust",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "burntsushi-toml",
+   "repo": "https://github.com/BurntSushi/toml",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "bz2file",
+   "repo": "https://github.com/nvawda/bz2file",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "c-ares",
+   "repo": "https://github.com/c-ares/c-ares.git",
+   "harnesses": 3,
+   "headers": 44,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "c-blosc",
+   "repo": "https://github.com/Blosc/c-blosc.git",
+   "harnesses": 2,
+   "headers": 90,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "c-blosc2",
+   "repo": "https://github.com/Blosc/c-blosc2.git",
+   "harnesses": 4,
+   "headers": 44,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "cachetools",
+   "repo": "https://github.com/tkem/cachetools/",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "caddy",
+   "repo": "https://github.com/caddyserver/caddy.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "caffeine",
+   "repo": "https://github.com/ben-manes/caffeine.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "calcite",
+   "repo": "https://github.com/apache/calcite/",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "calcite-avatica",
+   "repo": "https://github.com/apache/calcite-avatica",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "canvg",
+   "repo": "https://github.com/canvg/canvg",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "capnproto",
+   "repo": "https://github.com/capnproto/capnproto",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "capstone",
+   "repo": "https://github.com/capstone-engine/capstone.git",
+   "harnesses": 5,
+   "headers": 120,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "cascadia",
+   "repo": "https://github.com/andybalholm/cascadia",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "casync",
+   "repo": "https://github.com/systemd/casync",
+   "harnesses": 2,
+   "headers": 50,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "catapult",
+   "repo": "https://github.com/nemtech/catapult-server",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "clone-failed",
+   "error": "remote: Repository not found.\nfatal: repository 'https://github.com/nemtech/catapult-server/' not found\n"
+  },
+  {
+   "project": "cbor2",
+   "repo": "https://github.com/agronholm/cbor2",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "cctz",
+   "repo": "https://github.com/google/cctz",
+   "harnesses": 1,
+   "headers": 12,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "cel-cpp",
+   "repo": "https://github.com/google/cel-cpp",
+   "harnesses": 2,
+   "headers": 120,
+   "status": "ok",
+   "harness_source": "oss-fuzz-tree"
+  },
+  {
+   "project": "cel-go",
+   "repo": "https://github.com/google/cel-go",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "cert-manager",
+   "repo": "https://github.com/cert-manager/cert-manager",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "cfengine",
+   "repo": "https://github.com/cfengine/core",
+   "harnesses": 1,
+   "headers": 120,
+   "status": "ok",
+   "harness_source": "oss-fuzz-tree"
+  },
+  {
+   "project": "cgif",
+   "repo": "https://github.com/dloebl/cgif.git",
+   "harnesses": 6,
+   "headers": 2,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "cglib",
+   "repo": "https://github.com/cglib/cglib",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "chardet",
+   "repo": "https://github.com/erikrose/chardet",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "charset_normalizer",
+   "repo": "https://github.com/jawah/charset_normalizer",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "checkstyle",
+   "repo": "https://github.com/checkstyle/checkstyle",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "chrono",
+   "repo": "https://github.com/chronotope/chrono.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "cifuzz-example",
+   "repo": "https://github.com/jonathanmetzman/cifuzz-example.git",
+   "harnesses": 2,
+   "headers": 1,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "cilium",
+   "repo": "https://github.com/cilium/cilium.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "circl",
+   "repo": "https://github.com/cloudflare/circl.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "cirq",
+   "repo": "https://github.com/quantumlib/Cirq.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "civetweb",
+   "repo": "https://github.com/civetweb/civetweb",
+   "harnesses": 1,
+   "headers": 10,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "cjson",
+   "repo": "https://github.com/DaveGamble/cJSON.git",
+   "harnesses": 2,
+   "headers": 2,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "clamav",
+   "repo": "https://github.com/Cisco-Talos/clamav-devel.git",
+   "harnesses": 4,
+   "headers": 120,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "clib",
+   "repo": "https://github.com/clibs/clib",
+   "harnesses": 1,
+   "headers": 57,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "click",
+   "repo": "https://github.com/pallets/click",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "clickhouse",
+   "status": "error",
+   "error": "Command '['git', 'clone', '--depth', '1', '--quiet', '--filter=blob:none', 'https://github.com/ClickHouse/ClickHouse.git",
+   "harnesses": 0,
+   "headers": 0
+  },
+  {
+   "project": "clock",
+   "repo": "https://github.com/benbjohnson/clock",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "closure-compiler",
+   "repo": "https://github.com/google/closure-compiler/",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "closure-library",
+   "repo": "https://github.com/google/closure-library",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "cloud-custodian",
+   "repo": "https://github.com/cloud-custodian/cloud-custodian",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "cloud-hypervisor",
+   "repo": "https://github.com/cloud-hypervisor/cloud-hypervisor",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "cmark",
+   "repo": "https://github.com/commonmark/cmark.git",
+   "harnesses": 1,
+   "headers": 15,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "cockroachdb",
+   "repo": "https://github.com/cockroachdb/cockroach.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "compress",
+   "repo": "https://github.com/klauspost/compress",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "config-validator",
+   "repo": "https://github.com/GoogleCloudPlatform/config-validator/",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "configparser",
+   "repo": "https://github.com/jaraco/configparser/",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "connectedhomeip",
+   "repo": "https://github.com/project-chip/connectedhomeip.git",
+   "harnesses": 35,
+   "headers": 120,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "connexion",
+   "repo": "https://github.com/spec-first/connexion",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "containerd",
+   "repo": "https://github.com/containerd/containerd",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "coreutils",
+   "repo": "https://github.com/coreutils/coreutils",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "cosign",
+   "repo": "https://github.com/sigstore/cosign",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "cosmos-sdk",
+   "repo": "https://github.com/cosmos/cosmos-sdk",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "coturn",
+   "repo": "https://github.com/coturn/coturn",
+   "harnesses": 3,
+   "headers": 47,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "coveragepy",
+   "repo": "https://github.com/nedbat/coveragepy",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "cpp-httplib",
+   "repo": "https://github.com/yhirose/cpp-httplib.git",
+   "harnesses": 6,
+   "headers": 3,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "cppcheck",
+   "repo": "https://github.com/cppcheck-opensource/cppcheck.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "cppitertools",
+   "repo": "https://github.com/ryanhaining/cppitertools",
+   "harnesses": 1,
+   "headers": 0,
+   "status": "ok",
+   "harness_source": "oss-fuzz-tree"
+  },
+  {
+   "project": "cpuinfo",
+   "repo": "https://github.com/pytorch/cpuinfo",
+   "harnesses": 1,
+   "headers": 12,
+   "status": "ok",
+   "harness_source": "oss-fuzz-tree"
+  },
+  {
+   "project": "cpython3",
+   "status": "error",
+   "error": "Command '['git', 'clone', '--depth', '1', '--quiet', '--filter=blob:none', 'https://github.com/python/cpython', '/var/fo",
+   "harnesses": 0,
+   "headers": 0
+  },
+  {
+   "project": "cri-o",
+   "repo": "https://github.com/cri-o/cri-o",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "croaring",
+   "repo": "https://github.com/RoaringBitmap/CRoaring",
+   "harnesses": 2,
+   "headers": 36,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "cron-utils",
+   "repo": "https://github.com/jmrozanec/cron-utils.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "croniter",
+   "repo": "https://github.com/kiorky/croniter",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "crossplane",
+   "repo": "https://github.com/crossplane/crossplane",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "crow",
+   "repo": "https://github.com/CrowCpp/Crow",
+   "harnesses": 5,
+   "headers": 35,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "cryptofuzz",
+   "repo": "https://github.com/MozillaSecurity/cryptofuzz",
+   "harnesses": 5,
+   "headers": 105,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "cryptography",
+   "repo": "https://github.com/pyca/cryptography",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "cssselect",
+   "repo": "https://github.com/scrapy/cssselect",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "cubefs",
+   "repo": "https://github.com/cubefs/cubefs",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "cups",
+   "repo": "https://github.com/OpenPrinting/cups",
+   "harnesses": 1,
+   "headers": 76,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "cups-filters",
+   "repo": "https://github.com/OpenPrinting/cups-filters.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "cura-engine",
+   "repo": "https://github.com/Ultimaker/CuraEngine.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "curl",
+   "repo": "https://github.com/curl/curl.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "curvesapi",
+   "repo": "https://github.com/virtuald/curvesapi",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "cxxopts",
+   "repo": "https://github.com/jarro2783/cxxopts",
+   "harnesses": 1,
+   "headers": 0,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "cyclonedds",
+   "repo": "https://github.com/eclipse-cyclonedds/cyclonedds.git",
+   "harnesses": 8,
+   "headers": 120,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "d3",
+   "repo": "https://github.com/d3/d3.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "dapr",
+   "repo": "https://github.com/dapr/dapr",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "dart",
+   "repo": "https://github.com/dart-lang/sdk.git",
+   "harnesses": 1,
+   "headers": 120,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "dask",
+   "repo": "https://github.com/dask/dask",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "data-encoding",
+   "repo": "https://github.com/ia0/data-encoding.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "date",
+   "repo": "https://github.com/HowardHinnant/date",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "dateparser",
+   "repo": "https://github.com/scrapinghub/dateparser.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "dbus-broker",
+   "repo": "https://github.com/bus1/dbus-broker",
+   "harnesses": 1,
+   "headers": 47,
+   "status": "ok",
+   "harness_source": "oss-fuzz-tree"
+  },
+  {
+   "project": "dbus-sensors",
+   "repo": "https://github.com/openbmc/dbus-sensors",
+   "harnesses": 1,
+   "headers": 1,
+   "status": "ok",
+   "harness_source": "oss-fuzz-tree"
+  },
+  {
+   "project": "dcmtk",
+   "repo": "https://github.com/DCMTK/dcmtk.git",
+   "harnesses": 3,
+   "headers": 120,
+   "status": "ok",
+   "harness_source": "oss-fuzz-tree"
+  },
+  {
+   "project": "decorator",
+   "repo": "https://github.com/micheles/decorator",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "defusedxml",
+   "repo": "https://github.com/tiran/defusedxml",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "demangle",
+   "repo": "https://github.com/ianlancetaylor/demangle",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "deno",
+   "repo": "https://github.com/denoland/deno",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "dgraph",
+   "repo": "https://github.com/dgraph-io/dgraph",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "digest",
+   "repo": "https://github.com/bmc/digest",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "dill",
+   "repo": "https://github.com/uqfoundation/dill",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "distlib",
+   "repo": "https://github.com/pypa/distlib",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "distribution",
+   "repo": "https://github.com/distribution/distribution",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "django",
+   "repo": "https://github.com/django/django.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "dnspython",
+   "repo": "https://github.com/rthalley/dnspython",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "docker-client",
+   "repo": "https://github.com/spotify/docker-client",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "dom4j",
+   "repo": "https://github.com/dom4j/dom4j.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "double-conversion",
+   "repo": "https://github.com/google/double-conversion.git",
+   "harnesses": 1,
+   "headers": 12,
+   "status": "ok",
+   "harness_source": "oss-fuzz-tree"
+  },
+  {
+   "project": "dovecot",
+   "repo": "https://github.com/dovecot/core",
+   "harnesses": 16,
+   "headers": 120,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "dpp",
+   "repo": "https://github.com/brainboxdotcc/DPP.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "dr_libs",
+   "repo": "https://github.com/mackron/dr_libs.git",
+   "harnesses": 4,
+   "headers": 3,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "draco",
+   "repo": "https://github.com/google/draco",
+   "harnesses": 4,
+   "headers": 120,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "dragonfly",
+   "repo": "https://github.com/dragonflyoss/Dragonfly",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "dropbear",
+   "repo": "https://github.com/mkj/dropbear",
+   "harnesses": 20,
+   "headers": 84,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "dropwizard",
+   "repo": "https://github.com/dropwizard/dropwizard",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "duckdb",
+   "repo": "https://github.com/duckdb/duckdb/",
+   "harnesses": 5,
+   "headers": 79,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "dulwich",
+   "repo": "https://github.com/jelmer/dulwich",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "e2fsprogs",
+   "repo": "https://github.com/tytso/e2fsprogs",
+   "harnesses": 5,
+   "headers": 101,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "easywsclient",
+   "repo": "https://github.com/dhbaird/easywsclient",
+   "harnesses": 1,
+   "headers": 0,
+   "status": "ok",
+   "harness_source": "oss-fuzz-tree"
+  },
+  {
+   "project": "ecc-diff-fuzzer",
+   "repo": "https://github.com/catenacyber/elliptic-curve-differential-fuzzer",
+   "harnesses": 1,
+   "headers": 1,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "ecdsa-python",
+   "repo": "https://github.com/starkbank/ecdsa-python/",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "eclipse-equinox",
+   "repo": "https://github.com/eclipse-equinox/equinox",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "edk2",
+   "repo": "https://github.com/tianocore/edk2",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "envoy",
+   "repo": "https://github.com/envoyproxy/envoy.git",
+   "harnesses": 60,
+   "headers": 120,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "erigon",
+   "repo": "https://github.com/erigontech/erigon",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "esp-v2",
+   "repo": "https://github.com/GoogleCloudPlatform/esp-v2.git",
+   "harnesses": 6,
+   "headers": 34,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "espeak-ng",
+   "repo": "https://github.com/espeak-ng/espeak-ng",
+   "harnesses": 3,
+   "headers": 54,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "estoraged",
+   "repo": "https://github.com/openbmc/estoraged",
+   "harnesses": 1,
+   "headers": 2,
+   "status": "ok",
+   "harness_source": "oss-fuzz-tree"
+  },
+  {
+   "project": "et-xmlfile",
+   "repo": "https://github.com/biydnd/et_xmlfile",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "etcd",
+   "repo": "https://github.com/etcd-io/etcd",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "evo-inflector",
+   "repo": "https://github.com/atteo/evo-inflector",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "example",
+   "repo": "https://github.com/google/oss-fuzz",
+   "harnesses": 60,
+   "headers": 42,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "exiv2",
+   "repo": "https://github.com/Exiv2/exiv2",
+   "harnesses": 3,
+   "headers": 11,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "exp4j",
+   "repo": "https://github.com/fasseg/exp4j",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "expat",
+   "repo": "https://github.com/libexpat/libexpat",
+   "harnesses": 3,
+   "headers": 27,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "expr",
+   "repo": "https://github.com/expr-lang/expr.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "exprtk",
+   "repo": "https://github.com/ArashPartow/exprtk.git",
+   "harnesses": 1,
+   "headers": 0,
+   "status": "ok",
+   "harness_source": "oss-fuzz-tree"
+  },
+  {
+   "project": "faad2",
+   "repo": "https://github.com/knik0/faad2",
+   "harnesses": 2,
+   "headers": 65,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "fabric",
+   "repo": "https://github.com/hyperledger/fabric",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "face",
+   "repo": "https://github.com/mahmoud/face",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "clone-failed",
+   "error": " checkout failed.\nYou can inspect what was checked out with 'git status'\nand retry with 'git restore --source=HEAD :/'\n\n"
+  },
+  {
+   "project": "fast-dds",
+   "repo": "https://github.com/eProsima/Fast-DDS.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "fast-xml-parser",
+   "repo": "https://github.com/NaturalIntelligence/fast-xml-parser",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "fast_float",
+   "repo": "https://github.com/fastfloat/fast_float.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "fastcsv",
+   "repo": "https://github.com/osiegmar/FastCSV.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "fasthttp",
+   "repo": "https://github.com/valyala/fasthttp",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "fastify",
+   "repo": "https://github.com/fastify/fastify",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "fastjson",
+   "repo": "https://github.com/valyala/fastjson",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "fastjson2",
+   "repo": "https://github.com/alibaba/fastjson2",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "feign",
+   "repo": "https://github.com/openfeign/feign",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "ffmpeg",
+   "repo": "https://github.com/FFmpeg/FFmpeg",
+   "harnesses": 6,
+   "headers": 120,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "ffms2",
+   "repo": "https://github.com/FFMS/ffms2",
+   "harnesses": 1,
+   "headers": 15,
+   "status": "ok",
+   "harness_source": "oss-fuzz-tree"
+  },
+  {
+   "project": "fftw3",
+   "repo": "https://github.com/fftw/fftw3.git",
+   "harnesses": 1,
+   "headers": 89,
+   "status": "ok",
+   "harness_source": "oss-fuzz-tree"
+  },
+  {
+   "project": "file",
+   "repo": "https://github.com/file/file.git",
+   "harnesses": 1,
+   "headers": 14,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "filelock",
+   "repo": "https://github.com/tox-dev/py-filelock",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "filesystem_spec",
+   "repo": "https://github.com/fsspec/filesystem_spec",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "fio",
+   "repo": "https://github.com/axboe/fio.git",
+   "harnesses": 1,
+   "headers": 120,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "fips203",
+   "repo": "https://github.com/integritychain/fips203",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "firestore",
+   "repo": "https://github.com/firebase/firebase-ios-sdk.git",
+   "harnesses": 4,
+   "headers": 120,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "flac",
+   "repo": "https://github.com/xiph/flac.git",
+   "harnesses": 1,
+   "headers": 60,
+   "status": "ok",
+   "harness_source": "oss-fuzz-tree"
+  },
+  {
+   "project": "flask",
+   "repo": "https://github.com/pallets/flask",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "flask-jwt-extended",
+   "repo": "https://github.com/vimalloc/flask-jwt-extended",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "flask-restx",
+   "repo": "https://github.com/python-restx/flask-restx",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "flask-wtf",
+   "repo": "https://github.com/wtforms/flask-wtf/",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "flatbuffers",
+   "repo": "https://github.com/google/flatbuffers",
+   "harnesses": 9,
+   "headers": 71,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "flate2-rs",
+   "repo": "https://github.com/rust-lang/flate2-rs",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "flex",
+   "repo": "https://github.com/westes/flex",
+   "harnesses": 2,
+   "headers": 10,
+   "status": "ok",
+   "harness_source": "oss-fuzz-tree"
+  },
+  {
+   "project": "fluent-bit",
+   "repo": "https://github.com/fluent/fluent-bit/",
+   "harnesses": 44,
+   "headers": 120,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "fluxcd",
+   "repo": "https://github.com/fluxcd/flux2",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "flyway",
+   "repo": "https://github.com/flyway/flyway",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "fmt",
+   "repo": "https://github.com/fmtlib/fmt.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "fontations",
+   "repo": "https://github.com/googlefonts/fontations",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "freeradius",
+   "repo": "https://github.com/FreeRADIUS/freeradius-server.git",
+   "harnesses": 9,
+   "headers": 120,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "freerdp",
+   "status": "error",
+   "error": "Command '['git', 'clone', '--depth', '1', '--quiet', '--filter=blob:none', 'https://github.com/FreeRDP/FreeRDP', '/var/f",
+   "harnesses": 0,
+   "headers": 0
+  },
+  {
+   "project": "freetype2",
+   "repo": "https://github.com/freetype/freetype2-testing.git",
+   "harnesses": 7,
+   "headers": 76,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "fribidi",
+   "repo": "https://github.com/fribidi/fribidi.git",
+   "harnesses": 1,
+   "headers": 35,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "frr",
+   "repo": "https://github.com/FRRouting/frr",
+   "harnesses": 2,
+   "headers": 120,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "fsnotify",
+   "repo": "https://github.com/fsnotify/fsnotify",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "ftfy",
+   "repo": "https://github.com/rspeer/python-ftfy",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "fuzzing-puzzles",
+   "repo": "https://github.com/google/fuzzer-test-suite",
+   "harnesses": 5,
+   "headers": 2,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "fuzztest-example",
+   "repo": "https://github.com/google/fuzztest",
+   "harnesses": 36,
+   "headers": 120,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "fuzztest-raksha",
+   "repo": "https://github.com/google/fuzztest",
+   "harnesses": 36,
+   "headers": 120,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "fuzzywuzzy",
+   "repo": "https://github.com/xdrop/fuzzywuzzy",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "fwupd",
+   "repo": "https://github.com/fwupd/fwupd",
+   "harnesses": 2,
+   "headers": 120,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "g-api-auth-httplib2",
+   "repo": "https://github.com/googleapis/google-auth-library-python-httplib2/",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "g-api-auth-library-python",
+   "repo": "https://github.com/googleapis/google-auth-library-python",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "g-api-pubsub",
+   "repo": "https://github.com/googleapis/python-pubsub",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "g-api-py-api-common-protos",
+   "repo": "https://github.com/googleapis/python-api-common-protos",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "g-api-py-oauthlib",
+   "repo": "https://github.com/googleapis/google-auth-library-python-oauthlib",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "g-api-python-bigquery-storage",
+   "repo": "https://github.com/googleapis/python-bigquery-storage",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "g-api-python-client",
+   "repo": "https://github.com/googleapis/google-api-python-client",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "g-api-python-cloud-core",
+   "repo": "https://github.com/googleapis/python-cloud-core",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "g-api-python-firestore",
+   "repo": "https://github.com/googleapis/python-firestore",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "g-api-python-tasks",
+   "repo": "https://github.com/googleapis/google-cloud-python",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "g-api-resource-manager",
+   "repo": "https://github.com/googleapis/google-cloud-python",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "g-api-resumable-media-python",
+   "repo": "https://github.com/googleapis/google-resumable-media-python",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "g-api-secret-manager",
+   "repo": "https://github.com/googleapis/python-secret-manager",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "g-apis-py-api-core",
+   "repo": "https://github.com/googleapis/python-api-core",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "g-auth-library-java",
+   "repo": "https://github.com/googleapis/google-auth-library-java/",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "g-cloud-logging-py",
+   "repo": "https://github.com/googleapis/python-logging",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "g-http-java-client",
+   "repo": "https://github.com/googleapis/google-http-java-client/",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "g-oauth-java-client",
+   "repo": "https://github.com/googleapis/google-oauth-java-client",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "g-py-bigquery",
+   "repo": "https://github.com/googleapis/python-bigquery",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "g-py-crc32c",
+   "repo": "https://github.com/googleapis/python-crc32c",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "gast",
+   "repo": "https://github.com/serge-sans-paille/gast",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "gateway",
+   "repo": "https://github.com/envoyproxy/gateway.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "gc-iam",
+   "repo": "https://github.com/googleapis/google-cloud-python",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "gcloud-error-py",
+   "repo": "https://github.com/googleapis/python-error-reporting",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "gcloud-go",
+   "repo": "https://github.com/googleapis/google-cloud-go",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "gcp-python-cloud-storage",
+   "repo": "https://github.com/googleapis/python-storage",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "gdal",
+   "repo": "https://github.com/OSGeo/gdal",
+   "harnesses": 18,
+   "headers": 120,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "genshi",
+   "repo": "https://github.com/edgewall/genshi",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "gfwx",
+   "repo": "https://github.com/kalcutter/gfwx",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "gimli",
+   "repo": "https://github.com/gimli-rs/gimli",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "git",
+   "repo": "https://github.com/git/git",
+   "harnesses": 9,
+   "headers": 120,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "gitdb",
+   "repo": "https://github.com/gitpython-developers/gitdb",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "gitea",
+   "repo": "https://github.com/go-gitea/gitea",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "github_scarecrow",
+   "repo": "https://github.com/Alan32Liu/github-scarecrow",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "gitoxide",
+   "repo": "https://github.com/GitoxideLabs/gitoxide",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "gitpython",
+   "repo": "https://github.com/gitpython-developers/gitpython",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "glaze",
+   "repo": "https://github.com/stephenberry/glaze.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "globaleaks-whistleblowing-software",
+   "repo": "https://github.com/globaleaks/globaleaks-whistleblowing-software.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "glog",
+   "repo": "https://github.com/google/glog",
+   "harnesses": 1,
+   "headers": 24,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "glom",
+   "repo": "https://github.com/mahmoud/glom",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "glslang",
+   "repo": "https://github.com/khronosgroup/glslang",
+   "harnesses": 1,
+   "headers": 70,
+   "status": "ok",
+   "harness_source": "oss-fuzz-tree"
+  },
+  {
+   "project": "gluon",
+   "repo": "https://github.com/ProtonMail/gluon",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "go-attestation",
+   "repo": "https://github.com/google/go-attestation",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "go-cmp",
+   "repo": "https://github.com/google/go-cmp",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "go-coap",
+   "repo": "https://github.com/plgd-dev/go-coap",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "go-containerregistry",
+   "repo": "https://github.com/google/go-containerregistry",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "go-coredns",
+   "repo": "https://github.com/coredns/coredns.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "go-dhcp",
+   "repo": "https://github.com/insomniacslk/dhcp.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "go-dns",
+   "repo": "https://github.com/miekg/dns",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "go-ethereum",
+   "repo": "https://github.com/ethereum/go-ethereum",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "go-git",
+   "repo": "https://github.com/go-git/go-git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "go-humanize",
+   "repo": "https://github.com/dustin/go-humanize",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "go-json-iterator",
+   "repo": "https://github.com/json-iterator/go",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "go-ldap",
+   "repo": "https://github.com/go-ldap/ldap",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "go-ole",
+   "repo": "https://github.com/go-ole/go-ole",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "go-pprof",
+   "repo": "https://github.com/google/pprof",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "go-readline",
+   "repo": "https://github.com/chzyer/readline",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "go-redis",
+   "repo": "https://github.com/redis/go-redis",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "go-sftp",
+   "repo": "https://github.com/pkg/sftp",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "go-shlex",
+   "repo": "https://github.com/google/shlex",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "go-snappy",
+   "repo": "https://github.com/golang/snappy",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "go-sqlite3",
+   "repo": "https://github.com/mattn/go-sqlite3/",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "go-toml",
+   "repo": "https://github.com/pelletier/go-toml",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "go-yaml",
+   "repo": "https://github.com/go-yaml/yaml",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "gobgp",
+   "repo": "https://github.com/osrg/gobgp",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "gogo-protobuf",
+   "repo": "https://github.com/gogo/protobuf",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "goipp",
+   "repo": "https://github.com/OpenPrinting/goipp",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "golang",
+   "repo": "https://github.com/golang/go",
+   "harnesses": 1,
+   "headers": 16,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "golang-appengine",
+   "repo": "https://github.com/golang/appengine",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "golang-protobuf",
+   "repo": "https://github.com/protocolbuffers/protobuf-go",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "gonids",
+   "repo": "https://github.com/google/gonids",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "gopacket",
+   "repo": "https://github.com/google/gopacket",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "gopsutil",
+   "repo": "https://github.com/shirou/gopsutil",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "gosnmp",
+   "repo": "https://github.com/gosnmp/gosnmp",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "gpac",
+   "repo": "https://github.com/gpac/gpac",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "gprof2dot",
+   "repo": "https://github.com/jrfonseca/gprof2dot",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "graphql-java",
+   "repo": "https://github.com/graphql-java/graphql-java",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "greenmail",
+   "repo": "https://github.com/greenmail-mail-test/greenmail.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "grok",
+   "repo": "https://github.com/GrokImageCompression/grok.git",
+   "harnesses": 14,
+   "headers": 120,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "groovy",
+   "repo": "https://github.com/apache/groovy.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "grpc-gateway",
+   "repo": "https://github.com/grpc-ecosystem/grpc-gateway",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "grpc-go",
+   "repo": "https://github.com/grpc/grpc-go",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "grpc-httpjson-transcoding",
+   "repo": "https://github.com/grpc-ecosystem/grpc-httpjson-transcoding.git",
+   "harnesses": 2,
+   "headers": 19,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "grpc-py",
+   "repo": "https://github.com/grpc/grpc",
+   "harnesses": 54,
+   "headers": 120,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "grpc-swift",
+   "repo": "https://github.com/grpc/grpc-swift",
+   "harnesses": 1,
+   "headers": 1,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "gson",
+   "repo": "https://github.com/google/gson",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "gss-ntlmssp",
+   "repo": "https://github.com/gssapi/gss-ntlmssp",
+   "harnesses": 1,
+   "headers": 7,
+   "status": "ok",
+   "harness_source": "oss-fuzz-tree"
+  },
+  {
+   "project": "guava",
+   "repo": "https://github.com/google/guava.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "guetzli",
+   "repo": "https://github.com/google/guetzli",
+   "harnesses": 1,
+   "headers": 25,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "guice",
+   "repo": "https://github.com/google/guice.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "gunicorn",
+   "repo": "https://github.com/benoitc/gunicorn",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "gwt",
+   "repo": "https://github.com/gwtproject/gwt/",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "h11",
+   "repo": "https://github.com/python-hyper/h11",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "h2database",
+   "repo": "https://github.com/h2database/h2database.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "h2o",
+   "repo": "https://github.com/h2o/h2o",
+   "harnesses": 6,
+   "headers": 120,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "h3",
+   "repo": "https://github.com/uber/h3",
+   "harnesses": 24,
+   "headers": 29,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "h5py",
+   "repo": "https://github.com/h5py/h5py",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "hadoop",
+   "repo": "https://github.com/apache/hadoop/",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "halide",
+   "repo": "https://github.com/halide/Halide",
+   "harnesses": 4,
+   "headers": 120,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "hamcrest",
+   "repo": "https://github.com/hamcrest/JavaHamcrest.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "haproxy",
+   "repo": "https://github.com/haproxy/haproxy",
+   "harnesses": 5,
+   "headers": 120,
+   "status": "ok",
+   "harness_source": "oss-fuzz-tree"
+  },
+  {
+   "project": "harfbuzz",
+   "repo": "https://github.com/harfbuzz/harfbuzz.git",
+   "harnesses": 7,
+   "headers": 62,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "harfrust",
+   "repo": "https://github.com/harfbuzz/harfrust",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "hcl",
+   "repo": "https://github.com/hashicorp/hcl",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "hdf5",
+   "repo": "https://github.com/HDFGroup/hdf5",
+   "harnesses": 2,
+   "headers": 120,
+   "status": "ok",
+   "harness_source": "oss-fuzz-tree"
+  },
+  {
+   "project": "hdrhistogram",
+   "repo": "https://github.com/HdrHistogram/HdrHistogram.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "helm",
+   "repo": "https://github.com/helm/helm",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "hermes",
+   "repo": "https://github.com/facebook/hermes.git",
+   "harnesses": 2,
+   "headers": 120,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "hibernate-orm",
+   "status": "error",
+   "error": "Command '['git', 'clone', '--depth', '1', '--quiet', '--filter=blob:none', 'https://github.com/hibernate/hibernate-orm',",
+   "harnesses": 0,
+   "headers": 0
+  },
+  {
+   "project": "hibernate-validator",
+   "repo": "https://github.com/hibernate/hibernate-validator.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "highwayhash",
+   "repo": "https://github.com/google/highwayhash",
+   "harnesses": 2,
+   "headers": 33,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "hikaricp",
+   "repo": "https://github.com/brettwooldridge/HikariCP.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "hiredis",
+   "repo": "https://github.com/redis/hiredis",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "hiredis-py",
+   "repo": "https://github.com/redis/hiredis-py",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "hive",
+   "repo": "https://github.com/apache/hive",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "hobbes",
+   "repo": "https://github.com/morganstanley/hobbes.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "hoextdown",
+   "repo": "https://github.com/kjdev/hoextdown.git",
+   "harnesses": 1,
+   "headers": 10,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "hpn-ssh",
+   "repo": "https://github.com/rapier1/hpn-ssh.git",
+   "harnesses": 16,
+   "headers": 120,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "html2text",
+   "repo": "https://github.com/Alir3z4/html2text",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "html5lib-python",
+   "repo": "https://github.com/html5lib/html5lib-python",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "htmlunit",
+   "repo": "https://github.com/HtmlUnit/htmlunit.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "htslib",
+   "repo": "https://github.com/samtools/htslib.git",
+   "harnesses": 2,
+   "headers": 68,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "http-parser",
+   "repo": "https://github.com/nodejs/http-parser",
+   "harnesses": 2,
+   "headers": 1,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "http-pattern-matcher",
+   "repo": "https://github.com/google/http_pattern_matcher.git",
+   "harnesses": 1,
+   "headers": 4,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "httparse",
+   "repo": "https://github.com/seanmonstar/httparse",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "httpcomponents-client",
+   "repo": "https://github.com/apache/httpcomponents-client.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "httpcomponents-core",
+   "repo": "https://github.com/apache/httpcomponents-core.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "httpcore",
+   "repo": "https://github.com/encode/httpcore",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "httplib2",
+   "repo": "https://github.com/httplib2/httplib2",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "httpretty",
+   "repo": "https://github.com/gabrielfalcao/httpretty",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "httpx",
+   "repo": "https://github.com/encode/httpx",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "httrack",
+   "repo": "https://github.com/xroche/httrack.git",
+   "harnesses": 13,
+   "headers": 74,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "hugo",
+   "repo": "https://github.com/gohugoio/hugo",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "hunspell",
+   "repo": "https://github.com/hunspell/hunspell.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "hwloc",
+   "repo": "https://github.com/open-mpi/hwloc",
+   "harnesses": 1,
+   "headers": 41,
+   "status": "ok",
+   "harness_source": "oss-fuzz-tree"
+  },
+  {
+   "project": "hyperium",
+   "repo": "https://github.com/hyperium/http",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "ical4j",
+   "repo": "https://github.com/ical4j/ical4j.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "icalendar",
+   "repo": "https://github.com/collective/icalendar.git",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "icu",
+   "repo": "https://github.com/unicode-org/icu.git",
+   "harnesses": 34,
+   "headers": 120,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "idna",
+   "repo": "https://github.com/kjd/idna",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "igraph",
+   "repo": "https://github.com/igraph/igraph",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "ijson",
+   "repo": "https://github.com/ICRAR/ijson",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "image-png",
+   "repo": "https://github.com/image-rs/image-png",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "image-rs",
+   "repo": "https://github.com/image-rs/image",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "imageio",
+   "repo": "https://github.com/imageio/imageio",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "imagemagick",
+   "repo": "https://github.com/imagemagick/imagemagick",
+   "harnesses": 10,
+   "headers": 114,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "immer",
+   "repo": "https://github.com/arximboldi/immer.git",
+   "harnesses": 6,
+   "headers": 0,
+   "status": "ok",
+   "harness_source": "upstream"
+  },
+  {
+   "project": "importlib_metadata",
+   "repo": "https://github.com/python/importlib_metadata",
+   "harnesses": 0,
+   "headers": 0,
+   "status": "no-harness"
+  },
+  {
+   "project": "inchi",
+   "repo": "https://github.com/IUPAC-InChI/InChI",
+   "harnesses": 1,
+   "headers": 71,
+   "status": "ok",
+   "harness_source": "upstream"
+  }
+ ]
+}
