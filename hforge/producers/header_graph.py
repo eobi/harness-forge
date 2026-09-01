@@ -1980,6 +1980,22 @@ def _finisher_for(handle, cons, apis: dict, pm: dict, used: set):
     return best
 
 
+_INITIALISER_ISH = re.compile(r"(?:_|(?<=[a-z]))(initialize|initialise|_init)\w*$", re.I)
+
+
+def _initialises(api, handle: str, pm: dict) -> bool:
+    """Does this API (re)initialise `handle` in place, as its first parameter?
+
+    Narrow on purpose: the name must say initialise AND the first parameter must be the
+    lifecycle's own handle. `yaml_parser_initialize(yaml_parser_t *)` qualifies;
+    `yaml_parser_set_input_string(parser, input, size)` does not, and neither does an
+    initialiser for some other type that merely appears in the same plan.
+    """
+    if not api.params or not _INITIALISER_ISH.search(api.symbol or ""):
+        return False
+    return hkey(api.params[0].type.name, pm) == hkey(handle, pm)
+
+
 def _needs_terminator(nm: str, api) -> bool:
     """A pointer with NO length anywhere in the signature must be NUL-terminated.
 
@@ -2777,6 +2793,25 @@ def _plans_for_handle(decls, target, handle, inline_base, init_name, fini_name,
         # function was behind a condition that is always false.
         #
         # D2 caught it (0/6 planted defects killed) and was right to block the plan.
+        # AT MOST ONE INITIALISER OF A GIVEN HANDLE PER PLAN.
+        #
+        # libyaml has a family of `yaml_*_event_initialize(yaml_event_t *, ...)`. Role
+        # inference calls the first a CREATE and the rest CONSUMEs, so a plan happily called
+        # four of them on the same event struct with a single yaml_event_delete at the end.
+        # Each initialiser fills the struct afresh -- the alias one strdups its anchor -- so
+        # every call but the last LEAKS. S1 never saw it because only an op that BINDS a
+        # resource is checked for double-creation, and these pass it as an argument.
+        #
+        # Found by seeding: real YAML reached the leak in seconds, where an empty corpus ran
+        # the same harness for 30s and never did.
+        #
+        # Refused rather than emitted-and-blocked: there is no repair inside one plan, since
+        # each initialiser would need its own event and its own delete.
+        if create is not None and handle:
+            inits = [a for a in (create, cons, feeder[0] if feeder else None)
+                     if a is not None and _initialises(a, handle, pm)]
+            if len(inits) > 1:
+                continue
         resources.extend(extra_res)
         scratch_out = list(stream_scratch_out)
         if feeder is not None:
