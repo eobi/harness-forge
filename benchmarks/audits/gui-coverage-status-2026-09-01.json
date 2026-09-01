@@ -8,19 +8,31 @@
   "mechanism": "instrumented build -> open file -> wait for quiescence -> xdotool ctrl+q/ctrl+w for a CLEAN EXIT -> .profraw -> llvm-profdata -> llvm-cov"
  },
  "DOES_NOT_WORK_YET": {
-  "symptom": "Inside the campaign loop _regions_covered() returns -1 on every input, so the corpus never grows and guidance never happens.",
-  "what_was_ruled_out": [
-   "The function itself: called by hand against the same profile it returns 2235.",
-   "Missing profiles: an 87KB .profraw is present after a campaign.",
-   "llvm-cov: merge and export both return 0 and produce valid JSON.",
-   "A read-before-write race: waiting up to 2s for a non-empty profile did not change the result.",
-   "ctrl+w closing a dialog instead of the app: ctrl+q is now sent first, to every window the process owns."
+  "symptom": "_regions_covered() reports 'no profile written' on every input inside the campaign loop, so the corpus never grows and no guidance happens. An 87KB .profraw IS present on disk after the campaign finishes.",
+  "confirmed_facts": [
+   "The INSTRUMENTED binary is the one running: readlink /proc/<pid>/exe returns /home/ubuntu/covbuild/eog-42.0/build/src/eog.",
+   "It exits cleanly: p.poll() returns 0 after the window close.",
+   "xdotool finds 2 windows for the pid and the keys are delivered.",
+   "A profile IS produced -- 87272 bytes, visible after the run.",
+   "The same binary, same environment, run STANDALONE writes 639288 bytes reliably.",
+   "llvm-profdata and llvm-cov both succeed on that profile and _regions_covered() returns 2235 when called by hand against it."
   ],
-  "not_yet_explained": "Why the same call fails inside the loop and succeeds outside it.",
-  "blast_radius": "None. Everything is behind HF_GUI_COVERAGE and a blind campaign takes the identical path it always did."
+  "positions_the_wait_was_tried_in": [
+   "between the window close and terminate(), 2s -- always empty",
+   "same position, 8s -- always empty",
+   "after terminate() and after the app leaves the accessibility tree, 6s -- always empty"
+  ],
+  "profile_naming_tried": [
+   "%p (per-process)",
+   "%m (merge pool)"
+  ],
+  "not_yet_explained": "Why a profile that exists on disk after the campaign is never visible to a read inside the loop, at any wait position tried. The next thing to check is whether the campaign's own delete-before-each-input step races the write of the PREVIOUS input, which would explain a file that is always present afterwards and never present during.",
+  "attempts": 8,
+  "blast_radius": "None. Everything is behind HF_GUI_COVERAGE; a blind campaign takes the identical path and was re-verified after every change."
  },
  "TWO_ENVIRONMENT_FACTS_THAT_INVALIDATE_A_COMPARISON": {
   "container_eog_and_system_eog_disagree": "With the SAME seed, the SAME rng (1337) and therefore the same mutation sequence, input 006 -- a 45-byte truncated PNG -- is ACCEPTED by the container's eog and REJECTED by the VM's system eog. The 29% acceptance from the 5000-input campaign is a CONTAINER number and must not be compared against native runs.",
   "the_seed_is_chosen_by_directory_order": "The campaign picks the first PNG over 2000 bytes from a sorted walk of /usr/share/icons. Installing five more applications added icons and could have changed it silently. It did not this time -- the seed is still ac-adapter.png -- but a benchmark whose input depends on what else is installed is not reproducible, and --seed-file should be mandatory for any recorded run."
- }
+ },
+ "A_NOTE_ON_HOW_LONG_THIS_TOOK": "Eight attempts, five of them from reading the profile too early in the process lifecycle. The bare `return -1` hid the cause through the first five: a silent failure that looks like data is worse than a loud one, because -1 is indistinguishable from 'this input covered nothing' and the campaign kept running as though guided. Adding a reason to every failure path should have been the FIRST change, not the sixth."
 }

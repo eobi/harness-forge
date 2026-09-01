@@ -84,6 +84,21 @@ COV_BIN = os.environ.get("HF_GUI_COV_BIN", "")
 LLVM = os.environ.get("HF_LLVM_BIN", "/usr/lib/llvm-14/bin")
 
 
+_WHY_SEEN: set = set()
+
+
+def _why(msg: str) -> None:
+    """Say why coverage was unavailable, ONCE per distinct reason.
+
+    Returning a bare -1 hid the cause through five wrong hypotheses. A silent failure that
+    looks like data is worse than a loud one: -1 is indistinguishable from "this input
+    covered nothing" at a glance, and the campaign kept running as though guided.
+    """
+    if msg not in _WHY_SEEN:
+        _WHY_SEEN.add(msg)
+        print(f"  [coverage unavailable] {msg}")
+
+
 def _regions_covered() -> int:
     """Regions this input reached, or -1 if coverage is unavailable.
 
@@ -92,8 +107,9 @@ def _regions_covered() -> int:
     between. Returns a count, not a percentage -- the denominator is fixed across a run and
     a ratio only adds a division.
     """
-    raws = sorted(COV_DIR.glob("*.profraw"))
+    raws = [r for r in sorted(COV_DIR.glob("*.profraw")) if r.stat().st_size > 0]
     if not raws or not COV_BIN:
+        _why("no profile written" if COV_BIN else "HF_GUI_COV_BIN unset")
         return -1
     merged = COV_DIR / "merged.profdata"
     try:
@@ -101,15 +117,18 @@ def _regions_covered() -> int:
                             *[str(x) for x in raws], "-o", str(merged)],
                            capture_output=True, timeout=60)
         if r.returncode != 0:
+            _why(f"llvm-profdata: {r.stderr.decode(errors='replace')[:120]}")
             return -1
         out = subprocess.run([f"{LLVM}/llvm-cov", "export", "-summary-only", COV_BIN,
                               f"-instr-profile={merged}"],
                              capture_output=True, text=True, timeout=120)
         if out.returncode != 0:
+            _why(f"llvm-cov: {out.stderr[:120]}")
             return -1
         data = json.loads(out.stdout)
         return int(data["data"][0]["totals"]["regions"]["covered"])
-    except Exception:                                              # noqa: BLE001
+    except Exception as ex:                                        # noqa: BLE001
+        _why(f"{type(ex).__name__}: {str(ex)[:120]}")
         return -1
 
 
@@ -131,17 +150,27 @@ def _close_window(pid: int) -> None:
         # application keeps running, so it never reaches exit() and never writes its
         # profile -- which made coverage unreadable for exactly the inputs a campaign most
         # wants to measure. ctrl+q quits the application whatever is focused.
-        for win in reversed(out):
-            for key in ("ctrl+q", "ctrl+w"):
-                subprocess.run(["xdotool", "key", "--window", win, key],
-                               capture_output=True, timeout=5)
+        # The LAST window, ctrl+w first. That is the pair that was verified by hand to
+        # make eog leave and write its counters; `xdotool search --pid` returns the
+        # toplevel last, and sending ctrl+q to an earlier one first did nothing at all.
+        for key in ("ctrl+w", "ctrl+q"):
+            subprocess.run(["xdotool", "key", "--window", out[-1], key],
+                           capture_output=True, timeout=5)
     except Exception:                                              # noqa: BLE001
         pass
 
 
 def run_one(app: str, path: str, budget: float):
     """Open one file and decide what happened. One process, one verdict."""
-    argv = [app, "--new-instance", path] if app == "eog" else [app, path]
+    # THE BINARY AND THE ACCESSIBILITY NAME ARE DIFFERENT THINGS.
+    #
+    # `--app eog` selects both the executable to run and the name to match on the a11y bus.
+    # An instrumented build lives somewhere else on disk but still registers as "eog", and
+    # putting it first on PATH is not enough -- the campaign kept launching the system
+    # binary, which writes no coverage, and the only visible symptom was a node count of
+    # 117 where the instrumented build gives 58.
+    exe = os.environ.get("HF_GUI_APP_BIN") or app
+    argv = [exe, "--new-instance", path] if app == "eog" else [exe, path]
     p = subprocess.Popen(argv, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     t0 = time.time()
 
@@ -221,10 +250,7 @@ def run_one(app: str, path: str, budget: float):
         # wait() returns. Reading immediately found no file, reported -1, and the next
         # input deleted the profile before anyone looked again -- so coverage was always
         # unavailable while the mechanism itself worked perfectly when called by hand.
-        for _ in range(40):
-            if any(f.stat().st_size > 0 for f in COV_DIR.glob("*.profraw")):
-                break
-            time.sleep(0.05)
+
     p.terminate()
     try:
         p.wait(timeout=5)
@@ -234,6 +260,19 @@ def run_one(app: str, path: str, budget: float):
         if not apps(app):
             break
         time.sleep(0.05)
+
+    # WAIT FOR THE PROFILE AFTER THE PROCESS IS FULLY GONE, NOT BEFORE.
+    #
+    # The counters are written as the last thread unwinds, which happens AFTER terminate()
+    # and after the app leaves the accessibility tree. Waiting earlier -- between the
+    # window close and terminate() -- timed out every single time and reported "no profile
+    # written", while the file appeared moments later and was deleted by the next input.
+    # Five wrong hypotheses came from reading too early.
+    if COVERAGE:
+        for _ in range(120):
+            if any(f.stat().st_size > 0 for f in COV_DIR.glob("*.profraw")):
+                break
+            time.sleep(0.05)
     return v
 
 
