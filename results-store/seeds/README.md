@@ -54,14 +54,25 @@ makefile and two extensionless files the miner could not rule out. The miner doe
 be precise, because libFuzzer discards what adds no coverage. It needs to find the one file
 that matters.
 
-## What this means for every coverage number already recorded
+## What this means for the coverage numbers already recorded
 
-Every campaign in the corpus-scale sweep ran with an EMPTY corpus, and probe_synth runs on a
-single synthetic `a: 1\n`. For text formats that changes little. For structured binary
-formats it means those numbers measure the signature check, not the parser -- and the
-mutational-synthesis verdict of +0.40% was measured in exactly that condition.
+**A CORRECTION FIRST, because the first version of this section was wrong.** It said the
+mutational-synthesis verdict of +0.40% was measured unseeded. It was not.
+`probe_select.probe()` fills its corpus from the `seeds` directories curated in
+`benchmarks/drive.py`, and brotli's case carries `seeds=["/b/brotli/tests/testdata"]` -- the
+same directory the miner independently rediscovers. Its 84.53% base median is what a
+well-seeded campaign looks like. **The +0.40% stands as measured, and the coverage axis does
+not need re-running on this account.**
 
-The coverage axis has to be re-measured seeded before anything about it is claimed again.
+The single synthetic `a: 1\n` in probe_synth is its SMOKE TEST -- a 64-run check for a
+candidate that aborts on a valid input -- not its coverage campaign. Confusing the two is
+what produced the wrong claim.
+
+What genuinely IS unseeded is the corpus-scale sweep in `tools/fuzz_sweep.py`, which starts
+every campaign with an empty corpus. For text formats that changes little. For structured
+binary formats those numbers measure the signature check rather than the parser, and
+jbig2dec puts the size of that error at 26x. Those numbers, and only those, need re-running
+seeded.
 
 ## Why round 1 was the wrong test, stated plainly
 
