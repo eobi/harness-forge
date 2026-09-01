@@ -57,14 +57,43 @@ SOURCES = {
 }
 
 
-_MAIN = re.compile(r"^\s*(?:int|void)\s+main\s*\(", re.M)
+# `int` and `main(` are OFTEN ON SEPARATE LINES -- jbig2dec, zopfli and most K&R-descended C
+# write the return type on its own line. A per-line pattern matches none of them, which is
+# worse than useless here: it silently accepts every file.
+_MAIN = re.compile(r"(?:^|\n)\s*(?:int|void)\s*\n?\s*main\s*\(")
 
 
 def _defines_main(p: Path) -> bool:
+    """Does this file define main() UNCONDITIONALLY?
+
+    The nesting check is the whole point. A C library routinely ships a self-test main()
+    behind `#ifdef TEST`, and jbig2dec has three: jbig2_arith.c, jbig2_huffman.c and sha1.c.
+    Matching main() anywhere dropped all three from the link, and the build then failed on an
+    undefined jbig2_table -- a symbol from a file the filter had silently removed, with
+    nothing in the error pointing back at the filter.
+
+    Excluding a needed file gives that obscure undefined-symbol error; keeping a file with a
+    guarded main() costs nothing, because if the guard IS defined the linker says "duplicate
+    symbol _main", which names the problem exactly.
+    """
     try:
-        return bool(_MAIN.search(p.read_text(errors="ignore")))
+        text = p.read_text(errors="ignore")
     except OSError:
         return False
+    # Keep only the lines that are NOT inside a preprocessor conditional, then match across
+    # newlines. Doing it in one pass per line cannot see a declaration split over two.
+    kept, depth = [], 0
+    for line in text.splitlines():
+        st = line.strip()
+        if st.startswith("#if"):
+            depth += 1
+            continue
+        if st.startswith("#endif"):
+            depth = max(0, depth - 1)
+            continue
+        if depth == 0:
+            kept.append(line)
+    return bool(_MAIN.search("\n".join(kept)))
 
 
 def _sources_for(lib: str, work: Path) -> list[str]:
@@ -97,19 +126,32 @@ def _include_dirs(lib: str, work: Path) -> list[str]:
     return [d[2:] for d in _incdirs(work / lib)]
 
 
-def run(harness: Path, lib: str, work: Path, budget: int, out: Path) -> dict:
-    sys.path.insert(0, str(FORGE))
-    import asyncio
+# IMPORT NEMESISFORGE ONCE, AT MODULE SCOPE.
+#
+# These imports used to sit inside run(), so the FIRST call imported the package while later
+# calls did not, and the two took measurably different paths: campaigns intermittently fell
+# through to the fallback discovery agent, which builds the harness WITHOUT the library
+# sources or include directories. That produced "jbig2.h file not found", no findings, and a
+# row saying status="built" -- a build failure reported as a successful build, which is the
+# worst version of the silent-failure shape this driver exists to expose.
+sys.path.insert(0, str(FORGE))
+import asyncio                                                     # noqa: E402
 
-    from forge.job import lab_job, run_job                        # noqa: PLC0415
-    from forge.targets.source import SourceTarget                 # noqa: PLC0415
+from forge.job import lab_job, run_job                             # noqa: E402
+from forge.targets.source import SourceTarget                      # noqa: E402
+
+
+def run(harness: Path, lib: str, work: Path, budget: int, out: Path) -> dict:
 
     seen: dict = {}
     of = SourceTarget.fuzz
 
     def spy(self, *a, **k):
         r = of(self, *a, **k)
-        seen.update(execs=r.execs, coverage=r.coverage, corpus=r.corpus,
+        # fuzz_ran RECORDS THAT THE STEP HAPPENED AT ALL. Without it, a campaign where the
+        # fuzz call was never reached is indistinguishable from one that ran and executed
+        # nothing: both leave the counters absent and both report status "built".
+        seen.update(fuzz_ran=True, execs=r.execs, coverage=r.coverage, corpus=r.corpus,
                     crashed=bool(r.crashed))
         return r
 
@@ -141,7 +183,7 @@ def run(harness: Path, lib: str, work: Path, budget: int, out: Path) -> dict:
             "build_error": bf.strip().splitlines()[-1][:140] if bf else "",
             "findings": len(findings), "candidates": by_novelty.get("candidate", 0),
             "artifacts": by_novelty.get("artifact", 0), "novelty": by_novelty,
-            "seconds": round(time.time() - t0, 1), **seen}
+            "fuzz_ran": False, "seconds": round(time.time() - t0, 1), **seen}
 
 
 def main() -> int:
