@@ -1,17 +1,17 @@
 {
- "generated_utc": "2026-09-01T12:09:32Z",
+ "generated_utc": "2026-09-01T16:56:12Z",
  "compiler": "clang",
  "mode": "-fsyntax-only",
- "harnesses": 1479,
- "compiled": 1475,
- "rate": 99.7,
+ "harnesses": 1519,
+ "compiled": 1513,
+ "rate": 99.6,
  "rows": [
   {
    "library": "brotli",
    "harnesses": 27,
    "compiled": 27,
    "rate": 100.0,
-   "seconds": 0.5,
+   "seconds": 0.8,
    "top_errors": []
   },
   {
@@ -19,7 +19,7 @@
    "harnesses": 153,
    "compiled": 153,
    "rate": 100.0,
-   "seconds": 1.5,
+   "seconds": 2.0,
    "top_errors": []
   },
   {
@@ -27,21 +27,21 @@
    "harnesses": 97,
    "compiled": 97,
    "rate": 100.0,
-   "seconds": 1.0,
+   "seconds": 1.6,
    "top_errors": []
   },
   {
    "library": "jansson",
-   "harnesses": 36,
-   "compiled": 36,
+   "harnesses": 22,
+   "compiled": 22,
    "rate": 100.0,
    "seconds": 0.4,
    "top_errors": []
   },
   {
    "library": "jbig2dec",
-   "harnesses": 8,
-   "compiled": 8,
+   "harnesses": 4,
+   "compiled": 4,
    "rate": 100.0,
    "seconds": 0.1,
    "top_errors": []
@@ -51,7 +51,7 @@
    "harnesses": 178,
    "compiled": 178,
    "rate": 100.0,
-   "seconds": 2.0,
+   "seconds": 3.0,
    "top_errors": []
   },
   {
@@ -59,31 +59,36 @@
    "harnesses": 196,
    "compiled": 196,
    "rate": 100.0,
-   "seconds": 2.0,
+   "seconds": 7.4,
    "top_errors": []
   },
   {
    "library": "libde265",
-   "harnesses": 132,
-   "compiled": 132,
-   "rate": 100.0,
-   "seconds": 1.4,
-   "top_errors": []
+   "harnesses": 153,
+   "compiled": 151,
+   "rate": 98.7,
+   "seconds": 5.5,
+   "top_errors": [
+    {
+     "error": "must use 'struct' tag to refer to type 'de265_image'",
+     "count": 2
+    }
+   ]
   },
   {
    "library": "libwebp",
-   "harnesses": 82,
-   "compiled": 82,
+   "harnesses": 76,
+   "compiled": 76,
    "rate": 100.0,
-   "seconds": 0.9,
+   "seconds": 1.1,
    "top_errors": []
   },
   {
    "library": "libyaml",
-   "harnesses": 78,
-   "compiled": 78,
+   "harnesses": 121,
+   "compiled": 121,
    "rate": 100.0,
-   "seconds": 0.8,
+   "seconds": 1.6,
    "top_errors": []
   },
   {
@@ -91,7 +96,7 @@
    "harnesses": 101,
    "compiled": 97,
    "rate": 96.0,
-   "seconds": 1.2,
+   "seconds": 2.4,
    "top_errors": [
     {
      "error": "call to undeclared function 'mbedtls_x509_crt_verify_with_ca_cb'; ISO C99 and later do not support implicit fu",
@@ -104,7 +109,7 @@
    "harnesses": 22,
    "compiled": 22,
    "rate": 100.0,
-   "seconds": 0.3,
+   "seconds": 0.5,
    "top_errors": []
   },
   {
@@ -112,7 +117,7 @@
    "harnesses": 176,
    "compiled": 176,
    "rate": 100.0,
-   "seconds": 2.0,
+   "seconds": 3.4,
    "top_errors": []
   },
   {
@@ -120,7 +125,7 @@
    "harnesses": 1,
    "compiled": 1,
    "rate": 100.0,
-   "seconds": 0.0,
+   "seconds": 0.1,
    "top_errors": []
   },
   {
@@ -128,7 +133,7 @@
    "harnesses": 192,
    "compiled": 192,
    "rate": 100.0,
-   "seconds": 2.4,
+   "seconds": 5.1,
    "top_errors": []
   }
  ]

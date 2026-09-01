@@ -199,12 +199,12 @@
  "HARNESS_GENERATION_AT_CORPUS_SCALE": {
   "claim": "The yield of the METHOD, not of a library chosen by hand.",
   "harnesses": {
-   "value": 1479,
+   "value": 1519,
    "source": "harness-sweep/sweep-2026-08-31.json",
    "caveat": "15 of 18 libraries. libpng, wabt and woff2 produced ZERO -- every plan refused by the gates, which is the refusal rate of the method and belongs in the table."
   },
   "compile_rate": {
-   "value": 99.7,
+   "value": 99.6,
    "source": "harness-sweep/compile-2026-08-31.json",
    "caveat": "-fsyntax-only against the library's REAL headers. Not linking, and not a claim about finding bugs. The 4 failures are entry points declared only inside an #ifdef the build does not set; the engine reads header text and does not evaluate preprocessor conditions."
   },

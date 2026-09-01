@@ -1920,7 +1920,20 @@ def _feeder_for(handle, cons, apis: dict, pm: dict):
         buf = None
         for pd in a.params[1:]:
             if (pd.type.name.count("*") == 1
-                    and base_type(pd.type.name) in BYTE_BASES):
+                    and base_type(pd.type.name) in BYTE_BASES
+                    # CONST IS WHAT SEPARATES A SOURCE FROM A SINK.
+                    #
+                    # A non-const byte buffer on a setter is where the library WRITES, not
+                    # where it reads. `yaml_emitter_set_output_string(emitter, unsigned char
+                    # *output, size_t size, size_t *size_written)` was selected as a feeder
+                    # on its name, and the plan then pointed the emitter's OUTPUT at the
+                    # fuzzer's read-only input buffer and passed NULL for size_written --
+                    # which yaml_emitter_flush writes through. SIGSEGV at address 0 before
+                    # the first execution finished, and every crash the harness's own.
+                    #
+                    # A feeder delivers bytes INTO the handle, so its buffer is const by
+                    # definition. Anything else is an output sink wearing a setter's name.
+                    and "const" in pd.type.name):
                 buf = pd.name
                 break
         if buf is None:
@@ -1965,6 +1978,35 @@ def _finisher_for(handle, cons, apis: dict, pm: dict, used: set):
         if best is None or a.symbol < best.symbol:
             best = a
     return best
+
+
+def _needs_terminator(nm: str, api) -> bool:
+    """A pointer with NO length anywhere in the signature must be NUL-terminated.
+
+    A raw pointer into the fuzzer's buffer is only safe if the callee can learn how far it
+    may read. If the API pairs the pointer with a length, it can. If the signature carries no
+    length at all, the ONLY way the callee can find the end is a terminator -- so binding an
+    interior pointer there is an out-of-bounds read by construction, in the harness, before
+    the library has done anything wrong.
+
+    libyaml is the case that exposed this. `yaml_alias_event_initialize(event, const
+    yaml_char_t *anchor)` has no length, and yaml_char_t is a typedef for unsigned char, so
+    the char-name rule did not fire and the binder passed `hf_data + cursor` straight in.
+    strlen ran off the end of the input on the second execution: 10 harnesses, 8 executions
+    between them, zero coverage, and every crash the harness's own.
+
+    Deliberately narrow. If ANY size-ish parameter exists the existing byte binding is kept,
+    because that is the shape where the caller does supply an extent, and this is the branch
+    that decides where the fuzzer's bytes go.
+    """
+    if any(nm == pair[0] for pair in getattr(api.contract, "length_delimited", []) or []):
+        return False
+    for pd in api.params:
+        if pd.name == nm:
+            continue
+        if _SIZEISH.match(base_type(pd.type.name)) and "*" not in pd.type.name:
+            return False
+    return True
 
 
 _ERROR_ACCESSOR_ISH = re.compile(
@@ -2566,12 +2608,17 @@ def _plans_for_handle(decls, target, handle, inline_base, init_name, fini_name,
                 # input — arbitrary control flow, and every crash the harness's own. NULL is
                 # both safe and the conventional way to call these APIs.
                 args.append(Arg(nm, "literal", value=0))
-            elif nm in cons.contract.nul_terminated and not slices:
+            elif (not slices
+                  and (nm in cons.contract.nul_terminated
+                       or (("*" in ty and base_type(ty) in BYTE_BASES and "const" in ty)
+                           or ty.strip() in _CONST_BYTE_PTRS)
+                       and _needs_terminator(nm, cons))):
                 slices.append(InputSlice(nm, SLICE_CSTRING, remainder=True, min_len=1))
                 args.append(Arg(nm, "input", nm))
             elif (not slices and (not _const_byte or nm == _const_byte)
-                  and (("*" in ty and base_type(ty) in BYTE_BASES)
-                       or ty.strip() in _CONST_BYTE_PTRS)):
+                  and (("*" in ty and base_type(ty) in BYTE_BASES and "const" in ty)
+                       or ty.strip() in _CONST_BYTE_PTRS)
+                  and not _needs_terminator(nm, cons)):
                 # The second arm is the pointer-typedef spelling. Added rather than folded
                 # into the first so `char **` keeps whatever it did before: this is the
                 # branch that decides where the fuzzer's bytes go, and it is not the place
@@ -2673,7 +2720,16 @@ def _plans_for_handle(decls, target, handle, inline_base, init_name, fini_name,
             if got is None:
                 continue                   # nothing the fuzzer controls: not a harness
             fapi, fbuf, flen = got
-            slices.append(InputSlice(fbuf, SLICE_BYTES, remainder=True, min_len=1))
+            # NO LENGTH MEANS THE FEEDER MUST BE NUL-TERMINATED, same rule as the consume
+            # path. `yaml_parser_set_input_string(parser, input, size)` has a length and
+            # takes raw bytes; `yaml_alias_event_initialize(event, anchor)` has none, so the
+            # callee can only find the end with a terminator and an interior pointer into
+            # the fuzzer's buffer runs off it. Fixing only the consume path left this one
+            # live: the same 2-execution crash reappeared through a plan whose feed step
+            # made the call instead.
+            slices.append(InputSlice(fbuf,
+                                     SLICE_BYTES if flen else SLICE_CSTRING,
+                                     remainder=True, min_len=1))
             fargs = []
             for pd in fapi.params:
                 if hkey(pd.type.name, pm) == hkey(handle, pm):

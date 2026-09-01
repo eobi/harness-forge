@@ -178,8 +178,15 @@ def run(harness: Path, lib: str, work: Path, budget: int, out: Path) -> dict:
     by_novelty: dict = {}
     for f in findings:
         by_novelty[getattr(f, "novelty", "?")] = by_novelty.get(getattr(f, "novelty", "?"), 0) + 1
+    # "built" REQUIRES THAT THE FUZZ STEP ACTUALLY RAN.
+    #
+    # A build can fail without the failure reaching ctx.build_failure -- under heavy load the
+    # compile times out and the agent returns having set nothing. The row then read
+    # status="built", fuzz_ran=False, and a reader would count it as a working harness. There
+    # is no honest name for that state except "we do not know", so it gets one.
+    status = "build-failed" if bf else ("built" if seen.get("fuzz_ran") else "no-campaign")
     return {"harness": harness.name, "library": lib,
-            "status": "built" if not bf else "build-failed",
+            "status": status,
             "build_error": bf.strip().splitlines()[-1][:140] if bf else "",
             "findings": len(findings), "candidates": by_novelty.get("candidate", 0),
             "artifacts": by_novelty.get("artifact", 0), "novelty": by_novelty,
