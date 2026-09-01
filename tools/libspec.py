@@ -109,6 +109,15 @@ def _defines_main(p: Path) -> bool:
     return bool(_MAIN.search("\n".join(kept)))
 
 
+# Sources that belong to the library but pull in an EXTERNAL dependency the harness does not
+# need. jbig2dec ships jbig2_image_png.c, an optional PNG *output writer* that needs libpng;
+# linking it fails on png_error and takes every jbig2dec harness with it, for a file no
+# decoding harness ever calls.
+SOURCE_EXCLUDE = {
+    "jbig2dec": ("jbig2_image_png.c",),
+}
+
+
 def _sources_for(lib: str, work: Path) -> list[str]:
     """The library's translation units, MINUS any that defines main().
 
@@ -121,7 +130,9 @@ def _sources_for(lib: str, work: Path) -> list[str]:
     """
     out: list[str] = []
     for pat in SOURCES.get(lib, []):
-        out.extend(str(q) for q in sorted((work / lib).glob(pat)) if not _defines_main(q))
+        skip = SOURCE_EXCLUDE.get(lib, ())
+        out.extend(str(q) for q in sorted((work / lib).glob(pat))
+                   if not _defines_main(q) and q.name not in skip)
     return out
 
 

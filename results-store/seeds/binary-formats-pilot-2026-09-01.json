@@ -1,0 +1,237 @@
+{
+ "generated_utc": "2026-09-01T18:38:34Z",
+ "budget_seconds": 30,
+ "pairs": 6,
+ "rows": [
+  {
+   "library": "libwebp",
+   "harness": "libwebp_WebPDecode.c",
+   "seeds": 56,
+   "empty": {
+    "cov": 30,
+    "execs": 7792
+   },
+   "seeded": {
+    "cov": -1,
+    "execs": 5
+   },
+   "first_arm": "empty"
+  },
+  {
+   "library": "libwebp",
+   "harness": "libwebp_WebPDecodeARGB.c",
+   "seeds": 56,
+   "empty": {
+    "cov": 390,
+    "execs": 17165
+   },
+   "seeded": {
+    "cov": -1,
+    "execs": 5
+   },
+   "first_arm": "seeded"
+  },
+  {
+   "library": "libwebp",
+   "harness": "libwebp_WebPDecodeARGBInto.c",
+   "seeds": 56,
+   "empty": {
+    "cov": 4,
+    "execs": 13779120
+   },
+   "seeded": {
+    "cov": 5,
+    "execs": 11406311
+   },
+   "first_arm": "empty"
+  },
+  {
+   "library": "libwebp",
+   "harness": "libwebp_WebPDecodeARGBInto__repeat_WebPDecodeARGBInto.c",
+   "seeds": 56,
+   "empty": {
+    "cov": 4,
+    "execs": 13042618
+   },
+   "seeded": {
+    "cov": 5,
+    "execs": 11485999
+   },
+   "first_arm": "seeded"
+  },
+  {
+   "library": "libwebp",
+   "harness": "libwebp_WebPDecodeARGBInto_len64k.c",
+   "seeds": 56,
+   "empty": {
+    "cov": 4,
+    "execs": 14641791
+   },
+   "seeded": {
+    "cov": 4,
+    "execs": 16391942
+   },
+   "first_arm": "empty"
+  },
+  {
+   "library": "libwebp",
+   "harness": "libwebp_WebPDecodeARGBInto_len64k__repeat_WebPDecodeARGBInto.c",
+   "seeds": 56,
+   "empty": {
+    "cov": 4,
+    "execs": 16731448
+   },
+   "seeded": {
+    "cov": 4,
+    "execs": 16914913
+   },
+   "first_arm": "seeded"
+  },
+  {
+   "library": "libwebp",
+   "harness": "libwebp_WebPDecodeARGB__repeat_WebPDecodeARGB.c",
+   "seeds": 56,
+   "empty": {
+    "cov": 363,
+    "execs": 9988
+   },
+   "seeded": {
+    "cov": -1,
+    "execs": 5
+   },
+   "first_arm": "empty"
+  },
+  {
+   "library": "libwebp",
+   "harness": "libwebp_WebPDecodeARGB_len64k.c",
+   "seeds": 56,
+   "empty": {
+    "cov": 410,
+    "execs": 12194
+   },
+   "seeded": {
+    "cov": -1,
+    "execs": 5
+   },
+   "first_arm": "seeded"
+  },
+  {
+   "library": "lcms2",
+   "harness": "lcms2_cmsBuildGamma.c",
+   "seeds": 141,
+   "empty": {
+    "cov": 59,
+    "execs": 257982
+   },
+   "seeded": {
+    "cov": 60,
+    "execs": 371915
+   },
+   "first_arm": "empty"
+  },
+  {
+   "library": "lcms2",
+   "harness": "lcms2_cmsBuildGamma_len64k.c",
+   "seeds": 141,
+   "empty": {
+    "cov": 59,
+    "execs": 250827
+   },
+   "seeded": {
+    "cov": 60,
+    "execs": 300603
+   },
+   "first_arm": "seeded"
+  },
+  {
+   "library": "lcms2",
+   "harness": "lcms2_cmsBuildParametricToneCurve.c",
+   "seeds": 141,
+   "empty": {
+    "cov": -1,
+    "execs": 2
+   },
+   "seeded": {
+    "cov": -1,
+    "execs": 2
+   },
+   "first_arm": "empty"
+  },
+  {
+   "library": "lcms2",
+   "harness": "lcms2_cmsBuildParametricToneCurve_len64k.c",
+   "seeds": 141,
+   "empty": {
+    "cov": -1,
+    "execs": 2
+   },
+   "seeded": {
+    "cov": -1,
+    "execs": 2
+   },
+   "first_arm": "seeded"
+  },
+  {
+   "library": "lcms2",
+   "harness": "lcms2_cmsCIECAM02Forward.c",
+   "seeds": 141,
+   "empty": {
+    "cov": -1,
+    "execs": 2
+   },
+   "seeded": {
+    "cov": -1,
+    "execs": 2
+   },
+   "first_arm": "empty"
+  },
+  {
+   "library": "lcms2",
+   "harness": "lcms2_cmsCIECAM02Forward_len64k.c",
+   "seeds": 141,
+   "empty": {
+    "cov": -1,
+    "execs": 2
+   },
+   "seeded": {
+    "cov": -1,
+    "execs": 2
+   },
+   "first_arm": "seeded"
+  },
+  {
+   "library": "lcms2",
+   "harness": "lcms2_cmsCIECAM02Init.c",
+   "seeds": 141,
+   "empty": {
+    "cov": 24,
+    "execs": 4
+   },
+   "seeded": {
+    "cov": -1,
+    "execs": 3
+   },
+   "first_arm": "empty"
+  },
+  {
+   "library": "lcms2",
+   "harness": "lcms2_cmsCIECAM02Init_len64k.c",
+   "seeds": 141,
+   "empty": {
+    "cov": 24,
+    "execs": 4
+   },
+   "seeded": {
+    "cov": -1,
+    "execs": 3
+   },
+   "first_arm": "seeded"
+  }
+ ],
+ "median_ratio": 1.0169,
+ "median_gain_pct": 1.69,
+ "seeded_better": 4,
+ "tied": 2,
+ "seeded_worse": 0,
+ "sign_test_p_one_sided": 0.125
+}
