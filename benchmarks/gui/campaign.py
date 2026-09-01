@@ -99,7 +99,7 @@ def _why(msg: str) -> None:
         print(f"  [coverage unavailable] {msg}")
 
 
-def _regions_covered() -> int:
+def _regions_covered(where: Path = None) -> int:
     """Regions this input reached, or -1 if coverage is unavailable.
 
     Counting REGIONS rather than lines: a line can be covered by any path through it, while
@@ -107,11 +107,12 @@ def _regions_covered() -> int:
     between. Returns a count, not a percentage -- the denominator is fixed across a run and
     a ratio only adds a division.
     """
-    raws = [r for r in sorted(COV_DIR.glob("*.profraw")) if r.stat().st_size > 0]
+    d = where or COV_DIR
+    raws = [r for r in sorted(d.glob("*.profraw")) if r.stat().st_size > 0]
     if not raws or not COV_BIN:
         _why("no profile written" if COV_BIN else "HF_GUI_COV_BIN unset")
         return -1
-    merged = COV_DIR / "merged.profdata"
+    merged = d / "merged.profdata"
     try:
         r = subprocess.run([f"{LLVM}/llvm-profdata", "merge", "-sparse",
                             *[str(x) for x in raws], "-o", str(merged)],
@@ -160,7 +161,7 @@ def _close_window(pid: int) -> None:
         pass
 
 
-def run_one(app: str, path: str, budget: float):
+def run_one(app: str, path: str, budget: float, cov_dir: Path = None):
     """Open one file and decide what happened. One process, one verdict."""
     # THE BINARY AND THE ACCESSIBILITY NAME ARE DIFFERENT THINGS.
     #
@@ -171,7 +172,21 @@ def run_one(app: str, path: str, budget: float):
     # 117 where the instrumented build gives 58.
     exe = os.environ.get("HF_GUI_APP_BIN") or app
     argv = [exe, "--new-instance", path] if app == "eog" else [exe, path]
-    p = subprocess.Popen(argv, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+    # EACH INPUT WRITES INTO A DIRECTORY OF ITS OWN.
+    #
+    # The loop used to delete *.profraw before every input and read a shared directory
+    # afterwards. The counters are written as the last thread unwinds, so the delete for
+    # input N+1 raced the write for input N: the file was always present after a campaign
+    # and never present during one. Eight attempts were spent moving the READ around, which
+    # was the wrong axis -- a private directory removes the race by construction, and a
+    # read that finds nothing now genuinely means nothing was written.
+    env = None
+    if cov_dir is not None:
+        cov_dir.mkdir(parents=True, exist_ok=True)
+        env = dict(os.environ, LLVM_PROFILE_FILE=str(cov_dir / "p-%p.profraw"))
+    p = subprocess.Popen(argv, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                         env=env)
     t0 = time.time()
 
     # 1. WINDOW: poll with a deadline. It maps in 0.11-0.55 s measured; a fixed sleep is
@@ -268,9 +283,9 @@ def run_one(app: str, path: str, budget: float):
     # window close and terminate() -- timed out every single time and reported "no profile
     # written", while the file appeared moments later and was deleted by the next input.
     # Five wrong hypotheses came from reading too early.
-    if COVERAGE:
+    if COVERAGE and cov_dir is not None:
         for _ in range(120):
-            if any(f.stat().st_size > 0 for f in COV_DIR.glob("*.profraw")):
+            if any(f.stat().st_size > 0 for f in cov_dir.glob("*.profraw")):
                 break
             time.sleep(0.05)
     return v
@@ -405,15 +420,13 @@ def main() -> int:
         data, what = mutate(parent, rng, aware=not a.naive)
         kinds[what] = kinds.get(what, 0) + 1
         f.write_bytes(data)
-        if COVERAGE:
-            for old_raw in COV_DIR.glob("*.profraw"):
-                old_raw.unlink(missing_ok=True)
-        v = run_one(a.app, str(f), a.budget)
+        here = (COV_DIR / f"i{i:04d}") if COVERAGE else None
+        v = run_one(a.app, str(f), a.budget, cov_dir=here)
         tally[v.outcome.value] = tally.get(v.outcome.value, 0) + 1
 
         gained = ""
         if COVERAGE:
-            n = _regions_covered()
+            n = _regions_covered(here)
             if n > best_regions:
                 # KEEP IT. A mutation that reached a region nothing else did is the only
                 # kind worth breeding from; the rest are noise however they were labelled.

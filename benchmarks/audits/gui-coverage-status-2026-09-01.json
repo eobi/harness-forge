@@ -27,8 +27,15 @@
    "%m (merge pool)"
   ],
   "not_yet_explained": "Why a profile that exists on disk after the campaign is never visible to a read inside the loop, at any wait position tried. The next thing to check is whether the campaign's own delete-before-each-input step races the write of the PREVIOUS input, which would explain a file that is always present afterwards and never present during.",
-  "attempts": 8,
-  "blast_radius": "None. Everything is behind HF_GUI_COVERAGE; a blind campaign takes the identical path and was re-verified after every change."
+  "attempts": 9,
+  "blast_radius": "None. Everything is behind HF_GUI_COVERAGE; a blind campaign takes the identical path and was re-verified after every change.",
+  "hypothesis_ELIMINATED": {
+   "hypothesis": "The campaign deleted *.profraw before each input, so the delete for input N+1 raced the write for input N. That fitted the evidence exactly: a file always present after a campaign and never during one.",
+   "test": "Each input now writes into a private directory (COV_DIR/iNNNN) with LLVM_PROFILE_FILE set per process. No deletion happens at all, so no race is possible by construction.",
+   "RESULT": "ELIMINATED. Every per-input directory is created and contains exactly one .profraw, and every one of them is ZERO BYTES. There was never a race: the profile is genuinely never written when the process is launched from the campaign.",
+   "why_this_was_worth_doing": "Eight earlier attempts moved the READ around, which assumed the write happened and was being missed. This shows the write does not happen, which is a different problem and rules out the entire timing category."
+  },
+  "what_is_left": "The same binary, same environment and same close sequence writes 639288 bytes when launched from an interactive shell and 0 bytes when launched by subprocess.Popen with stdout/stderr redirected to DEVNULL. The remaining difference is the launch context, not the timing: process group, controlling terminal, or the SIGTERM from terminate() arriving before GTK finishes unwinding. The next test is to reproduce the failure with a MINIMAL Popen -- no oracle, no keys, just launch and close -- which separates the campaign's machinery from the launch itself."
  },
  "TWO_ENVIRONMENT_FACTS_THAT_INVALIDATE_A_COMPARISON": {
   "container_eog_and_system_eog_disagree": "With the SAME seed, the SAME rng (1337) and therefore the same mutation sequence, input 006 -- a 45-byte truncated PNG -- is ACCEPTED by the container's eog and REJECTED by the VM's system eog. The 29% acceptance from the 5000-input campaign is a CONTAINER number and must not be compared against native runs.",
