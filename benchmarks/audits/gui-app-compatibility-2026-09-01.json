@@ -1,0 +1,28 @@
+{
+ "date": "2026-09-01",
+ "what": "Which desktop applications the accessibility oracle can actually serve, tested by running its own positive and negative controls against eight installed apps.",
+ "why_it_matters": "The GUI track has always been described as covering 2 applications. That number was never validated against a control, and the constraint turns out to be sharper than 'we only tried two'.",
+ "validated_usable": {
+  "eog": {
+   "positive_control": "accepted, 117 nodes",
+   "negative_control": "rejected, 128 nodes",
+   "note": "The 5000-input campaign ran here."
+  },
+  "evince": {
+   "positive_control": "accepted, 113 nodes",
+   "negative_control": "rejected, 122 nodes",
+   "note": "Requires a PDF seed. Only naive byte-flip mutation is available: the structure-aware mutator is PNG-only."
+  }
+ },
+ "NOT_USABLE_and_why": {
+  "shotwell": "THE INTERESTING ONE. Positive control accepted at 83 nodes and NEGATIVE control ALSO accepted at 83 nodes. Shotwell never shows an error element, so the oracle cannot distinguish a refusal from a success and any campaign there would report every input as accepted. Not a bug in the app or the oracle -- a target this oracle cannot serve.",
+  "feh": "no_window. Raw X11/imlib2, exports no accessibility interface.",
+  "gpicview": "no_window. GTK2, no AT-SPI bridge.",
+  "mupdf": "no_window. Raw X11.",
+  "xpdf": "crashed on the control when handed a PNG; it is a PDF viewer. Untested with a PDF seed because it is Motif rather than GTK and exports no a11y tree.",
+  "gthumb": "Control REJECTED the unmodified seed, so the seed and the app disagree before any mutation. Fixable with the right seed format; not yet done."
+ },
+ "the_real_constraint": "The oracle needs an AT-SPI-exporting toolkit, which in practice means GTK3 or later. Of eight installed viewers, two qualify AND discriminate. That is a sharper limit than 'we only tried two applications' and it belongs in the paper as such.",
+ "an_environment_defect_found_and_fixed": "Running dbus-launch on every invocation created a NEW session bus per campaign while the at-spi launcher stayed bound to the previous one, so app and oracle sat on different buses and EVERY target reported no_window. One persistent session, address exported to all runs. Before the fix evince looked unusable; after it, its controls pass.",
+ "also_fixed": "GTK stalls before mapping a window with an unwritable HOME or a dconf backend it cannot reach, and says nothing at all. GSETTINGS_BACKEND=memory plus a writable HOME made the whole track runnable natively, without the container -- which mattered because the GUI image had to be deleted for disk."
+}
