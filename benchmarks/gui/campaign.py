@@ -163,10 +163,27 @@ def mutate_naive(seed: bytes, rng: random.Random) -> tuple:
 
 
 def mutate(seed: bytes, rng: random.Random, aware: bool = True) -> tuple:
+    """Pick the mutator by what the seed IS, not by what the campaign hopes it is.
+
+    Dispatching on the format removes a confound in this track's own numbers. eog was
+    campaigned with the PNG mutator and evince with plain byte flips, and the two were then
+    compared: 29% of PNG mutations got past the front door against 97% of PDF ones. That
+    varies the MUTATOR and the FORMAT together, so it cannot say whether evince is more
+    tolerant or the mutation was gentler.
+
+    Falls back to byte flips for any format without a grammar here, and says so in the
+    label, so a run is never silently less structured than it appears.
+    """
     if not aware:
         return mutate_naive(seed, rng)
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
     try:
-        sys.path.insert(0, str(Path(__file__).resolve().parent))
+        from mutate_pdf import looks_like_pdf, mutate as pdf_mutate
+        if looks_like_pdf(seed):
+            return pdf_mutate(seed, rng)
+    except Exception:                                              # noqa: BLE001
+        pass
+    try:
         from mutate_png import mutate as png_mutate
         return png_mutate(seed, rng)
     except Exception:                                              # noqa: BLE001
