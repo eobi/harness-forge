@@ -1,0 +1,8 @@
+{"app": "eog", "n": 20, "guided": true, "seed": "/usr/share/icons/Adwaita/256x256/legacy/ac-adapter.png", "cumulative_regions": 2125, "best_single": 2094, "corpus": 1, "accepted": 0, "utc": "2026-09-01T12:17:04Z"}
+{"app": "eog", "n": 20, "guided": false, "seed": "/usr/share/icons/Adwaita/256x256/legacy/ac-adapter.png", "cumulative_regions": 3250, "best_single": 2950, "corpus": 3, "accepted": 5, "utc": "2026-09-01T12:17:33Z"}
+{"app": "eog", "n": 20, "guided": true, "seed": "/usr/share/icons/Adwaita/256x256/legacy/ac-adapter.png", "cumulative_regions": 3141, "best_single": 2829, "corpus": 4, "accepted": 7, "utc": "2026-09-01T12:18:03Z"}
+{"app": "eog", "n": 20, "guided": false, "seed": "/usr/share/icons/Adwaita/256x256/legacy/ac-adapter.png", "cumulative_regions": 3275, "best_single": 2990, "corpus": 4, "accepted": 5, "utc": "2026-09-01T12:18:31Z"}
+{"app": "eog", "n": 20, "guided": true, "seed": "/usr/share/icons/Adwaita/256x256/legacy/ac-adapter.png", "cumulative_regions": 2112, "best_single": 2093, "corpus": 2, "accepted": 0, "utc": "2026-09-01T12:19:08Z"}
+{"app": "eog", "n": 20, "guided": false, "seed": "/usr/share/icons/Adwaita/256x256/legacy/ac-adapter.png", "cumulative_regions": 3250, "best_single": 2950, "corpus": 3, "accepted": 6, "utc": "2026-09-01T12:19:45Z"}
+{"app": "eog", "n": 20, "guided": true, "seed": "/usr/share/icons/Adwaita/256x256/legacy/ac-adapter.png", "cumulative_regions": 3282, "best_single": 2992, "corpus": 3, "accepted": 11, "utc": "2026-09-01T12:20:20Z"}
+{"app": "eog", "n": 20, "guided": false, "seed": "/usr/share/icons/Adwaita/256x256/legacy/ac-adapter.png", "cumulative_regions": 3264, "best_single": 2950, "corpus": 1, "accepted": 7, "utc": "2026-09-01T12:20:58Z"}

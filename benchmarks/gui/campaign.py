@@ -79,6 +79,10 @@ def first_button(node):
 
 
 COVERAGE = bool(os.environ.get("HF_GUI_COVERAGE"))
+# MEASURE ALWAYS, GUIDE OPTIONALLY. The point of a guided-vs-blind comparison is that both
+# arms are instrumented identically and only the SELECTION differs; turning instrumentation
+# off in the blind arm would compare two different programs.
+GUIDE = os.environ.get("HF_GUI_GUIDE", "1") != "0"
 COV_DIR = Path(os.environ.get("HF_GUI_COV_DIR", "/tmp/cov"))
 COV_BIN = os.environ.get("HF_GUI_COV_BIN", "")
 LLVM = os.environ.get("HF_LLVM_BIN", "/usr/lib/llvm-14/bin")
@@ -158,6 +162,36 @@ def _close_window(pid: int) -> None:
                            capture_output=True, timeout=5)
     except Exception:                                              # noqa: BLE001
         pass
+
+
+def _regions_covered_all() -> int:
+    """Regions covered across EVERY input in this campaign, merged.
+
+    llvm-profdata takes many .profraw files and merges them, so the union is one command
+    rather than a set the caller has to maintain.
+    """
+    raws = [str(r) for r in sorted(COV_DIR.rglob("*.profraw")) if r.stat().st_size > 0]
+    if not raws:
+        _why("cumulative: no non-empty profile in any per-input directory")
+        return -1
+    merged = COV_DIR / "all.profdata"
+    try:
+        subprocess.run([f"{LLVM}/llvm-profdata", "merge", "-sparse", *raws,
+                        "-o", str(merged)], check=True, capture_output=True, timeout=300)
+        out = subprocess.run([f"{LLVM}/llvm-cov", "export", "-summary-only", COV_BIN,
+                              f"-instr-profile={merged}"],
+                             check=True, capture_output=True, text=True, timeout=300)
+        return int(json.loads(out.stdout)["data"][0]["totals"]["regions"]["covered"])
+    except subprocess.CalledProcessError as ex:
+        # SAY WHAT WENT WRONG. A bare -1 here cost eight debugging attempts on the
+        # single-input path: it reads as "this input covered nothing", which is a fact about
+        # the target, when it actually means the measurement did not run.
+        _why(f"cumulative: {' '.join(ex.cmd[:2])} failed rc={ex.returncode}: "
+             f"{(ex.stderr or b'')[:200]!r}")
+        return -1
+    except Exception as ex:                                        # noqa: BLE001
+        _why(f"cumulative: {type(ex).__name__}: {str(ex)[:200]}")
+        return -1
 
 
 def run_one(app: str, path: str, budget: float, cov_dir: Path = None):
@@ -340,6 +374,9 @@ def main() -> int:
     ap.add_argument("--rng", type=int, default=1337)
     ap.add_argument("--results", default="",
                     help="append a JSON row here so the GUI table can be regenerated")
+    ap.add_argument("--record", default="",
+                    help="append one JSON row per campaign, for the "
+                         "guided-vs-blind comparison")
     ap.add_argument("--naive", action="store_true",
                     help="byte flips instead of the structure-aware mutator, for comparison")
     a = ap.parse_args()
@@ -407,7 +444,15 @@ def main() -> int:
 
     tally: dict = {}
     kinds: dict = {}
-    corpus: list = []          # inputs that reached a region nothing else did
+    # THE SEED IS ALWAYS IN THE CORPUS.
+    #
+    # It used to start empty, so once guidance had bred a few mutants the loop could only
+    # breed from mutants -- corruption compounds and the lineage drifts away from being a
+    # valid file. Measured: 2 of 4 guided campaigns collapsed to 0 of 20 inputs accepted,
+    # against a blind arm that varied by 25 regions across four runs because it always
+    # returned to the pristine seed. Every production fuzzer keeps its seed corpus; this
+    # loop did not, and that alone made guidance look worse than no guidance.
+    corpus: list = [seed]      # the seed, plus inputs that reached a region nothing else did
     best_regions = -1          # -1 until coverage is read; never negative after
     for i in range(a.n):
         f = slot(i) / f"input{ext}"
@@ -415,7 +460,7 @@ def main() -> int:
         # rather than always the original seed, which is the difference between a random
         # walk and a search. Without instrumentation `corpus` never grows past the seed and
         # the loop behaves exactly as before.
-        parent = corpus[rng.randrange(len(corpus))] if corpus else seed
+        parent = corpus[rng.randrange(len(corpus))] if GUIDE else seed
         data, what = mutate(parent, rng, aware=not a.naive)
         kinds[what] = kinds.get(what, 0) + 1
         f.write_bytes(data)
@@ -438,8 +483,20 @@ def main() -> int:
               f"{f.stat().st_size:>6}B{gained}{mark}")
     acc = tally.get("accepted", 0)
     if COVERAGE:
-        print(f"\n  coverage-guided: corpus grew to {len(corpus)} input(s), "
-              f"{best_regions} regions covered")
+        # CUMULATIVE, not the best single input. best_regions is the high-water mark of one
+        # input; what a campaign is actually worth is everything it reached between them,
+        # which is the merge of every per-input profile.
+        total = _regions_covered_all()
+        print(f"\n  coverage: corpus grew to {len(corpus)} input(s), "
+              f"best single input {best_regions} regions, "
+              f"{total} regions covered CUMULATIVELY "
+              f"({'guided' if GUIDE else 'blind'})")
+        if a.record:
+            Path(a.record).open("a").write(json.dumps(
+                {"app": a.app, "n": a.n, "guided": GUIDE, "seed": str(seed_path),
+                 "cumulative_regions": total, "best_single": best_regions,
+                 "corpus": len(corpus), "accepted": acc,
+                 "utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}) + "\n")
     print(f"\n  {a.n} inputs ({'byte flips' if a.naive else 'structure-aware'}): "
           + ", ".join(f"{k}={v}" for k, v in sorted(tally.items())))
     print(f"  past the front door: {acc}/{a.n} = {100.0*acc/max(1,a.n):.0f}% accepted")
@@ -449,7 +506,10 @@ def main() -> int:
     # A ROW, so the table can be regenerated rather than hand-maintained. Same discipline as
     # the C track: a table nobody can regenerate is a table nobody can check.
     if a.results:
-        import json
+        # json is imported at module scope. A second `import json` HERE made the name local
+        # to this whole function, so the --record block earlier in it raised
+        # UnboundLocalError before ever reaching this line -- and the guided-vs-blind
+        # experiment aborted on its first campaign.
         row = {
             "app": a.app,
             "format": ext.lstrip("."),
