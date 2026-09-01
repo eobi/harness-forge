@@ -1,9 +1,9 @@
 {
- "generated_utc": "2026-09-01T04:52:44Z",
+ "generated_utc": "2026-09-01T12:09:32Z",
  "compiler": "clang",
  "mode": "-fsyntax-only",
- "harnesses": 1495,
- "compiled": 1491,
+ "harnesses": 1479,
+ "compiled": 1475,
  "rate": 99.7,
  "rows": [
   {
@@ -11,7 +11,7 @@
    "harnesses": 27,
    "compiled": 27,
    "rate": 100.0,
-   "seconds": 0.3,
+   "seconds": 0.5,
    "top_errors": []
   },
   {
@@ -40,10 +40,10 @@
   },
   {
    "library": "jbig2dec",
-   "harnesses": 14,
-   "compiled": 14,
+   "harnesses": 8,
+   "compiled": 8,
    "rate": 100.0,
-   "seconds": 0.2,
+   "seconds": 0.1,
    "top_errors": []
   },
   {
@@ -51,7 +51,7 @@
    "harnesses": 178,
    "compiled": 178,
    "rate": 100.0,
-   "seconds": 2.1,
+   "seconds": 2.0,
    "top_errors": []
   },
   {
@@ -59,7 +59,7 @@
    "harnesses": 196,
    "compiled": 196,
    "rate": 100.0,
-   "seconds": 2.1,
+   "seconds": 2.0,
    "top_errors": []
   },
   {
@@ -67,7 +67,7 @@
    "harnesses": 132,
    "compiled": 132,
    "rate": 100.0,
-   "seconds": 1.5,
+   "seconds": 1.4,
    "top_errors": []
   },
   {
@@ -91,7 +91,7 @@
    "harnesses": 101,
    "compiled": 97,
    "rate": 96.0,
-   "seconds": 1.3,
+   "seconds": 1.2,
    "top_errors": [
     {
      "error": "call to undeclared function 'mbedtls_x509_crt_verify_with_ca_cb'; ISO C99 and later do not support implicit fu",
@@ -101,10 +101,10 @@
   },
   {
    "library": "yajl",
-   "harnesses": 32,
-   "compiled": 32,
+   "harnesses": 22,
+   "compiled": 22,
    "rate": 100.0,
-   "seconds": 0.4,
+   "seconds": 0.3,
    "top_errors": []
   },
   {
@@ -112,7 +112,7 @@
    "harnesses": 176,
    "compiled": 176,
    "rate": 100.0,
-   "seconds": 1.9,
+   "seconds": 2.0,
    "top_errors": []
   },
   {
@@ -128,7 +128,7 @@
    "harnesses": 192,
    "compiled": 192,
    "rate": 100.0,
-   "seconds": 2.2,
+   "seconds": 2.4,
    "top_errors": []
   }
  ]

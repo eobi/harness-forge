@@ -1970,6 +1970,32 @@ def _finisher_for(handle, cons, apis: dict, pm: dict, used: set):
 _ERROR_ACCESSOR_ISH = re.compile(
     r"(?:_|(?<=[a-z]))(get_error|last_error|error_string|errorstring|geterror|"
     r"lasterror|strerror|error_message|errmsg)\w*$", re.I)
+_DEALLOCATOR_ISH = re.compile(
+    r"(?:^|_|(?<=[a-z]))(free|release|dispose|dealloc|unref)\w*", re.I)
+
+
+def _frees_a_pointer_it_is_given(api, handle: str, pm: dict) -> bool:
+    """Does this API release a pointer the CALLER passes in, other than the handle?
+
+    Deliberately narrow. It is not enough for the name to say "free": `png_free_data(png_ptr,
+    info_ptr, mask, num)` frees things the library owns and takes no caller buffer, and
+    refusing every free-named consumer would lose real entry points. The dangerous shape is
+    specifically a deallocator with a NON-CONST pointer parameter that is not the lifecycle's
+    handle -- because that parameter is what the binder fills with harness-allocated memory.
+    """
+    if not _DEALLOCATOR_ISH.search(api.symbol or ""):
+        return False
+    for pd in api.params:
+        ty = pd.type.name
+        if ty.count("*") != 1 or "const" in ty:
+            continue
+        base = hkey(ty, pm)
+        if base and base == handle:
+            continue                       # the handle itself: that is a destroy, not this
+        return True
+    return False
+
+
 _ERROR_FREE_ISH = re.compile(
     r"(?:_|(?<=[a-z]))(free_error|error_free|free_errmsg|release_error)\w*$", re.I)
 
@@ -2411,6 +2437,21 @@ def _plans_for_handle(decls, target, handle, inline_base, init_name, fini_name,
     for cons in consumers:
         if cons.symbol in seen_consumers:
             continue                       # already planned under an earlier lifecycle
+        if _frees_a_pointer_it_is_given(cons, handle, pm):
+            # A DEALLOCATOR MUST NEVER BE HANDED HARNESS-OWNED MEMORY.
+            #
+            # `yajl_free_error(yajl_handle hand, unsigned char *str)` is a pure free: its
+            # body is YA_FREE(&hand->alloc, str). Role inference called it a consumer, so
+            # the plan malloc'd a buffer from the fuzzer's bytes and passed it in. yajl then
+            # freed memory it never allocated and the harness freed the same pointer again.
+            # Four such harnesses crashed after 2 executions -- and the downstream fuzzer
+            # CERTIFIED them as findings, which is the exact failure this engine exists to
+            # prevent. A false positive shipped as a discovery is worse than no discovery.
+            #
+            # This does not lose the call. `_error_accessor_for` already pairs get_error
+            # with free_error, which is the ONLY context where passing it a pointer is
+            # correct: the pointer came from the library.
+            continue
         used = {cons.symbol}
         create = creators[0] if creators else None
         destroy = destroyers[0] if destroyers else None

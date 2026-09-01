@@ -129,10 +129,19 @@ def run(harness: Path, lib: str, work: Path, budget: int, out: Path) -> dict:
                 "error": str(ex)[:160], "seconds": round(time.time() - t0, 1)}
     finally:
         SourceTarget.fuzz = of
+    # COUNT CANDIDATES, NOT FINDINGS. Triage de-rates a harness artifact to
+    # novelty="artifact" but deliberately keeps it in the list, because a human still
+    # decides. Reporting len(findings) therefore counts the engine's own mistakes as
+    # discoveries -- four yajl harnesses that freed their own memory were counted that way.
+    by_novelty: dict = {}
+    for f in findings:
+        by_novelty[getattr(f, "novelty", "?")] = by_novelty.get(getattr(f, "novelty", "?"), 0) + 1
     return {"harness": harness.name, "library": lib,
             "status": "built" if not bf else "build-failed",
             "build_error": bf.strip().splitlines()[-1][:140] if bf else "",
-            "findings": len(findings), "seconds": round(time.time() - t0, 1), **seen}
+            "findings": len(findings), "candidates": by_novelty.get("candidate", 0),
+            "artifacts": by_novelty.get("artifact", 0), "novelty": by_novelty,
+            "seconds": round(time.time() - t0, 1), **seen}
 
 
 def main() -> int:
@@ -165,14 +174,18 @@ def main() -> int:
     built = [r for r in rows if r.get("status") == "built"]
     ran = [r for r in built if (r.get("execs") or 0) > 0]
     crashes = [r for r in rows if r.get("crashed")]
+    cand = sum(r.get("candidates") or 0 for r in rows)
+    arte = sum(r.get("artifacts") or 0 for r in rows)
     summary = {"generated_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
                "budget_seconds": a.budget, "harnesses": len(rows),
                "built": len(built), "executed": len(ran),
                "total_execs": sum(r.get("execs") or 0 for r in ran),
-               "crashed": len(crashes), "rows": rows}
+               "crashed": len(crashes), "candidates": cand, "artifacts": arte,
+               "rows": rows}
     (out / "summary.json").write_text(json.dumps(summary, indent=1))
     print(f"\n{len(ran)}/{len(rows)} campaigns executed, "
-          f"{summary['total_execs']:,} total executions, {len(crashes)} crash candidate(s)")
+          f"{summary['total_execs']:,} total executions, {len(crashes)} crash(es) -> "
+          f"{cand} candidate(s), {arte} known harness artifact(s)")
     print(f"recorded: {out / 'summary.json'}")
     return 0
 

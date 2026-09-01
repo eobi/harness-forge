@@ -1,5 +1,5 @@
 {
- "generated_utc": "2026-09-01T04:52:27Z",
+ "generated_utc": "2026-09-01T12:09:15Z",
  "libraries": 18,
  "rows": [
   {
@@ -7,7 +7,7 @@
    "status": "ok",
    "returncode": 0,
    "harnesses_emitted": 27,
-   "seconds": 0.3,
+   "seconds": 0.5,
    "tail": [
     "  SKIP brotli_BrotliDecoderSetMetadataCallbacks_len   emit refused: op o1: argument 'chunk_func' references ",
     "",
@@ -33,7 +33,7 @@
    "harnesses_emitted": 97,
    "seconds": 0.6,
    "tail": [
-    "  emitted expat_XML_SetElementDeclHandler__widen_XML_SetHashSa   -> expat_XML_SetElementDeclHandler__widen_XML_SetHashSalt.c",
+    "  emitted expat_XML_SetElementDeclHandler_len64k__widen_XML_Me   -> expat_XML_SetElementDeclHandler_len64k__widen_XML_MemMalloc.c",
     "",
     "100 harness(es) written to /tmp/hf-harnesses/expat/expat"
    ]
@@ -54,12 +54,12 @@
    "library": "jbig2dec",
    "status": "ok",
    "returncode": 0,
-   "harnesses_emitted": 14,
+   "harnesses_emitted": 8,
    "seconds": 0.3,
    "tail": [
     "  emitted jbig2dec_jbig2_ctx_new_imp_len64k__repeat_jbig2_ctx_   -> jbig2dec_jbig2_ctx_new_imp_len64k__repeat_jbig2_ctx_new_imp.c",
     "",
-    "14 harness(es) written to /tmp/hf-harnesses/jbig2dec/jbig2dec"
+    "8 harness(es) written to /tmp/hf-harnesses/jbig2dec/jbig2dec"
    ]
   },
   {
@@ -67,7 +67,7 @@
    "status": "ok",
    "returncode": 0,
    "harnesses_emitted": 178,
-   "seconds": 1.7,
+   "seconds": 1.8,
    "tail": [
     "  emitted lcms2_cmsTagLinkedTo_len64k                            -> lcms2_cmsTagLinkedTo_len64k.c",
     "",
@@ -79,7 +79,7 @@
    "status": "ok",
    "returncode": 0,
    "harnesses_emitted": 196,
-   "seconds": 266.2,
+   "seconds": 266.4,
    "tail": [
     "  emitted leptonica_l_generateJpegDataMem_len64k                 -> leptonica_l_generateJpegDataMem_len64k.c",
     "",
@@ -171,12 +171,12 @@
    "library": "yajl",
    "status": "ok",
    "returncode": 0,
-   "harnesses_emitted": 32,
-   "seconds": 0.3,
+   "harnesses_emitted": 22,
+   "seconds": 0.8,
    "tail": [
-    "  emitted yajl_yajl_free_error_len64k__repeat_yajl_free_error    -> yajl_yajl_free_error_len64k__repeat_yajl_free_error.c",
+    "  emitted yajl_yajl_get_error_len64k__repeat_yajl_get_error      -> yajl_yajl_get_error_len64k__repeat_yajl_get_error.c",
     "",
-    "32 harness(es) written to /tmp/hf-harnesses/yajl/yajl"
+    "22 harness(es) written to /tmp/hf-harnesses/yajl/yajl"
    ]
   },
   {
@@ -184,7 +184,7 @@
    "status": "ok",
    "returncode": 0,
    "harnesses_emitted": 176,
-   "seconds": 0.4,
+   "seconds": 0.6,
    "tail": [
     "  emitted zlib_gzputc__widen_gzvprintf                           -> zlib_gzputc__widen_gzvprintf.c",
     "",
@@ -216,5 +216,5 @@
    ]
   }
  ],
- "total_harnesses": 1495
+ "total_harnesses": 1479
 }
