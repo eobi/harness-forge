@@ -32,6 +32,17 @@ def _load(name: str) -> dict:
     return json.loads(p.read_text()) if p.exists() else {}
 
 
+def _store(rel: str) -> dict:
+    """Load a record from results-store/, which holds results rather than audits.
+
+    Kept separate from _load: an audit is a record of a decision, a result is a record of a
+    measurement, and merging the two directories would make it impossible to say which a
+    number came from.
+    """
+    p = ROOT / "results-store" / rel
+    return json.loads(p.read_text()) if p.exists() else {}
+
+
 def build() -> dict:
     fleet = _load("ossfuzz-fleet-2026-08-30.json")
     upstream = _load("upstream-repos-2026-08-31.json")
@@ -42,6 +53,9 @@ def build() -> dict:
     gui = _load("gui-campaign-5000-2026-09-01.json")
     census = _load("fidelity-census-2026-08-31.json")
     proto = _load("protocol-mining-2026-08-31.json")
+    sweep = _store("harness-sweep/sweep-2026-08-31.json")
+    comp = _store("harness-sweep/compile-2026-08-31.json")
+    camp = _store("fuzz-campaign/campaign-2026-09-01.json")
 
     return {
         "generated": str(date.today()),
@@ -179,6 +193,34 @@ def build() -> dict:
             },
         },
 
+        "HARNESS_GENERATION_AT_CORPUS_SCALE": {
+            "claim": "The yield of the METHOD, not of a library chosen by hand.",
+            "harnesses": {"value": sweep.get("total_harnesses"),
+                          "source": "harness-sweep/sweep-2026-08-31.json",
+                          "caveat": "15 of 18 libraries. libpng, wabt and woff2 produced "
+                                    "ZERO -- every plan refused by the gates, which is the "
+                                    "refusal rate of the method and belongs in the table."},
+            "compile_rate": {"value": comp.get("rate"),
+                             "source": "harness-sweep/compile-2026-08-31.json",
+                             "caveat": "-fsyntax-only against the library's REAL headers. "
+                                       "Not linking, and not a claim about finding bugs. "
+                                       "The 4 failures are entry points declared only "
+                                       "inside an #ifdef the build does not set; the engine "
+                                       "reads header text and does not evaluate "
+                                       "preprocessor conditions."},
+            "fuzzed": {"value": camp.get("total_execs"),
+                       "source": "fuzz-campaign/campaign-2026-09-01.json",
+                       "caveat": "30s per harness is a SMOKE TEST, not a campaign. "
+                                 f"{camp.get('crashed', 0)} crashes, "
+                                 f"{camp.get('candidates', 0)} promoted -- every crash "
+                                 "refused by the oracle."},
+            "open_defect": "libyaml ran 10 campaigns and executed EIGHT TIMES IN TOTAL: "
+                           "every harness crashes after 2 executions at zero coverage, the "
+                           "same contract-violation shape as the yajl_free_error family. "
+                           "The deallocator rule is too narrow. Recorded as a defect in "
+                           "this engine, not as a result.",
+        },
+
         "GUI_TRACK": {
             "claim": "An accessibility-tree oracle can distinguish a target REFUSING an "
                      "input from one that has hung -- a distinction signal-based fuzzers "
@@ -207,6 +249,16 @@ def build() -> dict:
             {"result": "5000 blind GUI inputs find nothing in eog",
              "detail": "0 crashes, 0 hangs, controls held",
              "source": "gui-campaign-5000-2026-09-01.json"},
+            {"result": "Coverage guidance does not beat blind mutation on a GUI target",
+             "detail": "Guided median 3257 regions against blind 3270, exact Mann-Whitney "
+                       "p=0.3211, median ratio 0.996. For 7-against-8 the minimum attainable "
+                       "two-sided p is 0.00031, so the design had ample power to detect a "
+                       "clean separation and found none: the claim is 'at this scale there "
+                       "is nothing to tell', not 'we could not tell'. Blind is also six "
+                       "times more consistent (spread 34 against 1133). Before the seed was "
+                       "kept in the corpus, guidance was actively WORSE (median 2633, with "
+                       "2 of 4 campaigns accepting zero of 20 inputs).",
+             "source": "gui-guidance/guided-vs-blind-seed-retained-2026-09-01.jsonl"},
         ],
 
         "CORRECTIONS_MADE_TO_OUR_OWN_CLAIMS": [
@@ -226,6 +278,19 @@ def build() -> dict:
             "candidate ordering.",
             "Two regexes did not terminate; both were caught by timing the corpus, "
             "neither by the test suite.",
+            "Coverage guidance was measured as WORSE than blind mutation before the cause "
+            "was found: the corpus started empty, so guidance could only breed from mutants "
+            "and drifted away from validity. That is a missing invariant, not a finding "
+            "about search, and the as-implemented numbers are kept so the fix is measured "
+            "against something.",
+            "Four generated yajl harnesses passed a fuzzer-owned buffer to a pure "
+            "deallocator, and the fuzzer CERTIFIED all four as findings. A false positive "
+            "shipped as a discovery is the exact failure this engine exists to prevent. Both "
+            "halves fixed; the producer rule is still too narrow, since libyaml reproduces "
+            "the shape.",
+            "A sweep driver reported BUILD FAILURES AS SUCCESSFUL BUILDS because it imported "
+            "the fuzzer inside a function, so the first call and later calls took different "
+            "paths. Found only after adding a fuzz_ran field.",
         ],
     }
 

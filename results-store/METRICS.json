@@ -1,5 +1,5 @@
 {
- "generated": "2026-08-31",
+ "generated": "2026-09-01",
  "generator": "tools/consolidate.py -- derived, never hand-edited",
  "engine": "harness-forge",
  "AXIS_1_FINDINGS": {
@@ -196,6 +196,25 @@
    "caveat": "A GUEST VM reports itself idle while its host is saturated, so an in-guest load check gives a false all-clear. Throughput stability is the trustworthy substitute."
   }
  },
+ "HARNESS_GENERATION_AT_CORPUS_SCALE": {
+  "claim": "The yield of the METHOD, not of a library chosen by hand.",
+  "harnesses": {
+   "value": 1479,
+   "source": "harness-sweep/sweep-2026-08-31.json",
+   "caveat": "15 of 18 libraries. libpng, wabt and woff2 produced ZERO -- every plan refused by the gates, which is the refusal rate of the method and belongs in the table."
+  },
+  "compile_rate": {
+   "value": 99.7,
+   "source": "harness-sweep/compile-2026-08-31.json",
+   "caveat": "-fsyntax-only against the library's REAL headers. Not linking, and not a claim about finding bugs. The 4 failures are entry points declared only inside an #ifdef the build does not set; the engine reads header text and does not evaluate preprocessor conditions."
+  },
+  "fuzzed": {
+   "value": 651343964,
+   "source": "fuzz-campaign/campaign-2026-09-01.json",
+   "caveat": "30s per harness is a SMOKE TEST, not a campaign. 4 crashes, 0 promoted -- every crash refused by the oracle."
+  },
+  "open_defect": "libyaml ran 10 campaigns and executed EIGHT TIMES IN TOTAL: every harness crashes after 2 executions at zero coverage, the same contract-violation shape as the yajl_free_error family. The deallocator rule is too narrow. Recorded as a defect in this engine, not as a result."
+ },
  "GUI_TRACK": {
   "claim": "An accessibility-tree oracle can distinguish a target REFUSING an input from one that has hung -- a distinction signal-based fuzzers cannot make.",
   "campaign": {
@@ -214,44 +233,8 @@
   },
   "honest_rating": {
    "oracle": "7/10",
-   "search": "now has coverage feedback; unproven",
-   "caveat": "The search gained the input it was missing. Whether that finds bugs is unmeasured: 7000 blind inputs across two applications found none, and coverage changes the search rather than the oracle."
-  },
-  "applications": {
-   "tested": 8,
-   "validated_usable": 2,
-   "value": {
-    "eog": "GTK3, oracle discriminates",
-    "evince": "GTK3, oracle discriminates"
-   },
-   "source": "gui-app-compatibility-2026-09-01.json",
-   "caveat": "The oracle needs an AT-SPI-exporting toolkit, in practice GTK3+. shotwell accepts corrupt input IDENTICALLY to valid input, so the oracle cannot discriminate there at all -- a target it cannot serve. feh, gpicview, mupdf and xpdf export no accessibility tree."
-  },
-  "controlled_comparison": {
-   "value": {
-    "eog_png_aware": "29% accepted of 5000",
-    "evince_byteflip": "97% accepted of 1000",
-    "evince_pdf_aware": "82% accepted of 1000"
-   },
-   "source": "gui-controlled-comparison-2026-09-01.json",
-   "caveat": "REPORT PER MUTATION KIND, NOT AS AN AGGREGATE. evince accepts 100% of header, filter, stream_bytes, xref_offset and obj_len mutations and 0% of trailer_drop. The aggregate is a weighted average of near-constants and moves only with the mutator's mix."
-  },
-  "totals": {
-   "inputs": 7000,
-   "applications": 2,
-   "findings": 0
-  },
-  "coverage_feedback": {
-   "status": "WORKING as of 2026-09-01, previously the track's stated gap",
-   "value": "25.64% region coverage read back from a running desktop application; the campaign keeps inputs that reach a region nothing else did and mutates from them",
-   "source": "benchmarks/gui/COVERAGE.md, campaign.py behind HF_GUI_COVERAGE",
-   "mechanism": "instrumented eog -> open mutated file -> wait for quiescence -> xdotool ctrl+w for a CLEAN EXIT -> .profraw -> llvm-profdata -> llvm-cov export",
-   "caveat": "Coverage is of EOG'S OWN SOURCES, not of the image decoder. Most of what a viewer does with a corrupt PNG happens inside gdk-pixbuf and libpng, which are not instrumented. Application coverage is a loose proxy for depth reached, and the guided-versus-blind comparison has NOT been run, so no claim is made that guidance improves the search.",
-   "three_approaches_that_failed": {
-    "kill_the_process": "clang writes the profile in an atexit handler; SIGTERM skips it and leaves a ZERO-BYTE profile indistinguishable from 'covered nothing'.",
-    "continuous_mode": "LLVM_PROFILE_FILE=%c needs clang 17; jammy ships 14.",
-    "LD_PRELOAD_flush_shim": "A SIGUSR1 handler calling __llvm_profile_write_file fails twice -- undefined symbol when linked, NULL from dlsym(RTLD_DEFAULT). `nm` shows compiler-rt marks the writer LOCAL, so --export-dynamic cannot export it. Rebuilding eog with --export-dynamic was wasted effort; the nm check should have come first."
-   }
+   "search": "3/10",
+   "caveat": "GUIFUZZ++ is grey-box and found 23 bugs across 11-12 applications."
   }
  },
  "NEGATIVE_RESULTS_WORTH_PUBLISHING": [
@@ -274,6 +257,11 @@
    "result": "5000 blind GUI inputs find nothing in eog",
    "detail": "0 crashes, 0 hangs, controls held",
    "source": "gui-campaign-5000-2026-09-01.json"
+  },
+  {
+   "result": "Coverage guidance does not beat blind mutation on a GUI target",
+   "detail": "Guided median 3257 regions against blind 3270, exact Mann-Whitney p=0.3211, median ratio 0.996. For 7-against-8 the minimum attainable two-sided p is 0.00031, so the design had ample power to detect a clean separation and found none: the claim is 'at this scale there is nothing to tell', not 'we could not tell'. Blind is also six times more consistent (spread 34 against 1133). Before the seed was kept in the corpus, guidance was actively WORSE (median 2633, with 2 of 4 campaigns accepting zero of 20 inputs).",
+   "source": "gui-guidance/guided-vs-blind-seed-retained-2026-09-01.jsonl"
   }
  ],
  "CORRECTIONS_MADE_TO_OUR_OWN_CLAIMS": [
@@ -286,14 +274,8 @@
   "An alias-counter 'fix' promising +55 trusted lifts produced 17 FALSE positives against correct harnesses and was reverted.",
   "A synthesis probe reported 'gain -71.79 points' that measured only my own candidate ordering.",
   "Two regexes did not terminate; both were caught by timing the corpus, neither by the test suite.",
-  "The eog/evince acceptance comparison was confounded: it varied the mutator and the format together. A PDF-aware mutator was written to control it, and most of the 97% turned out to be a mutator too gentle to be refused."
- ],
- "INFRASTRUCTURE": {
-  "second_machine": {
-   "value": "Ubuntu 22.04 aarch64 guest, 8 vCPU, disk extended 30G -> 60G",
-   "source": "HANDOFF.md",
-   "caveat": "It is a GUEST on the same Mac. It runs benchmarks FASTER and 2.5x more stably than the host (25% vs 64% spread over 7 identical runs), but it cannot serve the purpose PAPERS.md asks of a second machine -- separating campaign variance from HOST effects -- because it is the host. A guest also reports itself idle while its host is saturated, so an in-guest load check gives a false all-clear.",
-   "how_the_space_was_found": "No VM resize was needed. The Ubuntu installer had allocated only 30G of a 61G disk to the logical volume; 30.47G of free extents were already in the volume group. lvextend + resize2fs, ten seconds, no downtime."
-  }
- }
+  "Coverage guidance was measured as WORSE than blind mutation before the cause was found: the corpus started empty, so guidance could only breed from mutants and drifted away from validity. That is a missing invariant, not a finding about search, and the as-implemented numbers are kept so the fix is measured against something.",
+  "Four generated yajl harnesses passed a fuzzer-owned buffer to a pure deallocator, and the fuzzer CERTIFIED all four as findings. A false positive shipped as a discovery is the exact failure this engine exists to prevent. Both halves fixed; the producer rule is still too narrow, since libyaml reproduces the shape.",
+  "A sweep driver reported BUILD FAILURES AS SUCCESSFUL BUILDS because it imported the fuzzer inside a function, so the first call and later calls took different paths. Found only after adding a fuzz_ran field."
+ ]
 }
