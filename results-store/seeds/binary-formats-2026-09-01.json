@@ -1,0 +1,349 @@
+{
+ "generated_utc": "2026-09-01T18:57:30Z",
+ "budget_seconds": 30,
+ "pairs": 10,
+ "rows": [
+  {
+   "library": "libwebp",
+   "harness": "libwebp_WebPDecode.c",
+   "seeds": 56,
+   "empty": {
+    "cov": 30,
+    "execs": 7117
+   },
+   "seeded": {
+    "cov": -1,
+    "execs": 5
+   },
+   "first_arm": "empty"
+  },
+  {
+   "library": "libwebp",
+   "harness": "libwebp_WebPDecodeARGB.c",
+   "seeds": 56,
+   "empty": {
+    "cov": 324,
+    "execs": 20325
+   },
+   "seeded": {
+    "cov": -1,
+    "execs": 5
+   },
+   "first_arm": "seeded"
+  },
+  {
+   "library": "libwebp",
+   "harness": "libwebp_WebPDecodeARGBInto.c",
+   "seeds": 56,
+   "empty": {
+    "cov": 4,
+    "execs": 16177293
+   },
+   "seeded": {
+    "cov": 5,
+    "execs": 10389514
+   },
+   "first_arm": "empty"
+  },
+  {
+   "library": "libwebp",
+   "harness": "libwebp_WebPDecodeARGBInto__repeat_WebPDecodeARGBInto.c",
+   "seeds": 56,
+   "empty": {
+    "cov": 4,
+    "execs": 15277143
+   },
+   "seeded": {
+    "cov": 5,
+    "execs": 11196797
+   },
+   "first_arm": "seeded"
+  },
+  {
+   "library": "libwebp",
+   "harness": "libwebp_WebPDecodeARGBInto_len64k.c",
+   "seeds": 56,
+   "empty": {
+    "cov": 4,
+    "execs": 13892603
+   },
+   "seeded": {
+    "cov": 4,
+    "execs": 16029127
+   },
+   "first_arm": "empty"
+  },
+  {
+   "library": "libwebp",
+   "harness": "libwebp_WebPDecodeARGBInto_len64k__repeat_WebPDecodeARGBInto.c",
+   "seeds": 56,
+   "empty": {
+    "cov": 4,
+    "execs": 14393978
+   },
+   "seeded": {
+    "cov": 4,
+    "execs": 15735884
+   },
+   "first_arm": "seeded"
+  },
+  {
+   "library": "libwebp",
+   "harness": "libwebp_WebPDecodeARGB__repeat_WebPDecodeARGB.c",
+   "seeds": 56,
+   "empty": {
+    "cov": 411,
+    "execs": 15020
+   },
+   "seeded": {
+    "cov": -1,
+    "execs": 5
+   },
+   "first_arm": "empty"
+  },
+  {
+   "library": "libwebp",
+   "harness": "libwebp_WebPDecodeARGB_len64k.c",
+   "seeds": 56,
+   "empty": {
+    "cov": 388,
+    "execs": 11698
+   },
+   "seeded": {
+    "cov": -1,
+    "execs": 5
+   },
+   "first_arm": "seeded"
+  },
+  {
+   "library": "libwebp",
+   "harness": "libwebp_WebPDecodeARGB_len64k__repeat_WebPDecodeARGB.c",
+   "seeds": 56,
+   "empty": {
+    "cov": 418,
+    "execs": 27071
+   },
+   "seeded": {
+    "cov": -1,
+    "execs": 5
+   },
+   "first_arm": "empty"
+  },
+  {
+   "library": "libwebp",
+   "harness": "libwebp_WebPDecodeBGR.c",
+   "seeds": 56,
+   "empty": {
+    "cov": 415,
+    "execs": 20810
+   },
+   "seeded": {
+    "cov": -1,
+    "execs": 5
+   },
+   "first_arm": "seeded"
+  },
+  {
+   "library": "lcms2",
+   "harness": "lcms2_cmsBuildGamma.c",
+   "seeds": 141,
+   "empty": {
+    "cov": 59,
+    "execs": 237032
+   },
+   "seeded": {
+    "cov": 60,
+    "execs": 341086
+   },
+   "first_arm": "empty"
+  },
+  {
+   "library": "lcms2",
+   "harness": "lcms2_cmsBuildGamma_len64k.c",
+   "seeds": 141,
+   "empty": {
+    "cov": 59,
+    "execs": 253602
+   },
+   "seeded": {
+    "cov": 60,
+    "execs": 307763
+   },
+   "first_arm": "seeded"
+  },
+  {
+   "library": "lcms2",
+   "harness": "lcms2_cmsBuildParametricToneCurve.c",
+   "seeds": 141,
+   "empty": {
+    "cov": -1,
+    "execs": 2
+   },
+   "seeded": {
+    "cov": -1,
+    "execs": 2
+   },
+   "first_arm": "empty"
+  },
+  {
+   "library": "lcms2",
+   "harness": "lcms2_cmsBuildParametricToneCurve_len64k.c",
+   "seeds": 141,
+   "empty": {
+    "cov": -1,
+    "execs": 2
+   },
+   "seeded": {
+    "cov": -1,
+    "execs": 2
+   },
+   "first_arm": "seeded"
+  },
+  {
+   "library": "lcms2",
+   "harness": "lcms2_cmsCIECAM02Forward.c",
+   "seeds": 141,
+   "empty": {
+    "cov": -1,
+    "execs": 2
+   },
+   "seeded": {
+    "cov": -1,
+    "execs": 2
+   },
+   "first_arm": "empty"
+  },
+  {
+   "library": "lcms2",
+   "harness": "lcms2_cmsCIECAM02Forward_len64k.c",
+   "seeds": 141,
+   "empty": {
+    "cov": -1,
+    "execs": 2
+   },
+   "seeded": {
+    "cov": -1,
+    "execs": 2
+   },
+   "first_arm": "seeded"
+  },
+  {
+   "library": "lcms2",
+   "harness": "lcms2_cmsCIECAM02Init.c",
+   "seeds": 141,
+   "empty": {
+    "cov": 24,
+    "execs": 4
+   },
+   "seeded": {
+    "cov": -1,
+    "execs": 3
+   },
+   "first_arm": "empty"
+  },
+  {
+   "library": "lcms2",
+   "harness": "lcms2_cmsCIECAM02Init_len64k.c",
+   "seeds": 141,
+   "empty": {
+    "cov": 24,
+    "execs": 4
+   },
+   "seeded": {
+    "cov": -1,
+    "execs": 3
+   },
+   "first_arm": "seeded"
+  },
+  {
+   "library": "lcms2",
+   "harness": "lcms2_cmsCIECAM02Reverse.c",
+   "seeds": 141,
+   "empty": {
+    "cov": -1,
+    "execs": 2
+   },
+   "seeded": {
+    "cov": -1,
+    "execs": 2
+   },
+   "first_arm": "empty"
+  },
+  {
+   "library": "lcms2",
+   "harness": "lcms2_cmsCIECAM02Reverse_len64k.c",
+   "seeds": 141,
+   "empty": {
+    "cov": -1,
+    "execs": 2
+   },
+   "seeded": {
+    "cov": -1,
+    "execs": 2
+   },
+   "first_arm": "seeded"
+  },
+  {
+   "library": "jbig2dec",
+   "harness": "jbig2dec_jbig2_data_in.c",
+   "seeds": 5,
+   "empty": {
+    "cov": 32,
+    "execs": 2825426
+   },
+   "seeded": {
+    "cov": 839,
+    "execs": 155
+   },
+   "first_arm": "empty"
+  },
+  {
+   "library": "jbig2dec",
+   "harness": "jbig2dec_jbig2_data_in__repeat_jbig2_data_in.c",
+   "seeds": 5,
+   "empty": {
+    "cov": 41,
+    "execs": 1776270
+   },
+   "seeded": {
+    "cov": 860,
+    "execs": 87
+   },
+   "first_arm": "seeded"
+  },
+  {
+   "library": "jbig2dec",
+   "harness": "jbig2dec_jbig2_data_in_len64k.c",
+   "seeds": 5,
+   "empty": {
+    "cov": 32,
+    "execs": 2590107
+   },
+   "seeded": {
+    "cov": 872,
+    "execs": 130
+   },
+   "first_arm": "empty"
+  },
+  {
+   "library": "jbig2dec",
+   "harness": "jbig2dec_jbig2_data_in_len64k__repeat_jbig2_data_in.c",
+   "seeds": 5,
+   "empty": {
+    "cov": 41,
+    "execs": 2302542
+   },
+   "seeded": {
+    "cov": 972,
+    "execs": 604
+   },
+   "first_arm": "seeded"
+  }
+ ],
+ "median_ratio": 1.25,
+ "median_gain_pct": 25.0,
+ "seeded_better": 8,
+ "tied": 2,
+ "seeded_worse": 0,
+ "sign_test_p_one_sided": 0.0078
+}
