@@ -37,6 +37,7 @@ from ..ir import (
     Api, Arg, Contract, HarnessIR, InputSlice, Knobs, Op, ParamDecl, RawBlock, Resource,
     Target, TypeRef, ROLE_CONSUME, ROLE_CREATE, ROLE_DESTROY, ROLE_QUERY,
     SLICE_BYTES,
+    SLICE_CSTRING,
 )
 
 class LiftError(Exception):
@@ -163,6 +164,15 @@ _NOT_A_CALL = {"if", "for", "while", "switch", "return", "sizeof", "assert", "st
 # them loses the data flow: a harness that memcpy's `data` into a buffer and parses the
 # buffer was reported as never consuming its input at all.
 _COPIERS = {"memcpy", "memmove", "strncpy", "strlcpy", "bcopy"}
+
+# `buf[len] = 0;` or `buf[len] = '\0';` -- the harness terminating its own copy.
+#
+# The correct idiom for feeding a C-string API from fuzzer bytes, and the lifter could not
+# see it: htslib's fuzz_expr.c copies into `char expr[8192]`, writes `expr[len] = 0`, and
+# passes expr to hts_filter_init. With one bytes-only input slice the lift reported the RAW
+# input as reaching a NUL-terminated parameter, and S2.CSTRING blocked a correct production
+# harness -- the first false positive the contract gates ever produced.
+_TERMINATES = re.compile(r"\b([A-Za-z_]\w*)\s*\[[^\]]*\]\s*=\s*(?:0|'\\0'|'\\x0+')\s*;")
 
 # Types that are a STATUS, not a resource. `int rc = sqlite3_open(...)` is the most common
 # line in C fuzz harnesses, and treating `rc` as a created object reported DOUBLE_CREATE and
@@ -330,9 +340,10 @@ def _split_args(s: str) -> list:
 
 
 def _classify_args(args_raw, data, size, tainted, resources, is_ptr, unread, fn,
-                   decl_type=None, caller_owned=None, size_alias=None):
+                   decl_type=None, caller_owned=None, size_alias=None, terminated=None):
     """Turn a call's textual arguments into IR Args, and say what could not be attributed."""
     args, params, out_created = [], [], []
+    terminated = terminated or set()
     for i, a in enumerate(args_raw):
         pname = f"a{i}"
         # A C++ CAST IS UNWRAPPED FIRST, on the raw text. `readJson(reinterpret_cast<const
@@ -394,8 +405,13 @@ def _classify_args(args_raw, data, size, tainted, resources, is_ptr, unread, fn,
             # on a tainted pixd bound the ADDRESS OF A POINTER as raw fuzzer bytes -- and
             # S2 then objected that a `void **` parameter is being filled with input,
             # against four correct leptonica harnesses.
-            args.append(Arg(pname, "input", "s_data"))
-            params.append(ParamDecl(pname, TypeRef("const uint8_t *", "pointer")))
+            # A buffer the harness TERMINATED ITSELF is a C string, not raw bytes. Binding
+            # it to the bytes slice told S2 the library would read past the end, which is
+            # exactly backwards: the harness did the one thing that makes the call safe.
+            _term = bare in terminated
+            args.append(Arg(pname, "input", "s_cstr" if _term else "s_data"))
+            params.append(ParamDecl(
+                pname, TypeRef("const char *" if _term else "const uint8_t *", "pointer")))
         elif (bare in (size_alias or {size})
               or any(re.fullmatch(rf"{re.escape(a)}\s*[-+]\s*\d+", bare)
                      for a in (size_alias or {size}) if a)):
@@ -654,6 +670,10 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
     resources: dict = {}
     apis: dict = {}
     tainted: set = {data}
+    # Buffers the harness NUL-terminates itself. Scanned over the whole body rather than
+    # statement by statement: the termination is written once, and every later call that
+    # passes the buffer benefits from it regardless of where it sits.
+    terminated: set = set(_TERMINATES.findall(body or ""))
     by_address: set = set()          # resources created through an out-parameter
     member_calls: list = []          # `x.f()` / `x->f()`: not C, not modelled
     caller_owned: dict = {}          # rid -> storage, for slots the harness declares
@@ -810,7 +830,7 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
             args, params, out_created = _classify_args(
                 args_raw, data, size, tainted, resources, is_ptr, unread, fn,
                 decl_type=decl_type, caller_owned=caller_owned,
-                size_alias=size_alias)
+                size_alias=size_alias, terminated=terminated)
 
             role, binds, targets = ROLE_QUERY, "", ""
             nulls_target = False
@@ -1021,7 +1041,13 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
         name=Path(path).stem,
         target=Target(name=target_name or Path(path).stem),
         apis=apis,
-        slices=[InputSlice("s_data", SLICE_BYTES, remainder=True, min_len=0)],
+        slices=([InputSlice("s_data", SLICE_BYTES, remainder=True, min_len=0)]
+                # remainder=False: s_cstr is the SAME input the harness copied and
+                # terminated, not a second region of it. Claiming the remainder twice is
+                # S5.MULTIPLE_REMAINDERS, which the first version of this fix produced --
+                # trading one false positive for another.
+                + ([InputSlice("s_cstr", SLICE_CSTRING, remainder=False, min_len=0)]
+                   if any(a.ref == "s_cstr" for o in ops for a in o.args) else [])),
         resources=[Resource(rid, TypeRef("void *", "pointer"),
                             storage=caller_owned.get(
                                 rid, "out_param" if rid in by_address else "handle"),

@@ -945,6 +945,20 @@ def s6_error_handling(ir: HarnessIR) -> GateResult:
         er = api.contract.error_return
         if er == "none":
             continue
+        # A CALLER-OWNED STRUCT EXISTS WHETHER OR NOT THE CALL SUCCEEDED.
+        #
+        # This gate's claim is that the harness "dereferences the failure value", and that
+        # can only happen when the resource's EXISTENCE depends on the call: a handle the
+        # library allocates, or an out-parameter it fills with a pointer. An inline struct
+        # the harness declared on its own stack is there either way, so using it after a
+        # failed call reads stale-but-valid memory -- wrong results, not a crash.
+        #
+        # http-parser's fuzz_url.c is the case: `struct http_parser_url u;` on the stack,
+        # http_parser_url_init(&u) returning void, and http_parser_parse_url returning int.
+        # The gate BLOCKED a correct production harness on a mechanism that cannot occur.
+        _res = next((r for r in ir.resources if r.id == op.binds), None)
+        if _res is not None and _res.storage == "inline":
+            continue
         checked += 1
         consumers = [o for o in ir.sequence[i + 1:]
                      if any(a.source == SRC_RESOURCE and a.ref == op.binds for a in o.args)

@@ -46,14 +46,45 @@ fixed-size local array, so it believes `hts_filter_init` receives the raw input 
 the failure value", but `u` is a STACK STRUCT and `http_parser_url_init` returns void. S6
 attributed a negative error return to a resource that cannot fail that way.
 
-## What this does to the false-positive claim
+## After fixing both engine defects
 
-The recorded claim is **0 false positives on 496 trusted lifts**. With the contract gates
-live that no longer holds: **2 false positives on 154 high-fidelity lifts, 1.3%.**
+Re-run on the same 879 harnesses, same headers: `audit-2026-09-01-after-fixes.json`.
 
-That is still below QuartetFuzz's 4.8%, and the denominators still differ -- but the honest
-statement is now "1.3% measured with contract gates running", not "zero". Turning a gate on
-is allowed to cost precision; hiding that it did would not be.
+| | before | after |
+|---|---|---|
+| BLOCK on high-fidelity lifts | 6 | **4** |
+| of those, false positives | **2** | **0** |
+| BLOCK on low-fidelity lifts | 293 | 279 |
+
+The four remaining are the bazel fixture, and all four are TRUE. **Zero false positives on
+154 high-fidelity lifts, with the contract gates running.**
+
+The two fixes:
+
+**The lifter now follows a copy into a terminated buffer.** `buf[len] = 0` marks the buffer a
+C string, and an argument naming it binds to a `cstring` slice rather than the raw bytes one.
+The first version of this fix traded one false positive for another -- the new slice claimed
+`remainder` alongside `s_data`, which is S5.MULTIPLE_REMAINDERS -- because the two slices are
+the same input seen two ways and the IR has no way to say so. The copy does not claim the
+remainder.
+
+**S6 no longer fires on a caller-owned struct.** Its claim is that the harness "dereferences
+the failure value", which can only happen when the resource's EXISTENCE depends on the call:
+a handle the library allocates, or an out-parameter it fills. A struct the harness declared on
+its own stack is there either way, so using it after a failed call reads stale-but-valid
+memory -- wrong results, not a crash.
+
+## What this did to the false-positive claim
+
+Turning the contract gates on cost precision before it was paid back. The first run measured
+**2 false positives on 154 high-fidelity lifts, 1.3%** -- against a recorded claim of zero.
+Both were defects in this engine, both were found by running the corpus, and both are fixed.
+The claim now reads **0 false positives on 154 high-fidelity lifts WITH the contract gates
+running**, which is a stronger statement than the original because S2 was dark when the
+original was measured.
+
+The 1.3% is kept on this page. A precision number that only ever appears after it has been
+restored is not evidence of anything.
 
 ## The result nobody wants to write down
 
