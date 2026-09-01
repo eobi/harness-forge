@@ -16,6 +16,31 @@ reversal are recorded in `plans/HOW-WE-WIN.md` under "DECISION, 2026-08-31".
 
 ---
 
+## Session close: 2026-09-01
+
+**The second machine is live and the GUI track has coverage feedback.**
+
+SSH key auth to `ubuntu@192.168.68.2` is installed and working. Disk was extended 30G -> 60G
+with `lvextend` + `resize2fs` -- **no VM resize was needed**, the installer had claimed only
+30G of a 61G disk and 30.47G of free extents were already in the volume group. An `amd64`
+foreign architecture on that ARM box was breaking `apt update`; the ports sources are now
+pinned to `arm64` and `sources.list` is backed up.
+
+**GUI coverage feedback works** -- the track's stated gap since it began. 25.64% region
+coverage read back from a running desktop application, and the campaign now keeps inputs
+that reach a region nothing else did. Behind `HF_GUI_COVERAGE`, so blind runs are unchanged
+and the 7000 already recorded stay comparable. See `benchmarks/gui/COVERAGE.md` for the
+three approaches that failed first.
+
+**NOT DONE and deliberately not claimed:** whether guidance beats a blind search. That
+comparison has not been run.
+
+**All results are consolidated in `harness-forge/results-store/METRICS.json`**, derived by
+`tools/consolidate.py` from the audit files. Every metric carries a `caveat` field; several
+are actively misleading without it.
+
+---
+
 ## Session close: 2026-08-31
 
 Everything below was true at the end of the 2026-08-31 session. Repo pushed, CI green.
