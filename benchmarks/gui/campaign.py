@@ -13,6 +13,7 @@ a hang. Wait without looking, then look once.
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import random
 import subprocess
@@ -77,6 +78,58 @@ def first_button(node):
     return None
 
 
+COVERAGE = bool(os.environ.get("HF_GUI_COVERAGE"))
+COV_DIR = Path(os.environ.get("HF_GUI_COV_DIR", "/tmp/cov"))
+COV_BIN = os.environ.get("HF_GUI_COV_BIN", "")
+LLVM = os.environ.get("HF_LLVM_BIN", "/usr/lib/llvm-14/bin")
+
+
+def _regions_covered() -> int:
+    """Regions this input reached, or -1 if coverage is unavailable.
+
+    Counting REGIONS rather than lines: a line can be covered by any path through it, while
+    a region distinguishes the branches, which is what a guided campaign is choosing
+    between. Returns a count, not a percentage -- the denominator is fixed across a run and
+    a ratio only adds a division.
+    """
+    raws = sorted(COV_DIR.glob("*.profraw"))
+    if not raws or not COV_BIN:
+        return -1
+    merged = COV_DIR / "merged.profdata"
+    try:
+        r = subprocess.run([f"{LLVM}/llvm-profdata", "merge", "-sparse",
+                            *[str(x) for x in raws], "-o", str(merged)],
+                           capture_output=True, timeout=60)
+        if r.returncode != 0:
+            return -1
+        out = subprocess.run([f"{LLVM}/llvm-cov", "export", "-summary-only", COV_BIN,
+                              f"-instr-profile={merged}"],
+                             capture_output=True, text=True, timeout=120)
+        if out.returncode != 0:
+            return -1
+        data = json.loads(out.stdout)
+        return int(data["data"][0]["totals"]["regions"]["covered"])
+    except Exception:                                              # noqa: BLE001
+        return -1
+
+
+def _close_window(pid: int) -> None:
+    """Ask the target's window to close, the way a user would.
+
+    `xdotool search --pid` finds the window without a window manager, which matters because
+    the campaign runs on a bare Xvfb display. ctrl+w is the close accelerator in every GTK
+    viewer here; a target that ignores it is still terminated by the caller.
+    """
+    try:
+        out = subprocess.run(["xdotool", "search", "--pid", str(pid)],
+                             capture_output=True, text=True, timeout=5).stdout.split()
+        if out:
+            subprocess.run(["xdotool", "key", "--window", out[-1], "ctrl+w"],
+                           capture_output=True, timeout=5)
+    except Exception:                                              # noqa: BLE001
+        pass
+
+
 def run_one(app: str, path: str, budget: float):
     """Open one file and decide what happened. One process, one verdict."""
     argv = [app, "--new-instance", path] if app == "eog" else [app, path]
@@ -137,6 +190,22 @@ def run_one(app: str, path: str, budget: float):
 
     v = classify(tree=tree, exited=exited, window_ms=window_ms,
                  serviced_action=serviced, action_ms=action_ms, termination=term)
+
+    # A CLEAN EXIT, SO AN INSTRUMENTED BUILD CAN WRITE ITS PROFILE.
+    #
+    # clang emits coverage in an atexit handler. `terminate()` sends SIGTERM, which skips
+    # it, so the .profraw is created at startup and stays ZERO BYTES -- and a zero-byte
+    # profile looks exactly like "this input covered nothing". Closing the window instead
+    # lets GTK return from main and the counters are written.
+    #
+    # Costs nothing when the target is not instrumented: it is one xdotool call, and the
+    # terminate() below still runs if the window refuses to close.
+    if COVERAGE:
+        _close_window(p.pid)
+        try:
+            p.wait(timeout=6)
+        except Exception:                                          # noqa: BLE001
+            pass
     p.terminate()
     try:
         p.wait(timeout=5)
@@ -266,18 +335,41 @@ def main() -> int:
 
     tally: dict = {}
     kinds: dict = {}
+    corpus: list = []          # inputs that reached a region nothing else did
+    best_regions = -1          # -1 until coverage is read; never negative after
     for i in range(a.n):
         f = slot(i) / f"input{ext}"
-        data, what = mutate(seed, rng, aware=not a.naive)
+        # COVERAGE-GUIDED, WHEN COVERAGE IS AVAILABLE. Mutate the best input seen so far
+        # rather than always the original seed, which is the difference between a random
+        # walk and a search. Without instrumentation `corpus` never grows past the seed and
+        # the loop behaves exactly as before.
+        parent = corpus[rng.randrange(len(corpus))] if corpus else seed
+        data, what = mutate(parent, rng, aware=not a.naive)
         kinds[what] = kinds.get(what, 0) + 1
         f.write_bytes(data)
+        if COVERAGE:
+            for old_raw in COV_DIR.glob("*.profraw"):
+                old_raw.unlink(missing_ok=True)
         v = run_one(a.app, str(f), a.budget)
         tally[v.outcome.value] = tally.get(v.outcome.value, 0) + 1
+
+        gained = ""
+        if COVERAGE:
+            n = _regions_covered()
+            if n > best_regions:
+                # KEEP IT. A mutation that reached a region nothing else did is the only
+                # kind worth breeding from; the rest are noise however they were labelled.
+                corpus.append(data)
+                gained = f"  +{n - best_regions} regions" if best_regions >= 0 else ""
+                best_regions = n
         mark = "  <-- FINDING" if v.is_finding() else ""
         print(f"  input {i:03d}  {what:11} {v.outcome.value:12} nodes={v.nodes:3} "
               f"term={v.termination.value if v.termination else '-':10} "
-              f"{f.stat().st_size:>6}B{mark}")
+              f"{f.stat().st_size:>6}B{gained}{mark}")
     acc = tally.get("accepted", 0)
+    if COVERAGE:
+        print(f"\n  coverage-guided: corpus grew to {len(corpus)} input(s), "
+              f"{best_regions} regions covered")
     print(f"\n  {a.n} inputs ({'byte flips' if a.naive else 'structure-aware'}): "
           + ", ".join(f"{k}={v}" for k, v in sorted(tally.items())))
     print(f"  past the front door: {acc}/{a.n} = {100.0*acc/max(1,a.n):.0f}% accepted")
