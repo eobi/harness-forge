@@ -216,6 +216,30 @@
    "oracle": "7/10",
    "search": "3/10",
    "caveat": "GUIFUZZ++ is grey-box and found 23 bugs across 11-12 applications."
+  },
+  "applications": {
+   "tested": 8,
+   "validated_usable": 2,
+   "value": {
+    "eog": "GTK3, oracle discriminates",
+    "evince": "GTK3, oracle discriminates"
+   },
+   "source": "gui-app-compatibility-2026-09-01.json",
+   "caveat": "The oracle needs an AT-SPI-exporting toolkit, in practice GTK3+. shotwell accepts corrupt input IDENTICALLY to valid input, so the oracle cannot discriminate there at all -- a target it cannot serve. feh, gpicview, mupdf and xpdf export no accessibility tree."
+  },
+  "controlled_comparison": {
+   "value": {
+    "eog_png_aware": "29% accepted of 5000",
+    "evince_byteflip": "97% accepted of 1000",
+    "evince_pdf_aware": "82% accepted of 1000"
+   },
+   "source": "gui-controlled-comparison-2026-09-01.json",
+   "caveat": "REPORT PER MUTATION KIND, NOT AS AN AGGREGATE. evince accepts 100% of header, filter, stream_bytes, xref_offset and obj_len mutations and 0% of trailer_drop. The aggregate is a weighted average of near-constants and moves only with the mutator's mix."
+  },
+  "totals": {
+   "inputs": 7000,
+   "applications": 2,
+   "findings": 0
   }
  },
  "NEGATIVE_RESULTS_WORTH_PUBLISHING": [
@@ -249,6 +273,7 @@
   "A projected +43% from member-call lifting delivered +5.6%.",
   "An alias-counter 'fix' promising +55 trusted lifts produced 17 FALSE positives against correct harnesses and was reverted.",
   "A synthesis probe reported 'gain -71.79 points' that measured only my own candidate ordering.",
-  "Two regexes did not terminate; both were caught by timing the corpus, neither by the test suite."
+  "Two regexes did not terminate; both were caught by timing the corpus, neither by the test suite.",
+  "The eog/evince acceptance comparison was confounded: it varied the mutator and the format together. A PDF-aware mutator was written to control it, and most of the 97% turned out to be a mutator too gentle to be refused."
  ]
 }
