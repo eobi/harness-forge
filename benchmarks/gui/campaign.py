@@ -136,26 +136,25 @@ def _regions_covered(where: Path = None) -> int:
 def _close_window(pid: int) -> None:
     """Ask the target's window to close, the way a user would.
 
-    `xdotool search --pid` finds the window without a window manager, which matters because
-    the campaign runs on a bare Xvfb display. ctrl+w is the close accelerator in every GTK
-    viewer here; a target that ignores it is still terminated by the caller.
+    ACTIVATE BEFORE SENDING THE KEY. `xdotool key --window <id>` sends a synthetic event
+    that GTK ignores, so every close attempt silently did nothing and the caller fell back
+    to SIGTERM. A process killed by SIGTERM never runs the profile runtime's atexit hook,
+    so it wrote a zero-byte .profraw -- which is why coverage read as unavailable for every
+    input while the same binary, closed by hand, wrote 639288 bytes. `windowactivate
+    --sync` followed by a plain `key` goes through XTEST, which GTK does accept, and the
+    target exits 0 and writes its counters.
+
+    ctrl+q rather than ctrl+w: a refused input leaves an error dialog on top, and ctrl+w
+    closes the dialog while the application keeps running. ctrl+q quits whatever is
+    focused, which matters most for exactly the inputs a campaign wants to measure.
     """
     try:
         out = subprocess.run(["xdotool", "search", "--pid", str(pid)],
                              capture_output=True, text=True, timeout=5).stdout.split()
-        if not out:
-            return
-        # ctrl+q BEFORE ctrl+w, and to EVERY window this process owns.
-        #
-        # A refused input leaves an error dialog on top. ctrl+w closes that dialog and the
-        # application keeps running, so it never reaches exit() and never writes its
-        # profile -- which made coverage unreadable for exactly the inputs a campaign most
-        # wants to measure. ctrl+q quits the application whatever is focused.
-        # The LAST window, ctrl+w first. That is the pair that was verified by hand to
-        # make eog leave and write its counters; `xdotool search --pid` returns the
-        # toplevel last, and sending ctrl+q to an earlier one first did nothing at all.
-        for key in ("ctrl+w", "ctrl+q"):
-            subprocess.run(["xdotool", "key", "--window", out[-1], key],
+        for win in out:
+            subprocess.run(["xdotool", "windowactivate", "--sync", win],
+                           capture_output=True, timeout=5)
+            subprocess.run(["xdotool", "key", "--clearmodifiers", "ctrl+q"],
                            capture_output=True, timeout=5)
     except Exception:                                              # noqa: BLE001
         pass

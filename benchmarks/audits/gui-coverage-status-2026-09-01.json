@@ -7,39 +7,30 @@
   "why_the_second_matters": "eog's own binary has 78 regions; libpng has 18,400. Application coverage was 236x coarser and measured the wrong surface -- a corrupt PNG is handled in the decoder, not in the viewer's UI code.",
   "mechanism": "instrumented build -> open file -> wait for quiescence -> xdotool ctrl+q/ctrl+w for a CLEAN EXIT -> .profraw -> llvm-profdata -> llvm-cov"
  },
- "DOES_NOT_WORK_YET": {
-  "symptom": "_regions_covered() reports 'no profile written' on every input inside the campaign loop, so the corpus never grows and no guidance happens. An 87KB .profraw IS present on disk after the campaign finishes.",
-  "confirmed_facts": [
-   "The INSTRUMENTED binary is the one running: readlink /proc/<pid>/exe returns /home/ubuntu/covbuild/eog-42.0/build/src/eog.",
-   "It exits cleanly: p.poll() returns 0 after the window close.",
-   "xdotool finds 2 windows for the pid and the keys are delivered.",
-   "A profile IS produced -- 87272 bytes, visible after the run.",
-   "The same binary, same environment, run STANDALONE writes 639288 bytes reliably.",
-   "llvm-profdata and llvm-cov both succeed on that profile and _regions_covered() returns 2235 when called by hand against it."
-  ],
-  "positions_the_wait_was_tried_in": [
-   "between the window close and terminate(), 2s -- always empty",
-   "same position, 8s -- always empty",
-   "after terminate() and after the app leaves the accessibility tree, 6s -- always empty"
-  ],
-  "profile_naming_tried": [
-   "%p (per-process)",
-   "%m (merge pool)"
-  ],
-  "not_yet_explained": "Why a profile that exists on disk after the campaign is never visible to a read inside the loop, at any wait position tried. The next thing to check is whether the campaign's own delete-before-each-input step races the write of the PREVIOUS input, which would explain a file that is always present afterwards and never present during.",
-  "attempts": 9,
-  "blast_radius": "None. Everything is behind HF_GUI_COVERAGE; a blind campaign takes the identical path and was re-verified after every change.",
-  "hypothesis_ELIMINATED": {
-   "hypothesis": "The campaign deleted *.profraw before each input, so the delete for input N+1 raced the write for input N. That fitted the evidence exactly: a file always present after a campaign and never during one.",
-   "test": "Each input now writes into a private directory (COV_DIR/iNNNN) with LLVM_PROFILE_FILE set per process. No deletion happens at all, so no race is possible by construction.",
-   "RESULT": "ELIMINATED. Every per-input directory is created and contains exactly one .profraw, and every one of them is ZERO BYTES. There was never a race: the profile is genuinely never written when the process is launched from the campaign.",
-   "why_this_was_worth_doing": "Eight earlier attempts moved the READ around, which assumed the write happened and was being missed. This shows the write does not happen, which is a different problem and rules out the entire timing category."
-  },
-  "what_is_left": "The same binary, same environment and same close sequence writes 639288 bytes when launched from an interactive shell and 0 bytes when launched by subprocess.Popen with stdout/stderr redirected to DEVNULL. The remaining difference is the launch context, not the timing: process group, controlling terminal, or the SIGTERM from terminate() arriving before GTK finishes unwinding. The next test is to reproduce the failure with a MINIMAL Popen -- no oracle, no keys, just launch and close -- which separates the campaign's machinery from the launch itself."
- },
  "TWO_ENVIRONMENT_FACTS_THAT_INVALIDATE_A_COMPARISON": {
   "container_eog_and_system_eog_disagree": "With the SAME seed, the SAME rng (1337) and therefore the same mutation sequence, input 006 -- a 45-byte truncated PNG -- is ACCEPTED by the container's eog and REJECTED by the VM's system eog. The 29% acceptance from the 5000-input campaign is a CONTAINER number and must not be compared against native runs.",
   "the_seed_is_chosen_by_directory_order": "The campaign picks the first PNG over 2000 bytes from a sorted walk of /usr/share/icons. Installing five more applications added icons and could have changed it silently. It did not this time -- the seed is still ac-adapter.png -- but a benchmark whose input depends on what else is installed is not reproducible, and --seed-file should be mandatory for any recorded run."
  },
- "A_NOTE_ON_HOW_LONG_THIS_TOOK": "Eight attempts, five of them from reading the profile too early in the process lifecycle. The bare `return -1` hid the cause through the first five: a silent failure that looks like data is worse than a loud one, because -1 is indistinguishable from 'this input covered nothing' and the campaign kept running as though guided. Adding a reason to every failure path should have been the FIRST change, not the sixth."
+ "A_NOTE_ON_HOW_LONG_THIS_TOOK": "Eight attempts, five of them from reading the profile too early in the process lifecycle. The bare `return -1` hid the cause through the first five: a silent failure that looks like data is worse than a loud one, because -1 is indistinguishable from 'this input covered nothing' and the campaign kept running as though guided. Adding a reason to every failure path should have been the FIRST change, not the sixth.",
+ "RESOLVED": {
+  "date": "2026-08-31",
+  "attempts_before_resolution": 11,
+  "root_cause": "xdotool `key --window <id>` sends a synthetic X event, which GTK ignores. Every close attempt therefore did nothing, the caller fell back to terminate(), and a process killed by SIGTERM never runs the profile runtime's atexit hook -- so it left a ZERO-BYTE .profraw. The same binary closed by hand wrote 639288 bytes, which is what made this look like a timing problem for eight attempts.",
+  "fix": "windowactivate --sync, then a plain `key` (which goes through XTEST and GTK does accept). The target then exits 0 and writes its counters.",
+  "how_it_was_found": "A MINIMAL Popen -- launch, sleep, close, read -- with no oracle and no campaign machinery. It reported rc=-15 (SIGTERM) where the hypothesis predicted rc=0, which said in one run that the process was being killed rather than the write being missed.",
+  "what_the_two_dead_ends_bought": [
+   "Per-input profile directories eliminated the delete/write race by construction. It was not the cause, but the directories are kept: a read that finds nothing now means nothing was written, rather than something may have been deleted.",
+   "LLVM continuous mode (%c) writes zero bytes on this runtime, so it is not an escape from needing a clean exit."
+  ],
+  "lesson": "Eight of the eleven attempts moved the READ, all assuming the write happened and was being missed. None tested that assumption. The minimal reproduction that did test it took one run.",
+  "verified": {
+   "campaign": "eog --n 8, libpng instrumented",
+   "corpus_growth": "3 inputs retained of 8",
+   "regions_covered": 2938,
+   "per_input_deltas_seen": [
+    "+844 on an accepted input",
+    "+1 on a rejected one"
+   ]
+  }
+ }
 }
