@@ -55,3 +55,26 @@ cat > "$SRC/src/jansson_private_config.h" <<'PRIV'
 #define INITIAL_HASHTABLE_ORDER 3
 PRIV
 echo "jansson: wrote src/jansson_private_config.h"
+
+# jansson_private_config.h, the OTHER generated header.
+#
+# utf.h reads <jansson_private_config.h> under HAVE_CONFIG_H and only includes <stdint.h>
+# when that config sets HAVE_STDINT_H. Without it utf.c does not compile, and the failure
+# does not surface there: the harness dies at LINK time on an undefined utf8_encode, thirty
+# lines away from the cause. Same class as jansson_config.h above -- a generated file whose
+# absence is silent until something far downstream breaks.
+cat > "$SRC/src/jansson_private_config.h" <<'PHDR'
+#ifndef JANSSON_PRIVATE_CONFIG_H
+#define JANSSON_PRIVATE_CONFIG_H
+#define HAVE_STDINT_H 1
+#define HAVE_STDDEF_H 1
+#define HAVE_STRING_H 1
+#define HAVE_STDLIB_H 1
+#define HAVE_SYS_TYPES_H 1
+#define HAVE_SNPRINTF 1
+#define HAVE_VSNPRINTF 1
+#define HAVE_STRTOLL 1
+#define HAVE_LOCALECONV 1
+#define INITIAL_HASHTABLE_ORDER 3
+#endif
+PHDR
