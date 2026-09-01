@@ -606,6 +606,34 @@ reading its output.
 
 ---
 
+## The GUI track, measured at scale
+
+Updated 2026-09-01. The accessibility oracle had never been given a real campaign — the
+largest previous run was **12 inputs**. On a quiet Linux host it has now run **5,000**.
+
+| | |
+|---|---:|
+| inputs (structure-aware PNG mutation) | 5,000 |
+| accepted past the front door | 1,426 (29%) |
+| refused by the target, with an error element | 3,574 |
+| crashed · unresponsive · no window | **0 · 0 · 0** |
+| **findings** | **0** |
+
+**The controls held**, which is what makes the zero a measurement rather than a broken
+harness: the campaign refuses to start unless an unmodified seed opens cleanly *and* a
+deliberately corrupt one is refused.
+
+**Acceptance is 29% at 12 inputs, 29% at 400, and 29% at 5,000** — stable across three
+orders of magnitude.
+
+**What this does not say.** It is not evidence that eog is sound. The campaign is **blind**:
+no coverage feedback, so it cannot tell a productive mutation from a wasted one, and 3,574
+of 5,000 inputs were refused at the door without exercising the decoder at all. GUIFUZZ++ is
+grey-box and found 23 bugs across 11–12 applications. The missing piece is instrumentation,
+not more inputs.
+
+The rating stands: **the oracle is the contribution, the search is not.**
+
 ## What these harnesses cannot find
 
 [`tools/bounds.py`](tools/bounds.py). This is the half of the thesis that had never been

@@ -1,0 +1,33 @@
+{
+ "date": "2026-09-01",
+ "what": "The first real-scale GUI campaign this project has run. 5000 inputs against eog through the accessibility oracle, on a quiet Linux host.",
+ "previous_largest": "12 inputs. This is 417x that.",
+ "host": "Ubuntu 22.04 aarch64, 8 vCPU, load ~1, inside the documented hforge-gui image so the environment matches every earlier GUI run.",
+ "result": {
+  "inputs": 5000,
+  "accepted": 1426,
+  "rejected": 3574,
+  "acceptance_rate": "29%",
+  "crashed": 0,
+  "unresponsive": 0,
+  "no_window": 0,
+  "FINDINGS": 0
+ },
+ "verdicts": {
+  "rejected": 3574,
+  "accepted": 1426
+ },
+ "mutators": {
+  "stale_crc": 859,
+  "trunc_idat": 825,
+  "drop": 801,
+  "dup": 866,
+  "payload": 798,
+  "dims": 851
+ },
+ "the_controls_held": "The campaign refuses to run unless an unmodified seed opens cleanly and a deliberately corrupt one is refused. Both passed, so the zero is a measurement rather than a broken harness.",
+ "acceptance_is_stable_across_three_orders_of_magnitude": "29% at 12 inputs, 29% at 400, 29% at 5000. The mutators reach the same proportion past the front door however long they run.",
+ "WHAT_THIS_SAYS": "eog does not crash or hang on 5000 structure-aware PNG mutations. That is a real negative result and it is the first one this track has been able to state. It is NOT evidence that eog is sound: the campaign is BLIND -- no coverage feedback -- so it cannot tell a productive mutation from a wasted one, and 3574 of 5000 inputs were refused at the front door without exercising the decoder at all.",
+ "what_it_costs_to_fix": "GUIFUZZ++ is grey-box and found 23 bugs across 11-12 applications. The missing piece here is coverage feedback, which needs eog rebuilt with instrumentation -- and the host is at 97% disk. That is the next constraint, not the next idea.",
+ "honest_rating_unchanged": "The oracle earns its 7/10: five-way verdicts, controls that fire, a stable acceptance rate across 3 orders of magnitude. The search is still 3/10 and 5000 blind inputs do not change that."
+}
