@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 import time
 from pathlib import Path
@@ -33,6 +34,11 @@ DEFINES = {
     "jansson": ["HAVE_CONFIG_H"],
     "libyaml": ["HAVE_CONFIG_H", "YAML_VERSION_STRING=\"0.2.5\"",
                 "YAML_VERSION_MAJOR=0", "YAML_VERSION_MINOR=2", "YAML_VERSION_PATCH=5"],
+    # zconf.h only declares read/close when the build says unistd.h exists, so gzread.c and
+    # gzwrite.c fail to compile and the harness dies at link on _gzclose_r -- the same
+    # far-from-the-cause shape as jansson and libyaml, for the third time.
+    "zlib":    ["HAVE_UNISTD_H"],
+    "expat":   ["XML_POOR_ENTROPY", "HAVE_MEMMOVE"],
 }
 
 SOURCES = {
@@ -51,11 +57,44 @@ SOURCES = {
 }
 
 
+_MAIN = re.compile(r"^\s*(?:int|void)\s+main\s*\(", re.M)
+
+
+def _defines_main(p: Path) -> bool:
+    try:
+        return bool(_MAIN.search(p.read_text(errors="ignore")))
+    except OSError:
+        return False
+
+
 def _sources_for(lib: str, work: Path) -> list[str]:
+    """The library's translation units, MINUS any that defines main().
+
+    A library ships its command-line tool beside its implementation. Linking that main()
+    alongside the libFuzzer driver produces a binary that is the TOOL, not a fuzzer: zopfli's
+    harness answered "Please provide filename" and the campaign recorded 0 executions while
+    reporting itself built. Same silent-nothing as the rejected dictionary and the missing
+    -D, arriving by a third route -- so this is filtered structurally rather than by
+    maintaining a list of which files to avoid per library.
+    """
     out: list[str] = []
     for pat in SOURCES.get(lib, []):
-        out.extend(str(p) for p in sorted((work / lib).glob(pat)))
+        out.extend(str(q) for q in sorted((work / lib).glob(pat)) if not _defines_main(q))
     return out
+
+
+def _include_dirs(lib: str, work: Path) -> list[str]:
+    """The same include set the compile probe uses, for the same reason.
+
+    Guessing at {root, src, include} put brotli's public header out of reach -- its headers
+    live under c/include and are included as <brotli/port.h>, so every brotli harness failed
+    to build. compile_rate._incdirs already solved this, including the part that must be
+    left OUT: mbedtls ships tests/include/baremetal-override/time.h, which shadows the
+    system header and #errors. Two copies of that logic would have drifted apart.
+    """
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from compile_rate import _incdirs                              # noqa: PLC0415
+    return [d[2:] for d in _incdirs(work / lib)]
 
 
 def run(harness: Path, lib: str, work: Path, budget: int, out: Path) -> dict:
@@ -81,8 +120,7 @@ def run(harness: Path, lib: str, work: Path, budget: int, out: Path) -> dict:
             f"fz-{harness.stem[:28]}", harness.read_text(), artifacts_root=out,
             name=lib, fuzz_time=budget, provider=None, defines=DEFINES.get(lib),
             target_sources=_sources_for(lib, work),
-            include_dirs=[str(work / lib), str(work / lib / "src"),
-                          str(work / lib / "include")])
+            include_dirs=_include_dirs(lib, work))
         findings = asyncio.run(run_job(ctx, discovery=disc, oracles=orc,
                                        escalation=esc, llm=llm))
         bf = str(getattr(ctx, "build_failure", "") or "")
