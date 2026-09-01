@@ -769,6 +769,85 @@ def cmd_batch(args) -> int:
     return 0 if shipped else 1
 
 
+def _contracts_from_headers(headers: list, includes: list) -> dict:
+    """{symbol: Contract} from the library's declarations.
+
+    Parsed ONCE for the whole audit run rather than per harness: a large public header takes
+    seconds, and a 2,693-harness corpus would pay that for every file.
+    """
+    if not headers:
+        return {}
+    from .producers.header_graph import infer_contract, parse_header    # noqa: PLC0415
+    from .ir import ROLE_CONSUME                                        # noqa: PLC0415
+    incs = tuple(includes or ())
+    out: dict = {}
+    for h in headers:
+        if not Path(h).exists():
+            continue
+        try:
+            decls = parse_header(h, incs, ())
+        except Exception:                                            # noqa: BLE001
+            continue
+        for d in decls:
+            try:
+                # No handle is passed: `requires_nonnull` needs a lifecycle this audit does
+                # not have, and inventing one would produce contract claims the header does
+                # not make. The termination and (pointer,length) facts do not need it.
+                #
+                # The DECLARED PARAMETER ORDER travels with the contract, because the two
+                # sides name parameters differently: the header says `value`, and a lifted
+                # call site has only positions, so the lifter calls it `a0`. S2 looks its
+                # arguments up BY NAME, so without the order the contract silently matches
+                # nothing and the gate reports NOT RUN on a harness it could have graded.
+                out[d.name] = (infer_contract(d, ROLE_CONSUME, None),
+                               [nm for _ty, nm in d.params])
+            except Exception:                                        # noqa: BLE001
+                continue
+    return out
+
+
+def _attach_contracts(ir, contracts: dict) -> int:
+    """Give each lifted API the contract its declaration states, REMAPPED to lifted names.
+
+    The header is ground truth for WHICH parameter is a C string; the lifted plan is ground
+    truth for what the harness actually passed. They disagree about names -- `value` against
+    `a0` -- so the contract is rewritten onto the lifted positions. An arity mismatch means
+    the lift and the declaration disagree about the call, and the contract is not applied at
+    all rather than applied to the wrong argument.
+    """
+    import dataclasses                                              # noqa: PLC0415
+    n = 0
+    for api in getattr(ir, "apis", {}).values():
+        got = contracts.get(api.symbol)
+        if got is None:
+            continue
+        c, declared = got
+        lifted_names = [q.name for q in api.params]
+        if len(declared) != len(lifted_names):
+            continue
+        pos = {nm: i for i, nm in enumerate(declared) if nm}
+
+        def _remap(names, _pos=pos, _lifted=lifted_names):
+            out = []
+            for nm in names:
+                i = _pos.get(nm)
+                if i is not None and i < len(_lifted):
+                    out.append(_lifted[i])
+            return out
+
+        api.contract = dataclasses.replace(
+            c,
+            nul_terminated=_remap(c.nul_terminated),
+            requires_nonnull=_remap(c.requires_nonnull),
+            transfers_ownership=_remap(c.transfers_ownership),
+            length_delimited=[[a, b] for a, b in
+                              ((_remap([x])[:1], _remap([y])[:1])
+                               for x, y in c.length_delimited)
+                              if a and b for a, b in [(a[0], b[0])]])
+        n += 1
+    return n
+
+
 def cmd_audit(args) -> int:
     """Grade harnesses somebody else wrote.
 
@@ -782,6 +861,20 @@ def cmd_audit(args) -> int:
         p = Path(a)
         paths.extend(sorted(p.rglob("*.c")) + sorted(p.rglob("*.cc"))
                      if p.is_dir() else [p])
+
+    # CONTRACTS COME FROM THE HEADER, and without them S2 is blind.
+    #
+    # S2.CSTRING is the gate that catches a harness handing a non-terminated buffer to an API
+    # that will strlen it -- the cJSON class, and the same defect this engine produced itself
+    # for libyaml's `const yaml_char_t *anchor`. It fires off `api.contract.nul_terminated`,
+    # which is derived from a declaration. A lifted harness has call sites, not declarations,
+    # so in audit that set was always empty and S2 reported NOT RUN on every harness ever
+    # graded. NOT RUN is not PASS, and reporting it as though the harness were clean is the
+    # failure this whole engine is built to avoid.
+    contracts = _contracts_from_headers(args.header, args.include)
+    if args.header and not contracts:
+        print(f"note: no declarations parsed from {len(args.header)} header(s); "
+              f"contract gates will still report NOT RUN")
 
     rows, total_block, total_warn, unliftable, low_fidelity = [], 0, 0, [], []
     for p in paths:
@@ -797,6 +890,7 @@ def cmd_audit(args) -> int:
         if lifted is None:
             unliftable.append((p, "the lift returned nothing and gave no reason"))
             continue
+        _attach_contracts(lifted.ir, contracts)
         gates = list(run_static_gates(lifted.ir))
         blocks = [v for g in gates for v in g.violations if v.severity == BLOCK]
         warns = [v for g in gates for v in g.violations if v.severity == WARN]
@@ -835,11 +929,19 @@ def cmd_audit(args) -> int:
             print(f"          unverified: {v.code}")
     for p, why in unliftable[:8]:
         print(f"      {p.name}: {why}")
-    if rows:
+    if rows and not contracts:
+        # Only when there is actually nothing to check with. Printing this after a run that
+        # DID have headers told the reader the contract gates were blind when they had just
+        # done the most valuable work in the audit.
         print()
         print("Contract gates (S2) need the target's headers. Without them they report what")
         print("they could check and NOT RUN for the rest, rather than guessing — a harness")
         print("graded on a guess is worse than one not graded at all.")
+        print("Pass --header <the library's public header> [--include <dir>] to run them.")
+    elif rows:
+        print()
+        print(f"Contract gates ran against {len(contracts)} declaration(s) from "
+              f"{len(args.header)} header(s).")
     return 1 if total_block else 0
 
 
@@ -1456,6 +1558,12 @@ def main(argv=None) -> int:
                         help="lift and grade harnesses somebody else wrote (files or dirs)")
     au.add_argument("harness", nargs="+")
     au.add_argument("--name", help="target name to record on the lifted plan")
+    au.add_argument("--header", action="append", default=[],
+                    help="the library's public header, so CONTRACT gates can run. Without "
+                         "one S2 has nothing to check and reports NOT RUN -- which is not "
+                         "the same as PASS. Repeatable.")
+    au.add_argument("--include", action="append", default=[],
+                    help="include directory for --header (repeatable)")
     au.add_argument("-v", "--verbose", action="store_true")
     au.set_defaults(fn=cmd_audit)
 
