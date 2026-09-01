@@ -741,6 +741,9 @@ def _complete_types(src: str) -> frozenset:
         a = _ALIAS_AFTER.match(text[i + 1:i + 80])
         if a:
             out.add(a.group("alias"))
+            _TYPEDEF_NAMES.add(a.group("alias"))
+        if m.group("tag"):
+            _STRUCT_TAGS.add(m.group("tag"))
     return frozenset(out)
 
 
@@ -749,6 +752,22 @@ def _complete_types(src: str) -> frozenset:
 # unrelated points in the plan builder need, and that would otherwise be threaded through
 # six signatures to reach the one place that binds a caller-allocated struct.
 _REQ_INIT: dict = {}
+
+# A STRUCT WITH A TAG AND NO TYPEDEF IS SPELLED `struct X`, NOT `X`.
+#
+# libde265 declares `struct de265_image_allocation { ... };` with no typedef, so a local of
+# that type must carry the tag. The emitter wrote `de265_image_allocation hf_r_out_arg1;`,
+# which is not valid C -- 9 of libde265's 132 harnesses failed to compile on it, and the
+# error came from clang rather than from any gate, so nothing in the engine noticed. Same
+# idiom as _REQ_INIT: a fact about the library's types that the plan builder needs in
+# several unrelated places.
+_STRUCT_TAGS: set = set()
+_TYPEDEF_NAMES: set = set()
+
+
+def _spell(base: str) -> str:
+    """How a by-value declaration of `base` must be written in C."""
+    return f"struct {base}" if base in _STRUCT_TAGS and base not in _TYPEDEF_NAMES else base
 
 _VERSION_MEMBER = re.compile(r"\b(?:png_)?(?:uint_32|uint32_t|unsigned\s+int|int|"
                              r"unsigned|size_t|png_uint_32)\s+(version|size)\s*;")
@@ -1825,7 +1844,7 @@ def _stream_bind(api, handle, pm, slices, scratch, out_capacity=65536, teardown=
                 if "const" in ty:
                     return None
                 rid = f"out_{nm}"
-                resources.append(Resource(rid, TypeRef(base_t, "struct"), storage="out",
+                resources.append(Resource(rid, TypeRef(_spell(base_t), "struct"), storage="out",
                                           init_fields=dict(_REQ_INIT.get(base_t) or {})))
                 args.append(Arg(nm, "resource", rid))
                 last_buf = None
@@ -1850,7 +1869,7 @@ def _stream_bind(api, handle, pm, slices, scratch, out_capacity=65536, teardown=
                                            targets=rid))
                 continue
             rid = f"cfg_{nm}"
-            resources.append(Resource(rid, TypeRef(base_t, "struct"), storage="inline",
+            resources.append(Resource(rid, TypeRef(_spell(base_t), "struct"), storage="inline",
                                       init_fields=dict(_REQ_INIT.get(base_t) or {})))
             setup.append(Op(f"o_cfg_{nm}", init.symbol,
                             [Arg(init.params[0].name, "resource", rid)], binds=rid))
@@ -2550,7 +2569,7 @@ def _plans_for_handle(decls, target, handle, inline_base, init_name, fini_name,
                 else:
                     rid = f"out_{nm}"
                     base_t = hkey(ty, pm)
-                    extra_res.append(Resource(rid, TypeRef(base_t, "struct"),
+                    extra_res.append(Resource(rid, TypeRef(_spell(base_t), "struct"),
                                               storage="inline",
                                               init_fields=dict(_REQ_INIT.get(base_t) or {})))
                     args.append(Arg(nm, "resource", rid))

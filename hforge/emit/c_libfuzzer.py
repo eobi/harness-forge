@@ -120,7 +120,10 @@ def _headers(ir: HarnessIR) -> list[str]:
                     rels.append(hp.relative_to(d).as_posix())
                 except ValueError:
                     continue
-            spelled = min(rels, key=len) if rels else hp.name
+            # FALL BACK TO THE ABSOLUTE PATH, NOT THE BASENAME. If the header sits under
+            # no include directory then the basename provably cannot resolve, so emitting it
+            # guarantees a build failure; the absolute path at least compiles here and now.
+            spelled = min(rels, key=len) if rels else hp.as_posix()
         else:
             # A BARE NAME, which is what the producer records on each Api. If it does not
             # sit directly in an include directory, find where it does and spell the path
@@ -135,6 +138,17 @@ def _headers(ir: HarnessIR) -> list[str]:
                     break
                 for cand in list(d.glob(f"*/{hp.name}")) + list(d.glob(f"*/*/{hp.name}")):
                     found.append(cand.relative_to(d).as_posix())
+            if not found:
+                # THREE LEVELS IS NOT ENOUGH. brotli's public header is
+                # `c/include/brotli/decode.h`, four components below the checkout root, so
+                # the two globs above miss it and the spelling degraded to `decode.h` --
+                # which cannot resolve, and took every one of brotli's 27 harnesses from
+                # compiling to not compiling. Bounded so a large tree cannot stall emission.
+                for d in inc_dirs:
+                    for i, cand in enumerate(d.rglob(hp.name)):
+                        found.append(cand.relative_to(d).as_posix())
+                        if i > 8:
+                            break
             if found:
                 spelled = min(found, key=len)
         out.append(spelled)

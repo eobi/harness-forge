@@ -1,0 +1,135 @@
+{
+ "generated_utc": "2026-09-01T04:52:44Z",
+ "compiler": "clang",
+ "mode": "-fsyntax-only",
+ "harnesses": 1495,
+ "compiled": 1491,
+ "rate": 99.7,
+ "rows": [
+  {
+   "library": "brotli",
+   "harnesses": 27,
+   "compiled": 27,
+   "rate": 100.0,
+   "seconds": 0.3,
+   "top_errors": []
+  },
+  {
+   "library": "cjson",
+   "harnesses": 153,
+   "compiled": 153,
+   "rate": 100.0,
+   "seconds": 1.5,
+   "top_errors": []
+  },
+  {
+   "library": "expat",
+   "harnesses": 97,
+   "compiled": 97,
+   "rate": 100.0,
+   "seconds": 1.0,
+   "top_errors": []
+  },
+  {
+   "library": "jansson",
+   "harnesses": 36,
+   "compiled": 36,
+   "rate": 100.0,
+   "seconds": 0.4,
+   "top_errors": []
+  },
+  {
+   "library": "jbig2dec",
+   "harnesses": 14,
+   "compiled": 14,
+   "rate": 100.0,
+   "seconds": 0.2,
+   "top_errors": []
+  },
+  {
+   "library": "lcms2",
+   "harnesses": 178,
+   "compiled": 178,
+   "rate": 100.0,
+   "seconds": 2.1,
+   "top_errors": []
+  },
+  {
+   "library": "leptonica",
+   "harnesses": 196,
+   "compiled": 196,
+   "rate": 100.0,
+   "seconds": 2.1,
+   "top_errors": []
+  },
+  {
+   "library": "libde265",
+   "harnesses": 132,
+   "compiled": 132,
+   "rate": 100.0,
+   "seconds": 1.5,
+   "top_errors": []
+  },
+  {
+   "library": "libwebp",
+   "harnesses": 82,
+   "compiled": 82,
+   "rate": 100.0,
+   "seconds": 0.9,
+   "top_errors": []
+  },
+  {
+   "library": "libyaml",
+   "harnesses": 78,
+   "compiled": 78,
+   "rate": 100.0,
+   "seconds": 0.8,
+   "top_errors": []
+  },
+  {
+   "library": "mbedtls",
+   "harnesses": 101,
+   "compiled": 97,
+   "rate": 96.0,
+   "seconds": 1.3,
+   "top_errors": [
+    {
+     "error": "call to undeclared function 'mbedtls_x509_crt_verify_with_ca_cb'; ISO C99 and later do not support implicit fu",
+     "count": 4
+    }
+   ]
+  },
+  {
+   "library": "yajl",
+   "harnesses": 32,
+   "compiled": 32,
+   "rate": 100.0,
+   "seconds": 0.4,
+   "top_errors": []
+  },
+  {
+   "library": "zlib",
+   "harnesses": 176,
+   "compiled": 176,
+   "rate": 100.0,
+   "seconds": 1.9,
+   "top_errors": []
+  },
+  {
+   "library": "zopfli",
+   "harnesses": 1,
+   "compiled": 1,
+   "rate": 100.0,
+   "seconds": 0.0,
+   "top_errors": []
+  },
+  {
+   "library": "zstd",
+   "harnesses": 192,
+   "compiled": 192,
+   "rate": 100.0,
+   "seconds": 2.2,
+   "top_errors": []
+  }
+ ]
+}
