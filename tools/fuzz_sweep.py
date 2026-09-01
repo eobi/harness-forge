@@ -27,104 +27,8 @@ FORGE = Path.home() / "Documents" / "NemesisForge"
 
 # The library sources each harness is compiled against. A harness needs the translation
 # units that define the symbols it calls; more than that only slows the build.
-# Build-time defines the library's own build passes. An autotools library compiled without
-# -DHAVE_CONFIG_H reads a different branch of its own headers, fails to compile ONE source,
-# and dies at link time on a symbol thirty lines from the cause.
-DEFINES = {
-    "jansson": ["HAVE_CONFIG_H"],
-    "libyaml": ["HAVE_CONFIG_H", "YAML_VERSION_STRING=\"0.2.5\"",
-                "YAML_VERSION_MAJOR=0", "YAML_VERSION_MINOR=2", "YAML_VERSION_PATCH=5"],
-    # zconf.h only declares read/close when the build says unistd.h exists, so gzread.c and
-    # gzwrite.c fail to compile and the harness dies at link on _gzclose_r -- the same
-    # far-from-the-cause shape as jansson and libyaml, for the third time.
-    "zlib":    ["HAVE_UNISTD_H"],
-    "expat":   ["XML_POOR_ENTROPY", "HAVE_MEMMOVE"],
-}
-
-SOURCES = {
-    "cjson":     ["cJSON.c"],
-    "jansson":   ["src/*.c"],
-    "libyaml":   ["src/*.c"],
-    "yajl":      ["src/*.c"],
-    "zlib":      ["*.c"],
-    "expat":     ["expat/lib/*.c"],
-    "jbig2dec":  ["*.c"],
-    "zopfli":    ["src/zopfli/*.c"],
-    "brotli":    ["c/dec/*.c", "c/common/*.c"],
-    "lcms2":     ["src/*.c"],
-    "libpng":    ["*.c"],
-    "libwebp":   ["src/dec/*.c", "src/dsp/*.c", "src/utils/*.c", "src/webp/*.c"],
-}
-
-
-# `int` and `main(` are OFTEN ON SEPARATE LINES -- jbig2dec, zopfli and most K&R-descended C
-# write the return type on its own line. A per-line pattern matches none of them, which is
-# worse than useless here: it silently accepts every file.
-_MAIN = re.compile(r"(?:^|\n)\s*(?:int|void)\s*\n?\s*main\s*\(")
-
-
-def _defines_main(p: Path) -> bool:
-    """Does this file define main() UNCONDITIONALLY?
-
-    The nesting check is the whole point. A C library routinely ships a self-test main()
-    behind `#ifdef TEST`, and jbig2dec has three: jbig2_arith.c, jbig2_huffman.c and sha1.c.
-    Matching main() anywhere dropped all three from the link, and the build then failed on an
-    undefined jbig2_table -- a symbol from a file the filter had silently removed, with
-    nothing in the error pointing back at the filter.
-
-    Excluding a needed file gives that obscure undefined-symbol error; keeping a file with a
-    guarded main() costs nothing, because if the guard IS defined the linker says "duplicate
-    symbol _main", which names the problem exactly.
-    """
-    try:
-        text = p.read_text(errors="ignore")
-    except OSError:
-        return False
-    # Keep only the lines that are NOT inside a preprocessor conditional, then match across
-    # newlines. Doing it in one pass per line cannot see a declaration split over two.
-    kept, depth = [], 0
-    for line in text.splitlines():
-        st = line.strip()
-        if st.startswith("#if"):
-            depth += 1
-            continue
-        if st.startswith("#endif"):
-            depth = max(0, depth - 1)
-            continue
-        if depth == 0:
-            kept.append(line)
-    return bool(_MAIN.search("\n".join(kept)))
-
-
-def _sources_for(lib: str, work: Path) -> list[str]:
-    """The library's translation units, MINUS any that defines main().
-
-    A library ships its command-line tool beside its implementation. Linking that main()
-    alongside the libFuzzer driver produces a binary that is the TOOL, not a fuzzer: zopfli's
-    harness answered "Please provide filename" and the campaign recorded 0 executions while
-    reporting itself built. Same silent-nothing as the rejected dictionary and the missing
-    -D, arriving by a third route -- so this is filtered structurally rather than by
-    maintaining a list of which files to avoid per library.
-    """
-    out: list[str] = []
-    for pat in SOURCES.get(lib, []):
-        out.extend(str(q) for q in sorted((work / lib).glob(pat)) if not _defines_main(q))
-    return out
-
-
-def _include_dirs(lib: str, work: Path) -> list[str]:
-    """The same include set the compile probe uses, for the same reason.
-
-    Guessing at {root, src, include} put brotli's public header out of reach -- its headers
-    live under c/include and are included as <brotli/port.h>, so every brotli harness failed
-    to build. compile_rate._incdirs already solved this, including the part that must be
-    left OUT: mbedtls ships tests/include/baremetal-override/time.h, which shadows the
-    system header and #errors. Two copies of that logic would have drifted apart.
-    """
-    sys.path.insert(0, str(Path(__file__).resolve().parent))
-    from compile_rate import _incdirs                              # noqa: PLC0415
-    return [d[2:] for d in _incdirs(work / lib)]
-
+from libspec import (DEFINES, SEED_FORMATS, SOURCES, _defines_main,  # noqa: E402
+                     _include_dirs, _sources_for)
 
 # IMPORT NEMESISFORGE ONCE, AT MODULE SCOPE.
 #
@@ -141,7 +45,18 @@ from forge.job import lab_job, run_job                             # noqa: E402
 from forge.targets.source import SourceTarget                      # noqa: E402
 
 
-def run(harness: Path, lib: str, work: Path, budget: int, out: Path) -> dict:
+
+
+def seed_campaign(lib: str, work: Path, corpus: Path, max_files: int = 200) -> int:
+    """Fill a campaign's corpus from the library's own repository. Returns how many."""
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from seed_mine import install, mine                            # noqa: PLC0415
+    chosen, _ = mine(work / lib, formats=SEED_FORMATS.get(lib, ()), max_files=max_files)
+    return install(chosen, corpus)
+
+
+def run(harness: Path, lib: str, work: Path, budget: int, out: Path,
+        seeds: bool = True) -> dict:
 
     seen: dict = {}
     of = SourceTarget.fuzz
@@ -157,9 +72,15 @@ def run(harness: Path, lib: str, work: Path, budget: int, out: Path) -> dict:
 
     SourceTarget.fuzz = spy
     t0 = time.time()
+    job = f"fz-{harness.stem[:28]}"
+    n_seeds = 0
+    if seeds:
+        # BEFORE the job runs: lab_job points the campaign at <root>/<job>/corpus, and
+        # target.fuzz passes that directory to libFuzzer, which loads whatever is in it.
+        n_seeds = seed_campaign(lib, work, out / job / "corpus")
     try:
         ctx, disc, orc, esc, llm = lab_job(
-            f"fz-{harness.stem[:28]}", harness.read_text(), artifacts_root=out,
+            job, harness.read_text(), artifacts_root=out,
             name=lib, fuzz_time=budget, provider=None, defines=DEFINES.get(lib),
             target_sources=_sources_for(lib, work),
             include_dirs=_include_dirs(lib, work))
@@ -167,7 +88,8 @@ def run(harness: Path, lib: str, work: Path, budget: int, out: Path) -> dict:
                                        escalation=esc, llm=llm))
         bf = str(getattr(ctx, "build_failure", "") or "")
     except Exception as ex:                                        # noqa: BLE001
-        return {"harness": harness.name, "library": lib, "status": "error",
+        return {"harness": harness.name, "library": lib, "seeds": n_seeds,
+                "status": "error",
                 "error": str(ex)[:160], "seconds": round(time.time() - t0, 1)}
     finally:
         SourceTarget.fuzz = of
@@ -185,7 +107,7 @@ def run(harness: Path, lib: str, work: Path, budget: int, out: Path) -> dict:
     # status="built", fuzz_ran=False, and a reader would count it as a working harness. There
     # is no honest name for that state except "we do not know", so it gets one.
     status = "build-failed" if bf else ("built" if seen.get("fuzz_ran") else "no-campaign")
-    return {"harness": harness.name, "library": lib,
+    return {"harness": harness.name, "library": lib, "seeds": n_seeds,
             "status": status,
             "build_error": bf.strip().splitlines()[-1][:140] if bf else "",
             "findings": len(findings), "candidates": by_novelty.get("candidate", 0),
@@ -201,6 +123,8 @@ def main() -> int:
     ap.add_argument("--per-lib", type=int, default=5)
     ap.add_argument("--budget", type=int, default=30)
     ap.add_argument("--libs", default="", help="comma-separated; default = all with sources")
+    ap.add_argument("--no-seeds", action="store_true",
+                    help="run with an EMPTY corpus, for the seeded-vs-unseeded comparison")
     a = ap.parse_args()
 
     out = Path(a.out); out.mkdir(parents=True, exist_ok=True)
@@ -212,7 +136,7 @@ def main() -> int:
         if not hdir.is_dir():
             continue
         for h in sorted(hdir.glob("*.c"))[:a.per_lib]:
-            r = run(h, lib, Path(a.work), a.budget, out)
+            r = run(h, lib, Path(a.work), a.budget, out, seeds=not a.no_seeds)
             rows.append(r)
             with rec.open("a") as f:
                 f.write(json.dumps(r) + "\n")
