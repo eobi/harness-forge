@@ -1,0 +1,26 @@
+{
+ "date": "2026-09-01",
+ "what": "Status of coverage-guided GUI campaigns: the capability works, the loop integration does not yet, and two environment facts were found that invalidate a comparison we had been making.",
+ "WORKS_verified_twice": {
+  "eog_application_coverage": "25.64% of 78 regions from a single image open",
+  "libpng_decoder_coverage": "12.10% of 18,400 regions from a single image open",
+  "why_the_second_matters": "eog's own binary has 78 regions; libpng has 18,400. Application coverage was 236x coarser and measured the wrong surface -- a corrupt PNG is handled in the decoder, not in the viewer's UI code.",
+  "mechanism": "instrumented build -> open file -> wait for quiescence -> xdotool ctrl+q/ctrl+w for a CLEAN EXIT -> .profraw -> llvm-profdata -> llvm-cov"
+ },
+ "DOES_NOT_WORK_YET": {
+  "symptom": "Inside the campaign loop _regions_covered() returns -1 on every input, so the corpus never grows and guidance never happens.",
+  "what_was_ruled_out": [
+   "The function itself: called by hand against the same profile it returns 2235.",
+   "Missing profiles: an 87KB .profraw is present after a campaign.",
+   "llvm-cov: merge and export both return 0 and produce valid JSON.",
+   "A read-before-write race: waiting up to 2s for a non-empty profile did not change the result.",
+   "ctrl+w closing a dialog instead of the app: ctrl+q is now sent first, to every window the process owns."
+  ],
+  "not_yet_explained": "Why the same call fails inside the loop and succeeds outside it.",
+  "blast_radius": "None. Everything is behind HF_GUI_COVERAGE and a blind campaign takes the identical path it always did."
+ },
+ "TWO_ENVIRONMENT_FACTS_THAT_INVALIDATE_A_COMPARISON": {
+  "container_eog_and_system_eog_disagree": "With the SAME seed, the SAME rng (1337) and therefore the same mutation sequence, input 006 -- a 45-byte truncated PNG -- is ACCEPTED by the container's eog and REJECTED by the VM's system eog. The 29% acceptance from the 5000-input campaign is a CONTAINER number and must not be compared against native runs.",
+  "the_seed_is_chosen_by_directory_order": "The campaign picks the first PNG over 2000 bytes from a sorted walk of /usr/share/icons. Installing five more applications added icons and could have changed it silently. It did not this time -- the seed is still ac-adapter.png -- but a benchmark whose input depends on what else is installed is not reproducible, and --seed-file should be mandatory for any recorded run."
+ }
+}

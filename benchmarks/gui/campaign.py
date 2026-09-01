@@ -123,9 +123,18 @@ def _close_window(pid: int) -> None:
     try:
         out = subprocess.run(["xdotool", "search", "--pid", str(pid)],
                              capture_output=True, text=True, timeout=5).stdout.split()
-        if out:
-            subprocess.run(["xdotool", "key", "--window", out[-1], "ctrl+w"],
-                           capture_output=True, timeout=5)
+        if not out:
+            return
+        # ctrl+q BEFORE ctrl+w, and to EVERY window this process owns.
+        #
+        # A refused input leaves an error dialog on top. ctrl+w closes that dialog and the
+        # application keeps running, so it never reaches exit() and never writes its
+        # profile -- which made coverage unreadable for exactly the inputs a campaign most
+        # wants to measure. ctrl+q quits the application whatever is focused.
+        for win in reversed(out):
+            for key in ("ctrl+q", "ctrl+w"):
+                subprocess.run(["xdotool", "key", "--window", win, key],
+                               capture_output=True, timeout=5)
     except Exception:                                              # noqa: BLE001
         pass
 
@@ -206,6 +215,16 @@ def run_one(app: str, path: str, budget: float):
             p.wait(timeout=6)
         except Exception:                                          # noqa: BLE001
             pass
+        # WAIT FOR THE PROFILE, DO NOT ASSUME IT.
+        #
+        # The counters are written as the process leaves, which happens slightly after
+        # wait() returns. Reading immediately found no file, reported -1, and the next
+        # input deleted the profile before anyone looked again -- so coverage was always
+        # unavailable while the mechanism itself worked perfectly when called by hand.
+        for _ in range(40):
+            if any(f.stat().st_size > 0 for f in COV_DIR.glob("*.profraw")):
+                break
+            time.sleep(0.05)
     p.terminate()
     try:
         p.wait(timeout=5)
