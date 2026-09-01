@@ -1,0 +1,49 @@
+{
+ "date": "2026-09-01",
+ "what": "The controlled version of the eog/evince comparison, after writing a PDF-aware mutator so the two differ by FORMAT rather than by mutator.",
+ "the_confound_that_was_removed": "eog was campaigned with structure-aware PNG mutation and evince with plain byte flips, then compared: 29% vs 97% accepted. That varied the mutator and the format together and could not say whether evince is more tolerant or the mutation was gentler.",
+ "controlled_result": {
+  "eog_structure_aware_png": {
+   "inputs": 5000,
+   "accepted": "29%"
+  },
+  "evince_naive_byteflip": {
+   "inputs": 1000,
+   "accepted": "97%",
+   "rejected": 31
+  },
+  "evince_structure_aware_pdf": {
+   "inputs": 1000,
+   "accepted": "82%",
+   "rejected": 177,
+   "crashed": 0,
+   "unresponsive": 0,
+   "findings": 0
+  }
+ },
+ "acceptance_by_mutation_kind": {
+  "header": "100% accepted (155/155)",
+  "filter": "100% accepted (170/170)",
+  "trailer_drop": "0% accepted (0/177)",
+  "stream_bytes": "100% accepted (168/168)",
+  "xref_offset": "100% accepted (163/163)",
+  "obj_len": "100% accepted (167/167)"
+ },
+ "WHAT_THE_CONTROL_SHOWS": "Structured PDF mutation is refused 6x more often than byte flips -- 177 refusals against 31 -- so most of the original 97% was the mutator being too gentle to make the parser decide anything. But 82% is still far above eog's 29%, so a real difference survives the control: a PDF reader genuinely accepts more damage than libpng does. Both halves of that are worth reporting, and only the controlled run can separate them.",
+ "still_zero_findings": "7000 GUI inputs across two applications and three mutators. No crash, no hang. The campaign remains BLIND -- acceptance rate measures what got past the door, not what was reached behind it, and that is what coverage feedback would answer.",
+ "honest_note": "The PDF mutator was written because the comparison WE published was confounded. It was not prompted by review; it was found by reading our own result and noticing the two campaigns differed in more than the variable under study.",
+ "THE_PER_MUTATION_BREAKDOWN_IS_THE_REAL_FINDING": {
+  "observed": {
+   "header": "100% accepted",
+   "filter": "100% accepted",
+   "stream_bytes": "100% accepted",
+   "xref_offset": "100% accepted",
+   "obj_len": "100% accepted",
+   "trailer_drop": "0% accepted (0/177)"
+  },
+  "reading": "evince recovers from EVERY structural corruption this mutator produces except a missing trailer. A wrong startxref, a /Length that lies, a /FlateDecode promise the payload does not keep, noise inside a stream, and a bogus version marker are all accepted. The entire 18% rejection rate is one mutation kind.",
+  "why_it_matters_for_the_metric": "Acceptance rate is nearly BINARY per mutation kind here, not a graded signal. Reporting '82% accepted' suggests a spectrum of partial damage; the truth is five kinds always pass and one always fails. An aggregate acceptance rate can hide that completely, and this track has been quoting aggregates.",
+  "the_limit_this_exposes": "We cannot tell whether xref_offset actually drove evince into its recovery path or was silently ignored -- both look like 'accepted' to an accessibility oracle. Distinguishing them needs coverage, which is the same missing piece as everywhere else in this track. Acceptance measures the front door; it says nothing about which room was entered.",
+  "what_should_change": "Report acceptance PER MUTATION KIND, not as a campaign aggregate. The aggregate is a weighted average of near-constants and moves only with the mutator's mix."
+ }
+}
