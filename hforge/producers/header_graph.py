@@ -1150,6 +1150,13 @@ def propose(headers: list, target: Target, *, platforms: Optional[list] = None,
     Plans are PROPOSALS. Several will be wrong, and the gates are what say which. That is
     the design: producers compete, gates rank, confidence decides nothing.
     """
+    # NORMALISE ONCE, HERE. An explicit platforms=None reaches the HarnessIR constructor as
+    # a real None and OVERRIDES the dataclass default_factory, so the plan carries no
+    # platform list at all and the C emitter dies on ", ".join(None). The chain plans passed
+    # a default and the free-function plans passed the argument through, which is why only
+    # SOME plans from the same header failed to emit -- jansson lost 4 of 34 that way, with
+    # the failure reported as "emit refused" as though a gate had rejected them.
+    platforms = platforms or ["linux-x86_64-glibc"]
     incs = tuple(target.include_dirs)
     cfl = tuple(target.cflags)
     decls: list = []

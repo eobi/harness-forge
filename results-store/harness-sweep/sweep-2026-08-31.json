@@ -1,0 +1,220 @@
+{
+ "generated_utc": "2026-09-01T04:32:18Z",
+ "libraries": 18,
+ "rows": [
+  {
+   "library": "brotli",
+   "status": "ok",
+   "returncode": 0,
+   "harnesses_emitted": 27,
+   "seconds": 0.3,
+   "tail": [
+    "  SKIP brotli_BrotliDecoderSetMetadataCallbacks_len   emit refused: op o1: argument 'chunk_func' references ",
+    "",
+    "28 harness(es) written to /tmp/hf-harnesses/brotli/brotli"
+   ]
+  },
+  {
+   "library": "cjson",
+   "status": "ok",
+   "returncode": 0,
+   "harnesses_emitted": 153,
+   "seconds": 1.7,
+   "tail": [
+    "  emitted cjson_cJSON_DeleteItemFromObject_with_cJSON_AddBoolT   -> cjson_cJSON_DeleteItemFromObject_with_cJSON_AddBoolToObject_.c",
+    "",
+    "188 harness(es) written to /tmp/hf-harnesses/cjson/cjson"
+   ]
+  },
+  {
+   "library": "expat",
+   "status": "ok",
+   "returncode": 0,
+   "harnesses_emitted": 97,
+   "seconds": 0.6,
+   "tail": [
+    "  emitted expat_XML_SetElementDeclHandler__widen_XML_SetHashSa   -> expat_XML_SetElementDeclHandler__widen_XML_SetHashSalt.c",
+    "",
+    "100 harness(es) written to /tmp/hf-harnesses/expat/expat"
+   ]
+  },
+  {
+   "library": "jansson",
+   "status": "ok",
+   "returncode": 0,
+   "harnesses_emitted": 36,
+   "seconds": 0.4,
+   "tail": [
+    "  emitted jansson_json_stringn_nocheck__widen_json_stringn       -> jansson_json_stringn_nocheck__widen_json_stringn.c",
+    "",
+    "36 harness(es) written to /tmp/hf-harnesses/jansson/jansson"
+   ]
+  },
+  {
+   "library": "jbig2dec",
+   "status": "ok",
+   "returncode": 0,
+   "harnesses_emitted": 14,
+   "seconds": 0.3,
+   "tail": [
+    "  emitted jbig2dec_jbig2_ctx_new_imp_len64k__repeat_jbig2_ctx_   -> jbig2dec_jbig2_ctx_new_imp_len64k__repeat_jbig2_ctx_new_imp.c",
+    "",
+    "14 harness(es) written to /tmp/hf-harnesses/jbig2dec/jbig2dec"
+   ]
+  },
+  {
+   "library": "lcms2",
+   "status": "ok",
+   "returncode": 0,
+   "harnesses_emitted": 178,
+   "seconds": 1.8,
+   "tail": [
+    "  emitted lcms2_cmsTagLinkedTo_len64k                            -> lcms2_cmsTagLinkedTo_len64k.c",
+    "",
+    "178 harness(es) written to /tmp/hf-harnesses/lcms2/lcms2"
+   ]
+  },
+  {
+   "library": "leptonica",
+   "status": "ok",
+   "returncode": 0,
+   "harnesses_emitted": 196,
+   "seconds": 264.0,
+   "tail": [
+    "  emitted leptonica_l_generateJpegDataMem_len64k                 -> leptonica_l_generateJpegDataMem_len64k.c",
+    "",
+    "196 harness(es) written to /tmp/hf-harnesses/leptonica/leptonica"
+   ]
+  },
+  {
+   "library": "libde265",
+   "status": "ok",
+   "returncode": 0,
+   "harnesses_emitted": 132,
+   "seconds": 0.6,
+   "tail": [
+    "  emitted libde265_de265_set_image_allocation_functions_len64k   -> libde265_de265_set_image_allocation_functions_len64k__widen_.c",
+    "",
+    "148 harness(es) written to /tmp/hf-harnesses/libde265/libde265"
+   ]
+  },
+  {
+   "library": "libpng",
+   "status": "error",
+   "returncode": 1,
+   "harnesses_emitted": 0,
+   "seconds": 0.4,
+   "tail": [
+    "libpng: 0 base plan(s) pass the gates, 0 synthesised candidate(s) pass",
+    "  nothing this engine will stand behind; not handing anything over"
+   ]
+  },
+  {
+   "library": "libwebp",
+   "status": "ok",
+   "returncode": 0,
+   "harnesses_emitted": 82,
+   "seconds": 0.4,
+   "tail": [
+    "  emitted libwebp_WebPIDecode_len64k__repeat_WebPIDecode         -> libwebp_WebPIDecode_len64k__repeat_WebPIDecode.c",
+    "",
+    "82 harness(es) written to /tmp/hf-harnesses/libwebp/libwebp"
+   ]
+  },
+  {
+   "library": "libyaml",
+   "status": "ok",
+   "returncode": 0,
+   "harnesses_emitted": 78,
+   "seconds": 0.5,
+   "tail": [
+    "  SKIP libyaml_yaml_emitter_set_break_len64k__widen   emit refused: op o2: argument 'line_break' references ",
+    "",
+    "120 harness(es) written to /tmp/hf-harnesses/libyaml/libyaml"
+   ]
+  },
+  {
+   "library": "mbedtls",
+   "status": "ok",
+   "returncode": 0,
+   "harnesses_emitted": 101,
+   "seconds": 0.5,
+   "tail": [
+    "  emitted mbedtls_mbedtls_x509_crt_check_extended_key_usage__w   -> mbedtls_mbedtls_x509_crt_check_extended_key_usage__widen_mbe.c",
+    "",
+    "198 harness(es) written to /tmp/hf-harnesses/mbedtls/mbedtls"
+   ]
+  },
+  {
+   "library": "wabt",
+   "status": "error",
+   "returncode": 1,
+   "harnesses_emitted": 0,
+   "seconds": 0.1,
+   "tail": [
+    "wabt: 0 base plan(s) pass the gates, 0 synthesised candidate(s) pass",
+    "  nothing this engine will stand behind; not handing anything over"
+   ]
+  },
+  {
+   "library": "woff2",
+   "status": "error",
+   "returncode": 1,
+   "harnesses_emitted": 0,
+   "seconds": 0.1,
+   "tail": [
+    "woff2: 0 base plan(s) pass the gates, 0 synthesised candidate(s) pass",
+    "  nothing this engine will stand behind; not handing anything over"
+   ]
+  },
+  {
+   "library": "yajl",
+   "status": "ok",
+   "returncode": 0,
+   "harnesses_emitted": 32,
+   "seconds": 0.3,
+   "tail": [
+    "  emitted yajl_yajl_free_error_len64k__repeat_yajl_free_error    -> yajl_yajl_free_error_len64k__repeat_yajl_free_error.c",
+    "",
+    "32 harness(es) written to /tmp/hf-harnesses/yajl/yajl"
+   ]
+  },
+  {
+   "library": "zlib",
+   "status": "ok",
+   "returncode": 0,
+   "harnesses_emitted": 176,
+   "seconds": 0.4,
+   "tail": [
+    "  emitted zlib_gzputc__widen_gzvprintf                           -> zlib_gzputc__widen_gzvprintf.c",
+    "",
+    "176 harness(es) written to /tmp/hf-harnesses/zlib/zlib"
+   ]
+  },
+  {
+   "library": "zopfli",
+   "status": "ok",
+   "returncode": 0,
+   "harnesses_emitted": 1,
+   "seconds": 0.3,
+   "tail": [
+    "  emitted zopfli_ZopfliCompress                                  -> zopfli_ZopfliCompress.c",
+    "",
+    "1 harness(es) written to /tmp/hf-harnesses/zopfli/zopfli"
+   ]
+  },
+  {
+   "library": "zstd",
+   "status": "ok",
+   "returncode": 0,
+   "harnesses_emitted": 192,
+   "seconds": 0.5,
+   "tail": [
+    "  emitted zstd_ZSTD_compressCCtx_setup_len64k__widen_ZSTD_crea   -> zstd_ZSTD_compressCCtx_setup_len64k__widen_ZSTD_createCDict.c",
+    "",
+    "196 harness(es) written to /tmp/hf-harnesses/zstd/zstd"
+   ]
+  }
+ ],
+ "total_harnesses": 1495
+}
