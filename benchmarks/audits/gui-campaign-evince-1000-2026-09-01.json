@@ -1,0 +1,35 @@
+{
+ "date": "2026-09-01",
+ "what": "The GUI track's second validated application, campaigned at scale for the first time. evince, 1000 inputs, PDF seed.",
+ "result": {
+  "inputs": 1000,
+  "accepted": 969,
+  "rejected": 31,
+  "acceptance_rate": "97%",
+  "crashed": 0,
+  "unresponsive": 0,
+  "findings": 0
+ },
+ "controls": "positive accepted at 113 nodes, negative rejected at 122. The oracle discriminates on this target.",
+ "THE_COMPARISON_THAT_MATTERS": {
+  "eog": {
+   "inputs": 5000,
+   "mutator": "structure-aware PNG",
+   "accepted": "29%"
+  },
+  "evince": {
+   "inputs": 1000,
+   "mutator": "naive byte-flip",
+   "accepted": "97%"
+  },
+  "reading": "Acceptance rate is a property of the MUTATOR crossed with the format's tolerance, not of the application's robustness. Structure-aware PNG mutation corrupts CRCs and truncates IDAT chunks, which libpng refuses outright, so 71% never reach the decoder. Byte-flipping a PDF mostly produces a document a tolerant reader still renders, so 97% get through the door -- and 'through the door' is not the same as 'exercised deeply'.",
+  "what_it_implies": "A high acceptance rate is not evidence of a better campaign. It can mean the mutator is too gentle to be refused. Neither number alone says anything about depth reached, which is exactly what coverage feedback would answer and this track does not have."
+ },
+ "the_missing_piece_is_unchanged": "No PDF-aware mutator exists here; the structure-aware mutator is PNG-only, so evince got byte flips. Writing one is cheap compared with coverage instrumentation, and would make the eog/evince comparison a controlled one rather than a confounded one.",
+ "totals_for_the_track": {
+  "applications_validated": 2,
+  "applications_tested": 8,
+  "total_inputs": 6000,
+  "total_findings": 0
+ }
+}
