@@ -138,6 +138,30 @@ first element. The captured initialiser was a truncated fragment containing no c
 literal, so the trace found the array, found nothing in it, and reported no seam at all. The
 closing brace must end the statement.
 
+## The ranker, automated -- and the bound it exposes
+
+`deep` = how many DEEP subsystems a lifted sequence enters (parse, serialise, transform), name-
+matched. Ranked above seam depth. 3 repeats, paired, same mined corpus, arms alternating.
+
+| library | best lifted | developer | ratio | subsystems available |
+|---|---|---|---|---|
+| jansson | 584 (`embed`, deep=2) | 646 | **0.90x** | parse + serialise |
+| jansson | 520 / 513 (deep=1) | 646 | 0.79-0.80x | parse only |
+| cjson | 198 (deep=1) | 307 | **0.64x** | parse only -- **no deep=2 test exists** |
+| libwebp | none | 2675 | -- | 0 candidates past the gates |
+
+**The ranker now picks `embed` by itself**, the candidate previously found by hand, and the
+ordering confirms the prior WITHIN jansson: deep=2 scores 0.90x against 0.79-0.80x for deep=1.
+
+**And it exposes the real bound. P3.LIFT can only be as good as the best SINGLE test
+function.** cjson's suite has no function that both parses and serialises, so every candidate
+is deep=1 and the library is stuck at 0.64x however it is ranked. The developer harness
+combines subsystems that no single test combines -- which is exactly why it wins.
+
+That points at the next idea rather than a tuning knob: COMPOSE a sequence from several tests
+(a parse test joined to a dump test) instead of lifting one. A composed plan could exceed any
+single test in the suite, and nothing measured so far can.
+
 ## Where it does not work yet
 
 **expat: 0 candidates passed the gates, and its own harness did not build either.** Not

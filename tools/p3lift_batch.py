@@ -40,6 +40,36 @@ from seam_finder import seams_for                                   # noqa: E402
 from test_sequences import sequences_in                             # noqa: E402
 
 CC = "/opt/homebrew/opt/llvm/bin/clang"
+
+# DEEP SUBSYSTEMS: the kinds of work that reach a lot of code behind one call.
+#
+# Measured, not assumed. Ranking candidates by the COUNT of distinct APIs was refuted at
+# 0.09x of the developer harness -- five comparison functions touch almost nothing while one
+# json_loads reaches the whole parser. Ranking by how many of these SUBSYSTEMS a sequence
+# enters took the same technique from 0.67x to 0.88x, because the developer harness wins by
+# loading AND dumping rather than by calling many functions.
+#
+# Name-based, and therefore a prior: it is expected to be confirmed or overturned by
+# campaigning, in the same way probe_select ranks statically and coverage decides.
+_SUBSYSTEMS = {
+    "parse":     re.compile(r"(?:^|_)(load|loads|loadb|parse|read|decode|scan|deserial|"
+                            r"unmarshal|from_)", re.I),
+    "serialise": re.compile(r"(?:^|_)(dump|dumps|dumpb|write|encode|serial|marshal|print|"
+                            r"emit|to_|save)", re.I),
+    "transform": re.compile(r"(?:^|_)(compress|decompress|inflate|deflate|convert|transform|"
+                            r"resize|scale|rotate)", re.I),
+    "validate":  re.compile(r"(?:^|_)(verify|validate|check|equal|compare)", re.I),
+}
+
+
+def subsystems(apis) -> set:
+    """Which deep subsystems this sequence enters."""
+    out = set()
+    for a in apis:
+        for name, pat in _SUBSYSTEMS.items():
+            if pat.search(a):
+                out.add(name)
+    return out
 _COV = re.compile(r"\bcov:\s*(\d+)")
 _EXECS = re.compile(r"number_of_executed_units:\s*(\d+)")
 
@@ -164,13 +194,20 @@ def lifted_candidates(lib: str, work: Path, out: Path, top: int) -> list:
             rec["status"] = "gated"
             rec["blocked_by"] = [b.code for b in blocks[:3]]
             continue
-        breadth = len({o.api for o in plan.sequence})
-        built.append({"plan": plan, "record": rec, "seam": s, "breadth": breadth})
+        names = {o.api for o in plan.sequence}
+        breadth = len(names)
+        subs = subsystems(names)
+        # A candidate that never enters a deep subsystem is not worth a campaign slot: it is
+        # the 0.09x shape, calling several shallow functions well.
+        deep = subs - {"validate"}
+        built.append({"plan": plan, "record": rec, "seam": s, "breadth": breadth,
+                      "subsystems": sorted(subs), "deep": len(deep)})
         if len(built) >= top * 6:          # a pool to rank, not the final selection
             break
 
-    built.sort(key=lambda c: (-c["breadth"], not c["seam"]["parse_like"],
-                              -c["seam"]["depth"]))
+    # DEEP SUBSYSTEM COUNT FIRST, then the seam, then breadth as a last tie-break.
+    built.sort(key=lambda c: (-c["deep"], not c["seam"]["parse_like"],
+                              -c["seam"]["depth"], -c["breadth"]))
     made: list = []
     for c in built:
         try:
@@ -178,12 +215,15 @@ def lifted_candidates(lib: str, work: Path, out: Path, top: int) -> list:
         except Exception as ex:                                     # noqa: BLE001
             c["record"]["status"] = f"emit-refused: {str(ex)[:60]}"
             continue
-        cf = out / (f"{lib}_b{c['breadth']:02d}_{c['seam']['function'][:24]}"
+        cf = out / (f"{lib}_d{c['deep']}_{c['seam']['function'][:24]}"
                     f"_{c['seam']['api'][:18]}.c")
         cf.write_text(csrc)
         c["record"]["breadth"] = c["breadth"]
+        c["record"]["subsystems"] = c["subsystems"]
+        c["record"]["deep_subsystems"] = c["deep"]
         made.append({"file": cf, "record": c["record"], "seam": c["seam"],
-                     "breadth": c["breadth"]})
+                     "breadth": c["breadth"], "deep": c["deep"],
+                     "subsystems": c["subsystems"]})
         if len(made) >= top:
             break
     return made
@@ -215,6 +255,9 @@ def main() -> int:
 
         cands = lifted_candidates(lib, work, ldir, a.top)
         print(f"  {len(cands)} lifted candidate(s) passed the gates", flush=True)
+        for c in cands:
+            print(f"      deep={c['deep']} {','.join(c['subsystems']) or '-':24s} "
+                  f"{c['file'].stem[:46]}", flush=True)
 
         dev = next((q for q in sorted((work / lib).glob(LIBS[lib][2]))
                     if "main" not in q.name), None)

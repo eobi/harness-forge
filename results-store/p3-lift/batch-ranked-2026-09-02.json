@@ -1,0 +1,196 @@
+{
+ "generated_utc": "2026-09-02T21:06:55Z",
+ "budget_seconds": 20,
+ "repeats": 3,
+ "rows": [
+  {
+   "library": "jansson",
+   "arm": "lifted:jansson_d2_embed_json_loads",
+   "repeat": 0,
+   "cov": 567,
+   "execs": 2048548
+  },
+  {
+   "library": "jansson",
+   "arm": "lifted:jansson_d1_test_copy_array_json_lo",
+   "repeat": 0,
+   "cov": 497,
+   "execs": 1299155
+  },
+  {
+   "library": "jansson",
+   "arm": "lifted:jansson_d1_test_deep_copy_array_js",
+   "repeat": 0,
+   "cov": 520,
+   "execs": 1704062
+  },
+  {
+   "library": "jansson",
+   "arm": "DEVELOPER:json_load_dump_fuzzer.cc",
+   "repeat": 0,
+   "cov": 646,
+   "execs": 1681170
+  },
+  {
+   "library": "jansson",
+   "arm": "DEVELOPER:json_load_dump_fuzzer.cc",
+   "repeat": 1,
+   "cov": 646,
+   "execs": 1304459
+  },
+  {
+   "library": "jansson",
+   "arm": "lifted:jansson_d1_test_deep_copy_array_js",
+   "repeat": 1,
+   "cov": 520,
+   "execs": 1547171
+  },
+  {
+   "library": "jansson",
+   "arm": "lifted:jansson_d1_test_copy_array_json_lo",
+   "repeat": 1,
+   "cov": 513,
+   "execs": 1403584
+  },
+  {
+   "library": "jansson",
+   "arm": "lifted:jansson_d2_embed_json_loads",
+   "repeat": 1,
+   "cov": 584,
+   "execs": 1591142
+  },
+  {
+   "library": "jansson",
+   "arm": "lifted:jansson_d2_embed_json_loads",
+   "repeat": 2,
+   "cov": 584,
+   "execs": 1655416
+  },
+  {
+   "library": "jansson",
+   "arm": "lifted:jansson_d1_test_copy_array_json_lo",
+   "repeat": 2,
+   "cov": 513,
+   "execs": 1503208
+  },
+  {
+   "library": "jansson",
+   "arm": "lifted:jansson_d1_test_deep_copy_array_js",
+   "repeat": 2,
+   "cov": 535,
+   "execs": 1595378
+  },
+  {
+   "library": "jansson",
+   "arm": "DEVELOPER:json_load_dump_fuzzer.cc",
+   "repeat": 2,
+   "cov": 659,
+   "execs": 1200082
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d1_parse_with_opts_should_r_",
+   "repeat": 0,
+   "cov": 198,
+   "execs": 1285280
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d1_parse_with_opts_should_p_",
+   "repeat": 0,
+   "cov": 198,
+   "execs": 1844030
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d1_json_pointer_tests_cJSON_",
+   "repeat": 0,
+   "cov": 192,
+   "execs": 2076357
+  },
+  {
+   "library": "cjson",
+   "arm": "DEVELOPER:cjson_read_fuzzer.c",
+   "repeat": 0,
+   "cov": 307,
+   "execs": 3075324
+  },
+  {
+   "library": "cjson",
+   "arm": "DEVELOPER:cjson_read_fuzzer.c",
+   "repeat": 1,
+   "cov": 307,
+   "execs": 2982969
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d1_json_pointer_tests_cJSON_",
+   "repeat": 1,
+   "cov": 192,
+   "execs": 3712243
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d1_parse_with_opts_should_p_",
+   "repeat": 1,
+   "cov": 198,
+   "execs": 1842911
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d1_parse_with_opts_should_r_",
+   "repeat": 1,
+   "cov": 198,
+   "execs": 2141208
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d1_parse_with_opts_should_r_",
+   "repeat": 2,
+   "cov": 198,
+   "execs": 2112323
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d1_parse_with_opts_should_p_",
+   "repeat": 2,
+   "cov": 198,
+   "execs": 1825454
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d1_json_pointer_tests_cJSON_",
+   "repeat": 2,
+   "cov": 192,
+   "execs": 1814648
+  },
+  {
+   "library": "cjson",
+   "arm": "DEVELOPER:cjson_read_fuzzer.c",
+   "repeat": 2,
+   "cov": 324,
+   "execs": 2681332
+  },
+  {
+   "library": "libwebp",
+   "arm": "DEVELOPER:advanced_api_fuzzer.c",
+   "repeat": 0,
+   "cov": 2643,
+   "execs": 115769
+  },
+  {
+   "library": "libwebp",
+   "arm": "DEVELOPER:advanced_api_fuzzer.c",
+   "repeat": 1,
+   "cov": 2675,
+   "execs": 130706
+  },
+  {
+   "library": "libwebp",
+   "arm": "DEVELOPER:advanced_api_fuzzer.c",
+   "repeat": 2,
+   "cov": 2698,
+   "execs": 129002
+  }
+ ]
+}
