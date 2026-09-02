@@ -594,25 +594,69 @@ def _fdp_taint(body: str, data: str, tainted: set) -> list:
     return consumed
 
 
-def lift(path: str, target_name: str = "", platforms: Optional[list] = None):
-    """Read a C harness and produce an IR plan plus a record of what could not be read."""
+# A TEST FUNCTION, declared plainly or by a framework macro.
+#
+# P3.LIFT: a project's own tests describe correct API usage, and they reach a median 66.7% of
+# the exported surface where our widest generated plan reaches 3.6%. Lifting one needs the
+# same machinery as lifting a harness -- the only difference is the entry point and the fact
+# that a test has no (data, size) parameters to taint.
+_TEST_ENTRY_MACROS = ("START_TEST", "TEST", "TEST_F", "TEST_P", "CTEST", "CTEST2",
+                      "ZTEST", "UTEST")
+
+
+def _find_function(src: str, name: str):
+    """Locate a definition of `name`, plain or macro-declared. Returns the match or None."""
+    pats = [re.compile(rf"^[A-Za-z_][\w \t\*]*?\b{re.escape(name)}\s*\([^;{{}}]*\)\s*(?=\{{)",
+                       re.M)]
+    pats += [re.compile(rf"\b{mac}\s*\(\s*{re.escape(name)}\b[^)]*\)\s*(?=\{{)")
+             for mac in _TEST_ENTRY_MACROS]
+    for pat in pats:
+        for cand in pat.finditer(src):
+            if src[cand.end():].lstrip().startswith("{"):
+                return cand
+    return None
+
+
+def lift(path: str, target_name: str = "", platforms: Optional[list] = None,
+         entry: str = ""):
+    """Read a C harness and produce an IR plan plus a record of what could not be read.
+
+    `entry` names a function OTHER than LLVMFuzzerTestOneInput -- a unit test, for P3.LIFT.
+    Such a function has no (data, size) parameters, so nothing is tainted and the lift
+    records the API SEQUENCE rather than a data flow. Finding where the fuzzer's bytes should
+    enter that sequence is a separate decision, made downstream and recorded, because it
+    changes what the harness does and must not happen silently.
+    """
     raw = Path(path).read_text(errors="replace")
     src = strip_noise(raw)
 
-    # A DEFINITION, not a prototype. `ossshell.c` declares the entry point and calls it from
-    # main; matching that prototype and taking the next `{` graded an unrelated function.
-    m = None
-    for cand in _ENTRY.finditer(src):
-        if src[cand.end():].lstrip().startswith("{"):
-            m = cand
-            break
-    if not m:
-        raise LiftError("no LLVMFuzzerTestOneInput definition found (a declaration without "
-                        "a body does not lift)")
-    data, size = m.group(1), m.group(2)
-    body = _body_of(src, m.end())
-    if not body.strip():
-        raise LiftError("LLVMFuzzerTestOneInput has an empty body")
+    if entry:
+        m = _find_function(src, entry)
+        if not m:
+            raise LiftError(f"no definition of {entry!r} found in {Path(path).name}")
+        # Names that cannot appear in the body, so the taint machinery stays inert: this
+        # lift is about ORDER, and inventing a data flow the test does not have would put
+        # claims in the IR that no source supports.
+        data, size = "\x00hf_no_data", "\x00hf_no_size"
+        body = _body_of(src, m.end())
+        if not body.strip():
+            raise LiftError(f"{entry} has an empty body")
+    else:
+        # A DEFINITION, not a prototype. `ossshell.c` declares the entry point and calls it
+        # from main; matching that prototype and taking the next `{` graded an unrelated
+        # function.
+        m = None
+        for cand in _ENTRY.finditer(src):
+            if src[cand.end():].lstrip().startswith("{"):
+                m = cand
+                break
+        if not m:
+            raise LiftError("no LLVMFuzzerTestOneInput definition found (a declaration "
+                            "without a body does not lift)")
+        data, size = m.group(1), m.group(2)
+        body = _body_of(src, m.end())
+        if not body.strip():
+            raise LiftError("LLVMFuzzerTestOneInput has an empty body")
 
     decl_type: dict = {}
     cxx_objects: dict = {}           # name -> declared C++ type, for member-call lifting
