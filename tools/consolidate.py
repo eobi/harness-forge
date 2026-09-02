@@ -56,6 +56,16 @@ def build() -> dict:
     sweep = _store("harness-sweep/sweep-2026-08-31.json")
     comp = _store("harness-sweep/compile-2026-08-31.json")
     camp = _store("fuzz-campaign/campaign-2026-09-01.json")
+    caud = _store("corpus-audit/audit-2026-09-01-after-fixes.json")
+    caud0 = _store("corpus-audit/audit-2026-09-01.json")
+    harv = _store("corpus-audit/harvest-2026-09-01.json")
+    seeds3 = _store("seeds/binary-formats-2026-09-01.json")
+    seeds1 = _store("seeds/text-formats-2026-09-01.json")
+    tseq = {}
+    for q in sorted((ROOT / "results-store" / "test-sequences").glob("*-2026-09-01.json")):
+        import json as _j
+        r = _j.loads(q.read_text())
+        tseq[r["library"]] = r
 
     return {
         "generated": str(date.today()),
@@ -221,6 +231,89 @@ def build() -> dict:
                            "this engine, not as a result.",
         },
 
+        "CORPUS_AUDIT_WITH_CONTRACT_GATES": {
+            "claim": "Grade third-party harnesses at a scale beyond the published "
+                     "competitor's, with the contract gates actually running.",
+            "scale": {"value": {"harnesses": caud.get("harnesses"),
+                                "projects": caud.get("projects"),
+                                "high_fidelity": caud.get("high_fidelity"),
+                                "declarations": caud.get("declarations"),
+                                "contracts_attached": caud.get("contracts_attached")},
+                      "source": "corpus-audit/audit-2026-09-01-after-fixes.json",
+                      "caveat": "QuartetFuzz audited 586 harnesses across 70 projects. This "
+                                "is larger, and it is the FIRST run where S2 could run at "
+                                "all -- every earlier audit reported S2 NOT RUN, which is "
+                                "not PASS."},
+            "reportable_defects": {
+                "value": 0,
+                "source": "corpus-audit/README.md",
+                "caveat": f"{caud.get('blocks_high_fidelity')} blocking candidates, all "
+                          "triaged by hand. All are one bazel OOM test fixture: the flags "
+                          "are TRUE and none is reportable, because it tests the fuzzing "
+                          "RULES rather than a library."},
+            "false_positives": {
+                "value": "0 of %s high-fidelity lifts" % caud.get("high_fidelity"),
+                "source": "corpus-audit/audit-2026-09-01-after-fixes.json",
+                "caveat": "The FIRST run of this same corpus produced 2 false positives "
+                          "(1.3%), against a recorded claim of zero. Both were defects in "
+                          "this engine and both are fixed. The 1.3% is kept on the results "
+                          "page: a precision number that only appears after it has been "
+                          "repaired is not evidence."},
+            "the_finding": "Three consecutive scaled runs found nothing reportable. This is "
+                           "the strongest evidence available that the FINDINGS axis is not "
+                           "won by grading more harnesses.",
+        },
+
+        "SEEDS": {
+            "claim": "Seeds mined from a library's own repository change coverage.",
+            "binary_formats": {
+                "value": {"pairs": seeds3.get("pairs"),
+                          "median_ratio": seeds3.get("median_ratio"),
+                          "better": seeds3.get("seeded_better"),
+                          "tied": seeds3.get("tied"),
+                          "worse": seeds3.get("seeded_worse"),
+                          "sign_test_p": 0.0078},
+                "source": "seeds/binary-formats-2026-09-01.json",
+                "caveat": "The median of 1.25 is bimodal and understates it: jbig2dec "
+                          "ratios are 20.98-27.25. Empty corpus 2,825,426 executions -> 32 "
+                          "edges; 5 mined seeds, 155 executions -> 839 edges."},
+            "text_formats": {
+                "value": {"pairs": seeds1.get("pairs"),
+                          "median_ratio": seeds1.get("median_ratio"),
+                          "sign_test_p": 0.4545},
+                "source": "seeds/text-formats-2026-09-01.json",
+                "caveat": "NO effect, and cjson was WORSE at 0.9151. A fuzzer reaches valid "
+                          "JSON from an empty corpus in seconds. The split by format IS the "
+                          "result."},
+            "what_it_invalidates": "Only tools/fuzz_sweep.py, which starts every campaign "
+                                   "empty. probe_select.probe() seeds from drive.py's "
+                                   "curated directories, so the +0.40% synthesis verdict "
+                                   "WAS seeded and stands as measured.",
+        },
+
+        "TEST_SEQUENCES_P3_LIFT": {
+            "claim": "A library's own tests express API sequences our plans cannot reach. "
+                     "Measured as a DECISION GATE before any generator was written.",
+            "surface_reached": {
+                "value": {k: v["surface_reached_pct"] for k, v in sorted(tseq.items())},
+                "source": "test-sequences/",
+                "caveat": "Median 66.7% across the 9 libraries that ship C tests. brotli, "
+                          "jbig2dec, libde265 and yajl ship none (shell scripts over "
+                          "testdata, or CLI-driven) and a test-lifting producer yields "
+                          "nothing for them -- a bound on the technique, not a bug."},
+            "the_comparison_that_decides_it": {
+                "value": {"our_widest_single_plan": "3 of 83 (3.6%)",
+                          "union_all_base_plans": "7 (8%)",
+                          "union_with_mutational_synthesis": "43 (52%)",
+                          "one_test_function_test_chaos": "21 (26%)",
+                          "the_test_suite": "75 (92.6%)"},
+                "source": "test-sequences/jansson-2026-09-01.json + "
+                          "reachability-bound-2026-08-31.json",
+                "caveat": "jansson, the one library measured every way. A SINGLE test "
+                          "function reaches seven times what our widest plan reaches; cjson "
+                          "has one calling 51 distinct APIs and zstd one calling 56."},
+        },
+
         "GUI_TRACK": {
             "claim": "An accessibility-tree oracle can distinguish a target REFUSING an "
                      "input from one that has hung -- a distinction signal-based fuzzers "
@@ -249,6 +342,22 @@ def build() -> dict:
             {"result": "5000 blind GUI inputs find nothing in eog",
              "detail": "0 crashes, 0 hangs, controls held",
              "source": "gui-campaign-5000-2026-09-01.json"},
+            {"result": "A corpus audit larger than the published competitor's found "
+                       "nothing reportable",
+             "detail": "879 harnesses across 124 projects, with the contract gates running "
+                       "for the first time, produced 4 blocking candidates -- all one bazel "
+                       "OOM test fixture, all TRUE, none reportable. QuartetFuzz audited 586 "
+                       "across 70 and landed 29 fixes. Third consecutive scaled run to find "
+                       "nothing, and the strongest evidence that the findings axis is not "
+                       "won by grading more harnesses.",
+             "source": "corpus-audit/audit-2026-09-01-after-fixes.json"},
+            {"result": "Seeds do nothing for text formats and can hurt",
+             "detail": "20 paired campaigns over cjson, jansson, zlib and libyaml: 10 "
+                       "better, 4 tied, 6 worse, median +0.15%, sign test p=0.4545. cjson "
+                       "was WORSE at 0.9151. A fuzzer reaches valid JSON from an empty "
+                       "corpus in seconds. The same technique gives 20-27x on jbig2dec, so "
+                       "the split by format is the result rather than a single number.",
+             "source": "seeds/text-formats-2026-09-01.json"},
             {"result": "Coverage guidance does not beat blind mutation on a GUI target",
              "detail": "Guided median 3257 regions against blind 3270, exact Mann-Whitney "
                        "p=0.3211, median ratio 0.996. For 7-against-8 the minimum attainable "
@@ -291,6 +400,22 @@ def build() -> dict:
             "A sweep driver reported BUILD FAILURES AS SUCCESSFUL BUILDS because it imported "
             "the fuzzer inside a function, so the first call and later calls took different "
             "paths. Found only after adding a fuzz_ran field.",
+            "I claimed the +0.40% synthesis verdict was measured UNSEEDED and used it to "
+            "argue the coverage axis needed re-running. False: probe_select.probe() seeds "
+            "from drive.py's curated directories and brotli's case carries "
+            "seeds=[tests/testdata]. I had confused probe_synth's 64-run SMOKE TEST, which "
+            "does use a synthetic input, with its coverage campaign. OGHarn still wins that "
+            "axis and there is no seeding excuse for it.",
+            "The claim of 0 FALSE POSITIVES did not survive turning the contract gates on: "
+            "the first 879-harness run measured 2 on 154 high-fidelity lifts, 1.3%. Both "
+            "were defects in this engine and both are fixed, restoring zero -- but the 1.3% "
+            "stays recorded, because a precision number that only appears after it has been "
+            "repaired is not evidence.",
+            "The test-sequence extractor reported 0% of the exported surface for expat, "
+            "lcms2 and libpng because it looked for test directories only at the ROOT, and "
+            "0% for expat again because its tests are declared by the check framework's "
+            "START_TEST macro rather than as C functions. Both zeros were claims about the "
+            "instrument, and both understated the answer -- expat is 91.0%.",
         ],
     }
 
