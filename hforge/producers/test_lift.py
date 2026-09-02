@@ -216,6 +216,21 @@ def propose(path: str, entry: str, decls: dict, seam: Optional[dict] = None,
     # The test is never compiled; only its sequence travels.
     apis = {k: replace(a, header=(hdrs0[0] if (hdrs0 := list(headers or [])) else ""))
             for k, a in ir.apis.items()}
+
+    # THE HEADER'S RETURN TYPE, FOR EVERY API -- not only the static-inline ones.
+    #
+    # The lift reads call sites, which do not state return types, so its Api carries a
+    # default. Overriding that only for inline definitions fixed jansson's json_decref and
+    # left every NORMALLY declared void function broken: cjson's cJSON_AddItemToObject is
+    # `void`, and the emitter wrote `hf_sink += (long)cJSON_AddItemToObject(...)` --
+    # "operand of type 'void' where arithmetic or pointer type is required". All four cjson
+    # candidates died at build for that one reason.
+    for nm, d in decls.items():
+        a = apis.get(nm)
+        rt = getattr(d, "ret", "") or ""
+        if a is not None and rt:
+            apis[nm] = replace(a, returns=TypeRef(
+                rt, "pointer" if "*" in rt else "scalar"))
     for nm, rt in inline_ret.items():
         a = apis.get(nm)
         if a is not None and rt:

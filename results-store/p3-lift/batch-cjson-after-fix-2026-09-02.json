@@ -1,0 +1,42 @@
+{
+ "generated_utc": "2026-09-02T18:52:08Z",
+ "budget_seconds": 15,
+ "repeats": 1,
+ "rows": [
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_parse_with_opts_should_requi",
+   "repeat": 0,
+   "cov": 198,
+   "execs": 1115678
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_parse_with_opts_should_parse",
+   "repeat": 0,
+   "cov": 198,
+   "execs": 1363763
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_parse_with_opts_should_retur",
+   "repeat": 0,
+   "cov": 192,
+   "execs": 2051548
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_cjson_add_item_to_object_or_",
+   "repeat": 0,
+   "cov": 18,
+   "execs": 9095645
+  },
+  {
+   "library": "cjson",
+   "arm": "DEVELOPER:cjson_read_fuzzer.c",
+   "repeat": 0,
+   "cov": 304,
+   "execs": 2648218
+  }
+ ]
+}

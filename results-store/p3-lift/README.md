@@ -53,6 +53,39 @@ helper may itself call library APIs, so the count of what was dropped travels wi
    Resource types came from the lift as `void *` for the same reason, and the build failed on
    `passing 'void **' to parameter of type 'json_error_t *'`. Both now come from the header.
 
+## Against the DEVELOPER-WRITTEN harness, which is the comparison that counts
+
+| library | best lifted | developer | ratio |
+|---|---|---|---|
+| jansson | 449 | 657 | **0.68x** |
+| cjson | 198 | 304 | **0.65x** |
+
+Paired, same mined seed corpus, same budget, same flags, arms alternating order.
+
+**P3.LIFT closes most of OUR OWN gap and does not close OGHarn's.** Our generated plans sit at
+0.06-0.07x of the developer harness; a lifted test reaches 0.65-0.68x. That is a 9-10x
+improvement on the thing we control, and it is still a THIRD BELOW the human-written baseline
+-- where OGHarn reports 1.14x. The axis is not contested yet.
+
+Why the developer harness still wins, as a hypothesis rather than a conclusion:
+`json_load_dump_fuzzer.cc` loads AND dumps, exercising both directions of the library, while a
+single lifted test does one thing. Combining sequences from several tests, or ranking
+candidates by the BREADTH of the lifted sequence rather than only by seam quality, is the
+obvious next move -- the current ranking prefers a good seam and takes whatever breadth comes
+with it.
+
+## Where it does not work yet
+
+**expat: 0 candidates passed the gates, and its own harness did not build either.** Not
+diagnosed. A technique that works on 2 of 3 libraries tried is not a technique yet.
+
+**cjson needed a fix that jansson had hidden.** The lift reads call sites, which do not state
+return types, so its Api carries a default. Overriding that only for STATIC-INLINE definitions
+fixed jansson's json_decref and left every normally-declared void function broken: cjson's
+cJSON_AddItemToObject is void, the emitter wrote `hf_sink += (long)cJSON_AddItemToObject(...)`,
+and all four cjson candidates died at build for that one reason. Return types now come from
+the header for every API.
+
 ## What is NOT claimed
 
 **n = 1 library, 1 test function, 1 run, 15 seconds.** No repeats, so the variance is unknown.

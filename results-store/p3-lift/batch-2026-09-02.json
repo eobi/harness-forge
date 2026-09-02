@@ -1,0 +1,91 @@
+{
+ "generated_utc": "2026-09-02T18:46:56Z",
+ "budget_seconds": 20,
+ "repeats": 2,
+ "rows": [
+  {
+   "library": "jansson",
+   "arm": "lifted:jansson_allow_nul_json_loads",
+   "repeat": 0,
+   "cov": 446,
+   "execs": 1876125
+  },
+  {
+   "library": "jansson",
+   "arm": "lifted:jansson_disable_eof_check_json_loa",
+   "repeat": 0,
+   "cov": 449,
+   "execs": 882313
+  },
+  {
+   "library": "jansson",
+   "arm": "lifted:jansson_file_not_found_json_load_f",
+   "repeat": 0,
+   "cov": 37,
+   "execs": 1842226
+  },
+  {
+   "library": "jansson",
+   "arm": "lifted:jansson_very_long_file_name_json_l",
+   "repeat": 0,
+   "cov": 37,
+   "execs": 2346799
+  },
+  {
+   "library": "jansson",
+   "arm": "DEVELOPER:json_load_dump_fuzzer.cc",
+   "repeat": 0,
+   "cov": 654,
+   "execs": 1585227
+  },
+  {
+   "library": "jansson",
+   "arm": "DEVELOPER:json_load_dump_fuzzer.cc",
+   "repeat": 1,
+   "cov": 660,
+   "execs": 1358838
+  },
+  {
+   "library": "jansson",
+   "arm": "lifted:jansson_very_long_file_name_json_l",
+   "repeat": 1,
+   "cov": 37,
+   "execs": 1556773
+  },
+  {
+   "library": "jansson",
+   "arm": "lifted:jansson_file_not_found_json_load_f",
+   "repeat": 1,
+   "cov": 37,
+   "execs": 2296483
+  },
+  {
+   "library": "jansson",
+   "arm": "lifted:jansson_disable_eof_check_json_loa",
+   "repeat": 1,
+   "cov": 449,
+   "execs": 566361
+  },
+  {
+   "library": "jansson",
+   "arm": "lifted:jansson_allow_nul_json_loads",
+   "repeat": 1,
+   "cov": 446,
+   "execs": 1004687
+  },
+  {
+   "library": "cjson",
+   "arm": "DEVELOPER:cjson_read_fuzzer.c",
+   "repeat": 0,
+   "cov": 279,
+   "execs": 3171916
+  },
+  {
+   "library": "cjson",
+   "arm": "DEVELOPER:cjson_read_fuzzer.c",
+   "repeat": 1,
+   "cov": 302,
+   "execs": 3515244
+  }
+ ]
+}
