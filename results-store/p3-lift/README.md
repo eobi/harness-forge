@@ -74,6 +74,41 @@ candidates by the BREADTH of the lifted sequence rather than only by seam qualit
 obvious next move -- the current ranking prefers a good seam and takes whatever breadth comes
 with it.
 
+## Breadth ranking: REFUTED, and it says something useful
+
+The hypothesis for the remaining gap was that the developer harness wins by being broader.
+Ranking candidates by the number of DISTINCT library APIs the lifted sequence keeps:
+
+| candidate | distinct APIs | coverage | vs developer |
+|---|---|---|---|
+| `test_equal_complex` | **5** | 58 | 0.09x |
+| `allow_nul` -> `json_loads` | 4 | **444** | **0.67x** |
+
+**More APIs gave LESS coverage.** `test_equal_complex` calls five comparison functions that
+each touch very little; one `json_loads` reaches the whole parser. Distinct-API count is a bad
+proxy for reachable code, and the seam is what matters.
+
+That refines rather than kills the idea. The developer harness loads AND dumps -- two DEEP
+subsystems, not many shallow functions. The refined hypothesis is that what counts is the
+number of deep entry points reached, and it is untested because of the limitation below.
+
+## The limitation that blocks the next test
+
+jansson's `embed()` does exactly what the refined hypothesis wants -- one load and three dumps
+-- and the seam finder finds NOTHING in it:
+
+```c
+static const char *plains[] = {"{\"bar\":[],\"foo\":{}}", "[[],{}]", "{}", "[]", NULL};
+...
+const char *plain = plains[i];
+parse = json_loads(plain, 0, NULL);
+```
+
+A seam is currently required to be a STRING LITERAL AT THE CALL SITE. Here the literals sit in
+a static table and the call receives a variable, which is a very common test idiom. Following
+a variable back to the literal that fills it is the next piece of work, and it is what stands
+between this and testing the load-and-dump hypothesis at all.
+
 ## Where it does not work yet
 
 **expat: 0 candidates passed the gates, and its own harness did not build either.** Not

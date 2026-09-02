@@ -1,0 +1,49 @@
+{
+ "generated_utc": "2026-09-02T19:42:44Z",
+ "budget_seconds": 20,
+ "repeats": 2,
+ "rows": [
+  {
+   "library": "jansson",
+   "arm": "lifted:jansson_b05_test_equal_complex_jso",
+   "repeat": 0,
+   "cov": 58,
+   "execs": 10447567
+  },
+  {
+   "library": "jansson",
+   "arm": "lifted:jansson_b04_allow_nul_json_loads",
+   "repeat": 0,
+   "cov": 443,
+   "execs": 1459155
+  },
+  {
+   "library": "jansson",
+   "arm": "DEVELOPER:json_load_dump_fuzzer.cc",
+   "repeat": 0,
+   "cov": 661,
+   "execs": 1615132
+  },
+  {
+   "library": "jansson",
+   "arm": "DEVELOPER:json_load_dump_fuzzer.cc",
+   "repeat": 1,
+   "cov": 663,
+   "execs": 1172327
+  },
+  {
+   "library": "jansson",
+   "arm": "lifted:jansson_b04_allow_nul_json_loads",
+   "repeat": 1,
+   "cov": 446,
+   "execs": 1309400
+  },
+  {
+   "library": "jansson",
+   "arm": "lifted:jansson_b05_test_equal_complex_jso",
+   "repeat": 1,
+   "cov": 58,
+   "execs": 9903593
+  }
+ ]
+}

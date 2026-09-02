@@ -135,7 +135,16 @@ def lifted_candidates(lib: str, work: Path, out: Path, top: int) -> list:
                 seams.extend(seams_for(f, s["function"], decls, src))
     seams.sort(key=lambda s: (not s["parse_like"], -s["depth"]))
 
-    made, seen = [], set()
+    # RANK BY BREADTH, NOT ONLY BY SEAM QUALITY.
+    #
+    # Ranking on the seam alone picked jansson's json_loads tests, which reached 0.68x the
+    # developer harness. That harness loads AND dumps -- it exercises both directions, while
+    # a test chosen for its seam does one thing well. Breadth is the number of DISTINCT
+    # library APIs the lifted sequence keeps, and it is only knowable after proposing, so
+    # every viable candidate is built first and ranked afterwards.
+    #
+    # A seam is still required: breadth with no seam is a harness the fuzzer does not drive.
+    built, seen = [], set()
     for s in seams:
         key = (s["file"], s["function"], s["api"], s["param_index"])
         if key in seen:
@@ -155,14 +164,26 @@ def lifted_candidates(lib: str, work: Path, out: Path, top: int) -> list:
             rec["status"] = "gated"
             rec["blocked_by"] = [b.code for b in blocks[:3]]
             continue
+        breadth = len({o.api for o in plan.sequence})
+        built.append({"plan": plan, "record": rec, "seam": s, "breadth": breadth})
+        if len(built) >= top * 6:          # a pool to rank, not the final selection
+            break
+
+    built.sort(key=lambda c: (-c["breadth"], not c["seam"]["parse_like"],
+                              -c["seam"]["depth"]))
+    made: list = []
+    for c in built:
         try:
-            csrc = emit(plan).source
+            csrc = emit(c["plan"]).source
         except Exception as ex:                                     # noqa: BLE001
-            rec["status"] = f"emit-refused: {str(ex)[:60]}"
+            c["record"]["status"] = f"emit-refused: {str(ex)[:60]}"
             continue
-        cf = out / f"{lib}_{s['function'][:28]}_{s['api'][:20]}.c"
+        cf = out / (f"{lib}_b{c['breadth']:02d}_{c['seam']['function'][:24]}"
+                    f"_{c['seam']['api'][:18]}.c")
         cf.write_text(csrc)
-        made.append({"file": cf, "record": rec, "seam": s})
+        c["record"]["breadth"] = c["breadth"]
+        made.append({"file": cf, "record": c["record"], "seam": c["seam"],
+                     "breadth": c["breadth"]})
         if len(made) >= top:
             break
     return made
