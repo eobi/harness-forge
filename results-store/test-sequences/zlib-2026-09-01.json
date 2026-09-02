@@ -1,0 +1,53 @@
+{
+ "generated_utc": "2026-09-02T00:04:17Z",
+ "library": "zlib",
+ "exported": 81,
+ "test_files": 28,
+ "sequences": 40,
+ "distinct_functions_reached": 42,
+ "surface_reached_pct": 51.9,
+ "median_sequence_length": 4,
+ "max_sequence_length": 21,
+ "widest_single_test": {
+  "function": "test_gzio",
+  "file": "example.c",
+  "distinct": 12,
+  "calls": [
+   "gzopen",
+   "gzputc",
+   "gzputs",
+   "gzerror",
+   "gzprintf",
+   "gzerror",
+   "gzseek",
+   "gzclose",
+   "gzopen",
+   "gzread",
+   "gzerror",
+   "gzread",
+   "gzseek",
+   "gztell",
+   "gztell",
+   "gzgetc",
+   "gzungetc",
+   "gzgets",
+   "gzerror",
+   "gzgets",
+   "gzclose"
+  ]
+ },
+ "most_called": {
+  "inflateEnd": 18,
+  "inflate": 17,
+  "deflate": 12,
+  "deflateEnd": 12,
+  "crc32": 5,
+  "gzerror": 5,
+  "gzclose": 5,
+  "inflateSetDictionary": 5,
+  "gzread": 3,
+  "inflateReset": 3,
+  "inflateBack": 3,
+  "deflateSetDictionary": 3
+ }
+}

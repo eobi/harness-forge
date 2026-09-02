@@ -1,0 +1,13 @@
+{
+ "generated_utc": "2026-09-02T00:04:19Z",
+ "library": "jbig2dec",
+ "exported": 8,
+ "test_files": 0,
+ "sequences": 0,
+ "distinct_functions_reached": 0,
+ "surface_reached_pct": 0.0,
+ "median_sequence_length": 0,
+ "max_sequence_length": 0,
+ "widest_single_test": null,
+ "most_called": {}
+}

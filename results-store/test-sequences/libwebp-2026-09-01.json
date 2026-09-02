@@ -1,0 +1,45 @@
+{
+ "generated_utc": "2026-09-02T00:04:18Z",
+ "library": "libwebp",
+ "exported": 30,
+ "test_files": 20,
+ "sequences": 4,
+ "distinct_functions_reached": 20,
+ "surface_reached_pct": 66.7,
+ "median_sequence_length": 6,
+ "max_sequence_length": 13,
+ "widest_single_test": {
+  "function": "LLVMFuzzerTestOneInput",
+  "file": "simple_api_fuzzer.c",
+  "distinct": 13,
+  "calls": [
+   "WebPGetInfo",
+   "WebPDecodeRGBA",
+   "WebPDecodeBGRA",
+   "WebPDecodeARGB",
+   "WebPDecodeRGB",
+   "WebPDecodeBGR",
+   "WebPDecodeYUV",
+   "WebPDecodeRGBAInto",
+   "WebPDecodeARGBInto",
+   "WebPDecodeBGRInto",
+   "WebPDecodeRGBInto",
+   "WebPDecodeBGRAInto",
+   "WebPDecodeYUVInto"
+  ]
+ },
+ "most_called": {
+  "WebPFreeDecBuffer": 2,
+  "WebPGetDecoderVersion": 2,
+  "WebPGetInfo": 2,
+  "WebPIDelete": 1,
+  "WebPDecode": 1,
+  "WebPIUpdate": 1,
+  "WebPIDecode": 1,
+  "WebPIAppend": 1,
+  "WebPDecodeBGRAInto": 1,
+  "WebPDecodeRGBAInto": 1,
+  "WebPDecodeBGR": 1,
+  "WebPDecodeBGRInto": 1
+ }
+}

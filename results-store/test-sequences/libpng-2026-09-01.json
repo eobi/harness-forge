@@ -1,0 +1,52 @@
+{
+ "generated_utc": "2026-09-02T00:04:18Z",
+ "library": "libpng",
+ "exported": 245,
+ "test_files": 41,
+ "sequences": 23,
+ "distinct_functions_reached": 68,
+ "surface_reached_pct": 27.8,
+ "median_sequence_length": 7,
+ "max_sequence_length": 20,
+ "widest_single_test": {
+  "function": "readpng2_info_callback",
+  "file": "readpng2.c",
+  "distinct": 16,
+  "calls": [
+   "png_get_progressive_ptr",
+   "png_get_IHDR",
+   "png_get_bKGD",
+   "png_set_expand",
+   "png_set_expand",
+   "png_get_valid",
+   "png_set_expand",
+   "png_set_scale_16",
+   "png_set_strip_16",
+   "png_set_gray_to_rgb",
+   "png_get_gAMA",
+   "png_set_gamma",
+   "png_set_gamma",
+   "png_get_gAMA_fixed",
+   "png_set_gamma_fixed",
+   "png_set_gamma_fixed",
+   "png_set_interlace_handling",
+   "png_read_update_info",
+   "png_get_rowbytes",
+   "png_get_channels"
+  ]
+ },
+ "most_called": {
+  "png_destroy_read_struct": 8,
+  "png_create_info_struct": 8,
+  "png_init_io": 7,
+  "png_destroy_write_struct": 6,
+  "png_create_read_struct": 5,
+  "png_error": 5,
+  "png_get_libpng_ver": 5,
+  "png_get_rowbytes": 4,
+  "png_get_IHDR": 4,
+  "png_write_end": 4,
+  "png_read_info": 3,
+  "png_get_valid": 3
+ }
+}

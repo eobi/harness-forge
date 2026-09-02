@@ -1,0 +1,50 @@
+{
+ "generated_utc": "2026-09-02T00:04:17Z",
+ "library": "libyaml",
+ "exported": 48,
+ "test_files": 13,
+ "sequences": 9,
+ "distinct_functions_reached": 30,
+ "surface_reached_pct": 62.5,
+ "median_sequence_length": 3,
+ "max_sequence_length": 18,
+ "widest_single_test": {
+  "function": "main",
+  "file": "run-emitter-test-suite.c",
+  "distinct": 16,
+  "calls": [
+   "yaml_emitter_initialize",
+   "yaml_emitter_set_output_file",
+   "yaml_emitter_set_canonical",
+   "yaml_emitter_set_unicode",
+   "yaml_stream_start_event_initialize",
+   "yaml_stream_end_event_initialize",
+   "yaml_document_start_event_initialize",
+   "yaml_document_end_event_initialize",
+   "yaml_mapping_start_event_initialize",
+   "yaml_mapping_end_event_initialize",
+   "yaml_sequence_start_event_initialize",
+   "yaml_sequence_end_event_initialize",
+   "yaml_scalar_event_initialize",
+   "yaml_alias_event_initialize",
+   "yaml_emitter_emit",
+   "yaml_emitter_delete",
+   "yaml_emitter_delete",
+   "yaml_emitter_delete"
+  ]
+ },
+ "most_called": {
+  "yaml_parser_initialize": 5,
+  "yaml_parser_delete": 5,
+  "yaml_parser_set_input_string": 4,
+  "yaml_document_start_event_initialize": 2,
+  "yaml_mapping_start_event_initialize": 2,
+  "yaml_sequence_start_event_initialize": 2,
+  "yaml_scalar_event_initialize": 2,
+  "yaml_stream_end_event_initialize": 2,
+  "yaml_sequence_end_event_initialize": 2,
+  "yaml_mapping_end_event_initialize": 2,
+  "yaml_document_end_event_initialize": 2,
+  "yaml_alias_event_initialize": 2
+ }
+}
