@@ -92,7 +92,27 @@ That refines rather than kills the idea. The developer harness loads AND dumps -
 subsystems, not many shallow functions. The refined hypothesis is that what counts is the
 number of deep entry points reached, and it is untested because of the limitation below.
 
-## The limitation that blocks the next test
+## Deep entry points, CONFIRMED: 0.67x -> 0.88x
+
+Following a variable back to the literal that fills it unblocked jansson's `embed()`, which
+does one load and three dumps. Measured against the same developer baseline:
+
+| harness | coverage | vs developer |
+|---|---|---|
+| our generated plans | 48 | 0.07x |
+| lifted, parse only (`allow_nul`) | 444 | 0.67x |
+| **lifted, parse + dump (`embed`)** | **584** | **0.88x** |
+| developer (`json_load_dump_fuzzer.cc`) | 662 | 1.00x |
+
+**What matters is the number of DEEP subsystems a harness reaches, not how many APIs it
+calls.** Breadth by API count was refuted at 0.09x; breadth by subsystem takes the same
+technique from 0.67x to 0.88x. The developer harness wins by loading AND dumping, and a lifted
+test that does both nearly matches it.
+
+Still below 1.00x, and OGHarn reports 1.14x over developer harnesses. The axis is closer to
+contested than it has ever been and is not contested yet.
+
+## The limitation that blocked it, and the bug inside the fix
 
 jansson's `embed()` does exactly what the refined hypothesis wants -- one load and three dumps
 -- and the seam finder finds NOTHING in it:
@@ -104,10 +124,19 @@ const char *plain = plains[i];
 parse = json_loads(plain, 0, NULL);
 ```
 
-A seam is currently required to be a STRING LITERAL AT THE CALL SITE. Here the literals sit in
-a static table and the call receives a variable, which is a very common test idiom. Following
-a variable back to the literal that fills it is the next piece of work, and it is what stands
-between this and testing the load-and-dump hypothesis at all.
+A seam used to be required to be a STRING LITERAL AT THE CALL SITE. Here the literals sit in a
+static table and the call receives a variable, which is a very common test idiom -- so this
+was not one awkward function but a whole class of tests the finder could not see. The trace
+now follows two hops: assignment from a literal, and assignment from a subscript of an array
+initialised with literals. Deeper chains are left alone rather than guessed at, because a
+wrong seam produces a harness that runs and tests nothing.
+
+**A bug inside that fix, worth recording because it failed silently.** Matching the array
+initialiser with a non-greedy `\{(.*?)\}` stops at the FIRST closing brace -- and jansson's
+table begins `{"{\"bar\":[],\"foo\":{}}", ...}`, whose first `}` is four characters into the
+first element. The captured initialiser was a truncated fragment containing no complete
+literal, so the trace found the array, found nothing in it, and reported no seam at all. The
+closing brace must end the statement.
 
 ## Where it does not work yet
 

@@ -35,9 +35,54 @@ sys.path.insert(0, str(ROOT / "tools"))
 from hforge.producers.header_graph import base_type, parse_header   # noqa: E402
 from hforge.lift.c_harness import LiftError                         # noqa: E402
 from hforge.lift.c_harness import lift                              # noqa: E402
-from test_sequences import sequences_in                             # noqa: E402
+from test_sequences import _body, sequences_in                      # noqa: E402
 
 _STR_LIT = re.compile(r'"(?:[^"\\]|\\.)*"')
+_IDENT = re.compile(r"^[A-Za-z_]\w*$")
+
+
+def _literal_source(var: str, body: str, filesrc: str, depth: int = 0):
+    """Follow `var` back to the string literal that fills it, or None.
+
+    A SEAM DOES NOT HAVE TO BE A LITERAL AT THE CALL SITE. jansson's embed() -- one load and
+    three dumps, exactly the shape worth testing -- keeps its inputs in a static table:
+
+        static const char *plains[] = {"{\"bar\":[],\"foo\":{}}", "[[],{}]", ...};
+        const char *plain = plains[i];
+        parse = json_loads(plain, 0, NULL);
+
+    Requiring a literal at the call site made that whole class of tests invisible, and it is a
+    very common idiom. Two hops are followed and no more: assignment from a literal, and
+    assignment from a subscript of an array initialised with literals. Deeper chains are left
+    alone rather than guessed at -- a wrong seam produces a harness that runs and tests
+    nothing, which is worse than no candidate.
+    """
+    if depth > 2 or not _IDENT.match(var or ""):
+        return None
+    # X = "literal";  or  const char *X = "literal";
+    m = re.search(rf"\b{re.escape(var)}\s*=\s*({_STR_LIT.pattern})", body)
+    if m:
+        return m.group(1)
+    # X = ARR[...];  then  ARR[] = {"lit", ...}  anywhere in the file
+    m = re.search(rf"\b{re.escape(var)}\s*=\s*([A-Za-z_]\w*)\s*\[", body)
+    if m:
+        arr = m.group(1)
+        # `\}` MUST END THE STATEMENT. A non-greedy match to the first closing brace stops
+        # INSIDE a string literal: jansson's table begins {"{\"bar\":[],\"foo\":{}}", ...},
+        # whose first `}` is four characters into the first element. The captured initialiser
+        # was a truncated fragment containing no complete literal, so the trace found the
+        # array, found nothing in it, and reported no seam.
+        a = re.search(rf"\b{re.escape(arr)}\s*\[\s*\]\s*=\s*\{{(.*?)\}}\s*;",
+                      filesrc, re.S)
+        if a:
+            lits = _STR_LIT.findall(a.group(1))
+            if lits:
+                return lits[0]
+    # X = Y;  one alias hop
+    m = re.search(rf"\b{re.escape(var)}\s*=\s*([A-Za-z_]\w*)\s*;", body)
+    if m:
+        return _literal_source(m.group(1), body, filesrc, depth + 1)
+    return None
 _BYTEISH = {"char", "unsigned char", "void", "uint8_t", "int8_t"}
 
 
@@ -82,6 +127,13 @@ def _buffer_params(decl) -> list:
     return out
 
 
+def _body_of_function(src: str, fn: str) -> str:
+    m = re.search(rf"\b{re.escape(fn)}\s*\([^;{{}}]*\)\s*\{{", src)
+    if not m:
+        return ""
+    return _body(src, src.index("{", m.end() - 1))
+
+
 def seams_for(path: Path, fn: str, decls: dict, src: str) -> list:
     """Candidate seams in one test function, deepest first."""
     try:
@@ -106,10 +158,16 @@ def seams_for(path: Path, fn: str, decls: dict, src: str) -> list:
         argstrs = by_api.get(op.api) or []
         for argstr in argstrs[:3]:
             args = [a.strip() for a in re.split(r",(?![^(]*\))", argstr)]
+            fnbody = _body_of_function(src, fn)
             for idx in bufs:
                 if idx >= len(args):
                     continue
-                if not _STR_LIT.fullmatch(args[idx]):
+                lit = args[idx] if _STR_LIT.fullmatch(args[idx]) else None
+                via = "literal at the call"
+                if lit is None:
+                    lit = _literal_source(args[idx], fnbody, src)
+                    via = "traced through a variable"
+                if lit is None:
                     continue
                 # DEPTH: how many later ops touch what this call produced.
                 produced = op.binds
@@ -117,7 +175,8 @@ def seams_for(path: Path, fn: str, decls: dict, src: str) -> list:
                             if produced and any(a.ref == produced for a in later.args))
                 parseish = bool(_PARSEISH.search(op.api))
                 out.append({"function": fn, "file": path.name, "api": op.api,
-                            "param_index": idx, "literal": args[idx][:60],
+                            "param_index": idx, "literal": lit[:60],
+                            "argument": args[idx][:40], "seam_via": via,
                             "depth": depth, "op": op.id, "parse_like": parseish,
                             "rank_reason": ("name says it parses" if parseish
                                             else "ranked on depth alone")})
