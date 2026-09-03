@@ -33,7 +33,8 @@ sys.path.insert(0, str(ROOT / "tools"))
 from hforge.emit import emit                                        # noqa: E402
 from hforge.gates.static_gates import BLOCK, run_static_gates       # noqa: E402
 from hforge.producers.header_graph import parse_header              # noqa: E402
-from hforge.producers.test_lift import inline_api, propose          # noqa: E402
+from hforge.producers.test_lift import (inline_api, propose,        # noqa: E402
+                                        resolve_wrappers)
 from libspec import (DEFINES, SEED_FORMATS, _include_dirs,          # noqa: E402
                      _sources_for)
 from seam_finder import seams_for                                   # noqa: E402
@@ -160,6 +161,11 @@ def lifted_candidates(lib: str, work: Path, out: Path, top: int) -> list:
     # tool until it is checked, and this is the second time the same zero meant the same
     # thing.
     from test_sequences import _TEST_DIRS                            # noqa: PLC0415
+
+    def _is_unit_test(q: Path) -> bool:
+        low = q.name.lower()
+        return not ("fuzz" in low or "fuzzer" in str(q.parent).lower())
+
     tdirs = [d for d in sorted((work / lib).rglob("*"))
              if d.is_dir() and d.name.lower() in _TEST_DIRS and ".git" not in d.parts]
     # A FUZZ HARNESS IS NOT A UNIT TEST, and lifting one would be circular.
@@ -169,9 +175,16 @@ def lifted_candidates(lib: str, work: Path, out: Path, top: int) -> list:
     # this experiment measures against and compare it with itself. They are also useless as
     # sources -- they take (data, size) and contain no literal seam -- so the driver reported
     # a clean "0 candidates" while doing something that should never have been attempted.
-    def _is_unit_test(q: Path) -> bool:
-        low = q.name.lower()
-        return not ("fuzz" in low or "fuzzer" in str(q.parent).lower())
+    # Resolve test-local wrappers ONCE for the whole suite: expat reaches the parser through
+    # _XML_Parse_SINGLE_BYTES 152 times against 32 direct XML_Parse calls.
+    tfiles = [q for base in tdirs for q in sorted(base.rglob("*.c"))[:300]
+              if _is_unit_test(q)]
+    wrappers = resolve_wrappers(tfiles, decls)
+    if wrappers:
+        print(f"  {len(wrappers)} test-local wrapper(s) resolved: "
+              f"{', '.join(f'{k}->{v[0]}' for k, v in list(wrappers.items())[:3])}",
+              flush=True)
+    api |= set(wrappers)
 
     seams: list = []
     for base in tdirs:
@@ -181,7 +194,8 @@ def lifted_candidates(lib: str, work: Path, out: Path, top: int) -> list:
             except OSError:
                 continue
             for s in sequences_in(f, api):
-                seams.extend(seams_for(f, s["function"], decls, src))
+                seams.extend(seams_for(f, s["function"], decls, src,
+                                       wrappers=wrappers))
     seams.sort(key=lambda s: (not s["parse_like"], -s["depth"]))
 
     # RANK BY BREADTH, NOT ONLY BY SEAM QUALITY.
@@ -204,7 +218,7 @@ def lifted_candidates(lib: str, work: Path, out: Path, top: int) -> list:
             continue
         plan, rec = propose(str(src_file), s["function"], decls, seam=s,
                             target_name=lib, headers=[Path(LIBS[lib][0]).name],
-                            also_api=extra)
+                            also_api=extra, wrappers=wrappers)
         if plan is None:
             continue
         blocks = [v for g in run_static_gates(plan) for v in g.violations

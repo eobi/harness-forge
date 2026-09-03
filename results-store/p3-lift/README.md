@@ -190,6 +190,37 @@ It produced a clean "0 candidates" while attempting something that should never 
 which is the most dangerous shape of failure -- a correct-looking result from a wrong method.
 Fuzz harnesses are now excluded from the test scan by name and by directory.
 
+## Test-local wrappers: built, and expat is still not measurable
+
+`resolve_wrappers` maps a test helper to the library call it wraps. A WITNESS is required
+rather than a name match: the helper must call exactly one library API, take the same number
+of parameters, and actually PASS its own parameter at the position claimed -- checked by
+finding that parameter name as the corresponding argument inside the body. Without the last
+condition a helper that reorders its arguments would have its seam mapped to the wrong
+parameter, producing a harness that runs and tests nothing.
+
+It resolves `_XML_Parse_SINGLE_BYTES -> XML_Parse` with all four parameters witnessed, and
+expat went **0 seams -> 31 seams -> 3 candidates past the gates**, from zero.
+
+**It is still not a measurement.** All three candidates die at build, on a fourth distinct
+cause: the lifter classifies `XML_Parser` as an inline struct and emits `&parser`, but
+`XML_Parser` is already a pointer typedef (`struct XML_ParserStruct *`). That is a
+storage-classification defect, not a seam problem.
+
+Four independent blockers were found in expat, each hidden behind the last:
+
+1. test directories searched only at the checkout root (the same defect fixed earlier in
+   `test_sequences.py` -- the second time that zero meant the same thing);
+2. the suite reaches the parser through a helper 152 times against 32 direct calls;
+3. `_body_of_function` could not find a MACRO-declared body (`START_TEST(name)`), so every
+   variable trace searched an EMPTY string and failed silently;
+4. inputs are declared `char text[] = "..."`, and the tracer required `=` to follow the name
+   immediately.
+
+Fixes 3 and 4 are general and help every suite, not only expat. `resolve_wrappers` is general
+too. Whether expat itself ever produces a measurement is a separate question, and it is not
+answered.
+
 ## Where it does not work yet
 
 **expat: 0 candidates passed the gates, and its own harness did not build either.** Not

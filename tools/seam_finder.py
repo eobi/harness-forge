@@ -59,8 +59,12 @@ def _literal_source(var: str, body: str, filesrc: str, depth: int = 0):
     """
     if depth > 2 or not _IDENT.match(var or ""):
         return None
-    # X = "literal";  or  const char *X = "literal";
-    m = re.search(rf"\b{re.escape(var)}\s*=\s*({_STR_LIT.pattern})", body)
+    # X = "literal";  const char *X = "literal";  or  char X[] = "literal";
+    #
+    # The array form is the common way a C test holds its input, and requiring `=` to follow
+    # the name immediately missed all of it: expat writes `char text[] = "<doc/>"`.
+    m = re.search(rf"\b{re.escape(var)}\s*(?:\[[^\]]*\])?\s*=\s*({_STR_LIT.pattern})",
+                  body)
     if m:
         return m.group(1)
     # X = ARR[...];  then  ARR[] = {"lit", ...}  anywhere in the file
@@ -127,14 +131,30 @@ def _buffer_params(decl) -> list:
     return out
 
 
+_MACRO_ENTRY = ("START_TEST", "TEST", "TEST_F", "TEST_P", "CTEST", "CTEST2",
+                "ZTEST", "UTEST")
+
+
 def _body_of_function(src: str, fn: str) -> str:
-    m = re.search(rf"\b{re.escape(fn)}\s*\([^;{{}}]*\)\s*\{{", src)
-    if not m:
-        return ""
-    return _body(src, src.index("{", m.end() - 1))
+    """The body of `fn`, whether declared plainly or by a framework macro.
+
+    A macro-declared test is written `START_TEST(test_nul_byte)` and then `{`, so a pattern
+    requiring `name(` finds nothing and the body comes back EMPTY -- which makes every
+    variable trace fail silently, since there is nothing to search. expat's whole suite is
+    written that way.
+    """
+    pats = [rf"\b{re.escape(fn)}\s*\([^;{{}}]*\)\s*\{{"]
+    pats += [rf"\b{mac}\s*\(\s*{re.escape(fn)}\b[^)]*\)\s*\{{"
+             for mac in _MACRO_ENTRY]
+    for pat in pats:
+        m = re.search(pat, src)
+        if m:
+            return _body(src, src.index("{", m.end() - 1))
+    return ""
 
 
-def seams_for(path: Path, fn: str, decls: dict, src: str) -> list:
+def seams_for(path: Path, fn: str, decls: dict, src: str,
+              wrappers: dict = None) -> list:
     """Candidate seams in one test function, deepest first."""
     try:
         lifted = lift(str(path), target_name=path.stem, entry=fn)
@@ -147,15 +167,23 @@ def seams_for(path: Path, fn: str, decls: dict, src: str) -> list:
     for name, argstr in calls:
         by_api.setdefault(name, []).append(argstr)
 
+    wmap = wrappers or {}
     out: list = []
     for i, op in enumerate(ops):
-        d = decls.get(op.api)
+        # Resolve a test-local wrapper to the library call it wraps, and look for the seam
+        # under the WRAPPER's own name at the call site -- the source says
+        # _XML_Parse_SINGLE_BYTES(parser, text, ...), not XML_Parse(...).
+        api_sym = op.api
+        call_sym = op.api
+        if api_sym in wmap:
+            api_sym = wmap[api_sym][0]
+        d = decls.get(api_sym)
         if d is None:
             continue
         bufs = _buffer_params(d)
         if not bufs:
             continue
-        argstrs = by_api.get(op.api) or []
+        argstrs = by_api.get(call_sym) or []
         for argstr in argstrs[:3]:
             args = [a.strip() for a in re.split(r",(?![^(]*\))", argstr)]
             fnbody = _body_of_function(src, fn)
@@ -173,8 +201,9 @@ def seams_for(path: Path, fn: str, decls: dict, src: str) -> list:
                 produced = op.binds
                 depth = sum(1 for later in ops[i + 1:]
                             if produced and any(a.ref == produced for a in later.args))
-                parseish = bool(_PARSEISH.search(op.api))
-                out.append({"function": fn, "file": path.name, "api": op.api,
+                parseish = bool(_PARSEISH.search(api_sym))
+                out.append({"function": fn, "file": path.name, "api": api_sym,
+                            "via_wrapper": call_sym if call_sym != api_sym else None,
                             "param_index": idx, "literal": lit[:60],
                             "argument": args[idx][:40], "seam_via": via,
                             "depth": depth, "op": op.id, "parse_like": parseish,

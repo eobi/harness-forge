@@ -89,9 +89,94 @@ def inline_api(headers: list) -> dict:
     return out
 
 
+# THE RETURN TYPE IS OFTEN ON ITS OWN LINE, and then the NAME starts the line.
+#
+# `\b` cannot match inside an identifier, so a pattern that requires a prefix before the name
+# can never match a K&R-style definition:
+#
+#     enum XML_Status
+#     _XML_Parse_SINGLE_BYTES(XML_Parser parser, const char *s, int len, int isFinal) {
+#
+# expat's common.c is written that way throughout, and the wrapper resolver found NOTHING in
+# it -- reported as "0 wrappers", which reads as "this suite has no wrappers" when it means
+# "the pattern cannot see them". The prefix is now optional.
+_FUNC_DEF = re.compile(
+    r"^(?:[A-Za-z_][\w \t\*]*?\b)?([A-Za-z_]\w*)\s*\(([^;{}]*)\)\s*\{", re.M)
+
+# Without this, a line beginning `if (`, `for (` or `switch (` at column zero reads as a
+# function definition named `if`.
+_C_KEYWORDS = {"if", "for", "while", "switch", "do", "else", "return", "sizeof",
+               "static", "extern", "inline", "typedef", "struct", "union", "enum"}
+
+
+def _fn_body(src: str, at: int) -> str:
+    depth, i = 0, at
+    while i < len(src):
+        if src[i] == "{":
+            depth += 1
+        elif src[i] == "}":
+            depth -= 1
+            if depth == 0:
+                return src[at + 1:i]
+        i += 1
+    return ""
+
+
+def resolve_wrappers(files: list, decls: dict) -> dict:
+    """{wrapper_name: (library_api, param_index_map)} for test helpers that wrap one API.
+
+    WHY THIS IS NEEDED. expat's suite calls `_XML_Parse_SINGLE_BYTES` 152 times against 32
+    direct `XML_Parse` calls -- the helper chunks the input and calls XML_Parse in a loop. The
+    lifted op is the WRAPPER, which is not in the header, so it was dropped as scaffolding and
+    the library call inside it was never seen: 194 liftable sequences, zero seams. Wrapping a
+    library call in a test helper is an extremely common idiom, so this is not one library.
+
+    A WITNESS IS REQUIRED, NOT A NAME MATCH. The wrapper must (a) call exactly one library API
+    in its body, (b) take the same number of parameters as that API, and (c) actually PASS its
+    own parameter at the position claimed -- checked by finding that parameter's name as the
+    corresponding argument in a call to the API inside the body. Without (c) a helper that
+    reorders or transforms its arguments would have its seam mapped to the wrong parameter,
+    producing a harness that runs and tests nothing.
+    """
+    out: dict = {}
+    for f in files:
+        try:
+            src = Path(f).read_text(errors="replace")
+        except OSError:
+            continue
+        for m in _FUNC_DEF.finditer(src):
+            name, params = m.group(1), m.group(2)
+            if name in decls or _is_scaffold(name) or name in _C_KEYWORDS:
+                continue
+            body = _fn_body(src, src.index("{", m.end() - 1))
+            if not body:
+                continue
+            called = {c for c in re.findall(r"\b([A-Za-z_]\w*)\s*\(", body)
+                      if c in decls}
+            if len(called) != 1:
+                continue                       # zero, or ambiguous: say nothing
+            api = called.pop()
+            pnames = [q.strip().split()[-1].lstrip("*")
+                      for q in params.split(",") if q.strip() and q.strip() != "void"]
+            d = decls[api]
+            if len(pnames) != len(d.params):
+                continue
+            # (c) the witness: the wrapper passes its own parameter at that position.
+            pmap: dict = {}
+            for call in re.findall(rf"\b{re.escape(api)}\s*\(([^;]*?)\)", body, re.S):
+                args = [x.strip() for x in re.split(r",(?![^(]*\))", call)]
+                for i, arg in enumerate(args):
+                    if i < len(pnames) and arg == pnames[i]:
+                        pmap[i] = i
+            if pmap:
+                out[name] = (api, pmap)
+    return out
+
+
 def propose(path: str, entry: str, decls: dict, seam: Optional[dict] = None,
             target_name: str = "", headers: Optional[list] = None,
-            also_api: Optional[set] = None) -> tuple:
+            also_api: Optional[set] = None,
+            wrappers: Optional[dict] = None) -> tuple:
     """Lift one test into a plan. Returns (HarnessIR or None, record).
 
     `decls` is {symbol: Decl} from the library's public header -- the authority on what is a
@@ -110,6 +195,27 @@ def propose(path: str, entry: str, decls: dict, seam: Optional[dict] = None,
 
     ir = lifted.ir
     rec["ops_lifted"] = len(ir.sequence)
+
+    # A TEST-LOCAL WRAPPER IS THE LIBRARY CALL IT WRAPS. expat's suite reaches the parser
+    # through _XML_Parse_SINGLE_BYTES 152 times against 32 direct XML_Parse calls; without
+    # this the wrapper is not in the header, is dropped as scaffolding, and the library call
+    # inside it is never seen -- 194 liftable sequences and zero seams.
+    wmap = wrappers or {}
+    if wmap:
+        rewritten, n_w = [], 0
+        for op in ir.sequence:
+            got = wmap.get(op.api)
+            if got is None:
+                rewritten.append(op)
+                continue
+            api_name, _pmap = got
+            rewritten.append(replace(op, api=api_name))
+            n_w += 1
+        ir = replace(ir, sequence=rewritten)
+        rec["wrapper_calls_resolved"] = n_w
+        for w, (api_name, _m) in wmap.items():
+            if w in ir.apis and api_name not in ir.apis:
+                ir.apis[api_name] = replace(ir.apis[w], symbol=api_name)
     inline_ret = dict(also_api or {}) if isinstance(also_api, dict) else {}
     api_names = set(decls) | set(inline_ret) | (
         set(also_api) if not isinstance(also_api, dict) else set())
