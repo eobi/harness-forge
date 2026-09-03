@@ -407,6 +407,15 @@ def propose(path: str, entry: str, decls: dict, seam: Optional[dict] = None,
             continue
         if r.storage == "inline" and ty.count("*") >= 1:
             ty = ty.replace("*", "", 1).strip()
+        # CONST BELONGS TO THE PARAMETER, NOT TO OUR STORAGE.
+        #
+        # cJSON_AddArrayToObject declares `cJSON * const object` -- the callee promises not
+        # to repoint it. Copying that qualifier onto the harness's OWN local made it
+        # `cJSON *const hf_r_r_root`, and every later assignment failed with "cannot assign
+        # to variable with const-qualified type". Both of cjson's deep-subsystem candidates
+        # died there, after passing every gate.
+        ty = re.sub(r"\bconst\b", " ", ty)
+        ty = re.sub(r"\s+", " ", ty).strip()
         res_out.append(replace(r, type=TypeRef(
             ty, "pointer" if "*" in ty else "struct")))
 
