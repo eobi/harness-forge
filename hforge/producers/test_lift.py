@@ -31,6 +31,7 @@ from typing import Optional
 
 from ..ir import (
     SLICE_BYTES,
+    ParamDecl,
     TypeRef,
     SLICE_CSTRING,
     Arg,
@@ -236,6 +237,34 @@ def propose(path: str, entry: str, decls: dict, seam: Optional[dict] = None,
         rec["why_not"] = "every call in this test is scaffolding or a test-local helper"
         return None, rec
 
+    # PAD EVERY OP TO ITS DECLARED ARITY, not only the seam's.
+    #
+    # The lifter records the arguments it can attribute and drops the rest -- a string
+    # literal is neither fuzzer input nor a resource -- so a call written
+    # `cJSON_CreateString("item")` lifts with zero arguments. Padding only the seam's op left
+    # every OTHER call short, and S2.MISSING_ARG refused the plan, which is that gate doing
+    # its job. The padded arguments are literal 0, which is what the emitter would write for
+    # an argument nothing is bound to, and the count is recorded on the plan.
+    _padded = 0
+    _fixed = []
+    for op in kept:
+        d0 = decls.get(op.api)
+        if d0 is None or len(op.args) >= len(d0.params):
+            _fixed.append(op)
+            continue
+        extra_args = [Arg(f"a{i}", "literal", value=0)
+                      for i in range(len(op.args), len(d0.params))]
+        _padded += len(extra_args)
+        _fixed.append(replace(op, args=list(op.args) + extra_args))
+        a0 = ir.apis.get(op.api)
+        if a0 is not None and len(a0.params) < len(d0.params):
+            ir.apis[op.api] = replace(a0, params=list(a0.params) + [
+                ParamDecl(f"a{i}", TypeRef(d0.params[i][0],
+                                           "pointer" if "*" in d0.params[i][0] else "scalar"))
+                for i in range(len(a0.params), len(d0.params))])
+    kept = _fixed
+    rec["padded_args"] = _padded
+
     # THE SEAM. Without one the plan calls the library with the test's own fixed values and
     # the fuzzer drives nothing -- S5.INPUT_NOT_CONSUMED, and correctly refused.
     slices: list = []
@@ -252,6 +281,17 @@ def propose(path: str, entry: str, decls: dict, seam: Optional[dict] = None,
         # nothing at all and emitted `json_loads(0, 0, &err)` -- a harness that compiles,
         # runs, and feeds the parser a literal zero. The same mismatch cost the audit its
         # contract gates until it was fixed there too.
+        # PAD TO THE DECLARED ARITY BEFORE SUBSTITUTING.
+        #
+        # The lifter drops arguments that are neither fuzzer input nor resources -- a string
+        # literal is neither -- so `cJSON *item = cJSON_CreateString("item")` lifts with ZERO
+        # arguments against a one-parameter declaration, and the seam was refused as an
+        # "arity mismatch". That refusal is what made cjson look as though its suite had no
+        # test reaching two deep subsystems. It has four; we could not lift them.
+        #
+        # Padded here rather than in the lifter: _classify_args feeds the audit, whose
+        # false-positive rate is a recorded claim, and widening what it emits would change
+        # numbers this change has nothing to do with.
         if pidx >= len(tgt.args):
             rec["status"] = "seam-arity-mismatch"
             rec["why_not"] = (f"{api_sym} is declared with {len(d.params)} parameter(s) but "

@@ -147,16 +147,31 @@ matched. Ranked above seam depth. 3 repeats, paired, same mined corpus, arms alt
 |---|---|---|---|---|
 | jansson | 584 (`embed`, deep=2) | 646 | **0.90x** | parse + serialise |
 | jansson | 520 / 513 (deep=1) | 646 | 0.79-0.80x | parse only |
-| cjson | 198 (deep=1) | 307 | **0.64x** | parse only -- **no deep=2 test exists** |
+| cjson | 198 (deep=1) | 307 | **0.64x** | parse only in the candidates -- see the correction below |
 | libwebp | none | 2675 | -- | 0 candidates past the gates |
 
 **The ranker now picks `embed` by itself**, the candidate previously found by hand, and the
 ordering confirms the prior WITHIN jansson: deep=2 scores 0.90x against 0.79-0.80x for deep=1.
 
-**And it exposes the real bound. P3.LIFT can only be as good as the best SINGLE test
-function.** cjson's suite has no function that both parses and serialises, so every candidate
-is deep=1 and the library is stuck at 0.64x however it is ranked. The developer harness
-combines subsystems that no single test combines -- which is exactly why it wins.
+**CORRECTION, 2026-09-03. The sentence that stood here was false.** It said cjson's suite has
+no function that both parses and serialises, and concluded that a lifted harness can only be
+as good as the best single test. **cjson has four such tests** (jansson has six). They did not
+appear as candidates because THIS ENGINE could not lift them:
+
+  - two were refused `seam-arity-mismatch`. The lifter records the arguments it can attribute
+    and drops the rest -- a string literal is neither fuzzer input nor a resource -- so
+    `cJSON *item = cJSON_CreateString("item")` lifts with ZERO arguments against a
+    one-parameter declaration, and the positional seam substitution refused it;
+  - two produced no seam at all.
+
+The claim was a fact about the tool reported as a fact about the library, which is the same
+error the test-sequence extractor made twice (root-only directory search, macro-declared
+tests) and the same shape as the silent-failure class this project catalogues. Padding every
+op to its declared arity now lets both of cjson's arity-refused tests through the gates.
+
+Whether a single lifted test is a real ceiling is therefore UNMEASURED. The composition idea
+below may not be needed; lifting the deep tests that already exist is the cheaper experiment
+and comes first.
 
 That points at the next idea rather than a tuning knob: COMPOSE a sequence from several tests
 (a parse test joined to a dump test) instead of lifting one. A composed plan could exceed any
