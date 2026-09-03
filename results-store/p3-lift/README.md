@@ -162,6 +162,34 @@ That points at the next idea rather than a tuning knob: COMPOSE a sequence from 
 (a parse test joined to a dump test) instead of lifting one. A composed plan could exceed any
 single test in the suite, and nothing measured so far can.
 
+## The two zeros, diagnosed
+
+`libwebp` and `expat` produced no candidates. Different causes, and only one is a defect.
+
+**expat -- a real gap, and a fixable one.** Its 18 test files yield 194 liftable sequences and
+ZERO seams, because the suite calls the parser through its own wrapper: `_XML_Parse_SINGLE_BYTES`
+appears 152 times against 32 direct `XML_Parse` calls. The lifted op is the WRAPPER, which is
+not in the header, so it is dropped as scaffolding and the library call inside it is never
+seen. **Tests that reach the library through a test-local helper are invisible to this
+technique.** Resolving one level of wrapper -- inlining a helper defined in the test file whose
+body calls a library API -- is the fix, and it is likely to affect many suites.
+
+Finding this also required fixing the SAME defect twice: test directories were searched only at
+the checkout root, so expat's `expat/expat/tests` went unread. `test_sequences.py` had already
+been fixed for exactly that after expat, lcms2 and libpng all reported 0% of their exported
+surface. A zero from a tool is a claim about the tool until it is checked, and this is the
+second time the same zero meant the same thing.
+
+**libwebp -- not a defect, and it exposed a circularity.** libwebp ships NO unit tests. Its
+`tests/` directory contains only `tests/fuzzer/*.c` -- the developer harnesses themselves. The
+technique correctly yields nothing.
+
+Worse than nothing, though: the driver was scanning those files AS TESTS. Lifting one would
+mean lifting the very harness this experiment measures against and comparing it with itself.
+It produced a clean "0 candidates" while attempting something that should never be attempted,
+which is the most dangerous shape of failure -- a correct-looking result from a wrong method.
+Fuzz harnesses are now excluded from the test scan by name and by directory.
+
 ## Where it does not work yet
 
 **expat: 0 candidates passed the gates, and its own harness did not build either.** Not

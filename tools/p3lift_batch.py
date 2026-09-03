@@ -151,12 +151,31 @@ def lifted_candidates(lib: str, work: Path, out: Path, top: int) -> list:
     extra = inline_api([str(hdr)])
     api = set(decls) | set(extra)
 
+    # TEST DIRECTORIES LIVE ANYWHERE IN THE TREE, not only at the checkout root.
+    #
+    # The same defect, in a second place. test_sequences.py was fixed for this after expat,
+    # lcms2 and libpng all reported 0% of their exported surface -- and this driver kept the
+    # root-only search, so expat reported "0 lifted candidates passed the gates" while its
+    # 18 test files at expat/expat/tests sat unread. A zero from a tool is a claim about the
+    # tool until it is checked, and this is the second time the same zero meant the same
+    # thing.
+    from test_sequences import _TEST_DIRS                            # noqa: PLC0415
+    tdirs = [d for d in sorted((work / lib).rglob("*"))
+             if d.is_dir() and d.name.lower() in _TEST_DIRS and ".git" not in d.parts]
+    # A FUZZ HARNESS IS NOT A UNIT TEST, and lifting one would be circular.
+    #
+    # libwebp ships NO unit tests: its tests/ directory holds only tests/fuzzer/*.c, the
+    # developer harnesses themselves. Scanning those as "tests" would lift the very harness
+    # this experiment measures against and compare it with itself. They are also useless as
+    # sources -- they take (data, size) and contain no literal seam -- so the driver reported
+    # a clean "0 candidates" while doing something that should never have been attempted.
+    def _is_unit_test(q: Path) -> bool:
+        low = q.name.lower()
+        return not ("fuzz" in low or "fuzzer" in str(q.parent).lower())
+
     seams: list = []
-    for d in ("test", "tests", "testbed", "check"):
-        base = work / lib / d
-        if not base.is_dir():
-            continue
-        for f in sorted(base.rglob("*.c"))[:200]:
+    for base in tdirs:
+        for f in [q for q in sorted(base.rglob("*.c"))[:300] if _is_unit_test(q)][:200]:
             try:
                 src = f.read_text(errors="replace")
             except OSError:
