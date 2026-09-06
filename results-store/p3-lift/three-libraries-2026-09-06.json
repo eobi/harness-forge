@@ -1,0 +1,196 @@
+{
+ "generated_utc": "2026-09-06T11:50:22Z",
+ "budget_seconds": 20,
+ "repeats": 3,
+ "rows": [
+  {
+   "library": "jansson",
+   "arm": "lifted:jansson_d2_embed_json_loads",
+   "repeat": 0,
+   "cov": 584,
+   "execs": 2233102
+  },
+  {
+   "library": "jansson",
+   "arm": "lifted:jansson_d1_test_copy_array_json_loads",
+   "repeat": 0,
+   "cov": 512,
+   "execs": 1867604
+  },
+  {
+   "library": "jansson",
+   "arm": "lifted:jansson_d1_test_deep_copy_array_json_loads",
+   "repeat": 0,
+   "cov": 536,
+   "execs": 1901217
+  },
+  {
+   "library": "jansson",
+   "arm": "DEVELOPER:json_load_dump_fuzzer.cc",
+   "repeat": 0,
+   "cov": 662,
+   "execs": 1896885
+  },
+  {
+   "library": "jansson",
+   "arm": "DEVELOPER:json_load_dump_fuzzer.cc",
+   "repeat": 1,
+   "cov": 663,
+   "execs": 1736950
+  },
+  {
+   "library": "jansson",
+   "arm": "lifted:jansson_d1_test_deep_copy_array_json_loads",
+   "repeat": 1,
+   "cov": 536,
+   "execs": 1364650
+  },
+  {
+   "library": "jansson",
+   "arm": "lifted:jansson_d1_test_copy_array_json_loads",
+   "repeat": 1,
+   "cov": 514,
+   "execs": 1574718
+  },
+  {
+   "library": "jansson",
+   "arm": "lifted:jansson_d2_embed_json_loads",
+   "repeat": 1,
+   "cov": 585,
+   "execs": 1802821
+  },
+  {
+   "library": "jansson",
+   "arm": "lifted:jansson_d2_embed_json_loads",
+   "repeat": 2,
+   "cov": 585,
+   "execs": 1737084
+  },
+  {
+   "library": "jansson",
+   "arm": "lifted:jansson_d1_test_copy_array_json_loads",
+   "repeat": 2,
+   "cov": 514,
+   "execs": 1385556
+  },
+  {
+   "library": "jansson",
+   "arm": "lifted:jansson_d1_test_deep_copy_array_json_loads",
+   "repeat": 2,
+   "cov": 536,
+   "execs": 1513807
+  },
+  {
+   "library": "jansson",
+   "arm": "DEVELOPER:json_load_dump_fuzzer.cc",
+   "repeat": 2,
+   "cov": 663,
+   "execs": 1690378
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d2_cjson_delete_item_from_a_cJSON_Parse",
+   "repeat": 0,
+   "cov": 279,
+   "execs": 785944
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d2_cjson_delete_item_from_a_cJSON_AddArrayToOb",
+   "repeat": 0,
+   "cov": 27,
+   "execs": 11170876
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d1_cjson_get_object_item_sh_cJSON_Parse",
+   "repeat": 0,
+   "cov": 199,
+   "execs": 1928652
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d1_cjson_get_object_item_ca_cJSON_Parse",
+   "repeat": 0,
+   "cov": 198,
+   "execs": 2820403
+  },
+  {
+   "library": "cjson",
+   "arm": "DEVELOPER:cjson_read_fuzzer.c",
+   "repeat": 0,
+   "cov": 286,
+   "execs": 3476692
+  },
+  {
+   "library": "cjson",
+   "arm": "DEVELOPER:cjson_read_fuzzer.c",
+   "repeat": 1,
+   "cov": 328,
+   "execs": 3480376
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d1_cjson_get_object_item_ca_cJSON_Parse",
+   "repeat": 1,
+   "cov": 198,
+   "execs": 2532761
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d1_cjson_get_object_item_sh_cJSON_Parse",
+   "repeat": 1,
+   "cov": 199,
+   "execs": 3453197
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d2_cjson_delete_item_from_a_cJSON_AddArrayToOb",
+   "repeat": 1,
+   "cov": 27,
+   "execs": 10750217
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d2_cjson_delete_item_from_a_cJSON_Parse",
+   "repeat": 1,
+   "cov": 279,
+   "execs": 799036
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d2_cjson_delete_item_from_a_cJSON_Parse",
+   "repeat": 2,
+   "cov": 279,
+   "execs": 770487
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d2_cjson_delete_item_from_a_cJSON_AddArrayToOb",
+   "repeat": 2,
+   "cov": 27,
+   "execs": 10301323
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d1_cjson_get_object_item_sh_cJSON_Parse",
+   "repeat": 2,
+   "cov": 199,
+   "execs": 2104484
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d1_cjson_get_object_item_ca_cJSON_Parse",
+   "repeat": 2,
+   "cov": 198,
+   "execs": 3734138
+  },
+  {
+   "library": "cjson",
+   "arm": "DEVELOPER:cjson_read_fuzzer.c",
+   "repeat": 2,
+   "cov": 328,
+   "execs": 2788423
+  }
+ ]
+}

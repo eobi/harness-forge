@@ -1,0 +1,98 @@
+{
+ "generated_utc": "2026-09-06T11:40:04Z",
+ "work": "/Users/ebukaobi/hf-work/libs",
+ "rows": [
+  {
+   "library": "jansson",
+   "stage": {
+    "declarations": 81,
+    "static_inline_api": 15,
+    "test_dirs": 2,
+    "test_files": 20,
+    "wrappers_resolved": 0,
+    "sequences": 75,
+    "seams": 377,
+    "proposed": 42,
+    "gated": 25,
+    "passed_gates": 17,
+    "passed_deep2": 2
+   },
+   "propose_failures": {},
+   "gate_blocks": {
+    "S1.DOUBLE_CREATE": 114,
+    "S1.USE_AFTER_DESTROY": 70,
+    "S1.DOUBLE_DESTROY": 5,
+    "S1.USE_BEFORE_CREATE": 3
+   },
+   "emit_failures": 0,
+   "notes": []
+  },
+  {
+   "library": "cjson",
+   "stage": {
+    "declarations": 78,
+    "static_inline_api": 0,
+    "test_dirs": 8,
+    "test_files": 70,
+    "wrappers_resolved": 0,
+    "sequences": 77,
+    "seams": 215,
+    "proposed": 38,
+    "gated": 3,
+    "passed_gates": 35,
+    "passed_deep2": 1
+   },
+   "propose_failures": {},
+   "gate_blocks": {
+    "S1.DOUBLE_CREATE": 4,
+    "S1.USE_BEFORE_CREATE": 2,
+    "S1.DESTROY_BEFORE_CREATE": 1,
+    "S3.DESTROY_NO_TARGET": 1
+   },
+   "emit_failures": 0,
+   "notes": []
+  },
+  {
+   "library": "expat",
+   "stage": {
+    "declarations": 68,
+    "static_inline_api": 0,
+    "test_dirs": 2,
+    "test_files": 18,
+    "wrappers_resolved": 1,
+    "sequences": 233,
+    "seams": 27,
+    "proposed": 13,
+    "gated": 0,
+    "passed_gates": 13,
+    "passed_deep2": 0
+   },
+   "propose_failures": {},
+   "gate_blocks": {},
+   "emit_failures": 0,
+   "notes": []
+  },
+  {
+   "library": "libyaml",
+   "stage": {
+    "declarations": 48,
+    "static_inline_api": 0,
+    "test_dirs": 2,
+    "test_files": 13,
+    "wrappers_resolved": 0,
+    "sequences": 9,
+    "seams": 0,
+    "proposed": 0,
+    "gated": 0,
+    "passed_gates": 0,
+    "passed_deep2": 0
+   },
+   "propose_failures": {},
+   "gate_blocks": {},
+   "emit_failures": 0,
+   "notes": [
+    "sequences exist but NO SEAM was found"
+   ]
+  }
+ ]
+}

@@ -87,6 +87,7 @@ LIBS = {
     "zstd":     ("lib/zstd.h", "tests/**/*.zst", "**/*fuzzer*.c*"),
     "libwebp":  ("src/webp/decode.h", "tests/**/*.webp", "**/*fuzzer*.c*"),
     "libpng":   ("png.h", "contrib/pngsuite/*.png", "**/*fuzzer*.c*"),
+    "libyaml":  ("include/yaml.h", "tests/**/*.yaml", "**/*fuzzer*.c*"),
 }
 
 
