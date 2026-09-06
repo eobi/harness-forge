@@ -48,7 +48,8 @@ def main() -> int:
     tf = [f for f in sorted((W / lib).rglob("*.c"))
           if "test" in str(f).lower() and "fuzz" not in str(f).lower()]
     w = resolve_wrappers(tf, decls)
-    A = E = None; Bs = []
+    from hforge.producers.compose import _produced_resources                # noqa: PLC0415
+    A = E = None; Bs = []; A_cands = []
     for f in tf:
         src = f.read_text(errors="replace")
         for sq in sequences_in(f, api):
@@ -57,6 +58,20 @@ def main() -> int:
             if sq["function"] == a.a and ss and A is None:
                 A, _ = propose(str(f), a.a, decls, seam=ss[0], target_name=lib,
                                headers=[hdr.name], also_api=extra, wrappers=w)
+            # AUTO-CANDIDATES: parse-only plans whose seam produces a parse-output root. The
+            # cjson composition lost because --a was a shallow hand-pick; the strongest such
+            # plan is chosen when --a is not given or does not compose.
+            if subs == {"parse"} and ss and [x for x in ss if x["parse_like"]]:
+                pa, _ = propose(str(f), sq["function"], decls,
+                                seam=[x for x in ss if x["parse_like"]][0],
+                                target_name=lib, headers=[hdr.name], also_api=extra, wrappers=w)
+                if pa is not None:
+                    from hforge.gates.static_gates import run_static_gates, BLOCK  # noqa: PLC0415,E501
+                    if not [v for g in run_static_gates(pa) for v in g.violations
+                            if v.severity == BLOCK]:
+                        pr = _produced_resources(pa, decls)
+                        if any(is_p for _, _, is_p, _ in pr):
+                            A_cands.append((sq["function"], pa, len(pa.sequence)))
             if sq["function"] == a.embed and ss and E is None:
                 E, _ = propose(str(f), a.embed, decls, seam=ss[0], target_name=lib,
                                headers=[hdr.name], also_api=extra, wrappers=w)
@@ -65,14 +80,23 @@ def main() -> int:
                                headers=[hdr.name], also_api=extra, wrappers=w)
                 if B is not None:
                     Bs.append(B)
-    if A is None:
-        print("no plan A"); return 1
+    # Strongest base A first: given by --a if it composes, else the parse-entered plan with
+    # the most ops. Each is tried against every B until one composition passes the gates.
+    ordered_A = ([("--a:" + a.a, A)] if A is not None else []) + [
+        (n, pa) for n, pa, _ in sorted(A_cands, key=lambda c: -c[2])]
+    if not ordered_A:
+        print("no parse-entered plan A"); return 1
     composed = None
-    for B in Bs:
+    for an, A in ordered_A:
+      for B in Bs:
         plan, rec = compose(A, B, decls)
         if plan and not [v for g in run_static_gates(plan) for v in g.violations
                          if v.severity == BLOCK]:
-            composed = plan; print("composed with", rec["b"], rec); break
+            composed = plan
+            print(f"composed A={an} + B={rec['b']} rebind={rec.get('rebound_resource')}")
+            break
+      if composed is not None:
+          break
     if composed is None:
         print("no composition passed the gates"); return 1
 

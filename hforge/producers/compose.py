@@ -69,7 +69,7 @@ def _produced_resources(plan: HarnessIR, decls: dict) -> list:
     if start is None:
         return []
     out: list = []
-    for op in plan.sequence[start:]:
+    for pos, op in enumerate(plan.sequence[start:]):
         if not op.binds:
             continue
         d = decls.get(op.api)
@@ -82,8 +82,13 @@ def _produced_resources(plan: HarnessIR, decls: dict) -> list:
                     ty = _base(d.params[j][0])
                     break
         if ty and ty != "void":
-            out.append((op.binds, ty))
-    return list(reversed(out))
+            # (id, type, is_parse_output, position). A resource that is the DIRECT output of
+            # a parse-subsystem call is the ROOT of the parsed value; anything else is derived
+            # from it -- a looked-up child, a copy. Serialising the root covers the whole
+            # tree, serialising a child covers one branch, which is why cjson composition
+            # LOST when it rebound to r_found (GetObjectItem's result) instead of the root.
+            out.append((op.binds, ty, _subsystem(op.api) == "parse", pos))
+    return out
 
 
 def _last_destroy_of(plan: HarnessIR, rid: str) -> int:
@@ -117,8 +122,13 @@ def compose(a: HarnessIR, b: HarnessIR, decls: dict, want: str = "serialise") ->
             continue
         # THE HANDLE PARAMETER, BY DECLARED TYPE. The first parameter whose base type is A's
         # parsed type gets A's resource; nothing else about B's call changes.
+        # PREFER THE PARSE OUTPUT (the root), EARLIEST FIRST, then anything else latest
+        # first. When B serialises, this hands it the whole parsed value rather than a child
+        # of it; when B needs a resource a parser produced downstream (libyaml's document
+        # from parser_load), that resource is still the parse output and is chosen.
+        ranked = sorted(prods, key=lambda r: (not r[2], r[3] if r[2] else -r[3]))
         hit = None; rid = rtype = None
-        for cand_rid, cand_ty in prods:
+        for cand_rid, cand_ty, _is_parse, _pos in ranked:
             for j, (pty, _pn) in enumerate(d.params):
                 if _base(pty) == cand_ty and j < len(op.args):
                     hit, rid, rtype = j, cand_rid, cand_ty
@@ -148,7 +158,7 @@ def compose(a: HarnessIR, b: HarnessIR, decls: dict, want: str = "serialise") ->
     rec["taken_from_b"], rec["left_behind"] = len(taken), left
     if not taken:
         rec["why_not"] = (f"none of B's '{want}' calls takes any of "
-                          f"{sorted({t for _, t in prods})} -- nothing to rebind")
+                          f"{sorted({t for _, t, _p, _q in prods})} -- nothing to rebind")
         return None, rec
     rec["rebound_resource"] = rid
     cut = _last_destroy_of(a, rid)
