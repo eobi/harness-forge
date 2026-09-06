@@ -66,3 +66,48 @@ def test_composition_refuses_when_a_already_enters_the_subsystem():
                        [Arg("json", "resource", "r_json"), Arg("flags", "literal", value=0)])]})
     plan, rec = compose(a2, b, decls)
     assert plan is None and "already enters" in rec["why_not"]
+
+
+def test_a_resource_produced_through_an_out_parameter_after_the_seam_is_matched():
+    # libyaml's seam call returns void; the document arrives later through an out-parameter
+    # of yaml_parser_load(&parser, &document). Matching only the seam call's return type
+    # composed nothing. Every resource bound at or after the seam is a candidate, typed from
+    # the declared parameter when the call fills an out-parameter.
+    decls = {
+        "yaml_parser_set_input_string": _decl("yaml_parser_set_input_string",
+            [("yaml_parser_t *", "parser"), ("const unsigned char *", "input"), ("size_t", "size")], "void"),
+        "yaml_parser_load": _decl("yaml_parser_load",
+            [("yaml_parser_t *", "parser"), ("yaml_document_t *", "document")], "int"),
+        "yaml_document_delete": _decl("yaml_document_delete", [("yaml_document_t *", "document")], "void"),
+        "yaml_emitter_dump": _decl("yaml_emitter_dump",
+            [("yaml_emitter_t *", "emitter"), ("yaml_document_t *", "document")], "int"),
+    }
+    apis = {k: _api(k, r, decls[k].params, decls[k].ret) for k, r in (
+        ("yaml_parser_set_input_string", "consume"), ("yaml_parser_load", "create"),
+        ("yaml_document_delete", "destroy"), ("yaml_emitter_dump", "query"))}
+    a = HarnessIR(name="A", target=Target(name="y"), apis=dict(apis),
+                  slices=[InputSlice("s_seam", "bytes", remainder=True, min_len=1)],
+                  resources=[Resource("r_parser", TypeRef("yaml_parser_t", "struct"), storage="inline"),
+                             Resource("r_doc", TypeRef("yaml_document_t", "struct"), storage="inline")],
+                  sequence=[Op("o0", "yaml_parser_set_input_string",
+                               [Arg("parser", "resource", "r_parser"), Arg("input", "input", "s_seam"),
+                                Arg("size", "length_of", "s_seam")]),
+                            Op("o1", "yaml_parser_load",
+                               [Arg("parser", "resource", "r_parser"), Arg("document", "resource", "r_doc")],
+                               binds="r_doc"),
+                            Op("o2", "yaml_document_delete", [Arg("document", "resource", "r_doc")],
+                               targets="r_doc")],
+                  knobs=Knobs(), platforms=["linux-x86_64-glibc"], producer="test_lift")
+    b = HarnessIR(name="B", target=Target(name="y"), apis=dict(apis), slices=[],
+                  resources=[Resource("r_em", TypeRef("yaml_emitter_t", "struct"), storage="inline"),
+                             Resource("r_bdoc", TypeRef("yaml_document_t", "struct"), storage="inline")],
+                  sequence=[Op("o0", "yaml_emitter_dump",
+                               [Arg("emitter", "resource", "r_em"), Arg("document", "resource", "r_bdoc")])],
+                  knobs=Knobs(), platforms=["linux-x86_64-glibc"], producer="test_lift")
+    plan, rec = compose(a, b, decls)
+    assert plan is not None, rec
+    dump = next(o for o in plan.sequence if o.api == "yaml_emitter_dump")
+    assert dump.args[1].ref == "r_doc", "the emitter's document was not rebound to the parsed one"
+    assert rec["rebound_resource"] == "r_doc"
+    order = [o.api for o in plan.sequence]
+    assert order.index("yaml_emitter_dump") < order.index("yaml_document_delete")
