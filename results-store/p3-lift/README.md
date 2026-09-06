@@ -325,7 +325,43 @@ one test does, because it enters two deep subsystems no single test in this suit
 except `embed`, and it exceeds even `embed`. Still under the developer harness's 663, but the
 single-test ceiling is broken, which nothing before composition could do.
 
-cjson composition is measured next.
+### cjson: composition HURT -- and the failure names its own two fixes
+
+| arm | coverage | vs developer |
+|---|---|---|
+| DEVELOPER | 319 | 1.00x |
+| EMBED (best single, d2) | 279 | 0.87x |
+| **COMPOSED** | **205** | **0.64x** |
+
+Composition helped jansson (+0.04) and hurt cjson (-0.23). This is more useful than a clean
+win: the loss names exactly what composition depends on.
+
+  1. IT IS ONLY AS STRONG AS BASE PLAN A. The cjson composition started from
+     `cjson_get_object_item_should_get_object_items` -- a shallow deep=1 parse test that
+     scores 0.61x alone. Adding serialise to a weak base cannot beat an integrated d2 test
+     that was strong to begin with. jansson's base was `decode_any`, a stronger parser.
+
+  2. THE SERIALISE MUST TARGET THE ROOT, NOT A CHILD. The composer rebound B's serialise to
+     `r_found` -- the node `cJSON_GetObjectItem` looked up, a single child of the tree --
+     because it takes the LATEST post-seam resource, latest first. That rule is right for
+     libyaml (the document is produced after the parser) and wrong here: the root parsed
+     value covers far more when serialised than one looked-up child does.
+
+Both are fixable and neither was measured with the fix in place, so no claim is made that
+composition helps or hurts in general. What IS established: on jansson, with a strong parse
+base and the root rebound, composition exceeds the best single test (0.92x > 0.88x). The
+mechanism works; the selection around it decides whether it helps.
+
+## Composition, summarised
+
+| library | best single | composed | verdict |
+|---|---|---|---|
+| jansson | 0.88x (`embed`) | **0.92x** | composition WINS: past the single-test ceiling |
+| cjson | 0.87x (d2) | 0.64x | composition LOSES: weak base A + serialised a child, not the root |
+
+The next work is not another campaign -- it is selection: compose onto the strongest
+parse-entered plan, and rebind a serialise to the seam's own root resource rather than the
+latest. Then re-measure both.
 
 ## Where it does not work yet
 

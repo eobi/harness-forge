@@ -1,0 +1,62 @@
+{
+ "generated_utc": "2026-09-06T12:45:52Z",
+ "lib": "cjson",
+ "budget": 20,
+ "repeats": 3,
+ "rows": [
+  {
+   "arm": "COMPOSED",
+   "repeat": 0,
+   "cov": 205,
+   "execs": 1793731
+  },
+  {
+   "arm": "EMBED",
+   "repeat": 0,
+   "cov": 279,
+   "execs": 744472
+  },
+  {
+   "arm": "DEVELOPER",
+   "repeat": 0,
+   "cov": 304,
+   "execs": 3212363
+  },
+  {
+   "arm": "DEVELOPER",
+   "repeat": 1,
+   "cov": 319,
+   "execs": 2786314
+  },
+  {
+   "arm": "EMBED",
+   "repeat": 1,
+   "cov": 279,
+   "execs": 779930
+  },
+  {
+   "arm": "COMPOSED",
+   "repeat": 1,
+   "cov": 205,
+   "execs": 2447139
+  },
+  {
+   "arm": "COMPOSED",
+   "repeat": 2,
+   "cov": 205,
+   "execs": 2703353
+  },
+  {
+   "arm": "EMBED",
+   "repeat": 2,
+   "cov": 279,
+   "execs": 844831
+  },
+  {
+   "arm": "DEVELOPER",
+   "repeat": 2,
+   "cov": 326,
+   "execs": 2827152
+  }
+ ]
+}
