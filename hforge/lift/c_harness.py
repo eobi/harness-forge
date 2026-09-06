@@ -216,6 +216,20 @@ _FREE_VERBS_TERMINAL = {"close"}
 _FREE_VERBS_EXACT = {"end", "del", "fini", "term", "cleanup", "free", "decref"}
 
 
+def _has_blank_arg(argstr: str) -> bool:
+    """Did strip_noise blank a string literal out of this argument list?
+
+    Read from the RAW text, not from _split_args: that helper drops a trailing empty
+    argument, so `json_object_del(object2, "c")` -- blanked to `object2,    ` -- split to
+    `['object2']` and the slot the literal left behind vanished with it. A comma with nothing
+    but whitespace after it, before it, or between it and the next comma is the mark.
+    """
+    a = argstr.strip()
+    if not a:
+        return False
+    return bool(re.search(r"(^\s*,)|(,\s*,)|(,\s*$)", a))
+
+
 def _name_segments(fn: str):
     return [seg.lower().rstrip("0123456789")
             for seg in re.split(r"_|(?<=[a-z0-9])(?=[A-Z])", fn) if seg]
@@ -965,9 +979,24 @@ def lift(path: str, target_name: str = "", platforms: Optional[list] = None,
                 # matching unref can be recognised as balanced.
                 refs[_resources_named_at(argstr, resources)[0]] = refs.get(
                     _resources_named_at(argstr, resources)[0], 0) + 1
-            elif not binds and _FREE_ISH.search(fn) and (
+            elif not binds and _FREE_ISH.search(fn) and not _has_blank_arg(argstr) and (
                     any(a.source == "resource" for a in args)
                     or _resources_named_at(argstr, resources)):
+                # A RELEASE VERB WITH A STRING-LITERAL ARGUMENT IS A KEYED REMOVAL.
+                #
+                # json_object_del(object, "key") removes ONE KEY from the object; "del" is a
+                # release verb, so this read as destroying the object and every later use of
+                # it was a use-after-free -- 70 such violations on jansson's own tests, none
+                # real. No deallocator takes a name: free(p), decref(j), pixDestroy(&pix),
+                # yaml_event_delete(&e) name the thing they free and nothing else. A string
+                # literal in the argument list is the cheapest reliable sign that the call
+                # operates ON the resource rather than releasing it.
+                #
+                # Seen from here the literal is GONE: strip_noise blanks every string
+                # literal to whitespace before the lifter runs, so `json_object_del(object2,
+                # "c")` arrives as `json_object_del(object2,    )`. The first version of this
+                # guard searched for a literal and never found one. What survives is the
+                # blank slot, and only a literal leaves one.
                 # THE LAST RESOURCE ARGUMENT IS THE ONE BEING FREED.
                 #
                 # `krb5_pac_free(context, pac)` frees the pac, not the context, and C APIs
