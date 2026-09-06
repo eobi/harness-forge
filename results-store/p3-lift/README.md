@@ -236,6 +236,28 @@ Fixes 3 and 4 are general and help every suite, not only expat. `resolve_wrapper
 too. Whether expat itself ever produces a measurement is a separate question, and it is not
 answered.
 
+## Candidate recovery, 2026-09-06: what the funnel found and what it recovered
+
+`tools/p3lift_funnel.py` reports the whole chain -- test files, sequences, seams, propose
+failures by reason, gate blocks by code -- in one cheap pass. Run repeatedly across one day it
+turned every zero into a named cause, and each cause was this tooling:
+
+| library | gate-passing plans before | after | what was wrong |
+|---|---|---|---|
+| jansson | 17 | **38** of 42 | `decref` was not a release verb (114 DOUBLE_CREATE); `json_object_del(obj, key)` read as destroying obj (70 USE_AFTER_DESTROY); an arity-padded `json_decref(0)`; a stale API-table copy (86 UNKNOWN_PARAM, a regression the funnel caught within one run) |
+| cjson | 35 | 35 | nothing to misread |
+| libyaml | 0 | **2** | `(unsigned char *)start` -- a cast is not an identifier, so the trace to the `utf8_sequences[]` table never began |
+| expat, zstd, libwebp, libpng | 0 | -- | **macOS reaped /tmp**; the checkouts had one .c file left. Not a defect. Working set moved to `~/hf-work/libs` |
+
+Two of the lifter fixes are pinned in `tests/test_lift_release_verbs.py`. Two guard versions
+for the keyed-removal case did nothing before the third worked: `strip_noise` blanks string
+literals before the lifter runs, and `_split_args` drops the empty slot they leave, so the
+only surviving mark is a trailing comma in the raw text.
+
+Coverage against the developer harness with the recovered candidate set is queued behind the
+corpus re-audit (the lifter changed, and the audit's 0-false-positive claim is recorded, so
+it is re-measured rather than assumed).
+
 ## Where it does not work yet
 
 **expat: 0 candidates passed the gates, and its own harness did not build either.** Not

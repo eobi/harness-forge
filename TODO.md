@@ -28,7 +28,9 @@ this project is if it succeeds. That should be a deliberate choice rather than a
 **Beats OGHarn when:** a generated harness reaches **>1.14x** the coverage of the library's own
 developer-written harness, median over >=5 libraries, >=3 repeats, seeded, paired.
 
-**Where we are: 0.90x on jansson, 0.64x on cjson.** P3.LIFT lifts a single test; jansson had
+**Where we are: 0.88x on jansson, 0.85x on cjson** (the 0.64x was this engine, not cjson; see
+`results-store/p3-lift/README.md`, "Candidate recovery"). Gate-passing plans recovered 17 -> 38
+on jansson and 0 -> 2 on libyaml by fixing the lifter, not the libraries. P3.LIFT lifts a single test; jansson had
 one test (`embed`) that both parses and dumps, cjson has none, and cjson is pinned at 0.64x
 however it is ranked. **A lifted harness can only be as good as the best single test function.**
 Composition -- joining a parse test to a dump test -- is the only idea that can exceed the
