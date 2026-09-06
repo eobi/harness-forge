@@ -258,6 +258,32 @@ Coverage against the developer harness with the recovered candidate set is queue
 corpus re-audit (the lifter changed, and the audit's 0-false-positive claim is recorded, so
 it is re-measured rather than assumed).
 
+## Recovered candidate set, re-measured 2026-09-06: cjson reaches parity
+
+After the lifter recovered jansson 17->38 and libyaml 0->2 plans, the full set was re-measured,
+3 repeats, paired, arms alternating.
+
+| library | best lifted | developer | ratio |
+|---|---|---|---|
+| jansson | 585 (`embed`, d2) | 663 | **0.88x** (stable across every run this week) |
+| cjson | **279** (d2, parse seam) | 276 | **1.01x** |
+
+**cjson's lifted candidate is at parity with the human-written harness -- the first time a
+lifted harness has reached 1.00x.** Stated honestly: the cjson DEVELOPER median moved 328 ->
+276 between runs while the lifted candidate held at 279 both times. So this is parity within
+run-to-run variance, and the notable part is which arm was STABLE: the lifted d2-parse harness,
+not the developer one. cjson is a small target and its coverage is noisy; the lifted harness is
+not.
+
+The ordering is unchanged and consistent: a deep=2 sequence through the PARSER first
+(0.88-1.01x), deep=1 parsers next (0.69-0.82x), a deep=2 sequence through a NON-parser last
+(0.10x). Both conditions -- depth and a parser seam -- are necessary; neither is sufficient.
+
+Where this leaves the coverage axis: our header-derived plans reach 0.07x of the developer
+harness, a single lifted test reaches 0.88-1.01x, and OGHarn reports 1.14x. The gap to OGHarn
+is now one library's variance wide, on the two libraries measured, from single lifted tests.
+Composition -- the attempt to exceed the single-test ceiling -- is measured next.
+
 ## Composition: past the single-test ceiling, built and queued for measurement
 
 `hforge/producers/compose.py` joins a parse-entered plan A (it carries the seam and its parser

@@ -1,0 +1,259 @@
+{
+ "generated_utc": "2026-09-06T12:38:41Z",
+ "budget_seconds": 20,
+ "repeats": 3,
+ "rows": [
+  {
+   "library": "jansson",
+   "arm": "lifted:jansson_d2_embed_json_loads",
+   "repeat": 0,
+   "cov": 584,
+   "execs": 2089572
+  },
+  {
+   "library": "jansson",
+   "arm": "lifted:jansson_d1_decode_any_json_loads",
+   "repeat": 0,
+   "cov": 456,
+   "execs": 653354
+  },
+  {
+   "library": "jansson",
+   "arm": "lifted:jansson_d1_decode_int_as_real_json_loads",
+   "repeat": 0,
+   "cov": 457,
+   "execs": 478447
+  },
+  {
+   "library": "jansson",
+   "arm": "lifted:jansson_d1_test_copy_object_json_loads",
+   "repeat": 0,
+   "cov": 523,
+   "execs": 1597740
+  },
+  {
+   "library": "jansson",
+   "arm": "lifted:jansson_d1_test_deep_copy_object_json_loads",
+   "repeat": 0,
+   "cov": 545,
+   "execs": 1566899
+  },
+  {
+   "library": "jansson",
+   "arm": "DEVELOPER:json_load_dump_fuzzer.cc",
+   "repeat": 0,
+   "cov": 661,
+   "execs": 1519288
+  },
+  {
+   "library": "jansson",
+   "arm": "DEVELOPER:json_load_dump_fuzzer.cc",
+   "repeat": 1,
+   "cov": 663,
+   "execs": 1212672
+  },
+  {
+   "library": "jansson",
+   "arm": "lifted:jansson_d1_test_deep_copy_object_json_loads",
+   "repeat": 1,
+   "cov": 545,
+   "execs": 1512679
+  },
+  {
+   "library": "jansson",
+   "arm": "lifted:jansson_d1_test_copy_object_json_loads",
+   "repeat": 1,
+   "cov": 523,
+   "execs": 980316
+  },
+  {
+   "library": "jansson",
+   "arm": "lifted:jansson_d1_decode_int_as_real_json_loads",
+   "repeat": 1,
+   "cov": 457,
+   "execs": 381565
+  },
+  {
+   "library": "jansson",
+   "arm": "lifted:jansson_d1_decode_any_json_loads",
+   "repeat": 1,
+   "cov": 456,
+   "execs": 465886
+  },
+  {
+   "library": "jansson",
+   "arm": "lifted:jansson_d2_embed_json_loads",
+   "repeat": 1,
+   "cov": 585,
+   "execs": 1539665
+  },
+  {
+   "library": "jansson",
+   "arm": "lifted:jansson_d2_embed_json_loads",
+   "repeat": 2,
+   "cov": 585,
+   "execs": 1585784
+  },
+  {
+   "library": "jansson",
+   "arm": "lifted:jansson_d1_decode_any_json_loads",
+   "repeat": 2,
+   "cov": 456,
+   "execs": 515372
+  },
+  {
+   "library": "jansson",
+   "arm": "lifted:jansson_d1_decode_int_as_real_json_loads",
+   "repeat": 2,
+   "cov": 457,
+   "execs": 373707
+  },
+  {
+   "library": "jansson",
+   "arm": "lifted:jansson_d1_test_copy_object_json_loads",
+   "repeat": 2,
+   "cov": 523,
+   "execs": 1087694
+  },
+  {
+   "library": "jansson",
+   "arm": "lifted:jansson_d1_test_deep_copy_object_json_loads",
+   "repeat": 2,
+   "cov": 545,
+   "execs": 1165688
+  },
+  {
+   "library": "jansson",
+   "arm": "DEVELOPER:json_load_dump_fuzzer.cc",
+   "repeat": 2,
+   "cov": 663,
+   "execs": 1246018
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d2_cjson_delete_item_from_a_cJSON_Parse",
+   "repeat": 0,
+   "cov": 259,
+   "execs": 550686
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d2_cjson_delete_item_from_a_cJSON_AddArrayToOb",
+   "repeat": 0,
+   "cov": 27,
+   "execs": 10698591
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d1_cjson_get_object_item_sh_cJSON_Parse",
+   "repeat": 0,
+   "cov": 199,
+   "execs": 2250776
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d1_cjson_get_object_item_ca_cJSON_Parse",
+   "repeat": 0,
+   "cov": 198,
+   "execs": 3317468
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d1_parse_with_opts_should_r_cJSON_ParseWithOpt",
+   "repeat": 0,
+   "cov": 201,
+   "execs": 1734275
+  },
+  {
+   "library": "cjson",
+   "arm": "DEVELOPER:cjson_read_fuzzer.c",
+   "repeat": 0,
+   "cov": 276,
+   "execs": 2885003
+  },
+  {
+   "library": "cjson",
+   "arm": "DEVELOPER:cjson_read_fuzzer.c",
+   "repeat": 1,
+   "cov": 276,
+   "execs": 2025419
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d1_parse_with_opts_should_r_cJSON_ParseWithOpt",
+   "repeat": 1,
+   "cov": 201,
+   "execs": 1406146
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d1_cjson_get_object_item_ca_cJSON_Parse",
+   "repeat": 1,
+   "cov": 198,
+   "execs": 2384109
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d1_cjson_get_object_item_sh_cJSON_Parse",
+   "repeat": 1,
+   "cov": 199,
+   "execs": 3180598
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d2_cjson_delete_item_from_a_cJSON_AddArrayToOb",
+   "repeat": 1,
+   "cov": 27,
+   "execs": 10841455
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d2_cjson_delete_item_from_a_cJSON_Parse",
+   "repeat": 1,
+   "cov": 279,
+   "execs": 739356
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d2_cjson_delete_item_from_a_cJSON_Parse",
+   "repeat": 2,
+   "cov": 279,
+   "execs": 761870
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d2_cjson_delete_item_from_a_cJSON_AddArrayToOb",
+   "repeat": 2,
+   "cov": 27,
+   "execs": 10870871
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d1_cjson_get_object_item_sh_cJSON_Parse",
+   "repeat": 2,
+   "cov": 199,
+   "execs": 3283294
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d1_cjson_get_object_item_ca_cJSON_Parse",
+   "repeat": 2,
+   "cov": 198,
+   "execs": 2102032
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d1_parse_with_opts_should_r_cJSON_ParseWithOpt",
+   "repeat": 2,
+   "cov": 201,
+   "execs": 1443989
+  },
+  {
+   "library": "cjson",
+   "arm": "DEVELOPER:cjson_read_fuzzer.c",
+   "repeat": 2,
+   "cov": 305,
+   "execs": 2544477
+  }
+ ]
+}
