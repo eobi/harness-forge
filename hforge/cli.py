@@ -863,6 +863,16 @@ def cmd_app_lift(args) -> int:
                  include_dirs=list(args.include or []))
     plan, rec = app_lift.propose(list(args.header), tgt,
                                  includes=tuple(args.include or []), only=args.only)
+    # A main(int, char**) cannot be told apart from an argv or a stdin app by its SIGNATURE
+    # alone -- both look identical. --channel lets the operator state which, and the override
+    # is recorded so the certificate says the channel was chosen, not inferred.
+    if plan is not None and args.channel:
+        from .ir import APP_CHANNELS                                # noqa: PLC0415
+        if args.channel not in APP_CHANNELS:
+            print(f"unknown channel {args.channel!r}; one of {', '.join(APP_CHANNELS)}")
+            return 2
+        plan.app_entry.channel = args.channel
+        rec["chosen"]["channel"] = args.channel + " (operator override)"
     print("candidates: " + ", ".join(f"{s}[{c}]" for s, c in rec.get("candidates", []))
           or "candidates: none")
     if plan is None:
@@ -1662,6 +1672,9 @@ def main(argv=None) -> int:
                     help="application source compiled with the harness (repeatable)")
     al.add_argument("--name", default="")
     al.add_argument("--only", default="", help="lift this symbol rather than the top candidate")
+    al.add_argument("--channel", default="",
+                    help="force the input channel (argv/file_arg/buffer/cstring/stdin); a "
+                         "main(int,char**) cannot be told from a stdin app by signature")
     al.add_argument("--out", default="", help="write the emitted C here instead of stdout")
     al.add_argument("--force", action="store_true", help="emit even if a static gate blocks")
     al.set_defaults(fn=cmd_app_lift)

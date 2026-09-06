@@ -75,3 +75,16 @@ def test_posix_target_keeps_the_clang_fuzzer_build():
     e = emit(h)
     assert e.build_command[0] == "$CC"
     assert any("fuzzer" in a for a in e.build_command)
+
+
+def test_stdin_channel_freopens_a_temp_file_onto_stdin():
+    from hforge.emit import emit
+    from hforge.ir import APP_STDIN, AppEntry, HarnessIR, Target
+    h = HarnessIR(name="s", target=Target(name="cli", sources=["a.c"]),
+                  app_entry=AppEntry(symbol="run_main", channel=APP_STDIN, header="a.h"))
+    src = emit(h).source
+    assert "#include <stdio.h>" in src
+    assert 'freopen(hf_path, "rb", stdin)' in src
+    assert "mkstemp" in src and "run_main(1, hf_argv)" in src
+    # hf_sink must be function-scoped so the trailing (void)hf_sink is valid
+    assert "(void)hf_sink;" in src

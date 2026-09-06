@@ -522,9 +522,9 @@ def _emit_app_entry(ir: HarnessIR, *, with_driver: bool = True) -> "Emitted":
     and unlinks it on every exit, including the early returns.
     """
     from ..ir import (APP_ARGV, APP_BUFFER, APP_CSTRING,          # noqa: PLC0415
-                       APP_FILE_ARG)
+                       APP_FILE_ARG, APP_STDIN)
     ae = ir.app_entry
-    if ae.channel not in (APP_ARGV, APP_FILE_ARG, APP_BUFFER, APP_CSTRING):
+    if ae.channel not in (APP_ARGV, APP_FILE_ARG, APP_BUFFER, APP_CSTRING, APP_STDIN):
         raise EmitError(f"unknown application channel {ae.channel!r}; a harness for a "
                         f"channel nothing emits is refused rather than emitted wrong")
     ver = f" {ir.target.version}" if ir.target.version else ""
@@ -563,6 +563,23 @@ def _emit_app_entry(ir: HarnessIR, *, with_driver: bool = True) -> "Emitted":
             call_lines = [f"    char *hf_argv[] = {{ {argv_c} }};",
                           f"    {sink}{cast}{ae.symbol}("
                           f"(int)(sizeof(hf_argv)/sizeof(hf_argv[0])) - 1, hf_argv);"]
+        elif ae.channel == APP_STDIN:
+            # The app reads stdin: point stdin at the temp file, then run the entry. freopen
+            # re-associates stdin each iteration, so no restore is needed between runs; a
+            # finite temp file gives the parser a correct EOF. Portable -- freopen(stdin)
+            # works on Windows too.
+            prog = (ae.argv[0] if ae.argv else (ir.target.name or "app"))
+            call_lines = [
+                f'    if (!freopen(hf_path, "rb", stdin)) {{',
+                "#ifdef _WIN32",
+                "        DeleteFileA(hf_path);",
+                "#else",
+                "        unlink(hf_path);",
+                "#endif",
+                "        return 0;",
+                "    }",
+                f'    char *hf_argv[] = {{ "{prog}", NULL }};',
+                f"    {sink}{cast}{ae.symbol}(1, hf_argv);"]
         else:  # APP_FILE_ARG
             call_lines = [f"    {sink}{cast}{ae.symbol}(hf_path);"]
 
@@ -571,7 +588,7 @@ def _emit_app_entry(ir: HarnessIR, *, with_driver: bool = True) -> "Emitted":
                            producer=ir.producer, plats=", ".join(ir.platforms)),
         "",
         "#include <stdint.h>", "#include <stddef.h>", "#include <stdlib.h>",
-        "#include <string.h>",
+        "#include <string.h>", "#include <stdio.h>",
         # ONE HARNESS, EVERY HOST. The temp-file channel is written once and compiles on
         # POSIX and Windows both -- GetTempFileNameA/WriteFile/DeleteFileA on Windows,
         # mkstemp/write/unlink elsewhere. That is the PX doctrine ("run the same way on every
