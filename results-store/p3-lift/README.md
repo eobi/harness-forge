@@ -352,16 +352,44 @@ composition helps or hurts in general. What IS established: on jansson, with a s
 base and the root rebound, composition exceeds the best single test (0.92x > 0.88x). The
 mechanism works; the selection around it decides whether it helps.
 
-## Composition, summarised
+## Composition, summarised (after the root-rebind fix)
 
 | library | best single | composed | verdict |
 |---|---|---|---|
-| jansson | 0.88x (`embed`) | **0.92x** | composition WINS: past the single-test ceiling |
-| cjson | 0.87x (d2) | 0.64x | composition LOSES: weak base A + serialised a child, not the root |
+| jansson | 0.88x (`embed`) | **0.92x** | composition WINS -- past the single-test ceiling, stable across two runs (609, 606) |
+| cjson | 0.86x (d2) | 0.84x | composition TIES -- recovered from 0.64x by rebinding to the parse root |
 
-The next work is not another campaign -- it is selection: compose onto the strongest
-parse-entered plan, and rebind a serialise to the seam's own root resource rather than the
-latest. Then re-measure both.
+**The finding, stated plainly:** composition EXCEEDS the single-test ceiling when the suite
+lacks a rich integrated test (jansson's best single does load+dump, and a composed parse+dump
+still beats it), and reaches PARITY when the suite already contains one (cjson already has a
+d2 test that parses and serialises a full tree; composition matches it but does not exceed).
+Composition is therefore worth most exactly where a library's own tests are weakest -- which
+is where a generated harness is worth most in the first place.
+
+Both fixes are validated by measurement:
+
+  - REBIND TO THE PARSE ROOT recovered cjson from 0.64x to 0.84x (+0.20). The first version
+    serialised r_found, a child cJSON_GetObjectItem looked up; it now serialises the root the
+    parser produced, covering the whole tree.
+  - It did NOT cost jansson's win: 0.92x held across two independent runs after the change.
+
+Raw: `compose-jansson-2026-09-06.json` (0.92x), `compose-cjson-2026-09-06.json` (0.64x, before
+fix), `compose-cjson-rootfix-2026-09-06.json` (0.84x, after), `compose-jansson-confirm-2026-09-06.json`.
+
+## Where the coverage axis stands
+
+| approach | jansson | cjson |
+|---|---|---|
+| our header-derived plans | 0.07x | 0.07x |
+| single lifted test | 0.88x | 0.86-1.01x |
+| **composed lifted tests** | **0.92x** | 0.84x |
+| OGHarn (published, over developer harnesses) | 1.14x | -- |
+
+From 0.07x to 0.92x on jansson. The remaining gap to OGHarn is real and not yet closed, and
+composition's ceiling on these two libraries is the developer harness itself (it combines more
+than two subsystems, and hand-tunes the input framing). The honest position: a generated
+harness now reaches 0.84-0.92x of a human-written one from the library's own tests, where six
+weeks ago it reached 0.07x from headers.
 
 ## Where it does not work yet
 

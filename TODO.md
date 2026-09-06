@@ -25,6 +25,8 @@ this project is if it succeeds. That should be a deliberate choice rather than a
 ## Depth — beat a specific competitor at its own number
 
 ### D1. Composed sequences (P3, producers)
+**Status: 0.92x on jansson (composition past the single-test ceiling), 0.84-1.01x on cjson. Gap to OGHarn's 1.14x not yet closed.**
+
 **Beats OGHarn when:** a generated harness reaches **>1.14x** the coverage of the library's own
 developer-written harness, median over >=5 libraries, >=3 repeats, seeded, paired.
 

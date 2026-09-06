@@ -1,0 +1,62 @@
+{
+ "generated_utc": "2026-09-06T12:57:22Z",
+ "lib": "jansson",
+ "budget": 20,
+ "repeats": 3,
+ "rows": [
+  {
+   "arm": "COMPOSED",
+   "repeat": 0,
+   "cov": 590,
+   "execs": 1021732
+  },
+  {
+   "arm": "EMBED",
+   "repeat": 0,
+   "cov": 569,
+   "execs": 1643976
+  },
+  {
+   "arm": "DEVELOPER",
+   "repeat": 0,
+   "cov": 647,
+   "execs": 1711940
+  },
+  {
+   "arm": "DEVELOPER",
+   "repeat": 1,
+   "cov": 661,
+   "execs": 1455350
+  },
+  {
+   "arm": "EMBED",
+   "repeat": 1,
+   "cov": 579,
+   "execs": 1525707
+  },
+  {
+   "arm": "COMPOSED",
+   "repeat": 1,
+   "cov": 606,
+   "execs": 587722
+  },
+  {
+   "arm": "COMPOSED",
+   "repeat": 2,
+   "cov": 606,
+   "execs": 615265
+  },
+  {
+   "arm": "EMBED",
+   "repeat": 2,
+   "cov": 584,
+   "execs": 1589222
+  },
+  {
+   "arm": "DEVELOPER",
+   "repeat": 2,
+   "cov": 662,
+   "execs": 1329057
+  }
+ ]
+}
