@@ -190,10 +190,16 @@ def seams_for(path: Path, fn: str, decls: dict, src: str,
             for idx in bufs:
                 if idx >= len(args):
                     continue
-                lit = args[idx] if _STR_LIT.fullmatch(args[idx]) else None
+                # STRIP A C CAST FIRST. libyaml's test-reader passes
+                # `(unsigned char *)start`, and `start` walks a table of literals -- but a
+                # cast is not a bare identifier, so the trace never began and the whole
+                # library reported "sequences but no seam". The cast is noise to the seam;
+                # what matters is where the bytes came from.
+                bare = re.sub(r"^\(\s*[^()]*\*\s*\)\s*", "", args[idx]).strip()
+                lit = bare if _STR_LIT.fullmatch(bare) else None
                 via = "literal at the call"
                 if lit is None:
-                    lit = _literal_source(args[idx], fnbody, src)
+                    lit = _literal_source(bare, fnbody, src)
                     via = "traced through a variable"
                 if lit is None:
                     continue
