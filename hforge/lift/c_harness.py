@@ -207,7 +207,13 @@ _FREE_VERBS_PREFIX = {"free", "destroy", "delete", "cleanup", "release",
 _FREE_VERBS_TERMINAL = {"close"}
 # Too short or too common to match as a prefix: "end" would claim `endian`, "del" would
 # claim `delimiter`, "fini" would claim `finish`. These must BE the segment.
-_FREE_VERBS_EXACT = {"end", "del", "fini", "term", "cleanup", "free"}
+# `decref` IS A RELEASE. json_decref drops a reference and frees on zero, and a harness that
+# decrefs and then re-creates into the same variable is correct C. Without this verb
+# json_decref lifted as a QUERY, S1 never saw the resource die, and every following
+# json_loads read as DOUBLE_CREATE: 114 violations on jansson's own test suite, 25 of 42
+# proposed plans lost, on a library where every one of them is well-formed. Whole-segment on
+# purpose -- "decref" must never match inside another word.
+_FREE_VERBS_EXACT = {"end", "del", "fini", "term", "cleanup", "free", "decref"}
 
 
 def _name_segments(fn: str):

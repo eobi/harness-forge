@@ -237,6 +237,8 @@ def propose(path: str, entry: str, decls: dict, seam: Optional[dict] = None,
         rec["why_not"] = "every call in this test is scaffolding or a test-local helper"
         return None, rec
 
+    apis0 = dict(ir.apis)
+
     # PAD EVERY OP TO ITS DECLARED ARITY, not only the seam's.
     #
     # The lifter records the arguments it can attribute and drops the rest -- a string
@@ -246,11 +248,24 @@ def propose(path: str, entry: str, decls: dict, seam: Optional[dict] = None,
     # its job. The padded arguments are literal 0, which is what the emitter would write for
     # an argument nothing is bound to, and the count is recorded on the plan.
     _padded = 0
+    _dropped_destroys = 0
     _fixed = []
     for op in kept:
         d0 = decls.get(op.api)
         if d0 is None or len(op.args) >= len(d0.params):
             _fixed.append(op)
+            continue
+        # A DESTROY WHOSE TARGET COULD NOT BE ATTRIBUTED IS DROPPED, NOT PADDED.
+        #
+        # `json_decref(json_array_get(arr, i))` releases a value the lifter never tracked, so
+        # its argument was dropped. Padding it to arity produced `json_decref(0)` -- a destroy
+        # of nothing -- and S3.DESTROY_NO_TARGET refused the plan, correctly. The call cannot
+        # be made faithfully without the object it names, so it is removed and counted; the
+        # untracked object was never in the IR to leak.
+        _api = apis0.get(op.api) if apis0 else None
+        if _api is not None and _api.role == "destroy" and not any(
+                a.source == "resource" for a in op.args):
+            _dropped_destroys += 1
             continue
         extra_args = [Arg(f"a{i}", "literal", value=0)
                       for i in range(len(op.args), len(d0.params))]
@@ -264,6 +279,7 @@ def propose(path: str, entry: str, decls: dict, seam: Optional[dict] = None,
                 for i in range(len(a0.params), len(d0.params))])
     kept = _fixed
     rec["padded_args"] = _padded
+    rec["dropped_untargeted_destroys"] = _dropped_destroys
 
     # THE SEAM. Without one the plan calls the library with the test's own fixed values and
     # the fuzzer drives nothing -- S5.INPUT_NOT_CONSUMED, and correctly refused.
