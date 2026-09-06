@@ -49,18 +49,41 @@ def _base(ty: str) -> str:
     return re.sub(r"\bconst\b|\*|\s+", " ", ty or "").strip()
 
 
-def _produced_resource(plan: HarnessIR, decls: dict):
-    """(resource id, declared type, index of the op that produced it) for the seam's parser."""
+def _produced_resources(plan: HarnessIR, decls: dict) -> list:
+    """Every (resource id, declared type) A produces AT OR AFTER its seam, latest first.
+
+    The seam call is not always what produces the value worth handing on. jansson's
+    json_loads returns the json_t* directly; libyaml's yaml_parser_set_input_string returns
+    VOID and the document comes two calls later from yaml_parser_load(&parser, &document).
+    Matching only the seam call's return type composed nothing for libyaml -- "none of B's
+    calls takes a 'void'". So every resource bound after the seam is a candidate, typed from
+    the producing call's return when it returns it and from the declared parameter when it
+    fills an out-parameter, and B's calls are matched against all of them, latest first.
+    """
     seam_slices = {s.id for s in plan.slices}
+    start = None
     for i, op in enumerate(plan.sequence):
-        if not any(a.source == "input" and a.ref in seam_slices for a in op.args):
-            continue
+        if any(a.source == "input" and a.ref in seam_slices for a in op.args):
+            start = i
+            break
+    if start is None:
+        return []
+    out: list = []
+    for op in plan.sequence[start:]:
         if not op.binds:
             continue
         d = decls.get(op.api)
         rt = getattr(d, "ret", "") if d else ""
-        return op.binds, _base(rt), i
-    return None
+        ty = _base(rt) if rt and "*" in rt else ""
+        if not ty and d is not None:
+            # An out-parameter: the resource is what the pointer parameter points AT.
+            for j, a in enumerate(op.args):
+                if a.source == "resource" and a.ref == op.binds and j < len(d.params):
+                    ty = _base(d.params[j][0])
+                    break
+        if ty and ty != "void":
+            out.append((op.binds, ty))
+    return list(reversed(out))
 
 
 def _last_destroy_of(plan: HarnessIR, rid: str) -> int:
@@ -76,13 +99,9 @@ def compose(a: HarnessIR, b: HarnessIR, decls: dict, want: str = "serialise") ->
     """Return (plan or None, record)."""
     rec = {"producer": PRODUCER, "a": a.name, "b": b.name, "subsystem": want,
            "taken_from_b": 0, "left_behind": 0, "rebound_param": None, "why_not": ""}
-    prod = _produced_resource(a, decls)
-    if prod is None:
-        rec["why_not"] = "plan A produces no resource from its seam"
-        return None, rec
-    rid, rtype, _ = prod
-    if not rtype:
-        rec["why_not"] = f"the declaration of A's parser has no return type to match on"
+    prods = _produced_resources(a, decls)
+    if not prods:
+        rec["why_not"] = "plan A produces no typed resource at or after its seam"
         return None, rec
     if any(_subsystem(o.api) == want for o in a.sequence):
         rec["why_not"] = f"plan A already enters '{want}' -- composition adds nothing"
@@ -98,10 +117,13 @@ def compose(a: HarnessIR, b: HarnessIR, decls: dict, want: str = "serialise") ->
             continue
         # THE HANDLE PARAMETER, BY DECLARED TYPE. The first parameter whose base type is A's
         # parsed type gets A's resource; nothing else about B's call changes.
-        hit = None
-        for j, (pty, _pn) in enumerate(d.params):
-            if _base(pty) == rtype and j < len(op.args):
-                hit = j
+        hit = None; rid = rtype = None
+        for cand_rid, cand_ty in prods:
+            for j, (pty, _pn) in enumerate(d.params):
+                if _base(pty) == cand_ty and j < len(op.args):
+                    hit, rid, rtype = j, cand_rid, cand_ty
+                    break
+            if hit is not None:
                 break
         if hit is None:
             left += 1
@@ -125,9 +147,10 @@ def compose(a: HarnessIR, b: HarnessIR, decls: dict, want: str = "serialise") ->
         rec["rebound_param"] = d.params[hit][1] or f"a{hit}"
     rec["taken_from_b"], rec["left_behind"] = len(taken), left
     if not taken:
-        rec["why_not"] = (f"none of B's '{want}' calls takes a {rtype!r} -- nothing to rebind")
+        rec["why_not"] = (f"none of B's '{want}' calls takes any of "
+                          f"{sorted({t for _, t in prods})} -- nothing to rebind")
         return None, rec
-
+    rec["rebound_resource"] = rid
     cut = _last_destroy_of(a, rid)
     seq = list(a.sequence[:cut]) + taken + list(a.sequence[cut:])
     # B's ops that bind resources need those resources declared, and their APIs known.

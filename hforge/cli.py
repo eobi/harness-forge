@@ -848,6 +848,65 @@ def _attach_contracts(ir, contracts: dict) -> int:
     return n
 
 
+def cmd_test_lift(args) -> int:
+    """Lift ONE of a library's own unit tests into a certified harness plan.
+
+    P3.LIFT from the command line: a test function is a description of correct API usage the
+    header does not state, and it reaches a median 66.7% of a library's exported surface where
+    a header-derived plan reaches 3.6%. The seam -- where the fuzzer's bytes replace the
+    test's fixed input -- is given explicitly here, because it changes what the harness does
+    and must never be chosen silently. Every drop the producer makes (assertions, test-local
+    helpers, untargeted destroys) is printed, so the reader can see how much of the test
+    survived.
+    """
+    from .producers import test_lift                                 # noqa: PLC0415
+    from .producers.header_graph import parse_header                 # noqa: PLC0415
+    decls: dict = {}
+    for h in args.header:
+        for d in parse_header(h, tuple(args.include or ()), ()):
+            decls[d.name] = d
+    if not decls:
+        print("no declarations parsed from the header(s); a lifted test needs them to tell "
+              "a library call from the test's own scaffolding")
+        return 2
+    seam = None
+    if args.seam_api:
+        seam = {"api": args.seam_api, "param_index": args.seam_param, "literal": "",
+                "parse_like": True, "depth": 0}
+    plan, rec = test_lift.propose(
+        args.test_file, args.entry, decls, seam=seam,
+        target_name=args.name or Path(args.header[0]).stem,
+        headers=[Path(h).name for h in args.header],
+        also_api=test_lift.inline_api(list(args.header)))
+    for k in ("ops_lifted", "ops_kept", "dropped_assertions", "dropped_non_library",
+              "dropped_untargeted_destroys", "rekeyed_removals", "padded_args"):
+        if k in rec:
+            print(f"  {k:28s} {rec[k]}")
+    if plan is None:
+        print(f"refused: {rec.get('status')} -- {rec.get('why_not', '')}")
+        return 1
+    if rec.get("seam"):
+        print(f"  seam: {rec['seam']}")
+    gates = list(run_static_gates(plan))
+    blocks = [v for g in gates for v in g.violations if v.severity == BLOCK]
+    for v in blocks:
+        print(f"  [BLOCK] {v.code}: {v.message[:140]}")
+    if not seam:
+        print("  no --seam-api given: the plan runs the test's own fixed values and the "
+              "fuzzer drives nothing (S5 will say so). Name the call and parameter that "
+              "should receive the input.")
+    if blocks and not args.force:
+        print(f"{len(blocks)} blocking violation(s); not emitting (pass --force to emit anyway)")
+        return 1
+    src = emit(plan).source
+    if args.out:
+        Path(args.out).write_text(src)
+        print(f"wrote {args.out}")
+    else:
+        print(src)
+    return 0
+
+
 def cmd_audit(args) -> int:
     """Grade harnesses somebody else wrote.
 
@@ -1553,6 +1612,23 @@ def main(argv=None) -> int:
                    help="do not ship a harness whose campaign reached fewer edges")
     b.add_argument("--no-positive-control", action="store_true")
     b.set_defaults(fn=cmd_batch)
+
+    tl = sub.add_parser("test-lift",
+                        help="lift one of a library's own unit tests into a harness plan")
+    tl.add_argument("test_file")
+    tl.add_argument("entry", help="the test function to lift")
+    tl.add_argument("--header", action="append", required=True,
+                    help="the library's public header (repeatable)")
+    tl.add_argument("--include", action="append", default=[])
+    tl.add_argument("--name", default="")
+    tl.add_argument("--seam-api", default="",
+                    help="the library call whose argument receives the fuzzer's bytes")
+    tl.add_argument("--seam-param", type=int, default=0,
+                    help="which parameter of --seam-api (0-based)")
+    tl.add_argument("--out", default="", help="write the emitted C here instead of stdout")
+    tl.add_argument("--force", action="store_true",
+                    help="emit even if a static gate blocks (the certificate records it)")
+    tl.set_defaults(fn=cmd_test_lift)
 
     au = sub.add_parser("audit",
                         help="lift and grade harnesses somebody else wrote (files or dirs)")
