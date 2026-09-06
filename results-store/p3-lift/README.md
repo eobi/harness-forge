@@ -309,8 +309,23 @@ assigned to a variable the lifter dropped, so nothing freed it and LeakSanitizer
 reported the harness itself. A pointer-returning taken call now binds a fresh resource and a
 `free()` is appended. Pinned in `tests/test_compose.py`.
 
-Measurements queued on a quiet machine, paired against `embed` (best single test) and the
-developer harness: jansson first, then cjson. **No number is claimed until they land.**
+### jansson: composition exceeds the best single test
+
+Measured, 3 repeats, paired, arms alternating:
+
+| arm | coverage | vs developer |
+|---|---|---|
+| DEVELOPER `json_load_dump_fuzzer.cc` | 663 | 1.00x |
+| **COMPOSED** `decode_any` + `test_circular`'s `json_dumps` | **609** | **0.92x** |
+| EMBED (best single test) | 584 | 0.88x |
+
+**The composed harness beats the best single test in the suite: 0.92x against 0.88x.** That is
+the hypothesis confirmed -- joining a parse test to a serialise test reaches more code than any
+one test does, because it enters two deep subsystems no single test in this suite combines
+except `embed`, and it exceeds even `embed`. Still under the developer harness's 663, but the
+single-test ceiling is broken, which nothing before composition could do.
+
+cjson composition is measured next.
 
 ## Where it does not work yet
 
