@@ -258,6 +258,34 @@ Coverage against the developer harness with the recovered candidate set is queue
 corpus re-audit (the lifter changed, and the audit's 0-false-positive claim is recorded, so
 it is re-measured rather than assumed).
 
+## Composition: past the single-test ceiling, built and queued for measurement
+
+`hforge/producers/compose.py` joins a parse-entered plan A (it carries the seam and its parser
+produces a resource) to a second test B that enters a different deep subsystem. B's ops in
+that subsystem -- not its setup or teardown -- are taken, the parameter naming B's handle is
+rebound to A's parsed resource BY DECLARED TYPE, and they are inserted just before A's final
+destroy of it. What came from where, what was rebound to what, and how many of B's ops were
+left behind for a type mismatch all travel on the record.
+
+This is the first thing in this line of work that INVENTS a sequence rather than observing
+one. It is the territory where mutational synthesis died on libyaml; the gates and the smoke
+test are what keep it honest, and nothing composed reaches a campaign without passing both.
+
+Dry runs, gates + build + 200-run smoke, no campaign:
+
+| library | A (parse) | B (serialise) | gates | build | smoke |
+|---|---|---|---|---|---|
+| jansson | `decode_any` | `test_circular` -> `json_dumps` | pass | ok | clean |
+| cjson | `cjson_get_object_item_should_get_object_items` | 4 of 5 serialise tests | pass | ok | clean |
+
+The first jansson composition LEAKED: `json_dumps` returns a malloc'd `char*` that B's test
+assigned to a variable the lifter dropped, so nothing freed it and LeakSanitizer would have
+reported the harness itself. A pointer-returning taken call now binds a fresh resource and a
+`free()` is appended. Pinned in `tests/test_compose.py`.
+
+Measurements queued on a quiet machine, paired against `embed` (best single test) and the
+developer harness: jansson first, then cjson. **No number is claimed until they land.**
+
 ## Where it does not work yet
 
 **expat: 0 candidates passed the gates, and its own harness did not build either.** Not

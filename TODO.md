@@ -34,7 +34,9 @@ on jansson and 0 -> 2 on libyaml by fixing the lifter, not the libraries. P3.LIF
 one test (`embed`) that both parses and dumps, cjson has none, and cjson is pinned at 0.64x
 however it is ranked. **A lifted harness can only be as good as the best single test function.**
 Composition -- joining a parse test to a dump test -- is the only idea that can exceed the
-suite, and it is the first that INVENTS a sequence rather than observing one. That is the
+suite, and it is the first that INVENTS a sequence rather than observing one. **Built
+(`hforge/producers/compose.py`), gated, built and smoke-clean on jansson and cjson;
+measurements queued.** That is the
 territory where mutational synthesis failed (libyaml: all 8 candidates aborted on valid input),
 so the smoke test and gates are what keep it honest.
 
