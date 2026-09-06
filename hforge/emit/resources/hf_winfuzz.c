@@ -33,11 +33,43 @@ void __sanitizer_cov_trace_pc(void) {
     uint32_t i = (uint32_t)((pc ^ (pc >> 15) ^ (pc >> 29)) & (HF_MAXG - 1));
     if (!hf_seen[i]) { hf_seen[i] = 1; hf_edges++; }
 }
-/* also satisfy trace-cmp hooks if enabled (no-ops keep the link clean) */
-void __sanitizer_cov_trace_cmp1(uint8_t a, uint8_t b) { (void)a;(void)b; }
-void __sanitizer_cov_trace_cmp2(uint16_t a, uint16_t b) { (void)a;(void)b; }
-void __sanitizer_cov_trace_cmp4(uint32_t a, uint32_t b) { (void)a;(void)b; }
-void __sanitizer_cov_trace_cmp8(uint64_t a, uint64_t b) { (void)a;(void)b; }
+/* ---- comparison feedback (value profile) ----
+ * A raw edge fuzzer stalls at `if (magic == 0xCAFEBABE)`: the branch is one edge, taken only
+ * on an exact 4-byte hit random mutation never lands. trace-cmp reports the two operands of
+ * every comparison; two things are done with them.
+ *   1. VALUE PROFILE: feature = (call site, number of matching high bits of a^b). As a
+ *      mutation makes more high bits agree, a NEW feature appears, so the corpus keeps the
+ *      input that got closer -- the comparison is climbed one bit at a time instead of hit
+ *      all at once. This is what breaks the plateau.
+ *   2. TORC: the operands are pushed into a table of recent constants the mutator injects, so
+ *      a magic the code compares against is dropped straight into the input. */
+#define HF_TORC 512
+static uint64_t hf_torc[HF_TORC]; static uint32_t hf_torc_i = 0;
+static void hf_torc_push(uint64_t v) {
+    if (v == 0 || v == (uint64_t)-1) return;      /* 0 and all-ones are noise */
+    hf_torc[hf_torc_i++ & (HF_TORC - 1)] = v;
+}
+static void hf_cmp(uintptr_t pc, uint64_t a, uint64_t b) {
+    uint64_t x = a ^ b;
+    uint32_t lead = x ? (uint32_t)__builtin_clzll(x) : 64;   /* matching leading bits */
+    uint32_t f = (uint32_t)(pc * 2654435761u) ^ (lead * 0x9e3779b1u);
+    uint32_t i = f & (HF_MAXG - 1);
+    if (!hf_seen[i]) { hf_seen[i] = 1; hf_edges++; }
+    hf_torc_push(a); hf_torc_push(b);
+}
+#define HF_PC() ((uintptr_t)__builtin_return_address(0))
+void __sanitizer_cov_trace_cmp1(uint8_t a, uint8_t b)   { hf_cmp(HF_PC(), a, b); }
+void __sanitizer_cov_trace_cmp2(uint16_t a, uint16_t b) { hf_cmp(HF_PC(), a, b); }
+void __sanitizer_cov_trace_cmp4(uint32_t a, uint32_t b) { hf_cmp(HF_PC(), a, b); }
+void __sanitizer_cov_trace_cmp8(uint64_t a, uint64_t b) { hf_cmp(HF_PC(), a, b); }
+void __sanitizer_cov_trace_const_cmp1(uint8_t a, uint8_t b)   { hf_cmp(HF_PC(), a, b); }
+void __sanitizer_cov_trace_const_cmp2(uint16_t a, uint16_t b) { hf_cmp(HF_PC(), a, b); }
+void __sanitizer_cov_trace_const_cmp4(uint32_t a, uint32_t b) { hf_cmp(HF_PC(), a, b); }
+void __sanitizer_cov_trace_const_cmp8(uint64_t a, uint64_t b) { hf_cmp(HF_PC(), a, b); }
+void __sanitizer_cov_trace_switch(uint64_t val, uint64_t *cases) {
+    uint64_t n = cases[0];                          /* cases[0]=count, cases[1]=bitwidth */
+    for (uint64_t k = 0; k < n && k < 256; k++) hf_cmp(HF_PC() + k, val, cases[2 + k]);
+}
 
 /* ---- corpus ---- */
 typedef struct { uint8_t *b; size_t n; } Unit;
@@ -85,7 +117,7 @@ static size_t mutate(const uint8_t *in, size_t n, uint8_t *out, size_t cap) {
     size_t m = n; if (m > cap) m = cap; if (m) memcpy(out, in, m);
     int rounds = 1 + (int)(rnd() % 5);
     for (int r = 0; r < rounds; r++) {
-        int op = (int)(rnd() % 6);
+        int op = (int)(rnd() % 7);
         if (op == 0 && m) out[rnd() % m] ^= (uint8_t)(1u << (rnd() % 8));       /* bit flip */
         else if (op == 1 && m) out[rnd() % m] = (uint8_t)rnd();                  /* byte set */
         else if (op == 2 && m < cap) { size_t p = rnd() % (m + 1);               /* insert */
@@ -101,6 +133,13 @@ static size_t mutate(const uint8_t *in, size_t n, uint8_t *out, size_t cap) {
             Unit *u = &corp[rnd() % corp_n]; size_t k = u->n ? rnd() % u->n : 0;
             size_t p = m ? rnd() % m : 0; size_t L = u->n - k; if (p + L > cap) L = cap - p;
             if (L) { memcpy(out + p, u->b + k, L); if (p + L > m) m = p + L; } }
+        else if (op == 6 && m >= 1) {         /* inject a comparison constant (TORC) */
+            uint64_t v = hf_torc[rnd() % HF_TORC];
+            if (v) { int w = (v >> 32) ? 8 : (v >> 16) ? 4 : (v >> 8) ? 2 : 1;
+                size_t p = rnd() % m; int be = (int)(rnd() & 1);
+                for (int k = 0; k < w && p + k < cap; k++)
+                    out[p + k] = (uint8_t)(v >> (8 * (be ? (w - 1 - k) : k)));
+                if (p + w > m && p + w <= cap) m = p + w; } }
     }
     return m;
 }
