@@ -108,6 +108,24 @@ PHASES: tuple = (
                            "test_role_inference_from_signatures",
                            "test_contract_inference_finds_cstrings_and_length_pairs",
                            "test_proposed_plans_pass_the_static_gates")),
+        Deliverable("P3.APPENTRY",
+                    "application entry points: the IR AppEntry and a channel emitter "
+                    "(argv/file/buffer/cstring/stdin) -- the one abstraction CLI, GUI and "
+                    "mobile apps share, so input arrives through a channel not an API call",
+                    DONE,
+                    modules=("hforge.ir", "hforge.emit.c_libfuzzer"),
+                    tests=("test_app_entry_round_trips_through_json",
+                           "test_file_arg_channel_materialises_a_temp_file_and_unlinks_it",
+                           "test_stdin_channel_freopens_a_temp_file_onto_stdin")),
+        Deliverable("P3.APPLIFT",
+                    "discover application entry points from a header and classify each by "
+                    "signature into its input channel; verified on real apps (libyaml "
+                    "run-parser reached the full parser)",
+                    DONE,
+                    modules=("hforge.producers.app_lift",),
+                    cli=("app-lift",),
+                    tests=("test_discover_ranks_a_direct_parser_above_main",
+                           "test_lone_content_named_pointer_is_the_cstring_channel")),
         Deliverable("P3.RANK", "producers compete, gates rank, confidence decides nothing",
                     DONE,
                     modules=("hforge.producers.rank",),
@@ -1906,7 +1924,14 @@ PHASES: tuple = (
                          "Scale (OSS-Fuzz corpus) and header-backed contract gates remain."),
     )),
 
-    Phase("P5", "Windows and closed binary", PLANNED, (
+    Phase("P5", "Windows and closed binary", PARTIAL, (
+        Deliverable("P5.APP",
+                    "application-entry emission verified on windows-x64-msvc: the emitted "
+                    "harness compiles with MSVC cl.exe, runs, and the overflow input is "
+                    "caught natively (STATUS_STACK_BUFFER_OVERRUN) while benign exits clean",
+                    DONE,
+                    modules=("hforge.emit.c_libfuzzer",),
+                    tests=("test_windows_target_emits_the_win32_temp_shim_and_a_cl_build",)),
         Deliverable("P5.TINYINST", "TinyInst coverage backend", PLANNED),
         Deliverable("P5.PE", "PE posture table and SEH-aware crash parsing", PLANNED),
     )),

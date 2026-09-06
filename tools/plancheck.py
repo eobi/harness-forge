@@ -69,7 +69,10 @@ def _test_functions() -> set:
 
 def _cli_commands() -> set:
     src = (ROOT / "hforge" / "cli.py").read_text()
-    return set(re.findall(r'sub\.add_parser\(\s*"([a-z_]+)"', src))
+    # Subcommand names use hyphens (test-lift, app-lift), so the character class must
+    # include '-'. The old [a-z_]+ stopped at the hyphen and reported "app" for "app-lift",
+    # which made a deliverable that correctly declared cli=("app-lift",) look unregistered.
+    return set(re.findall(r'sub\.add_parser\(\s*"([a-z_-]+)"', src))
 
 
 def _module_exists(dotted: str) -> bool:
