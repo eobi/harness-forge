@@ -40,6 +40,9 @@ _CONTENT_NAME = re.compile(r"(data|input|buf|buffer|str|string|text|src|json|xml
 # Entry points worth ranking to the top: they consume attacker input.
 _PARSEISH = re.compile(r"(?:^|_)(main|parse|read|load|decode|scan|deserial|process|handle|"
                        r"from_|ingest|import)", re.I)
+# A shallow query: reads a header and answers a question, never entering the decode body.
+_QUERY = re.compile(r"(?:^|_)(info|is_|is[A-Z]|get_?(?:size|width|height|len|info|count|"
+                    r"dimensions|num)|test|check|valid|probe|detect|sniff|peek)", re.I)
 
 
 def _is_byte_ptr(ty: str) -> bool:
@@ -154,9 +157,15 @@ def classify(decl) -> Optional[dict]:
     if bi >= 0:
         call_args, call_locals = _buffer_plan(params, bi, bi + 1)
         if call_args is not None:
+            # DEPTH: a full decoder writes several out-parameters and returns a buffer of
+            # decoded data; a query (info/is_/get_size) reads a header and returns a flag.
+            # Prefer the decoder so the DEFAULT entry drives the whole format body.
+            returns_ptr = "*" in getattr(decl, "ret", "")
+            is_query = bool(_QUERY.search(name))
+            depth = len(call_locals) + (1 if returns_ptr else 0)
             return {"channel": APP_BUFFER, "symbol": name, "param": params[bi][1],
                     "call_args": call_args, "call_locals": call_locals,
-                    "arity": len(params)}
+                    "arity": len(params), "depth": depth, "is_query": is_query}
     # f(const char *) -- lone char pointer: path or content
     if len(params) == 1 and _is_byte_ptr(params[0][0]) and "char" in params[0][0]:
         pn = params[0][1] or ""
@@ -170,10 +179,15 @@ def _rank(c: dict) -> tuple:
     # Parse-like names first; among those main() last (argv is the heaviest channel), so a
     # direct parse function is preferred over driving the whole CLI when both exist.
     parseish = 0 if _PARSEISH.search(c["symbol"]) else 1
+    # A query (stbi_info, stbi_is_hdr) reads the header and stops; a decoder runs the whole
+    # format body. Rank queries after real decoders, and deeper decoders (more out-params, a
+    # returned buffer) ahead of shallow ones, so the DEFAULT entry is the deepest available.
+    is_query = 1 if c.get("is_query") else 0
+    depth = -int(c.get("depth", 0))
     is_main = 1 if c["channel"] == APP_ARGV else 0
     # buffer/cstring (no file I/O) are the most direct, then file_arg, then argv.
     directness = {APP_BUFFER: 0, APP_CSTRING: 0, APP_FILE_ARG: 1, APP_ARGV: 2}[c["channel"]]
-    return (parseish, is_main, directness, c["symbol"])
+    return (parseish, is_query, is_main, directness, depth, c["symbol"])
 
 
 def discover(headers: list, includes: tuple = ()) -> list:

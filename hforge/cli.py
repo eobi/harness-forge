@@ -891,8 +891,20 @@ def cmd_app_lift(args) -> int:
         Path(args.out).write_text(e.source)
         if e.driver:
             Path(args.out).with_suffix(".driver.c").write_text(e.driver)
+        # A DICTIONARY SHIPS WITH THE HARNESS. Structure is the single largest lever on an
+        # application harness's depth -- the same stb_image harness reaches 146 edges raw and
+        # ~900 with a format dictionary. Mine it from the target's own source (or the header
+        # itself for a header-only library) so it is correct for what this library parses.
+        from .producers.dict_mine import mine_dict                  # noqa: PLC0415
+        dict_srcs = list(args.source) or list(args.header)
+        body = mine_dict(dict_srcs)
+        n_tokens = max(0, len(body.splitlines()) - 1)
+        dpath = Path(args.out).with_suffix(".dict")
+        if n_tokens:
+            dpath.write_text(body)
         print(f"wrote {args.out}"
-              + (f" and {Path(args.out).with_suffix('.driver.c')}" if e.driver else ""))
+              + (f" and {Path(args.out).with_suffix('.driver.c')}" if e.driver else "")
+              + (f" and {dpath} ({n_tokens} tokens)" if n_tokens else ""))
     else:
         print(e.source)
     return 0
