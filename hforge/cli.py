@@ -848,6 +848,46 @@ def _attach_contracts(ir, contracts: dict) -> int:
     return n
 
 
+def cmd_app_lift(args) -> int:
+    """Discover an application entry point and emit a harness that drives it (B1 producer).
+
+    An application takes input through a channel -- argv, a file it opens, a buffer or a
+    NUL-terminated string -- not an API call. This finds those entry points in the header,
+    classifies each by signature, and emits the harness for the best (or the one named by
+    --only). Every candidate found is printed, and the chosen channel is stated, because the
+    channel changes what the harness does and must not be silent.
+    """
+    from .producers import app_lift                                 # noqa: PLC0415
+    tgt = Target(name=args.name or Path(args.header[0]).stem,
+                 sources=list(args.source or []),
+                 include_dirs=list(args.include or []))
+    plan, rec = app_lift.propose(list(args.header), tgt,
+                                 includes=tuple(args.include or []), only=args.only)
+    print("candidates: " + ", ".join(f"{s}[{c}]" for s, c in rec.get("candidates", []))
+          or "candidates: none")
+    if plan is None:
+        print(f"refused: {rec.get('why_not', '')}")
+        return 1
+    print(f"chosen: {rec['chosen']['symbol']} via the {rec['chosen']['channel']} channel")
+    gates = list(run_static_gates(plan))
+    blocks = [v for g in gates for v in g.violations if v.severity == BLOCK]
+    for v in blocks:
+        print(f"  [BLOCK] {v.code}: {v.message[:140]}")
+    if blocks and not args.force:
+        print(f"{len(blocks)} blocking violation(s); not emitting (pass --force)")
+        return 1
+    e = emit(plan)
+    if args.out:
+        Path(args.out).write_text(e.source)
+        if e.driver:
+            Path(args.out).with_suffix(".driver.c").write_text(e.driver)
+        print(f"wrote {args.out}"
+              + (f" and {Path(args.out).with_suffix('.driver.c')}" if e.driver else ""))
+    else:
+        print(e.source)
+    return 0
+
+
 def cmd_test_lift(args) -> int:
     """Lift ONE of a library's own unit tests into a certified harness plan.
 
@@ -1612,6 +1652,19 @@ def main(argv=None) -> int:
                    help="do not ship a harness whose campaign reached fewer edges")
     b.add_argument("--no-positive-control", action="store_true")
     b.set_defaults(fn=cmd_batch)
+
+    al = sub.add_parser("app-lift",
+                        help="discover an application entry point and emit its harness (B1)")
+    al.add_argument("--header", action="append", required=True,
+                    help="the application's public header (repeatable)")
+    al.add_argument("--include", action="append", default=[])
+    al.add_argument("--source", action="append", default=[],
+                    help="application source compiled with the harness (repeatable)")
+    al.add_argument("--name", default="")
+    al.add_argument("--only", default="", help="lift this symbol rather than the top candidate")
+    al.add_argument("--out", default="", help="write the emitted C here instead of stdout")
+    al.add_argument("--force", action="store_true", help="emit even if a static gate blocks")
+    al.set_defaults(fn=cmd_app_lift)
 
     tl = sub.add_parser("test-lift",
                         help="lift one of a library's own unit tests into a harness plan")

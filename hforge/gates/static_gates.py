@@ -820,7 +820,15 @@ def s3_ordering(ir: HarnessIR) -> GateResult:
                                f"the returned resource is dropped on the floor",
                                where=op.id, principle="P1"))
 
-    if not ir.sequence:
+    if getattr(ir, "app_entry", None) is not None:
+        # AN APPLICATION HARNESS DOES ITS WORK THROUGH THE ENTRY CALL, not an op sequence.
+        # S3 is a library-shape check (legal role ordering, non-empty sequence); it does not
+        # apply, and the certificate says so positively rather than blocking a valid harness.
+        v.append(Violation("S3.APP_ENTRY", INFO,
+                           f"application entry {ir.app_entry.symbol!r} via the "
+                           f"{ir.app_entry.channel!r} channel; op-sequence checks N/A",
+                           principle="P4"))
+    elif not ir.sequence:
         v.append(Violation("S3.EMPTY", BLOCK, "the plan has no ops: this harness tests nothing",
                            principle="P4"))
     elif (not any(r in (ROLE_CONSUME, ROLE_CREATE) for r in seen_roles)
@@ -916,7 +924,14 @@ def s5_input_flow(ir: HarnessIR) -> GateResult:
                            f"slices {remainders} all claim the remainder of the input; at most "
                            f"one may", principle="P4"))
 
-    if not ir.slices:
+    if getattr(ir, "app_entry", None) is not None:
+        # THE CHANNEL IS THE INPUT PATH. An application harness delivers the fuzzer's bytes
+        # through argv/file/buffer/cstring, not through an InputSlice, so "no slices" is
+        # correct and expected rather than a defect.
+        v.append(Violation("S5.APP_CHANNEL", INFO,
+                           f"fuzzer input reaches the target through the "
+                           f"{ir.app_entry.channel!r} channel", principle="P4"))
+    elif not ir.slices:
         v.append(Violation("S5.NO_INPUT", BLOCK,
                            "the plan declares no input slices: nothing the fuzzer produces "
                            "reaches the target", principle="P4"))

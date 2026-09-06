@@ -521,9 +521,10 @@ def _emit_app_entry(ir: HarnessIR, *, with_driver: bool = True) -> "Emitted":
     contents leak into the next campaign iteration, so every call gets its own mkstemp name
     and unlinks it on every exit, including the early returns.
     """
-    from ..ir import APP_ARGV, APP_BUFFER, APP_FILE_ARG            # noqa: PLC0415
+    from ..ir import (APP_ARGV, APP_BUFFER, APP_CSTRING,          # noqa: PLC0415
+                       APP_FILE_ARG)
     ae = ir.app_entry
-    if ae.channel not in (APP_ARGV, APP_FILE_ARG, APP_BUFFER):
+    if ae.channel not in (APP_ARGV, APP_FILE_ARG, APP_BUFFER, APP_CSTRING):
         raise EmitError(f"unknown application channel {ae.channel!r}; a harness for a "
                         f"channel nothing emits is refused rather than emitted wrong")
     ver = f" {ir.target.version}" if ir.target.version else ""
@@ -537,6 +538,19 @@ def _emit_app_entry(ir: HarnessIR, *, with_driver: bool = True) -> "Emitted":
     if ae.channel == APP_BUFFER:
         # No file: the entry takes the bytes and their length directly.
         call_lines = [f"    {sink}{cast}{ae.symbol}((const char *)hf_data, hf_size);"]
+        needs_tmp = False
+    elif ae.channel == APP_CSTRING:
+        # NUL-terminated content in memory: copy, terminate, call, free. A parser taking a
+        # lone `const char *` reads to the terminator, so the fuzzer's bytes must be a real
+        # C string -- an interior pointer into libFuzzer's exact-size buffer would over-read.
+        call_lines = [
+            "    char *hf_cstr = (char *)malloc(hf_size + 1);",
+            "    if (!hf_cstr) return 0;",
+            "    memcpy(hf_cstr, hf_data, hf_size);",
+            "    hf_cstr[hf_size] = 0;",
+            f"    {sink}{cast}{ae.symbol}(hf_cstr);",
+            "    free(hf_cstr);",
+        ]
         needs_tmp = False
     else:
         needs_tmp = True

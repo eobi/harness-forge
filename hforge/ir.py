@@ -514,7 +514,8 @@ class Target:
 APP_ARGV = "argv"         # a real main(argc, argv): bytes -> temp file -> argv slot
 APP_FILE_ARG = "file_arg"  # a function taking a path: bytes -> temp file -> f(path)
 APP_BUFFER = "buffer"      # a function taking a buffer: f((const char *)data, size)
-APP_CHANNELS = (APP_ARGV, APP_FILE_ARG, APP_BUFFER)
+APP_CSTRING = "cstring"    # a function taking NUL-terminated content: f(const char *text)
+APP_CHANNELS = (APP_ARGV, APP_FILE_ARG, APP_BUFFER, APP_CSTRING)
 
 
 @dataclass
