@@ -504,6 +504,44 @@ class Target:
         return t
 
 
+# Channels through which the fuzzer's bytes reach an APPLICATION, as opposed to a library.
+#
+# A library harness feeds bytes to an API call. An application does not expose an API; it
+# takes input through argv, a file it opens, stdin, or a buffer it is handed. This is the one
+# abstraction the IR lacked -- every role it knew (create/consume/destroy/query/reset) is a
+# C-function lifecycle, so CLI apps, GUI apps and mobile apps were all unreachable for the
+# same reason. A channel names how the input arrives; the emitter materialises it.
+APP_ARGV = "argv"         # a real main(argc, argv): bytes -> temp file -> argv slot
+APP_FILE_ARG = "file_arg"  # a function taking a path: bytes -> temp file -> f(path)
+APP_BUFFER = "buffer"      # a function taking a buffer: f((const char *)data, size)
+APP_CHANNELS = (APP_ARGV, APP_FILE_ARG, APP_BUFFER)
+
+
+@dataclass
+class AppEntry:
+    """An application entry point and the channel its input arrives through.
+
+    Present on a HarnessIR INSTEAD OF an op sequence: an application harness makes no
+    lifecycle claims, so the create/consume/destroy gates are vacuous on it by design, and
+    the certificate says so rather than pretending otherwise.
+    """
+    symbol: str                        # the function to drive
+    channel: str = APP_BUFFER          # one of APP_CHANNELS
+    header: str = ""                   # header declaring `symbol`, for #include
+    argv: list = field(default_factory=list)   # APP_ARGV: template with "@INPUT@" for the path
+    returns_int: bool = True           # sink the return value if it has one
+
+    def to_json(self) -> dict:
+        return {"symbol": self.symbol, "channel": self.channel, "header": self.header,
+                "argv": list(self.argv), "returns_int": self.returns_int}
+
+    @staticmethod
+    def from_json(d: dict) -> "AppEntry":
+        return AppEntry(symbol=d["symbol"], channel=d.get("channel", APP_BUFFER),
+                        header=d.get("header", ""), argv=list(d.get("argv", [])),
+                        returns_int=d.get("returns_int", True))
+
+
 @dataclass
 class HarnessIR:
     """A complete harness plan."""
@@ -521,6 +559,7 @@ class HarnessIR:
     schema_version: str = SCHEMA_VERSION
     producer: str = "hand"           # which producer emitted this plan
     notes: str = ""
+    app_entry: Optional["AppEntry"] = None   # set for an APPLICATION harness, not a library one
 
     # ── lookups ──
     def slice_by_id(self, sid: str) -> Optional[InputSlice]:
@@ -560,6 +599,7 @@ class HarnessIR:
             "knobs": self.knobs.to_json(),
             "format_model": self.format_model.to_json() if self.format_model else None,
             "raw_blocks": [b.to_json() for b in self.raw_blocks],
+            "app_entry": self.app_entry.to_json() if self.app_entry else None,
         }
 
     def dumps(self, indent: int = 2) -> str:
@@ -586,7 +626,8 @@ class HarnessIR:
             raw_blocks=[RawBlock.from_json(b) for b in d.get("raw_blocks", [])],
             schema_version=got,
             producer=d.get("producer", "hand"),
-            notes=d.get("notes", ""))
+            notes=d.get("notes", ""),
+            app_entry=AppEntry.from_json(d["app_entry"]) if d.get("app_entry") else None)
 
     @staticmethod
     def loads(text: str) -> "HarnessIR":
