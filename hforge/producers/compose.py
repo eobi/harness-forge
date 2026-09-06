@@ -34,7 +34,8 @@ _SUBSYSTEM = {
     "serialise": re.compile(r"(?:^|_)(dump|dumps|dumpb|write|encode|serial|marshal|print|"
                             r"emit|to_|save)", re.I),
     "transform": re.compile(r"(?:^|_)(compress|decompress|inflate|deflate|convert|transform|"
-                            r"resize|scale|rotate)", re.I),
+                            r"resize|scale|rotate|copy|dup|clone)", re.I),
+    "validate": re.compile(r"(?:^|_)(equal|compare|validate|verify|check)(?:$|_)", re.I),
 }
 
 
@@ -195,3 +196,38 @@ def compose(a: HarnessIR, b: HarnessIR, decls: dict, want: str = "serialise") ->
     plan = replace(a, name=f"{a.name}__with_{want}_from_{b.name}"[:60], sequence=seq,
                    apis=apis, resources=res, producer=PRODUCER)
     return plan, rec
+
+
+def compose_chain(a: HarnessIR, pool_by_subsystem: dict, decls: dict,
+                  wants: tuple = ("serialise", "transform", "validate")) -> tuple:
+    """Fold ONE call from each downstream subsystem onto A's parsed root, in turn.
+
+    Two-test composition matched the developer harness where the suite already had a rich
+    integrated test (cjson) and beat the best single test where it did not (jansson). To
+    EXCEED the developer harness -- OGHarn's +14% bar is over the human harness, not the best
+    single test -- the composed harness must exercise MORE subsystems than the human combined.
+    This chains a serialise, a transform and a validate call (whichever the pool provides)
+    onto the same parsed value, so one harness parses the fuzzer's bytes and then dumps,
+    transforms and compares them.
+
+    `pool_by_subsystem` maps a subsystem name to a list of candidate B plans that enter it.
+    Each fold is the existing two-test compose(), which rebinds to the parse root and inserts
+    before the final destroy; composing a second subsystem onto the result is legal because
+    compose() only refuses a subsystem A ALREADY enters, and each fold enters a new one.
+    """
+    rec = {"producer": PRODUCER, "base": a.name, "folded": [], "skipped": []}
+    plan = a
+    for want in wants:
+        folded = False
+        for b in pool_by_subsystem.get(want, []):
+            cand, r = compose(plan, b, decls, want=want)
+            if cand is not None:
+                plan = cand
+                rec["folded"].append({"subsystem": want, "from": r.get("b"),
+                                      "rebound": r.get("rebound_resource")})
+                folded = True
+                break
+        if not folded:
+            rec["skipped"].append(want)
+    rec["subsystems_added"] = len(rec["folded"])
+    return (plan if rec["folded"] else None), rec
