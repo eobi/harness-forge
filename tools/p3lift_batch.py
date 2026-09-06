@@ -63,7 +63,7 @@ _SUBSYSTEMS = {
     "serialise": re.compile(r"(?:^|_)(dump|dumps|dumpb|write|encode|serial|marshal|print|"
                             r"emit|to_|save)", re.I),
     "transform": re.compile(r"(?:^|_)(compress|decompress|inflate|deflate|convert|transform|"
-                            r"resize|scale|rotate)", re.I),
+                            r"resize|scale|rotate|copy|dup|clone)", re.I),
     "validate":  re.compile(r"(?:^|_)(verify|validate|check|equal|compare)", re.I),
 }
 

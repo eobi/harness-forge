@@ -50,6 +50,22 @@ def _base(ty: str) -> str:
     return re.sub(r"\bconst\b|\*|\s+", " ", ty or "").strip()
 
 
+def _deallocator_for(base_ty: str, decls: dict) -> str:
+    """The library function that frees a value of this pointer type: *_decref / *_free /
+    *_delete / *_destroy taking exactly that type. json_copy returns json_t*, which
+    json_decref releases -- freeing it with free() would be a mismatched free. Returns the
+    symbol, or '' (the caller uses free() for a raw char*/void* buffer)."""
+    import re as _re
+    for name, d in decls.items():
+        if not _re.search(r"(?:^|_)(decref|unref|free|delete|destroy|release)(?:$|_|[A-Z])",
+                          name):
+            continue
+        params = list(getattr(d, "params", []) or [])
+        if len(params) == 1 and _base(params[0][0]) == base_ty:
+            return name
+    return ""
+
+
 def _produced_resources(plan: HarnessIR, decls: dict) -> list:
     """Every (resource id, declared type) A produces AT OR AFTER its seam, latest first.
 
@@ -101,7 +117,8 @@ def _last_destroy_of(plan: HarnessIR, rid: str) -> int:
     return idx
 
 
-def compose(a: HarnessIR, b: HarnessIR, decls: dict, want: str = "serialise") -> tuple:
+def compose(a: HarnessIR, b: HarnessIR, decls: dict, want: str = "serialise",
+            first_only: bool = False) -> tuple:
     """Return (plan or None, record)."""
     rec = {"producer": PRODUCER, "a": a.name, "b": b.name, "subsystem": want,
            "taken_from_b": 0, "left_behind": 0, "rebound_param": None, "why_not": ""}
@@ -114,6 +131,7 @@ def compose(a: HarnessIR, b: HarnessIR, decls: dict, want: str = "serialise") ->
         return None, rec
 
     taken, left = [], 0
+    _obj_dtors: dict = {}
     for op in b.sequence:
         if _subsystem(op.api) != want:
             continue
@@ -157,12 +175,26 @@ def compose(a: HarnessIR, b: HarnessIR, decls: dict, want: str = "serialise") ->
         # and a free() is appended for it.
         binds = op.binds
         rt = _base(getattr(d, "ret", "") or "")
-        if not binds and "*" in (getattr(d, "ret", "") or "") and rt in ("char", "void",
-                                                                          "unsigned char"):
-            binds = f"r_c{len(taken)}"
+        dtor_sym = ""
+        if not binds and "*" in (getattr(d, "ret", "") or ""):
+            if rt in ("char", "void", "unsigned char"):
+                binds = f"r_c{len(taken)}"          # raw buffer -> free()
+            else:
+                # A library object the call ALLOCATED (json_copy -> json_t*). Bind it and
+                # release it with the type's own deallocator, not free().
+                dtor_sym = _deallocator_for(rt, decls)
+                if dtor_sym:
+                    binds = f"r_o{len(taken)}"
+                    _obj_dtors[binds] = (dtor_sym, rt)
         taken.append(replace(op, args=args, id=f"c{len(taken)}", binds=binds,
                              guarded_by=[g for g in (op.guarded_by or []) if g == rid]))
         rec["rebound_param"] = d.params[hit][1] or f"a{hit}"
+        if first_only:
+            # ONE representative call per subsystem. A lifted test may call json_copy seven
+            # times reusing one variable; folding all seven binds one resource seven times
+            # and trails six decrefs -- DOUBLE_DESTROY, which the gate rightly refuses. For a
+            # chain, one call of each subsystem on the parsed root is the harness we want.
+            break
     rec["taken_from_b"], rec["left_behind"] = len(taken), left
     if not taken:
         rec["why_not"] = (f"none of B's '{want}' calls takes any of "
@@ -192,6 +224,20 @@ def compose(a: HarnessIR, b: HarnessIR, decls: dict, want: str = "serialise") ->
         if dtor is not None:
             seq.append(replace(dtor, id=f"cd{o.binds}"))
             apis.setdefault(dtor.api, b.apis[dtor.api])
+        elif o.binds in _obj_dtors:
+            # A library object the taken call allocated: release it with the type's own
+            # deallocator (json_copy -> json_decref), so the composed harness does not leak
+            # the copy and does not mismatched-free it.
+            dsym, dty = _obj_dtors[o.binds]
+            if o.binds not in have:
+                res.append(Resource(o.binds, TypeRef(dty + " *", "pointer")))
+                have.add(o.binds)
+            apis.setdefault(dsym, Api(symbol=dsym, header="",
+                                      role="destroy",
+                                      params=[ParamDecl("o", TypeRef(dty + " *", "pointer"))],
+                                      returns=TypeRef("void", "scalar"), contract=Contract()))
+            seq.append(Op(f"cd{o.binds}", dsym, [Arg("o", "resource", o.binds)],
+                          binds="", targets=o.binds, guarded_by=[o.binds]))
         elif o.binds.startswith("r_c"):
             if o.binds not in have:
                 res.append(Resource(o.binds, TypeRef("char *", "pointer"))); have.add(o.binds)
@@ -227,7 +273,7 @@ def compose_chain(a: HarnessIR, pool_by_subsystem: dict, decls: dict,
     for want in wants:
         folded = False
         for b in pool_by_subsystem.get(want, []):
-            cand, r = compose(plan, b, decls, want=want)
+            cand, r = compose(plan, b, decls, want=want, first_only=True)
             if cand is not None:
                 plan = cand
                 rec["folded"].append({"subsystem": want, "from": r.get("b"),
