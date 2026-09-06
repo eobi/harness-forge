@@ -74,6 +74,25 @@ a handle the library allocates, or an out-parameter it fills. A struct the harne
 its own stack is there either way, so using it after a failed call reads stale-but-valid
 memory -- wrong results, not a crash.
 
+## Re-measured 2026-09-06, after the lifter changed
+
+The lifter gained three rules on 2026-09-06 -- `decref` is a release, a release verb with a
+string-literal argument is a keyed removal, and a C cast is stripped before a seam trace --
+and each could in principle move the audit. The corpus was re-harvested (macOS had reaped
+/tmp) and re-graded: `audit-2026-09-06-after-lifter-changes.json`.
+
+| | 2026-09-01 | 2026-09-06 |
+|---|---|---|
+| harnesses / projects | 879 / 124 | 946 / 128 |
+| high-fidelity lifts | 154 | 162 |
+| declarations parsed | 26,901 | 28,660 |
+| BLOCK on high-fidelity lifts | 4 | 4 |
+| false positives among them | 0 | **0** |
+
+The four are the same bazel OOM fixture (`010_oom_fuzz_test.cc`, S3.NO_WORK and
+S5.INPUT_NOT_CONSUMED, both TRUE, neither a library harness). **Zero false positives on 162
+high-fidelity lifts, measured rather than assumed after the change.**
+
 ## What this did to the false-positive claim
 
 Turning the contract gates on cost precision before it was paid back. The first run measured
