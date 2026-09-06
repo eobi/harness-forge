@@ -1,0 +1,45 @@
+{
+ "metric": "M1: coverage vs developer harness",
+ "bar_name": "OGHarn",
+ "bar": 1.14,
+ "libraries_scored": 2,
+ "median_ratio": 0.871,
+ "beats_parity": {
+  "wins": 0,
+  "losses": 2,
+  "sign_test_p": 0.5
+ },
+ "beats_bar": {
+  "wins": 0,
+  "losses": 2,
+  "sign_test_p": 0.5
+ },
+ "verdict": "median ratio 0.871 over 2 libraries -- UNDERPOWERED (need >=5 for a claim); BELOW parity with the developer harness",
+ "per_library": [
+  {
+   "library": "cjson",
+   "our_best_arm": "cjson_d2_cjson_delete_item_from_a_cJSON_",
+   "our_median": 279,
+   "developer_median": 326,
+   "ratio": 0.856,
+   "beats_developer": false,
+   "beats_bar": false
+  },
+  {
+   "library": "jansson",
+   "our_best_arm": "jansson_d2_embed_json_loads",
+   "our_median": 585,
+   "developer_median": 660,
+   "ratio": 0.886,
+   "beats_developer": false,
+   "beats_bar": false
+  }
+ ],
+ "provenance": {
+  "commit": "0f0e1ec",
+  "budget_seconds": null,
+  "repeats": 3,
+  "source": "/tmp/bench_hth/result.json",
+  "generated_utc": "2026-09-06T18:07:59Z"
+ }
+}
