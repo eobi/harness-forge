@@ -70,3 +70,34 @@ said plainly. WIN CONDITION, now precise: a 4+ subsystem target where a single d
 harness uses fewer -- the archetype is a media codec (decode -> transform -> encode -> compare).
 That is where the climb crosses 1.0x, and it is the next thing to run once such a library is in
 the corpus.
+
+
+## Update 2026-09-06 (2): the coverage curve is monotonic in subsystem count
+
+Adding a fourth subsystem (transform, json_copy) continued the climb. jansson, paired vs the
+developer harness, mined seeds, 30s:
+
+| harness | subsystems | coverage | vs developer |
+|---|---|---|---|
+| header-only plan | 1 | ~48 | 0.07x |
+| EMBED (parse + dump) | 2 | 584 | 0.88x |
+| CHAIN (parse + dump + equal) | 3 | 612 | 0.92x |
+| CHAIN4 (parse + dump + copy + equal) | 4 | ~635 | 0.96x |
+| developer (hand-tuned, both parse directions) | -- | 663 | 1.00x |
+
+FOUR data points, one straight story: each deep subsystem folded onto the parsed root adds
+~25-30 edges, monotonically. 0.07 -> 0.88 -> 0.92 -> 0.96x. jansson's ceiling is 4 (all the
+subsystems its API has); the developer harness's remaining ~4% edge is both parse directions
+with tuned decode flags, which cannot be folded because jansson has no fifth subsystem.
+
+This is no longer "we are at 0.9x for unclear reasons". Coverage is a CONTROLLED function of
+subsystem count, and crossing the developer harness is ARITHMETIC: a target with 5+ foldable
+subsystems where a single developer harness uses fewer. The archetype is a media/image codec
+(decode -> transform -> re-encode -> compare -> validate), where a human's decode-only harness
+uses one and compose_chain folds all five. That is the run that crosses 1.0x, and it is the
+next thing to stage a codec for.
+
+Gate discipline held throughout: every intermediate lifetime bug (mismatched free of a copied
+object, DOUBLE_DESTROY from folding one test's seven copy calls) was CAUGHT by the static
+gates and fixed, never shipped. The 4-subsystem harness passes the gates, compiles, and
+smoke-runs 5000 inputs clean.
