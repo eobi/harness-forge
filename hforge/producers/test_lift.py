@@ -264,6 +264,16 @@ def propose(path: str, entry: str, decls: dict, seam: Optional[dict] = None,
     _dropped_destroys = 0
     _rekeyed = 0
     _fixed = []
+    # DECIDE KEYED REMOVALS ONCE, FOR THE API, AND CLEAR EVERY OP THAT CALLS IT.
+    #
+    # Deciding per op flipped the API to query at its FIRST call, so the second and third
+    # json_object_del skipped the branch and kept the destroy target the lifter gave them --
+    # and S1 reads a target as a destroy whatever the role says. test_bad_args calls it three
+    # times; the third still killed the object.
+    _keyed = {sym for sym, a in (apis0 or {}).items()
+              if a.role == "destroy" and sym in decls and _keyed_removal(decls[sym])}
+    for sym in _keyed:
+        apis0[sym] = replace(apis0[sym], role="query")
     for op in kept:
         d0 = decls.get(op.api)
         _api = apis0.get(op.api) if apis0 else None
@@ -275,10 +285,8 @@ def propose(path: str, entry: str, decls: dict, seam: Optional[dict] = None,
         # at all and the object still reads as destroyed. The declaration settles it: a
         # deallocator names only the thing it frees, so any pointer or string parameter
         # after the handle means the call operates ON the resource.
-        if (_api is not None and _api.role == "destroy" and d0 is not None
-                and _keyed_removal(d0)):
+        if op.api in _keyed:
             _rekeyed += 1
-            apis0[op.api] = replace(_api, role="query")
             _fixed.append(replace(op, targets=""))
             continue
         # A DESTROY THAT NAMES NO RESOURCE IS DROPPED, whatever its arity. The first version
