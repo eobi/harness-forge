@@ -557,7 +557,18 @@ def _emit_app_entry(ir: HarnessIR, *, with_driver: bool = True) -> "Emitted":
                            producer=ir.producer, plats=", ".join(ir.platforms)),
         "",
         "#include <stdint.h>", "#include <stddef.h>", "#include <stdlib.h>",
-        "#include <string.h>", "#include <unistd.h>", "",
+        "#include <string.h>",
+        # ONE HARNESS, EVERY HOST. The temp-file channel is written once and compiles on
+        # POSIX and Windows both -- GetTempFileNameA/WriteFile/DeleteFileA on Windows,
+        # mkstemp/write/unlink elsewhere. That is the PX doctrine ("run the same way on every
+        # host") applied to an application harness, and it means the windows-*-msvc platforms
+        # are the same source the linux and macos ones already run.
+        "#ifdef _WIN32",
+        "#include <windows.h>",
+        "#else",
+        "#include <unistd.h>",
+        "#endif",
+        "",
         incs, "",
         "/* APPLICATION harness: input arrives through the "
         f"{ae.channel!r} channel, not an API call. */",
@@ -566,27 +577,59 @@ def _emit_app_entry(ir: HarnessIR, *, with_driver: bool = True) -> "Emitted":
     ]
     if needs_tmp:
         lines += [
-            "    char hf_path[] = \"/tmp/hf_appXXXXXX\";",
-            "    int hf_fd = mkstemp(hf_path);",
-            "    if (hf_fd < 0) return 0;",
-            "    if (write(hf_fd, hf_data, hf_size) != (ssize_t)hf_size) {",
-            "        close(hf_fd); unlink(hf_path); return 0;",
+            "    char hf_path[260];",
+            "#ifdef _WIN32",
+            "    char hf_dir[260];",
+            "    if (!GetTempPathA(sizeof hf_dir, hf_dir)) return 0;",
+            "    if (!GetTempFileNameA(hf_dir, \"hf\", 0, hf_path)) return 0;",
+            "    {",
+            "        HANDLE hf_h = CreateFileA(hf_path, GENERIC_WRITE, 0, NULL,",
+            "                                  CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);",
+            "        DWORD hf_wr = 0;",
+            "        if (hf_h == INVALID_HANDLE_VALUE) return 0;",
+            "        if (!WriteFile(hf_h, hf_data, (DWORD)hf_size, &hf_wr, NULL)",
+            "                || hf_wr != (DWORD)hf_size) {",
+            "            CloseHandle(hf_h); DeleteFileA(hf_path); return 0;",
+            "        }",
+            "        CloseHandle(hf_h);",
             "    }",
-            "    close(hf_fd);",
+            "#else",
+            "    memcpy(hf_path, \"/tmp/hf_appXXXXXX\", 18);",
+            "    {",
+            "        int hf_fd = mkstemp(hf_path);",
+            "        if (hf_fd < 0) return 0;",
+            "        if (write(hf_fd, hf_data, hf_size) != (ssize_t)hf_size) {",
+            "            close(hf_fd); unlink(hf_path); return 0;",
+            "        }",
+            "        close(hf_fd);",
+            "    }",
+            "#endif",
         ]
     lines += call_lines
     if ae.returns_int:
         lines.append("    (void)hf_sink;")
     if needs_tmp:
-        lines.append("    unlink(hf_path);")
+        lines += ["#ifdef _WIN32", "    DeleteFileA(hf_path);",
+                  "#else", "    unlink(hf_path);", "#endif"]
     lines += ["    return 0;", "}"]
     source = "\n".join(lines) + "\n"
 
+    is_win = any(pl.startswith("windows") for pl in ir.platforms)
     san = ",".join(ir.knobs.sanitizers) if ir.knobs.sanitizers else "address"
-    incdirs = [f"-I{d}" for d in ir.target.include_dirs]
-    build = ["$CC", "-g", ir.knobs.optimisation, "-fno-omit-frame-pointer", *incdirs,
-             f"-fsanitize=fuzzer,{san}", "harness.c",
-             *ir.target.sources, *ir.target.link_libs, "-o", f"{ir.name}_fuzz"]
+    if is_win:
+        # MSVC: cl.exe with its built-in AddressSanitizer. libFuzzer's compiler-rt is not
+        # reliably present on windows-arm64, so the Windows build uses the standalone replay
+        # driver's main() for the gate run; the same harness.c compiles under clang-cl with
+        # -fsanitize=fuzzer where that runtime IS available.
+        incdirs = [f"/I{d}" for d in ir.target.include_dirs]
+        build = ["cl", "/nologo", "/Zi", "/fsanitize=address", *incdirs,
+                 "harness.c", *ir.target.sources, *ir.target.link_libs,
+                 f"/Fe:{ir.name}_fuzz.exe"]
+    else:
+        incdirs = [f"-I{d}" for d in ir.target.include_dirs]
+        build = ["$CC", "-g", ir.knobs.optimisation, "-fno-omit-frame-pointer", *incdirs,
+                 f"-fsanitize=fuzzer,{san}", "harness.c",
+                 *ir.target.sources, *ir.target.link_libs, "-o", f"{ir.name}_fuzz"]
     return Emitted(source=source, driver="", build_command=build,
                    driver_build_command=[], entry_symbols=[ae.symbol])
 

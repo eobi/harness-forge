@@ -47,3 +47,31 @@ def test_a_library_harness_is_unaffected():
     # No app_entry -> the ordinary library path, still producing the libFuzzer entry.
     h = HarnessIR(name="lib", target=Target(name="lib"))
     assert "LLVMFuzzerTestOneInput" in emit(h).source
+
+
+def test_windows_target_emits_the_win32_temp_shim_and_a_cl_build():
+    # B2: the same harness compiles on Windows. The file channel uses GetTempFileNameA/
+    # WriteFile/DeleteFileA under _WIN32 and mkstemp/write/unlink elsewhere -- one source,
+    # every host (the PX doctrine applied to an application harness).
+    from hforge.emit import emit
+    from hforge.ir import APP_FILE_ARG, AppEntry, HarnessIR, Target
+    h = HarnessIR(name="w", target=Target(name="app", sources=["app.c"]),
+                  platforms=["windows-arm64-msvc"],
+                  app_entry=AppEntry(symbol="parse_file", channel=APP_FILE_ARG, header="app.h"))
+    e = emit(h)
+    assert "GetTempFileNameA" in e.source and "WriteFile" in e.source
+    assert "mkstemp" in e.source, "the POSIX branch must still be present under #else"
+    assert "#ifdef _WIN32" in e.source
+    assert e.build_command[0] == "cl", "a Windows target must build with cl.exe"
+    assert "/fsanitize=address" in e.build_command
+
+
+def test_posix_target_keeps_the_clang_fuzzer_build():
+    from hforge.emit import emit
+    from hforge.ir import APP_FILE_ARG, AppEntry, HarnessIR, Target
+    h = HarnessIR(name="p", target=Target(name="app", sources=["app.c"]),
+                  platforms=["linux-x86_64-glibc"],
+                  app_entry=AppEntry(symbol="parse_file", channel=APP_FILE_ARG, header="app.h"))
+    e = emit(h)
+    assert e.build_command[0] == "$CC"
+    assert any("fuzzer" in a for a in e.build_command)
