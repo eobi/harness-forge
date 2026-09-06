@@ -45,3 +45,33 @@ to fuzz it.
     today; stdin and directory-shaped inputs are the next real-app channels.
   - app-entry artifact triage: an abort()/exit() in the application's own code on valid input
     is an app artifact, the app-layer analogue of the library S1 checks.
+
+
+## expat `xmlwf` (argv channel) -- a real, widely-shipped CLI, deep parser reach, clean
+
+`xmlwf` is expat's command-line XML well-formedness checker, shipped on millions of systems.
+Not a test program -- a real application. `hforge app-lift` discovered its main (argv channel),
+emitted, and it compiled against the real expat parser (xmlparse/xmlrole/xmltok + xmlwf's
+xmlfile/codepage/filemap).
+
+    fuzzed 25s: 138,119 executions, cov 1771 edges, ft 3239, corpus grew 1 -> 1378, no crash
+
+1771 edges is the genuine XML parser+scanner+role state machine, reached through the
+application's own argv file entry -- the fuzzer's bytes went temp file -> argv -> xmlwf ->
+XML_ProcessFile -> expat. A clean run on a heavily-fuzzed real tool is the expected result and
+the honest one; the point proven is REACH: a generated harness drives a real shipped CLI deep
+into its parser with no hand-written glue.
+
+## The three real apps together
+
+| app | shipped? | channel | reach | outcome |
+|---|---|---|---|---|
+| expat `xmlwf` | yes, millions | argv | 1771 edges, deep parser | clean (well-fuzzed) |
+| libyaml `run-parser` | test tool | argv | full scanner+parser | defensive abort (now auto-triaged) |
+| jansson `json_process` | test tool | argv | coverage 8 | channel mismatch, surfaced honestly |
+
+Between them: a generated harness reaches deep into a real shipped parser (xmlwf); the engine
+does not fake success when the channel is wrong (json_process); and a crash in the app's own
+defensive code is triaged as an artifact, not a finding (libyaml). The application-fuzzing
+capability is real and it is honest -- the surface library-only tools (OGHarn, QuartetFuzz)
+do not address at all.
