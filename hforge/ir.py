@@ -532,16 +532,27 @@ class AppEntry:
     header: str = ""                   # header declaring `symbol`, for #include
     argv: list = field(default_factory=list)   # APP_ARGV: template with "@INPUT@" for the path
     returns_int: bool = True           # sink the return value if it has one
+    # A DEEP BUFFER ENTRY takes more than (bytes, len). The real image/font/audio loaders a
+    # GUI app reaches are f(const T *buf, int len, int *x, int *y, int *comp, int req): the
+    # (buf,len) pair carries the fuzzer bytes and the trailing params are out-locals or
+    # scalar defaults. call_args is the full, ordered list of C argument expressions and
+    # call_locals the declarations they need. Empty means the legacy 2-arg buffer call, so
+    # every existing harness emits byte-for-byte as before.
+    call_args: list = field(default_factory=list)
+    call_locals: list = field(default_factory=list)
 
     def to_json(self) -> dict:
         return {"symbol": self.symbol, "channel": self.channel, "header": self.header,
-                "argv": list(self.argv), "returns_int": self.returns_int}
+                "argv": list(self.argv), "returns_int": self.returns_int,
+                "call_args": list(self.call_args), "call_locals": list(self.call_locals)}
 
     @staticmethod
     def from_json(d: dict) -> "AppEntry":
         return AppEntry(symbol=d["symbol"], channel=d.get("channel", APP_BUFFER),
                         header=d.get("header", ""), argv=list(d.get("argv", [])),
-                        returns_int=d.get("returns_int", True))
+                        returns_int=d.get("returns_int", True),
+                        call_args=list(d.get("call_args", [])),
+                        call_locals=list(d.get("call_locals", [])))
 
 
 @dataclass

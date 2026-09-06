@@ -537,7 +537,16 @@ def _emit_app_entry(ir: HarnessIR, *, with_driver: bool = True) -> "Emitted":
     call_lines: list = []
     if ae.channel == APP_BUFFER:
         # No file: the entry takes the bytes and their length directly.
-        call_lines = [f"    {sink}{cast}{ae.symbol}((const char *)hf_data, hf_size);"]
+        if ae.call_args:
+            # DEEP ENTRY: a real loader takes (buf, len, out*, out*, scalar...). The producer
+            # planned every argument -- the (buf,len) pair carries the bytes, out-pointers get
+            # a zeroed local passed by address, scalars a default -- so the call compiles and
+            # exercises the full decode, not a 2-arg stub that would not build.
+            locals_c = "".join(f"    {l}\n" for l in ae.call_locals)
+            args_c = ", ".join(ae.call_args)
+            call_lines = [locals_c + f"    {sink}{cast}{ae.symbol}({args_c});"]
+        else:
+            call_lines = [f"    {sink}{cast}{ae.symbol}((const char *)hf_data, hf_size);"]
         needs_tmp = False
     elif ae.channel == APP_CSTRING:
         # NUL-terminated content in memory: copy, terminate, call, free. A parser taking a
