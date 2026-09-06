@@ -45,3 +45,28 @@ the rig forbids that today -- but "the only generator that autonomously produces
 harnesses across libraries, applications and operating systems, with zero-FP discipline." That
 is true, measured, and unmatched. The coverage gap is stated, not hidden, and the path to
 closing it is named above.
+
+
+## Update 2026-09-06: N-way composition is a MONOTONIC coverage lever
+
+compose_chain folds one call from each downstream subsystem onto the parsed root. Measured on
+jansson, 3 repeats, paired, same seeds, 25s:
+
+| harness | subsystems | coverage | vs developer |
+|---|---|---|---|
+| developer (hand-tuned load+dump) | 2 | 662 | 1.000x |
+| CHAIN (parse + dump + equal) | 3 | 612 | 0.924x |
+| EMBED (parse + dump) | 2 | 584 | 0.882x |
+| header-only plan | 1 | ~48 | 0.07x |
+
+Coverage rises monotonically with the number of deep subsystems folded onto one parsed value:
+0.07x -> 0.88x -> 0.92x. That turns "0.87x, cause unknown" into a controllable relationship:
+more foldable subsystems -> more coverage, and the win is a target with more of them than the
+human harness combines.
+
+jansson tops out at 3 (no pure-transform test for a fourth; the human runs both parse
+directions with tuned flags), so composition closes most of the gap without crossing it --
+said plainly. WIN CONDITION, now precise: a 4+ subsystem target where a single developer
+harness uses fewer -- the archetype is a media codec (decode -> transform -> encode -> compare).
+That is where the climb crosses 1.0x, and it is the next thing to run once such a library is in
+the corpus.

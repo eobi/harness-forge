@@ -139,8 +139,15 @@ def compose(a: HarnessIR, b: HarnessIR, decls: dict, want: str = "serialise") ->
         if hit is None:
             left += 1
             continue
+        # REBIND EVERY PARAMETER OF THE ROOT'S TYPE, not only the first. json_equal(a, b)
+        # takes two json_t* -- binding one to the parsed root and leaving the other as B's
+        # own resource left that second argument dangling (S1.UNKNOWN_RESOURCE, caught by the
+        # gate). Both now point at the parsed value: equal(root, root) exercises the
+        # comparator's full traversal on the parsed tree, which is the coverage we want.
         args = list(op.args)
-        args[hit] = Arg(args[hit].param, "resource", rid)
+        for j, (pty, _pn) in enumerate(d.params):
+            if j < len(args) and _base(pty) == rtype:
+                args[j] = Arg(args[j].param, "resource", rid)
         # A SERIALISER THAT RETURNS A POINTER RETURNS SOMETHING THAT MUST BE FREED.
         #
         # json_dumps returns a malloc'd char*. In B's test it was assigned to a variable the

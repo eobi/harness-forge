@@ -1,0 +1,15 @@
+  r0 CHAIN(parse+dump+equal)      cov=607
+  r0 EMBED(parse+dump)            cov=584
+  r0 DEVELOPER                    cov=662
+  r1 DEVELOPER                    cov=662
+  r1 EMBED(parse+dump)            cov=584
+  r1 CHAIN(parse+dump+equal)      cov=612
+  r2 CHAIN(parse+dump+equal)      cov=612
+  r2 EMBED(parse+dump)            cov=585
+  r2 DEVELOPER                    cov=662
+
+=== RESULT ===
+  DEVELOPER                    median    662  1.000x dev
+  CHAIN(parse+dump+equal)      median    612  0.924x dev
+  EMBED(parse+dump)            median    584  0.882x dev
+CHAIN_DONE
