@@ -51,6 +51,15 @@ _SCAFFOLD = re.compile(
     r"perror|strcmp|strncmp|memcmp|free|malloc|calloc|realloc)$", re.I)
 
 
+def _keyed_removal(decl) -> bool:
+    """Does this declaration take a key or name after its handle? Then it removes, not frees."""
+    params = list(getattr(decl, "params", []) or [])
+    for ty, _nm in params[1:]:
+        if "*" in ty or "char" in ty:
+            return True
+    return False
+
+
 def _is_scaffold(sym: str) -> bool:
     return bool(_SCAFFOLD.match(sym or ""))
 
@@ -237,7 +246,11 @@ def propose(path: str, entry: str, decls: dict, seam: Optional[dict] = None,
         rec["why_not"] = "every call in this test is scaffolding or a test-local helper"
         return None, rec
 
-    apis0 = dict(ir.apis)
+    # ALIAS, NOT A COPY. Arity padding below grows parameter lists in ir.apis; the re-role of
+    # keyed removals writes here too. A copy taken before padding carried the OLD parameter
+    # lists into the plan, every padded argument named a parameter the API did not declare,
+    # and S2.UNKNOWN_PARAM refused 86 jansson plans that had passed a minute earlier.
+    apis0 = ir.apis
 
     # PAD EVERY OP TO ITS DECLARED ARITY, not only the seam's.
     #
@@ -249,9 +262,32 @@ def propose(path: str, entry: str, decls: dict, seam: Optional[dict] = None,
     # an argument nothing is bound to, and the count is recorded on the plan.
     _padded = 0
     _dropped_destroys = 0
+    _rekeyed = 0
     _fixed = []
     for op in kept:
         d0 = decls.get(op.api)
+        _api = apis0.get(op.api) if apis0 else None
+        # A RELEASE VERB WHOSE DECLARATION TAKES A KEY IS A REMOVAL, NOT A DESTROY.
+        #
+        # The lifter reads call sites and cannot see that json_object_del(json_t *, const
+        # char *key) takes a key. When the key is a string literal the blanked slot gives it
+        # away; when the key is a VARIABLE -- test_fixed_size passes one -- there is no mark
+        # at all and the object still reads as destroyed. The declaration settles it: a
+        # deallocator names only the thing it frees, so any pointer or string parameter
+        # after the handle means the call operates ON the resource.
+        if (_api is not None and _api.role == "destroy" and d0 is not None
+                and _keyed_removal(d0)):
+            _rekeyed += 1
+            apis0[op.api] = replace(_api, role="query")
+            _fixed.append(replace(op, targets=""))
+            continue
+        # A DESTROY THAT NAMES NO RESOURCE IS DROPPED, whatever its arity. The first version
+        # only dropped it while padding, so `json_decref(<untracked value>)` that already had
+        # its argument count survived and S3.DESTROY_NO_TARGET refused the plan, correctly.
+        if (_api is not None and _api.role == "destroy"
+                and not any(a.source == "resource" for a in op.args)):
+            _dropped_destroys += 1
+            continue
         if d0 is None or len(op.args) >= len(d0.params):
             _fixed.append(op)
             continue
@@ -262,11 +298,6 @@ def propose(path: str, entry: str, decls: dict, seam: Optional[dict] = None,
         # of nothing -- and S3.DESTROY_NO_TARGET refused the plan, correctly. The call cannot
         # be made faithfully without the object it names, so it is removed and counted; the
         # untracked object was never in the IR to leak.
-        _api = apis0.get(op.api) if apis0 else None
-        if _api is not None and _api.role == "destroy" and not any(
-                a.source == "resource" for a in op.args):
-            _dropped_destroys += 1
-            continue
         extra_args = [Arg(f"a{i}", "literal", value=0)
                       for i in range(len(op.args), len(d0.params))]
         _padded += len(extra_args)
@@ -280,6 +311,7 @@ def propose(path: str, entry: str, decls: dict, seam: Optional[dict] = None,
     kept = _fixed
     rec["padded_args"] = _padded
     rec["dropped_untargeted_destroys"] = _dropped_destroys
+    rec["rekeyed_removals"] = _rekeyed
 
     # THE SEAM. Without one the plan calls the library with the test's own fixed values and
     # the fuzzer drives nothing -- S5.INPUT_NOT_CONSUMED, and correctly refused.
@@ -377,7 +409,7 @@ def propose(path: str, entry: str, decls: dict, seam: Optional[dict] = None,
     # `#include "test_load.c"`, a harness that tries to compile the test suite it came from.
     # The test is never compiled; only its sequence travels.
     apis = {k: replace(a, header=(hdrs0[0] if (hdrs0 := list(headers or [])) else ""))
-            for k, a in ir.apis.items()}
+            for k, a in apis0.items()}
 
     # THE HEADER'S RETURN TYPE, FOR EVERY API -- not only the static-inline ones.
     #
