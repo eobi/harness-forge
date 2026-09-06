@@ -630,8 +630,47 @@ def _emit_app_entry(ir: HarnessIR, *, with_driver: bool = True) -> "Emitted":
         build = ["$CC", "-g", ir.knobs.optimisation, "-fno-omit-frame-pointer", *incdirs,
                  f"-fsanitize=fuzzer,{san}", "harness.c",
                  *ir.target.sources, *ir.target.link_libs, "-o", f"{ir.name}_fuzz"]
-    return Emitted(source=source, driver="", build_command=build,
-                   driver_build_command=[], entry_symbols=[ae.symbol])
+    # A STANDALONE REPLAY DRIVER, so the harness runs where libFuzzer's runtime does not --
+    # MSVC on windows-arm64 has /fsanitize=address but no libFuzzer, so the gate run there
+    # reads one input from a file and calls the harness once. The buffer is heap and EXACTLY
+    # the input size, so an over-read lands in an ASan redzone rather than valid memory (the
+    # same discipline the library replay driver documents).
+    driver = ("""/* Standalone replay driver for {name} (application entry, {chan} channel).
+ * Reads one input file and calls the harness once. For the hosts where libFuzzer's
+ * compiler-rt is absent -- notably windows-arm64-msvc, which still has /fsanitize=address.
+ */
+#include <stdint.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
+#ifdef __cplusplus
+extern "C"
+#endif
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size);
+int main(int argc, char **argv) {{
+    if (argc < 2) return 0;
+    FILE *f = fopen(argv[1], "rb");
+    if (!f) return 0;
+    fseek(f, 0, SEEK_END); long n = ftell(f); fseek(f, 0, SEEK_SET);
+    if (n < 0) {{ fclose(f); return 0; }}
+    uint8_t *buf = (uint8_t *)malloc((size_t)n ? (size_t)n : 1);
+    size_t got = fread(buf, 1, (size_t)n, f); fclose(f);
+    LLVMFuzzerTestOneInput(buf, got);
+    free(buf);
+    return 0;
+}}
+""").format(name=ir.name, chan=ae.channel)
+    if is_win:
+        dbuild = ["cl", "/nologo", "/Zi", "/fsanitize=address", *incdirs,
+                  "harness.c", "driver.c", *ir.target.sources, *ir.target.link_libs,
+                  f"/Fe:{ir.name}_replay.exe"]
+    else:
+        dbuild = ["$CC", "-g", ir.knobs.optimisation, *incdirs,
+                  *([f"-fsanitize={san}"] if san else []),
+                  "harness.c", "driver.c", *ir.target.sources, *ir.target.link_libs,
+                  "-o", f"{ir.name}_replay"]
+    return Emitted(source=source, driver=driver, build_command=build,
+                   driver_build_command=dbuild, entry_symbols=[ae.symbol])
 
 
 def emit(ir: HarnessIR, *, with_driver: bool = True) -> Emitted:
