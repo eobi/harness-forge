@@ -118,7 +118,7 @@ def _last_destroy_of(plan: HarnessIR, rid: str) -> int:
 
 
 def compose(a: HarnessIR, b: HarnessIR, decls: dict, want: str = "serialise",
-            first_only: bool = False) -> tuple:
+            first_only: bool = False, only_symbol: str = "") -> tuple:
     """Return (plan or None, record)."""
     rec = {"producer": PRODUCER, "a": a.name, "b": b.name, "subsystem": want,
            "taken_from_b": 0, "left_behind": 0, "rebound_param": None, "why_not": ""}
@@ -126,14 +126,24 @@ def compose(a: HarnessIR, b: HarnessIR, decls: dict, want: str = "serialise",
     if not prods:
         rec["why_not"] = "plan A produces no typed resource at or after its seam"
         return None, rec
-    if any(_subsystem(o.api) == want for o in a.sequence):
+    if only_symbol:
+        # Folding a SPECIFIC distinct function (json_deep_copy after json_copy). The
+        # subsystem may already be present; what matters is that THIS symbol is not, because
+        # a different traversal of the same subsystem is different code and adds coverage.
+        if any(o.api == only_symbol for o in a.sequence):
+            rec["why_not"] = f"{only_symbol} already in the plan"
+            return None, rec
+    elif any(_subsystem(o.api) == want for o in a.sequence):
         rec["why_not"] = f"plan A already enters '{want}' -- composition adds nothing"
         return None, rec
 
     taken, left = [], 0
     _obj_dtors: dict = {}
     for op in b.sequence:
-        if _subsystem(op.api) != want:
+        if only_symbol:
+            if op.api != only_symbol:
+                continue
+        elif _subsystem(op.api) != want:
             continue
         d = decls.get(op.api)
         if d is None:
@@ -305,7 +315,7 @@ def compose_max(a: HarnessIR, pool_by_subsystem: dict, decls: dict) -> tuple:
             sym = next((o.api for o in b.sequence if _subsystem(o.api) == want), None)
             if not sym or sym in seen:
                 continue
-            cand, r = compose(plan, b, decls, want=want, first_only=True)
+            cand, r = compose(plan, b, decls, want=want, first_only=True, only_symbol=sym)
             if cand is not None and r.get("taken_from_b"):
                 plan = cand
                 seen.add(sym)
