@@ -1,0 +1,112 @@
+{
+ "generated_utc": "2026-09-06T01:27:00Z",
+ "budget_seconds": 20,
+ "repeats": 3,
+ "rows": [
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d2_cjson_delete_item_from_a_cJSON_Parse",
+   "repeat": 0,
+   "cov": 279,
+   "execs": 756742
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d2_cjson_delete_item_from_a_cJSON_AddArrayToOb",
+   "repeat": 0,
+   "cov": 27,
+   "execs": 11253358
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d1_cjson_get_object_item_sh_cJSON_Parse",
+   "repeat": 0,
+   "cov": 199,
+   "execs": 2301672
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d1_cjson_get_object_item_ca_cJSON_Parse",
+   "repeat": 0,
+   "cov": 198,
+   "execs": 3678490
+  },
+  {
+   "library": "cjson",
+   "arm": "DEVELOPER:cjson_read_fuzzer.c",
+   "repeat": 0,
+   "cov": 328,
+   "execs": 4177507
+  },
+  {
+   "library": "cjson",
+   "arm": "DEVELOPER:cjson_read_fuzzer.c",
+   "repeat": 1,
+   "cov": 328,
+   "execs": 4196596
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d1_cjson_get_object_item_ca_cJSON_Parse",
+   "repeat": 1,
+   "cov": 198,
+   "execs": 3523983
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d1_cjson_get_object_item_sh_cJSON_Parse",
+   "repeat": 1,
+   "cov": 199,
+   "execs": 2526621
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d2_cjson_delete_item_from_a_cJSON_AddArrayToOb",
+   "repeat": 1,
+   "cov": 27,
+   "execs": 10701770
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d2_cjson_delete_item_from_a_cJSON_Parse",
+   "repeat": 1,
+   "cov": 279,
+   "execs": 951113
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d2_cjson_delete_item_from_a_cJSON_Parse",
+   "repeat": 2,
+   "cov": 279,
+   "execs": 817603
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d2_cjson_delete_item_from_a_cJSON_AddArrayToOb",
+   "repeat": 2,
+   "cov": 27,
+   "execs": 10407270
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d1_cjson_get_object_item_sh_cJSON_Parse",
+   "repeat": 2,
+   "cov": 199,
+   "execs": 2123325
+  },
+  {
+   "library": "cjson",
+   "arm": "lifted:cjson_d1_cjson_get_object_item_ca_cJSON_Parse",
+   "repeat": 2,
+   "cov": 198,
+   "execs": 3778689
+  },
+  {
+   "library": "cjson",
+   "arm": "DEVELOPER:cjson_read_fuzzer.c",
+   "repeat": 2,
+   "cov": 328,
+   "execs": 4334365
+  }
+ ]
+}

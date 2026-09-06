@@ -19,10 +19,13 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import statistics as st
 import subprocess
 import sys
+import threading
+from concurrent.futures import ThreadPoolExecutor
 import time
 from pathlib import Path
 
@@ -41,6 +44,8 @@ from seam_finder import seams_for                                   # noqa: E402
 from test_sequences import sequences_in                             # noqa: E402
 
 CC = "/opt/homebrew/opt/llvm/bin/clang"
+# Leave the machine some headroom: this box runs other people's work.
+_JOBS = max(2, (os.cpu_count() or 4) - 2)
 
 # DEEP SUBSYSTEMS: the kinds of work that reach a lot of code behind one call.
 #
@@ -85,6 +90,46 @@ LIBS = {
 }
 
 
+_OBJ_LOCK = threading.Lock()
+
+
+def _library_objects(lib: str, work: Path, root: Path) -> list:
+    """Compile the library ONCE per run and share the objects across every candidate.
+
+    Each candidate used to recompile the whole library, so a 4-candidate run built it five
+    times. The objects depend only on (library, flags), not on the harness, so they are built
+    once under a lock and reused. This is the difference between a batch that takes an hour
+    and one that takes minutes, and it changes no result -- the same objects link into every
+    arm, which makes the comparison MORE controlled rather than less.
+    """
+    objdir = root / f"_objcache_{lib}"
+    with _OBJ_LOCK:
+        objdir.mkdir(parents=True, exist_ok=True)
+        srcs = _sources_for(lib, work)
+        common = ["-fsanitize=fuzzer,address", "-g", "-O1", "-w",
+                  *[f"-D{d}" for d in (DEFINES.get(lib) or [])],
+                  *[f"-I{i}" for i in _include_dirs(lib, work)]]
+        objs, todo = [], []
+        for i, src in enumerate(srcs):
+            o = objdir / f"{i:03d}.o"
+            objs.append(str(o))
+            if not o.exists():
+                todo.append((src, o))
+        if todo:
+            # PARALLEL COMPILES, SEQUENTIAL CAMPAIGNS. Builds are CPU-bound and independent,
+            # so they fan out; a campaign is a MEASUREMENT and two of them running at once
+            # compete for the same cores and corrupt the number they exist to produce.
+            with ThreadPoolExecutor(max_workers=_JOBS) as ex:
+                futs = [ex.submit(subprocess.run,
+                                  [CC, "-c", *common, src, "-o", str(o)],
+                                  capture_output=True, text=True, timeout=900)
+                        for src, o in todo]
+                for f in futs:
+                    if f.result().returncode != 0:
+                        return []
+        return objs
+
+
 def build(cfile: Path, lib: str, work: Path, out: Path) -> bool:
     """Compile the harness in ITS language and the library in C, then link.
 
@@ -99,17 +144,11 @@ def build(cfile: Path, lib: str, work: Path, out: Path) -> bool:
     common = ["-fsanitize=fuzzer,address", "-g", "-O1", "-w",
               *[f"-D{d}" for d in (DEFINES.get(lib) or [])],
               *[f"-I{i}" for i in _include_dirs(lib, work)]]
+    objs = _library_objects(lib, work, out.parent)
+    if not objs:
+        return False
     objdir = out.parent / (out.stem + "_obj")
     objdir.mkdir(parents=True, exist_ok=True)
-    objs: list = []
-    for i, src in enumerate(_sources_for(lib, work)):
-        o = objdir / f"{i:03d}.o"
-        if not o.exists():
-            r = subprocess.run([CC, "-c", *common, src, "-o", str(o)],
-                               capture_output=True, text=True, timeout=600)
-            if r.returncode != 0:
-                return False
-        objs.append(str(o))
     ho = objdir / "harness.o"
     hargs = [CC, "-c", *common]
     if cxx:
@@ -298,7 +337,13 @@ def main() -> int:
         for c in cands:
             b = ldir / (c["file"].stem + ".bin")
             if build(c["file"], lib, work, b) and smoke(b, corpus):
-                arms.append(("lifted:" + c["file"].stem[:34], b))
+                # NAME THE ARM UNIQUELY. Truncating to 34 characters collapsed two
+                # DIFFERENT cjson candidates -- `..._cJSON_Parse` and `..._cJSON_AddArrayToOb`
+                # -- into one arm, and their coverages of 279 and 27 were pooled into a median
+                # of 153. That reported deep=2 as WORSE than deep=1 when one of the two was
+                # the best lifted harness cjson had produced. A label is not cosmetic when the
+                # summary groups by it.
+                arms.append(("lifted:" + c["file"].stem, b))
             else:
                 print(f"    killed (build or smoke): {c['file'].stem[:40]}", flush=True)
         if dev is not None:
@@ -314,7 +359,7 @@ def main() -> int:
                 cov, ex = campaign(b, corpus, a.budget)
                 rows.append({"library": lib, "arm": name, "repeat": k,
                              "cov": cov, "execs": ex})
-                print(f"    r{k} {name[:44]:46s} cov={cov:<6} execs={ex:,}", flush=True)
+                print(f"    r{k} {name[-52:]:54s} cov={cov:<6} execs={ex:,}", flush=True)
 
     res = {"generated_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
            "budget_seconds": a.budget, "repeats": a.repeats, "rows": rows}
@@ -328,7 +373,7 @@ def main() -> int:
         dev_med = next((st.median(v) for k, v in per.items() if k.startswith("DEVELOPER")), 0)
         for k, v in sorted(per.items(), key=lambda kv: -st.median(kv[1])):
             ratio = f"{st.median(v)/dev_med:.2f}x dev" if dev_med else "no dev baseline"
-            print(f"  {lib:9s} {k[:44]:46s} median {st.median(v):<7.0f} {ratio}")
+            print(f"  {lib:9s} {k[-56:]:58s} median {st.median(v):<7.0f} {ratio}")
     print(f"recorded: {a.out}/result.json")
     return 0
 
