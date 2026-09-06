@@ -284,3 +284,31 @@ def compose_chain(a: HarnessIR, pool_by_subsystem: dict, decls: dict,
             rec["skipped"].append(want)
     rec["subsystems_added"] = len(rec["folded"])
     return (plan if rec["folded"] else None), rec
+
+
+def compose_max(a: HarnessIR, pool_by_subsystem: dict, decls: dict) -> tuple:
+    """Fold ONE call of EVERY DISTINCT downstream function that accepts the parsed root.
+
+    The coverage lever is not the abstract subsystem -- it is each distinct traversal of the
+    parsed structure. json_copy and json_deep_copy are both "transform" but different code
+    (shallow vs recursive); json_dumps is another traversal again. compose_chain folded one
+    per subsystem NAME and so took only one of copy/deep_copy. This folds one call of every
+    distinct SYMBOL across serialise, transform and validate, maximising the number of
+    distinct traversals a single harness runs on the parsed value -- which is what pushes
+    coverage toward and past the developer harness.
+    """
+    seen: set = set()
+    plan = a
+    rec = {"producer": PRODUCER, "base": a.name, "folded": []}
+    for want in ("serialise", "transform", "validate"):
+        for b in pool_by_subsystem.get(want, []):
+            sym = next((o.api for o in b.sequence if _subsystem(o.api) == want), None)
+            if not sym or sym in seen:
+                continue
+            cand, r = compose(plan, b, decls, want=want, first_only=True)
+            if cand is not None and r.get("taken_from_b"):
+                plan = cand
+                seen.add(sym)
+                rec["folded"].append({"subsystem": want, "symbol": sym})
+    rec["distinct_folded"] = len(rec["folded"])
+    return (plan if rec["folded"] else None), rec
