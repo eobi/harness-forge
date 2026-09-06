@@ -138,6 +138,28 @@ _OS_IMPORTS = frozenset({
 })
 
 
+def _cstring_plan(params: list):
+    """(call_args, call_locals) for a f(char *content, config...) parser, or (None, None).
+
+    The content (param 0) is the NUL-terminated copy the emitter builds; every later argument
+    is filled safely or the whole entry is refused."""
+    args = ["(%s)hf_cstr" % params[0][0].strip()]
+    locs: list = []
+    for j in range(1, len(params)):
+        ty, _nm = params[j]
+        if ty.count("*") == 0 and _SCALAR.match(ty.strip()):
+            args.append("0")
+        elif "char" in ty and ty.count("*") == 1 and "const" in ty:
+            args.append('""')                          # config string: empty, never NULL
+        elif ty.count("*") >= 1 and "char" not in ty and "void" not in ty:
+            pt = _pointee(ty)
+            locs.append(f"{pt} hf_a{j} = {{0}};")
+            args.append(f"&hf_a{j}")
+        else:
+            return None, None                          # writable char*/void* out: unsafe
+    return args, locs
+
+
 def classify(decl) -> Optional[dict]:
     """Return a candidate {channel, symbol, argv?, param, ...} for a declaration, or None."""
     params = list(getattr(decl, "params", []) or [])
@@ -172,6 +194,19 @@ def classify(decl) -> Optional[dict]:
         if _PATH_NAME.search(pn):
             return {"channel": APP_FILE_ARG, "symbol": name, "param": pn}
         return {"channel": APP_CSTRING, "symbol": name, "param": pn}
+    # f(char *content, config...) -- a NUL-terminated parser with configuration arguments,
+    # e.g. nsvgParse(char *input, const char *units, float dpi). The content is the first
+    # parameter (a parser's primary input leads); the rest must be safely defaultable -- a
+    # scalar to 0, a const char* config to "" (NOT NULL: the target may strcmp it), a non-char
+    # out-pointer to a local. A writable char* or void* after the content is an output buffer
+    # we cannot size, so the whole entry is refused rather than risk a harness-made overflow.
+    if len(params) >= 2 and params[0][0].count("*") == 1 and "char" in params[0][0] \
+            and (_CONTENT_NAME.search(params[0][1] or "") or "const" not in params[0][0]):
+        args, locs = _cstring_plan(params)
+        if args is not None:
+            return {"channel": APP_CSTRING, "symbol": name, "param": params[0][1],
+                    "call_args": args, "call_locals": locs, "arity": len(params),
+                    "depth": len(locs), "is_query": bool(_QUERY.search(name))}
     return None
 
 

@@ -43,3 +43,26 @@ def test_query_ranks_below_decoder():
                            ("int *", "x"), ("int *", "y")]))
     load["header"] = info["header"] = "x.h"
     assert _rank(load) < _rank(info)              # decoder before query
+
+
+def test_cstring_multiarg_parser():
+    # nsvgParse(char *input, const char *units, float dpi): content + config args
+    d = _decl("nsvgParse", "void *",
+              [("char *", "input"), ("const char *", "units"), ("float", "dpi")])
+    c = classify(d)
+    assert c["channel"] == "cstring"
+    assert c["call_args"][0].endswith(")hf_cstr")   # content is the NUL-terminated copy
+    assert c["call_args"][1] == '""'                 # config string: empty, not NULL
+    assert c["call_args"][2] == "0"                  # dpi scalar default
+
+
+def test_cstring_refuses_writable_out_buffer():
+    # strcpy(char *dst, const char *src): dst is a writable output we cannot size -> refuse
+    d = _decl("strcpy", "char *", [("char *", "dst"), ("const char *", "src")])
+    c = classify(d)
+    # dst is content-named? no -- first param 'dst' is not; but even if taken, a non-const
+    # char* AFTER the content must refuse. Here param0 'dst' non-const char* is the content,
+    # param1 const char* -> "" which is safe, so this one is allowed but harmless (copies into
+    # the fuzzer string). The dangerous shape is a non-const char* AFTER content:
+    d2 = _decl("f", "int", [("char *", "input"), ("char *", "outbuf")])
+    assert classify(d2) is None

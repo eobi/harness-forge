@@ -552,14 +552,28 @@ def _emit_app_entry(ir: HarnessIR, *, with_driver: bool = True) -> "Emitted":
         # NUL-terminated content in memory: copy, terminate, call, free. A parser taking a
         # lone `const char *` reads to the terminator, so the fuzzer's bytes must be a real
         # C string -- an interior pointer into libFuzzer's exact-size buffer would over-read.
-        call_lines = [
-            "    char *hf_cstr = (char *)malloc(hf_size + 1);",
-            "    if (!hf_cstr) return 0;",
-            "    memcpy(hf_cstr, hf_data, hf_size);",
-            "    hf_cstr[hf_size] = 0;",
-            f"    {sink}{cast}{ae.symbol}(hf_cstr);",
-            "    free(hf_cstr);",
-        ]
+        if ae.call_args:
+            # DEEP: a NUL-terminated parser with configuration arguments (nsvgParse(input,
+            # units, dpi)). hf_cstr carries the bytes; the planned args fill the rest.
+            locals_c = "".join(f"    {l}\n" for l in ae.call_locals)
+            args_c = ", ".join(ae.call_args)
+            call_lines = [
+                "    char *hf_cstr = (char *)malloc(hf_size + 1);",
+                "    if (!hf_cstr) return 0;",
+                "    memcpy(hf_cstr, hf_data, hf_size);",
+                "    hf_cstr[hf_size] = 0;",
+                locals_c + f"    {sink}{cast}{ae.symbol}({args_c});",
+                "    free(hf_cstr);",
+            ]
+        else:
+            call_lines = [
+                "    char *hf_cstr = (char *)malloc(hf_size + 1);",
+                "    if (!hf_cstr) return 0;",
+                "    memcpy(hf_cstr, hf_data, hf_size);",
+                "    hf_cstr[hf_size] = 0;",
+                f"    {sink}{cast}{ae.symbol}(hf_cstr);",
+                "    free(hf_cstr);",
+            ]
         needs_tmp = False
     else:
         needs_tmp = True
