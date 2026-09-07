@@ -107,3 +107,21 @@ def test_compose_app_excludes_encoders_and_out_buffers(tmp_path):
     # only Dec_A is a safe decoder; fewer than two -> refused, and Enc/Into never appear
     assert "Enc_Save" not in rec.get("family", [])
     assert "Dec_Into" not in rec.get("family", [])
+
+
+def test_flag_scalar_is_fuzzed_not_defaulted():
+    # json_loadb(const char* buffer, size_t buflen, size_t flags, json_error_t* error)
+    d = _decl("json_loadb", "void *",
+              [("const char *", "buffer"), ("size_t", "buflen"),
+               ("size_t", "flags"), ("json_error_t *", "error")])
+    c = classify(d)
+    # the (buf,len) pair carries bytes; `flags` is a behaviour scalar -> fuzzed from a byte
+    assert any("hf_data[" in a and "flags" not in a for a in c["call_args"])
+    assert c["call_args"][2].startswith("(size_t)(hf_size ? hf_data[")
+
+
+def test_size_scalar_is_not_fuzzed():
+    # a `count`/`size` scalar must stay 0 -- fuzzing it to a large value would hang/over-read
+    from hforge.producers.app_lift import _fuzz_scalar_arg, _FLAG_NAME, _SIZE_NAME
+    assert _SIZE_NAME.search("num_items") and not _FLAG_NAME.search("num_items")
+    assert _FLAG_NAME.search("decode_flags") and not _SIZE_NAME.search("decode_flags")

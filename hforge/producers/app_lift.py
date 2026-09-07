@@ -44,6 +44,20 @@ _PARSEISH = re.compile(r"(?:^|_)(main|parse|read|load|decode|scan|deserial|proce
 _QUERY = re.compile(r"(?:^|_)(info|is_|is[A-Z]|get_?(?:size|width|height|len|info|count|"
                     r"dimensions|num)|test|check|valid|probe|detect|sniff|peek)", re.I)
 
+# A by-value scalar that selects BEHAVIOUR -- a parse flag, decode mode, quality/level. Worth
+# fuzzing from input bytes instead of defaulting to 0, because it gates real code (jansson's
+# json_loads `flags`, a decoder's `mode`). Deliberately tight: NOT a size/count/index, which
+# controls allocation or iteration and would hang or over-read if driven to a large value.
+_FLAG_NAME = re.compile(r"(?:^|_)(flag|flags|mode|option|options|opt|quality|level|"
+                        r"colou?rspace|policy|style|kind|variant)s?$", re.I)
+_SIZE_NAME = re.compile(r"(?:^|_)(size|len|length|count|num|n|cap|capacity|width|height|"
+                        r"stride|offset|index|idx|nmemb|bytes)s?$", re.I)
+
+
+def _fuzz_scalar_arg(ty: str, j: int) -> str:
+    """A behaviour scalar read from an input byte (0..255), safe on short inputs."""
+    return f"({ty.strip()})(hf_size ? hf_data[{j} %% hf_size] : 0)".replace("%%", "%")
+
 
 def _is_byte_ptr(ty: str) -> bool:
     return bool(_BYTE_PTR.search(ty)) and ty.count("*") == 1
@@ -122,7 +136,10 @@ def _buffer_plan(params: list, buf_i: int, len_i: int):
             locals_.append(f"{pt} {ln} = {{0}};")
             args.append(f"&{ln}")
         elif _is_scalar(ty):
-            args.append("0")
+            if _FLAG_NAME.search(nm or "") and not _SIZE_NAME.search(nm or ""):
+                args.append(_fuzz_scalar_arg(ty, j))   # a behaviour flag: fuzz it
+            else:
+                args.append("0")
         else:
             return None, None               # by-value struct/handle: cannot fill safely
     return args, locals_
@@ -148,7 +165,10 @@ def _cstring_plan(params: list):
     for j in range(1, len(params)):
         ty, _nm = params[j]
         if ty.count("*") == 0 and _SCALAR.match(ty.strip()):
-            args.append("0")
+            if _FLAG_NAME.search(_nm or "") and not _SIZE_NAME.search(_nm or ""):
+                args.append(_fuzz_scalar_arg(ty, j))
+            else:
+                args.append("0")
         elif "char" in ty and ty.count("*") == 1 and "const" in ty:
             args.append('""')                          # config string: empty, never NULL
         elif ty.count("*") >= 1 and "char" not in ty and "void" not in ty:
