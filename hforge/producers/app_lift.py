@@ -651,3 +651,173 @@ def _find_init(struct_type: str, decls: dict) -> str:
         if len(params) == 1 and struct_type in params[0][0] and "*" in params[0][0]:
             return name
     return ""
+
+
+# ── SEQUENCE lifting: create -> process(buffer,len) -> destroy ────────────────────────────────
+# A streaming/handle decoder is not one call. An opaque handle is produced by a create call,
+# driven by process calls that take the fuzzer bytes, and released by a destroy call. The handle
+# is only ever used THROUGH the pointer create returns, so its incomplete type never blocks us --
+# which is exactly why the single-call path refuses these and this path can lift them.
+_CREATE = re.compile(r"(?:^|_)(create|new|open|init|alloc|make|start|from_)", re.I)
+_PROCESS = re.compile(r"(?:^|_)(decode|parse|process|read|update|feed|run|scan|convert|load|"
+                      r"header|info|advance|next|step)", re.I)
+_DESTROY = re.compile(r"(?:^|_)(free|destroy|close|delete|release|done|finish|cleanup|dispose|"
+                      r"deinit|fini|term|end)", re.I)
+_FINAL_NAME = re.compile(r"(?:^|_)(final|last|eos|is_?final|is_?last|end)s?$", re.I)
+
+
+def _snake(name: str) -> str:
+    """Insert underscores at CamelCase humps so the snake-case verb regexes also match a
+    CamelCase API: XML_ParserCreate -> XML_Parser_Create, so _CREATE sees the `Create`."""
+    return re.sub(r"(?<=[a-z0-9])(?=[A-Z])", "_", name or "")
+
+
+def _norm_ty(t: str) -> str:
+    return re.sub(r"\s+", " ", (t or "").replace("const", " ")).strip()
+
+
+def _first_param_is(d, handle_ty: str) -> bool:
+    ps = list(getattr(d, "params", []) or [])
+    return bool(ps) and _norm_ty(ps[0][0]) == _norm_ty(handle_ty)
+
+
+def _seq_fill(params, handle_i: int, handle_var: str, put_input, locals_: list) -> list:
+    """C argument expressions for one sequence call. `handle_i` is the handle param (or -1);
+    `put_input` is (buf_i,len_i) to route the fuzzer bytes, or None. Out-pointers become locals,
+    a `final`/`last` flag becomes 1 (complete the parse), other scalars 0, config pointers NULL."""
+    bi, li = put_input if put_input else (-2, -2)
+    args = []
+    for j, (ty, nm) in enumerate(params):
+        if j == handle_i:
+            args.append(handle_var)
+        elif j == bi:
+            args.append(f"({ty.strip()})hf_data")
+        elif j == li:
+            args.append(f"({ty.strip()})hf_size")
+        elif ty.count("*") == 0 and _SCALAR.match(ty.strip()):
+            if _FINAL_NAME.search(nm or ""):
+                args.append(f"({ty.strip()})1")            # "final chunk": finish the parse
+            elif _FLAG_NAME.search(nm or "") and not _SIZE_NAME.search(nm or ""):
+                args.append(_fuzz_scalar_arg(ty, j))
+            else:
+                args.append("0")
+        elif ty.count("*") >= 1:
+            pt = _pointee(ty)
+            if pt == "void" or _OPAQUE_HANDLE.search(pt) \
+                    or ("char" in ty.lower() and "const" in ty):
+                args.append("0")                           # NULL: default sentinel / config
+            else:
+                ln = f"hf_a{j}"
+                locals_.append(f"{pt} {ln} = {{0}};")
+                args.append(f"&{ln}")
+        else:
+            args.append("0")
+    return args
+
+
+def _proc_rank(name: str) -> int:
+    # header/info reads must precede a full decode; rank them first, then the decoders.
+    if re.search(r"(?:^|_)(header|info|begin|start|sniff|probe)", _snake(name), re.I):
+        return 0
+    return 1
+
+
+def lift_sequence(headers: list, target, includes: tuple = ()):
+    """Lift a create -> process(buffer,len) -> destroy handle API into a HarnessIR, or (None, rec).
+
+    Shape A: create takes the input itself (upng_new_from_bytes(buf,size)); process calls then
+    drive the handle. Shape B: create takes no input (XML_ParserCreate); a process call carries
+    the (buffer,len) (XML_Parse(p, s, len, final)). Either way the handle threads through.
+    """
+    from .header_graph import parse_header                          # noqa: PLC0415
+    decls: dict = {}
+    for h in headers:
+        if Path(h).exists():
+            for d in parse_header(h, tuple(includes), ()):
+                decls.setdefault(d.name, d)
+    rec = {"producer": PRODUCER}
+    hdr = Path(headers[0]).name if headers else ""
+    best = None
+    for cname, cd in decls.items():
+        if "__" in cname or cname in _OS_IMPORTS or not _CREATE.search(_snake(cname)) \
+                or _DESTROY.search(_snake(cname)):
+            continue
+        H = (getattr(cd, "ret", "") or "").strip()
+        if not H or _is_scalar(H) or _norm_ty(H) in ("void", "int", "unsigned int", "long",
+                                                     "unsigned", "size_t"):
+            continue                                        # create must return a handle
+        cparams = list(getattr(cd, "params", []) or [])
+        destroys = [n for n, d in decls.items()
+                    if _DESTROY.search(_snake(n)) and n != cname and _first_param_is(d, H)]
+        if not destroys:
+            continue                                        # no matching destroy: not a lifecycle
+        procs = [(n, d) for n, d in decls.items()
+                 if _PROCESS.search(_snake(n)) and not _DESTROY.search(_snake(n)) and not _CREATE.search(_snake(n))
+                 and n != cname and _first_param_is(d, H)]
+        cbi, cli = _buffer_pair(cparams)
+        shape_a = cbi >= 0
+        input_proc = None
+        if not shape_a:
+            for n, d in sorted(procs, key=lambda x: _proc_rank(x[0])):
+                pb, pl = _buffer_pair(list(getattr(d, "params", []) or []))
+                if pb >= 0:
+                    input_proc = (n, d, pb, pl)
+                    break
+            if input_proc is None:
+                continue                                    # no way to deliver the fuzzer bytes
+        # a create that needs the input but ALSO has no process is still worth driving
+        score = (2 if shape_a else 1) + len(procs)
+        if best is None or score > best[0]:
+            best = (score, cname, cd, H, cparams, destroys, procs, shape_a, cbi, cli, input_proc)
+    if best is None:
+        rec["why_not"] = ("no create->process->destroy handle sequence found (no create returning "
+                          "a handle with a matching destroy and a way to deliver input)")
+        return None, rec
+    (_s, cname, cd, H, cparams, destroys, procs, shape_a, cbi, cli, input_proc) = best
+    locals_: list = []
+    steps: list = []
+    hv = "hf_h"
+    # create
+    cin = (cbi, cli) if shape_a else None
+    def _sink(d) -> bool:
+        return _norm_ty(getattr(d, "ret", "")) not in ("", "void")
+    steps.append({"symbol": cname, "args": _seq_fill(cparams, -1, hv, cin, locals_),
+                  "out_type": H.strip(), "out_var": hv, "guard": True, "sink": False})
+    used_syms = {cname}
+    if shape_a:
+        # every process call, header/info first, then decoders -- each deepens coverage
+        for n, d in sorted(procs, key=lambda x: _proc_rank(x[0])):
+            if n in used_syms:
+                continue
+            steps.append({"symbol": n, "args": _seq_fill(list(getattr(d, "params", []) or []),
+                          0, hv, None, locals_), "out_type": "", "out_var": "", "guard": False,
+                          "sink": _sink(d)})
+            used_syms.add(n)
+    else:
+        n, d, pb, pl = input_proc
+        steps.append({"symbol": n, "args": _seq_fill(list(getattr(d, "params", []) or []),
+                      0, hv, (pb, pl), locals_), "out_type": "", "out_var": "", "guard": False,
+                      "sink": _sink(d)})
+        used_syms.add(n)
+    # destroy: the object's own destructor takes ONLY the handle (XML_ParserFree(p)); a helper
+    # like XML_MemFree(p, ptr) frees something else and would leak the handle. Fewest params wins.
+    dname = sorted(destroys, key=lambda n: (len(list(getattr(decls[n], "params", []) or [])),
+                                            len(n)))[0]
+    dd = decls[dname]
+    steps.append({"symbol": dname, "args": _seq_fill(list(getattr(dd, "params", []) or []),
+                  0, hv, None, []), "out_type": "", "out_var": "", "guard": False,
+                  "sink": _sink(dd)})
+    ae = AppEntry(symbol=cname, channel=APP_BUFFER, header=hdr,
+                  call_locals=locals_, app_seq=steps)
+    try:
+        target.public_headers = list(getattr(target, "public_headers", []) or []) + \
+            [h for h in headers if h not in set(getattr(target, "public_headers", []) or [])]
+    except (AttributeError, TypeError):
+        pass
+    rec["chosen"] = {"sequence": [s["symbol"] for s in steps], "handle": H.strip(),
+                     "shape": "A" if shape_a else "B"}
+    plan = HarnessIR(name=f"{target.name}_{cname}_seq"[:60], target=target, app_entry=ae,
+                     knobs=Knobs(),
+                     platforms=list(target.__dict__.get("platforms", [])) or ["linux-x86_64-glibc"],
+                     producer=PRODUCER)
+    return plan, rec

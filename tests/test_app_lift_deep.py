@@ -251,3 +251,48 @@ def test_length_before_buffer_does_not_pair_void_config():
                ("const void *", "opts"), ("void *", "error")])
     c = classify(d)
     assert c is None or c["channel"] != "buffer"
+
+
+def test_sequence_shape_a_create_takes_input(tmp_path):
+    # upng shape: create(buffer,len) -> process(handle) -> destroy(handle)
+    from hforge.producers import app_lift
+    from hforge.ir import Target
+    from hforge.emit import emit
+    h = tmp_path / "u.h"
+    h.write_text("typedef struct upng_t upng_t;\n"
+                 "upng_t* upng_new_from_bytes(const unsigned char* buffer, unsigned long size);\n"
+                 "int upng_header(upng_t* upng);\n"
+                 "int upng_decode(upng_t* upng);\n"
+                 "void upng_free(upng_t* upng);\n")
+    plan, rec = app_lift.lift_sequence([str(h)], Target(name="u"))
+    assert plan is not None
+    seq = rec["chosen"]["sequence"]
+    assert seq[0] == "upng_new_from_bytes" and seq[-1] == "upng_free"
+    assert "upng_decode" in seq
+    src = emit(plan).source
+    assert "upng_new_from_bytes((const unsigned char*)hf_data" in src
+    assert "if (!hf_h) return 0;" in src           # guard the handle
+    assert "upng_free(hf_h)" in src
+
+
+def test_sequence_shape_b_process_takes_input_and_picks_real_destructor(tmp_path):
+    # expat shape: create() -> process(handle, buffer, len, final) -> destroy(handle).
+    # A two-arg XML_MemFree must NOT be chosen over the one-arg XML_ParserFree.
+    from hforge.producers import app_lift
+    from hforge.ir import Target
+    from hforge.emit import emit
+    h = tmp_path / "x.h"
+    h.write_text("typedef struct X* XML_Parser;\n"
+                 "XML_Parser XML_ParserCreate(const char* encoding);\n"
+                 "int XML_Parse(XML_Parser p, const char* s, int len, int isFinal);\n"
+                 "void XML_MemFree(XML_Parser p, void* ptr);\n"
+                 "void XML_ParserFree(XML_Parser p);\n")
+    plan, rec = app_lift.lift_sequence([str(h)], Target(name="x"))
+    assert plan is not None
+    seq = rec["chosen"]["sequence"]
+    assert seq == ["XML_ParserCreate", "XML_Parse", "XML_ParserFree"]   # not XML_MemFree
+    src = emit(plan).source
+    assert "XML_ParserCreate(0)" in src                        # NULL encoding default
+    assert "XML_Parse(hf_h," in src and "hf_data" in src and "hf_size" in src
+    assert "(int)1)" in src                                    # final chunk -> finish the parse
+    assert "XML_ParserFree(hf_h)" in src

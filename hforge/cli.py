@@ -906,6 +906,27 @@ def cmd_app_lift(args) -> int:
         else:
             print(e.source)
         return 0
+    if getattr(args, "sequence", False):
+        plan, rec = app_lift.lift_sequence(list(args.header), tgt,
+                                           includes=tuple(args.include or []))
+        if plan is None:
+            print(f"refused: {rec.get('why_not', 'no create->process->destroy sequence found')}")
+            return 1
+        ch = rec["chosen"]
+        print(f"sequence (shape {ch['shape']}, handle {ch['handle']}): "
+              + " -> ".join(ch["sequence"]))
+        e = emit(plan)
+        if args.out:
+            Path(args.out).write_text(e.source)
+            msg = f"wrote {args.out}"
+            sp = _provision_seeds(args, ch["sequence"])
+            if sp:
+                msg += f" and {sp['dir']} ({sp['total']} seeds: {sp['mined']} mined, " \
+                       f"{sp['synthesised']} synth)"
+            print(msg)
+        else:
+            print(e.source)
+        return 0
     plan, rec = app_lift.propose(list(args.header), tgt,
                                  includes=tuple(args.include or []), only=args.only)
     # A main(int, char**) cannot be told apart from an argv or a stdin app by its SIGNATURE
@@ -1799,6 +1820,9 @@ def main(argv=None) -> int:
     al.add_argument("--compose", action="store_true",
                     help="fold the header's whole decode FAMILY onto one input (codec "
                          "composition) instead of the single best entry")
+    al.add_argument("--sequence", action="store_true",
+                    help="lift a create->process(buffer,len)->destroy handle API (streaming "
+                         "decoders the single-call path refuses: upng, expat, libjxl-style)")
     al.set_defaults(fn=cmd_app_lift)
 
     cl = sub.add_parser("closed",

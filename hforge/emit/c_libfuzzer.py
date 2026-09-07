@@ -550,7 +550,25 @@ def _emit_app_entry(ir: HarnessIR, *, with_driver: bool = True) -> "Emitted":
     cast = "(long)" if ae.returns_int else ""
 
     call_lines: list = []
-    if ae.channel == APP_BUFFER:
+    if getattr(ae, "app_seq", None):
+        # SEQUENCE: create -> process(hf_data/hf_size) -> destroy. The handle threads through as
+        # a local; a create guard bails on NULL so no later call dereferences a failed handle.
+        lines = ["    volatile long hf_sink = 0;"]
+        for l in ae.call_locals:
+            lines.append(f"    {l}")
+        for step in ae.app_seq:
+            callexpr = f"{step['symbol']}({', '.join(step['args'])})"
+            if step.get("out_var"):
+                lines.append(f"    {step['out_type']} {step['out_var']} = {callexpr};")
+                if step.get("guard"):
+                    lines.append(f"    if (!{step['out_var']}) return 0;")
+            elif step.get("sink"):
+                lines.append(f"    hf_sink = (long){callexpr};")
+            else:
+                lines.append(f"    {callexpr};")
+        call_lines = ["\n".join(lines)]
+        needs_tmp = False
+    elif ae.channel == APP_BUFFER:
         # No file: the entry takes the bytes and their length directly.
         def _buffer_block(e, idx: int) -> str:
             # One decode call on hf_data/hf_size. Locals are namespaced by idx so a fold of

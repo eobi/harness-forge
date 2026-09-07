@@ -558,6 +558,13 @@ class AppEntry:
     config_local: str = ""
     config_init: str = ""
     config_fields: list = field(default_factory=list)   # list[(path, ctype)]
+    # SEQUENCE (create -> process -> destroy). A streaming/handle decoder is not one call: an
+    # opaque handle is produced by a create call, driven by one or more process calls that take
+    # the fuzzer bytes, then released by a destroy call. The handle is only ever used THROUGH the
+    # pointer create returns, so its incomplete type is never a problem. Each step is
+    # {symbol, args, out_type, out_var, guard}: out_var/out_type declare and capture a return
+    # (the handle); guard emits `if (!out_var) return 0;`. Empty app_seq = a single-call entry.
+    app_seq: list = field(default_factory=list)          # list[dict] ordered steps
 
     def to_json(self) -> dict:
         return {"symbol": self.symbol, "channel": self.channel, "header": self.header,
@@ -566,7 +573,8 @@ class AppEntry:
                 "fold": [e.to_json() for e in self.fold], "free_symbol": self.free_symbol,
                 "returns_ptr": self.returns_ptr, "config_local": self.config_local,
                 "config_init": self.config_init,
-                "config_fields": [list(f) for f in self.config_fields]}
+                "config_fields": [list(f) for f in self.config_fields],
+                "app_seq": [dict(s) for s in self.app_seq]}
 
     @staticmethod
     def from_json(d: dict) -> "AppEntry":
@@ -580,7 +588,8 @@ class AppEntry:
                         returns_ptr=d.get("returns_ptr", False),
                         config_local=d.get("config_local", ""),
                         config_init=d.get("config_init", ""),
-                        config_fields=[tuple(f) for f in d.get("config_fields", [])])
+                        config_fields=[tuple(f) for f in d.get("config_fields", [])],
+                        app_seq=[dict(s) for s in d.get("app_seq", [])])
 
 
 @dataclass
