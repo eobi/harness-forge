@@ -40,3 +40,19 @@ scorecard position: below the developer harness, well below OGHarn's +14% bar.
 
 This is genuinely multi-hour build engineering per library, and it is the honest gate on the
 OGHarn claim -- not an engine limitation.
+
+## Update: param-type fix unblocked a 3rd comparison (2026-09-07)
+A real generator fix landed (test-lift now takes PARAMETER types from the header, not from
+inferred call sites -- it was casting libyaml's seam bytes to (int)). That took the run from
+2 to 3 paired comparisons:
+
+| lib | ours (best lifted) | developer | ratio |
+|-----|-------------------:|----------:|------:|
+| cjson   | 260  | 301  | 0.86x |
+| jansson | 544  | 664  | 0.82x |
+| libyaml | 18   | 1508 | 0.01x |
+
+median 0.819x, still UNDERPOWERED (>=5). libyaml at 0.01x is an honest limitation, not a bug:
+test-lift lifted libyaml's ENCODING-CHECK unit tests (check_utf8/check_boms), which do not
+drive the parse loop the developer harness runs. Coverage from test-lift is bounded by the
+quality of the library's unit tests -- a real, stated property of the approach.
