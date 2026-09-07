@@ -365,11 +365,27 @@ def compose_app(headers: list, target, includes: tuple = (), max_fold: int = 16)
         return None, rec
     free = _find_free(decls)
 
+    structs = _all_structs(hdr_paths)
+
     def mk(c) -> AppEntry:
         rp = c.get("returns_ptr", False)
-        return AppEntry(symbol=c["symbol"], channel=APP_BUFFER, header=c.get("header", ""),
-                        call_args=c["call_args"], call_locals=c["call_locals"],
-                        returns_ptr=rp, returns_int=not rp)
+        e = AppEntry(symbol=c["symbol"], channel=APP_BUFFER, header=c.get("header", ""),
+                     call_args=c["call_args"], call_locals=c["call_locals"],
+                     returns_ptr=rp, returns_int=not rp)
+        # OPTION FUZZING: if this entry passes a config struct out-local that has an
+        # initialiser and pointer-free scalar options, set those from input bytes so the
+        # crop/scale/flip/dither code runs -- the coverage a developer's option-fuzzer reaches.
+        for loc in c.get("call_locals", []):
+            m = re.match(r"^([A-Za-z_][\w ]*?)\s+(hf_a\d+)\s*=", loc)
+            if not m:
+                continue
+            sty = m.group(1).strip()
+            fields, _safe = _struct_fuzz_fields(sty, structs)
+            init = _find_init(sty, decls)
+            if fields:
+                e.config_local, e.config_init, e.config_fields = m.group(2), init, fields
+                break
+        return e
 
     primary = mk(fam[0])
     primary.header = ""   # target.public_headers spells the include path correctly
@@ -383,3 +399,81 @@ def compose_app(headers: list, target, includes: tuple = (), max_fold: int = 16)
     rec["chosen"] = {"primary": primary.symbol, "folded": len(primary.fold),
                      "free_symbol": free}
     return plan, rec
+
+
+_STRUCT_SCALAR = re.compile(r"^(?:const\s+)?(?:unsigned\s+|signed\s+)?"
+                            r"(?:int|char|short|long|float|double|size_t|uint\d+_t|int\d+_t|"
+                            r"_Bool|bool)$")
+
+
+def _all_structs(sources: list) -> dict:
+    """{struct name -> [(ctype, field, is_ptr, is_array)]} parsed from header text.
+
+    Handles both `typedef struct [tag] {..} NAME;` and `struct NAME {..};`, and comma-lists
+    (`int crop_left, crop_top;`). Structs whose body contains a nested brace (union/anon) are
+    skipped -- they cannot be fuzzed field-by-field safely and the regex would misparse them.
+    """
+    structs: dict = {}
+    for src in sources:
+        try:
+            text = Path(src).read_text(errors="replace")
+        except OSError:
+            continue
+        text = re.sub(r"/\*.*?\*/", "", text, flags=re.S)
+        text = re.sub(r"//.*", "", text)
+        for pi, pat in ((0, r"typedef\s+struct\s*(?:\w+\s*)?\{([^{}]*?)\}\s*(\w+)\s*;"),
+                        (1, r"struct\s+(\w+)\s*\{([^{}]*?)\}\s*;")):
+            for m in re.finditer(pat, text, re.S):
+                body, name = (m.group(1), m.group(2)) if pi == 0 else (m.group(2), m.group(1))
+                fields = []
+                for decl in body.split(";"):
+                    decl = " ".join(decl.split())
+                    mm = re.match(r"^((?:const |unsigned |signed |struct )*[A-Za-z_]\w*) (.+)$", decl)
+                    if not mm:
+                        continue
+                    ctype = mm.group(1).replace("struct", "").strip()
+                    for nm in mm.group(2).split(","):
+                        clean = re.sub(r"[*\[\]0-9\s]", "", nm)
+                        if clean:
+                            fields.append((ctype, clean, "*" in nm, "[" in nm))
+                structs.setdefault(name, fields)
+    return structs
+
+
+def _struct_fuzz_fields(typ: str, structs: dict, depth: int = 0):
+    """(fields, safe): scalar fields as (dotted-path, ctype); safe=False if any pointer/union.
+
+    Recurses into pointer-free sub-structs (config.options.flip) and skips any sub-struct that
+    contains a pointer (config.output, which holds the pixel buffer), so setting the returned
+    fields can never corrupt a buffer pointer."""
+    if depth > 4 or typ not in structs:
+        return ([], False)
+    out, safe = [], True
+    for ctype, fname, is_ptr, is_arr in structs[typ]:
+        if is_ptr:
+            safe = False                     # a pointer we might corrupt -> struct is unsafe
+            continue
+        if is_arr:
+            continue                         # a padding/array field: skip it, still safe
+        if ctype in structs:
+            sub, sub_safe = _struct_fuzz_fields(ctype, structs, depth + 1)
+            if sub_safe:
+                out += [(fname + "." + p, t) for p, t in sub]
+            else:
+                safe = False
+        elif _STRUCT_SCALAR.match(ctype):
+            out.append((fname, ctype))
+        else:
+            safe = False
+    return (out, safe)
+
+
+def _find_init(struct_type: str, decls: dict) -> str:
+    """An initialiser f(StructType*) named *Init*, required before a config is used."""
+    for name, d in decls.items():
+        if "Init" not in name:
+            continue
+        params = list(getattr(d, "params", []) or [])
+        if len(params) == 1 and struct_type in params[0][0] and "*" in params[0][0]:
+            return name
+    return ""

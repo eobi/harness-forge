@@ -549,13 +549,24 @@ class AppEntry:
     fold: list = field(default_factory=list)      # list[AppEntry], same-input decode family
     free_symbol: str = ""                          # e.g. WebPFree; frees returned buffers
     returns_ptr: bool = False                      # the call returns a buffer to free
+    # OPTION FUZZING. A codec's advanced decode takes a config struct whose OPTIONS
+    # (crop/scale/flip/dither) are scalar fields a developer fuzzer varies to reach the
+    # resize/crop/upsampling code. `config_local` is the config out-local this entry passes;
+    # `config_init` its required initialiser; `config_fields` the (dotted-path, C-type) scalar
+    # fields to set from input bytes before the call. Only pointer-free fields are listed, so
+    # setting them can never corrupt a buffer pointer.
+    config_local: str = ""
+    config_init: str = ""
+    config_fields: list = field(default_factory=list)   # list[(path, ctype)]
 
     def to_json(self) -> dict:
         return {"symbol": self.symbol, "channel": self.channel, "header": self.header,
                 "argv": list(self.argv), "returns_int": self.returns_int,
                 "call_args": list(self.call_args), "call_locals": list(self.call_locals),
                 "fold": [e.to_json() for e in self.fold], "free_symbol": self.free_symbol,
-                "returns_ptr": self.returns_ptr}
+                "returns_ptr": self.returns_ptr, "config_local": self.config_local,
+                "config_init": self.config_init,
+                "config_fields": [list(f) for f in self.config_fields]}
 
     @staticmethod
     def from_json(d: dict) -> "AppEntry":
@@ -566,7 +577,10 @@ class AppEntry:
                         call_locals=list(d.get("call_locals", [])),
                         fold=[AppEntry.from_json(x) for x in d.get("fold", [])],
                         free_symbol=d.get("free_symbol", ""),
-                        returns_ptr=d.get("returns_ptr", False))
+                        returns_ptr=d.get("returns_ptr", False),
+                        config_local=d.get("config_local", ""),
+                        config_init=d.get("config_init", ""),
+                        config_fields=[tuple(f) for f in d.get("config_fields", [])])
 
 
 @dataclass

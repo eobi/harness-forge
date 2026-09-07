@@ -552,6 +552,20 @@ def _emit_app_entry(ir: HarnessIR, *, with_driver: bool = True) -> "Emitted":
             for l in (e.call_locals or []):
                 nm = l.split("=")[0].strip().split()[-1].lstrip("*")
                 body += "    " + l.replace(nm, f"{nm}_{idx}") + "\n"
+            # OPTION FUZZING: initialise the config struct, then set each pointer-free scalar
+            # option field from a distinct input byte, so the crop/scale/flip/dither code runs.
+            if e.config_local and e.config_fields:
+                if e.config_init:
+                    body += f"    {e.config_init}(&{e.config_local}_{idx});\n"
+                for fi, fld in enumerate(e.config_fields):
+                    path, ctype = fld[0], fld[1]
+                    off = f"({fi} %% hf_size)".replace("%%", "%")
+                    # One input byte per field (0..255). A small value is more often VALID for
+                    # a crop/scale dimension than a full 32-bit word (which the decoder rejects
+                    # up front), so it reaches more of the option code -- measured better than a
+                    # 4-byte read on libwebp.
+                    body += (f"    {e.config_local}_{idx}.{path} = ({ctype})"
+                             f"(hf_size ? hf_data[{off}] : 0);\n")
             if e.call_args:
                 # rebind &hf_aN / hf_aN args to the idx-namespaced locals; leave the
                 # (type)hf_data / (type)hf_size casts and scalar defaults untouched.
