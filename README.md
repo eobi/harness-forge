@@ -35,13 +35,13 @@ A producer proposes a plan; the gates certify it; confidence decides nothing.
 | `M` | the model gets hands on the engine, never on the arbiter | 7/7 | **done** |
 | `L` | language coverage beyond C | 13/15 | partial |
 | `P4` | lift-and-grade third-party harnesses | 3/4 | partial |
-| `P5` | Windows and closed binary | 1/3 | partial |
+| `P5` | Windows and closed binary | 2/3 | partial |
 | `P6` | GUI track | 0/3 | planned |
 | `P7` | mobile: Android and iOS | 0/3 | partial |
 | `P8` | snapshot and scale | 0/2 | planned |
 | `P9` | exotic targets | 0/2 | planned |
 
-**105 of 131 deliverables done**, and `plancheck` refuses to let any of them say so without a module that imports and a test that exists.
+**106 of 131 deliverables done**, and `plancheck` refuses to let any of them say so without a module that imports and a test that exists.
 
 <!-- PHASES:END -->
 
@@ -665,6 +665,33 @@ grey-box and found 23 bugs across 11–12 applications. The missing piece is ins
 not more inputs.
 
 The rating stands: **the oracle is the contribution, the search is not.**
+
+## The closed-binary track (P5)
+
+Every path above ends at the same wall: a shipped binary with no source, which no
+source-based generator can touch. `hforge closed` crosses it. TinyInst gives edge coverage of
+an *uninstrumented* module, so `litecov` measures a closed target and `jackalope` fuzzes it
+with that coverage as feedback — the same evidence record (coverage, corpus, crashes) the
+source track produces, on code that was never recompiled.
+
+```console
+$ hforge closed /opt/homebrew/bin/dwebp \
+    --instrument-module libwebp.7.2.0.dylib --instrument-module libwebpdemux.2.0.17.dylib \
+    --seeds seeds --arg=@@ --arg=-o --arg=/dev/null --budget 60
+
+coverage probe: 825 .. 662 blocks across 2 instrumented module(s)
+campaign: ran=True unique_samples=9 crashes=0 hangs=0
+```
+
+Proven end-to-end on a real shipped decoder (libwebp, via `dwebp`) — **825 decoder blocks
+covered with no source**, then a coverage-guided campaign. `litecov` and `jackalope` are
+optional external tools discovered by `doctor` and reported like the compiler is: absent, the
+track reports NOT_RUN and says what to install, rather than failing the engine. Two rules the
+macOS path taught: instrument modules by their **exact loaded-image name** (the version is
+part of it — `libwebp.7.2.0.dylib`, not `.7.dylib`), and a target must be attachable (re-sign
+with get-task-allow; arm64e system binaries do not attach). This is the un-fuzzed frontier —
+closed apps, games, firmware — and the engine now reaches it. The remaining variable is
+target selection, not capability.
 
 ## What these harnesses cannot find
 

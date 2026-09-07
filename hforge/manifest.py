@@ -1932,7 +1932,15 @@ PHASES: tuple = (
                     DONE,
                     modules=("hforge.emit.c_libfuzzer",),
                     tests=("test_windows_target_emits_the_win32_temp_shim_and_a_cl_build",)),
-        Deliverable("P5.TINYINST", "TinyInst coverage backend", PLANNED),
+        Deliverable("P5.TINYINST",
+                    "TinyInst/Jackalope coverage backend for CLOSED binaries: `hforge closed` "
+                    "runs coverage (litecov) and a coverage-guided campaign (jackalope) on a "
+                    "binary with NO source; doctor detects both tools and reports what their "
+                    "absence costs; proven end-to-end on a shipped decoder (libwebp via dwebp)",
+                    DONE,
+                    modules=("hforge.closed",),
+                    tests=("test_litecov_cmd", "test_jackalope_cmd_file_delivery",
+                           "test_toolchain_declares_closed_tools")),
         Deliverable("P5.PE", "PE posture table and SEH-aware crash parsing", PLANNED),
     )),
 

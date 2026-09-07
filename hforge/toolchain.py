@@ -255,6 +255,34 @@ def find_nm() -> Optional[str]:
     return _first("llvm-nm", "/opt/homebrew/opt/llvm/bin/llvm-nm", "nm")
 
 
+def find_litecov() -> Optional[str]:
+    """TinyInst's litecov: coverage on a CLOSED binary (no source, no recompile).
+
+    The one piece a source-based fuzzer cannot provide -- coverage of a shipped binary. Found
+    via $LITECOV, $TINYINST_DIR/build, or the PATH. It is optional exactly like a compiler:
+    absent, the closed-binary path reports NOT RUN rather than failing the whole engine.
+    """
+    td = os.environ.get("TINYINST_DIR")
+    exe = "litecov.exe" if os.name == "nt" else "litecov"
+    return _first(os.environ.get("LITECOV"),
+                  td and str(Path(td) / "build" / exe) or None,
+                  td and str(Path(td) / "build" / "Release" / exe) or None,
+                  "litecov")
+
+
+def find_jackalope() -> Optional[str]:
+    """Jackalope's `fuzzer`: coverage-guided fuzzing of a closed binary (drives TinyInst).
+
+    Found via $JACKALOPE_FUZZER, $JACKALOPE_DIR/build, or the PATH.
+    """
+    jd = os.environ.get("JACKALOPE_DIR")
+    exe = "fuzzer.exe" if os.name == "nt" else "fuzzer"
+    return _first(os.environ.get("JACKALOPE_FUZZER"),
+                  jd and str(Path(jd) / "build" / exe) or None,
+                  jd and str(Path(jd) / "build" / "Release" / exe) or None,
+                  "jackalope-fuzzer")
+
+
 def find_adb() -> Optional[str]:
     return _first(os.environ.get("ADB"), "adb",
                   str(Path.home() / "Library/Android/sdk/platform-tools/adb"),
@@ -341,6 +369,12 @@ def inventory() -> Toolchain:
              "Android harnesses cannot be built here, only run if prebuilt"),
         Tool("xcrun", find_xcrun(), "the iOS Simulator, which is the practical iOS path",
              "iOS discovery is unavailable; device runs were never the discovery path"),
+        Tool("litecov", find_litecov(),
+             "coverage of a CLOSED binary (no source) -- the closed-binary track (P5)",
+             "closed-binary coverage is unavailable; source targets are unaffected"),
+        Tool("jackalope", find_jackalope(),
+             "coverage-guided fuzzing of a closed binary (drives litecov/TinyInst)",
+             "closed-binary campaigns cannot run; one-shot litecov coverage still can"),
     ])
 
 

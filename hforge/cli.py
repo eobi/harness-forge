@@ -910,6 +910,66 @@ def cmd_app_lift(args) -> int:
     return 0
 
 
+def cmd_closed(args) -> int:
+    """Fuzz a CLOSED binary -- no source, no recompile (P5, TinyInst/Jackalope).
+
+    The one target the source track cannot reach: a shipped binary. litecov gives coverage of
+    an uninstrumented module and jackalope fuzzes with it. Both are optional tools; absent,
+    this reports NOT_RUN and says what to install, the same contract as a missing compiler.
+    Instrument modules must be the EXACT loaded-image names (the version is part of the name:
+    libwebp.7.2.0.dylib). Use @@ in --arg for the input file's position.
+    """
+    from . import closed                                            # noqa: PLC0415
+    inv = tc.inventory()
+    litecov = inv.get("litecov")
+    jackalope = inv.get("jackalope")
+    mods = list(args.instrument_module)
+    target_args = list(args.arg) if args.arg else [closed.INPUT]
+    if closed.INPUT not in target_args:
+        target_args.append(closed.INPUT)
+
+    if not (litecov and litecov.present):
+        print("NOT_RUN: no litecov. Build TinyInst and set $LITECOV or $TINYINST_DIR.")
+        print("  cost: closed-binary coverage is unavailable; source targets are unaffected.")
+        return 1
+
+    seeds = sorted(p for p in Path(args.seeds).glob("*") if p.is_file())
+    if not seeds:
+        print(f"no seed files in {args.seeds}")
+        return 2
+
+    # Smoke / coverage probe: prove the target is instrumentable and coverage is
+    # input-sensitive before committing a campaign to it.
+    lo = closed.coverage_once(args.binary, mods, str(seeds[0]),
+                              litecov=litecov.path, target_args=target_args)
+    hi = closed.coverage_once(args.binary, mods, str(seeds[-1]),
+                              litecov=litecov.path, target_args=target_args)
+    print(f"coverage probe: {lo} .. {hi} blocks across {len(mods)} instrumented module(s)")
+    if lo < 0:
+        print("  the target did not run under litecov -- check the binary attaches "
+              "(macOS: re-sign with get-task-allow) and the module names match the "
+              "loaded-image list exactly.")
+        return 1
+    if args.smoke:
+        return 0
+
+    if not (jackalope and jackalope.present):
+        print("NOT_RUN (campaign): no jackalope. Coverage probe succeeded; build Jackalope "
+              "and set $JACKALOPE_FUZZER or $JACKALOPE_DIR to fuzz.")
+        return 1
+
+    res = closed.campaign(args.binary, mods, args.seeds, args.out,
+                          jackalope=jackalope.path, target_args=target_args,
+                          budget_s=args.budget)
+    print(f"campaign: ran={res.ran} unique_samples={res.unique_samples} "
+          f"crashes={res.crashes} hangs={res.hangs}")
+    print(f"artifacts: {res.out_dir}")
+    if res.crashes:
+        print(f"  {res.crashes} crash input(s) in {Path(res.out, 'crashes')} -- triage before "
+              "any claim (defensive abort vs real memory bug), then check prior art.")
+    return 0
+
+
 def cmd_test_lift(args) -> int:
     """Lift ONE of a library's own unit tests into a certified harness plan.
 
@@ -1690,6 +1750,22 @@ def main(argv=None) -> int:
     al.add_argument("--out", default="", help="write the emitted C here instead of stdout")
     al.add_argument("--force", action="store_true", help="emit even if a static gate blocks")
     al.set_defaults(fn=cmd_app_lift)
+
+    cl = sub.add_parser("closed",
+                        help="fuzz a CLOSED binary with no source (P5, TinyInst/Jackalope)")
+    cl.add_argument("binary", help="path to the closed target binary")
+    cl.add_argument("--instrument-module", action="append", default=[],
+                    dest="instrument_module", required=True,
+                    help="EXACT loaded-image name to instrument (repeatable), e.g. "
+                         "libwebp.7.2.0.dylib -- the version is part of the name")
+    cl.add_argument("--seeds", required=True, help="seed corpus directory")
+    cl.add_argument("--out", default="build/closed", help="campaign output directory")
+    cl.add_argument("--arg", action="append", default=[], dest="arg",
+                    help="target argument; use @@ for the input file (repeatable)")
+    cl.add_argument("--budget", type=int, default=60, help="campaign seconds (default 60)")
+    cl.add_argument("--smoke", action="store_true",
+                    help="only run the coverage probe, do not launch a campaign")
+    cl.set_defaults(fn=cmd_closed)
 
     tl = sub.add_parser("test-lift",
                         help="lift one of a library's own unit tests into a harness plan")
