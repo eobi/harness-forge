@@ -288,6 +288,11 @@ def propose(headers: list, target: Target, includes: tuple = (),
 # Encode/serialise names never belong in a DECODE fold -- they consume a decoded object, not
 # the fuzzer's bytes, and would add nothing an attacker controls.
 _ENCODE = re.compile(r"(encode|write|save|dump|serial|compress|mux)", re.I)
+# A DIFFERENT codec subsystem than the format's own decode -- generic compression/entropy
+# helpers (stb ships stbi_zlib_decode_*). Folding them adds a second decoder with different
+# input semantics (and stb's guesssize variant hangs on a 0 size hint), so keep the fold to
+# the FORMAT decode family.
+_AUX_CODEC = re.compile(r"(zlib|inflate|deflate|lzw|huffman|base64|unzip|gunzip)", re.I)
 
 
 def _find_free(decls: dict) -> str:
@@ -347,7 +352,7 @@ def compose_app(headers: list, target, includes: tuple = (), max_fold: int = 16)
                 and not c.get("has_out_buffer") and not _ENCODE.search(c["symbol"])
                 and c["symbol"] not in seen):
             continue
-        if "Internal" in c["symbol"] or "__" in c["symbol"]:
+        if "Internal" in c["symbol"] or "__" in c["symbol"] or _AUX_CODEC.search(c["symbol"]):
             continue
         if not all(_local_ok(l) for l in c.get("call_locals", [])):
             continue                                     # opaque out-local: cannot stack-alloc

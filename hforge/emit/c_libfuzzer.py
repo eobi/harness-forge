@@ -562,14 +562,16 @@ def _emit_app_entry(ir: HarnessIR, *, with_driver: bool = True) -> "Emitted":
             if e.returns_ptr and ae.free_symbol:
                 body += (f"    void *hf_ret_{idx} = (void *)({callexpr});\n"
                          f"    if (hf_ret_{idx}) {ae.free_symbol}(hf_ret_{idx});")
+            elif e.returns_int:
+                body += f"    hf_sink = (long){callexpr};"   # shared sink, declared once
             else:
-                s = f"volatile long hf_sink_{idx} = " if e.returns_int else ""
-                c = "(long)" if e.returns_int else ""
-                body += f"    {s}{c}{callexpr};"
+                body += f"    {callexpr};"
             return body
 
         if ae.call_args or ae.fold:
-            blocks = [_buffer_block(ae, 0)]
+            # One shared `hf_sink` for every folded call; `(void)hf_sink;` below is satisfied.
+            blocks = ["    volatile long hf_sink = 0;"]
+            blocks.append(_buffer_block(ae, 0))
             for i, fe in enumerate(ae.fold, start=1):
                 blocks.append(_buffer_block(fe, i))
             call_lines = ["\n".join(blocks)]
