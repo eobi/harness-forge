@@ -536,8 +536,10 @@ distinct outcome** so an absent check never reads as a passed one.
 
 ## Findings: harnesses this engine graded, and the defects it found
 
-Updated 2026-08-31. **Two upstream-reportable defects, both filed, both verified against the
-library's own source before filing rather than against our own verdict.**
+Updated 2026-09-06. **Two harness defects filed upstream (the table below), plus four
+memory-safety out-of-bounds reads in widely-embedded parsers found via the application-entry
+path ([2026-09-06 subsection](#memory-safety-defects-from-the-application-entry-path-2026-09-06)) —
+verified against each library's own source before filing rather than against our own verdict.**
 
 | | defect | status |
 |---|---|---|
@@ -603,6 +605,36 @@ engine can read: the trusted tier grew from 117 to 463 across the same work, so 
 false-positive count fell while the denominator rose. That ratio is the honest
 headline: a gate bank is an instrument, and most of the work is calibrating it rather than
 reading its output.
+
+### Memory-safety defects from the application-entry path (2026-09-06)
+
+The application-entry path — a harness for a program's file/buffer entry point rather than a
+library API — plus dictionaries mined from each target's own source and comparison-feedback
+fuzzing under ASan turned up out-of-bounds reads in several widely-embedded parsers. Every
+crash was reproduced, minimized, root-caused, and **checked against the library's own issue
+tracker before any novelty claim**. That check is the point of this entry: it downgraded two
+"new" findings to duplicates.
+
+| defect | harness | status |
+|---|---|---|
+| nanosvg `nsvg__parseNameValue` OOB read (style/class parser) | **auto-generated** (`nsvgParse`, cstring channel) | duplicate of open [nanosvg#295](https://github.com/memononen/nanosvg/issues/295) — [verified fix contributed](https://github.com/memononen/nanosvg/issues/295#issuecomment-5563683590) |
+| pl_mpeg `plm_audio_decode_header` negative-index global OOB (`bitrate_index == -1`) | hand-written decode loop | filed as [pl_mpeg#78](https://github.com/phoboslab/pl_mpeg/issues/78) with a one-line fix — not among the library's open issues |
+| pl_mpeg `plm_video_process_macroblock` half-pel OOB | hand-written decode loop | duplicate of open [pl_mpeg#73](https://github.com/phoboslab/pl_mpeg/issues/73) — [verified fix contributed](https://github.com/phoboslab/pl_mpeg/issues/73#issuecomment-5563693311) |
+| upng `read_bit` inflate OOB | hand-written decode loop | real, but the library appears unmaintained; not filed |
+
+One harness was generated automatically by `app-lift`; the pl_mpeg and upng decoders need a
+create-then-decode call *sequence* the application-entry path does not yet lift, so those
+were driven by thin hand-written harnesses over the public API. **The honest headline is the
+prior-art check, not the bug count.** Popular single-header parsers are *actively* fuzzed —
+pl_mpeg alone carried several fresh out-of-bounds reports filed by others in 2026 — so most
+of what any fuzzer finds in them is already known. Three of these four defects were
+duplicates or in an abandoned project; the value added was a *verified* fix for each open
+issue (reproducer no longer faults, valid input still parses, re-fuzzing finds no
+recurrence) plus one report the maintainer did not already have. Reproducers are held
+privately pending maintainer response rather than published here. A clean run is also
+recorded: picojpeg, an embedded JPEG decoder, survived a campaign with no defect — embedded
+code written defensively for microcontrollers is a harder, and more honest, target than the
+famous single-headers.
 
 ---
 
