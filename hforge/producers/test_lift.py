@@ -433,6 +433,18 @@ def propose(path: str, entry: str, decls: dict, seam: Optional[dict] = None,
         if a is not None and rt:
             apis[nm] = replace(a, returns=TypeRef(
                 rt, "pointer" if "*" in rt else "scalar"))
+        # THE HEADER'S PARAMETER TYPES, TOO. The lift infers param types from call sites --
+        # `yaml_parser_set_input_string(&p, input, size)` inferred (void**, int, int) where
+        # the header declares (yaml_parser_t*, const unsigned char*, size_t). The emitter
+        # then cast the seam bytes to (int) and the harness did not compile. When the symbol
+        # is declared and the arity matches, take the DECLARED types positionally, keeping
+        # the api's own parameter names so the argument bindings still resolve by name.
+        dp = list(getattr(d, "params", []) or [])
+        if a is not None and len(a.params) == len(dp):
+            apis[nm] = replace(apis[nm], params=[
+                replace(p, type=TypeRef(dp[i][0],
+                                        "pointer" if "*" in dp[i][0] else "scalar"))
+                for i, p in enumerate(apis[nm].params)])
     for nm, rt in inline_ret.items():
         a = apis.get(nm)
         if a is not None and rt:
