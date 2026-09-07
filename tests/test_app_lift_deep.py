@@ -296,3 +296,29 @@ def test_sequence_shape_b_process_takes_input_and_picks_real_destructor(tmp_path
     assert "XML_Parse(hf_h," in src and "hf_data" in src and "hf_size" in src
     assert "(int)1)" in src                                    # final chunk -> finish the parse
     assert "XML_ParserFree(hf_h)" in src
+
+
+def test_sequence_feed_then_process_libjxl_shape(tmp_path):
+    # libjxl: create() -> SetInput(handle, data, size) -> ProcessInput(handle) -> destroy().
+    # The feeder is NOT a process-verb (SetInput), and every function embeds the type name
+    # "JxlDecoder" (contains "decode") -- the verb must be matched after stripping that prefix,
+    # or Reset/Rewind would be pulled in as "drivers".
+    from hforge.producers import app_lift
+    from hforge.ir import Target
+    from hforge.emit import emit
+    h = tmp_path / "j.h"
+    h.write_text("typedef struct JxlDecoderStruct JxlDecoder;\n"
+                 "JxlDecoder* JxlDecoderCreate(const void* memory_manager);\n"
+                 "int JxlDecoderSetInput(JxlDecoder* dec, const uint8_t* data, size_t size);\n"
+                 "int JxlDecoderProcessInput(JxlDecoder* dec);\n"
+                 "int JxlDecoderReset(JxlDecoder* dec);\n"
+                 "void JxlDecoderDestroy(JxlDecoder* dec);\n")
+    plan, rec = app_lift.lift_sequence([str(h)], Target(name="j"))
+    assert plan is not None
+    seq = rec["chosen"]["sequence"]
+    assert seq == ["JxlDecoderCreate", "JxlDecoderSetInput", "JxlDecoderProcessInput",
+                   "JxlDecoderDestroy"]                       # Reset excluded, ProcessInput kept
+    src = emit(plan).source
+    assert "JxlDecoderSetInput(hf_h, (const uint8_t" in src and "hf_size" in src
+    assert "JxlDecoderProcessInput(hf_h)" in src
+    assert "JxlDecoderReset" not in src                       # type-prefix pollution avoided

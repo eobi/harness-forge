@@ -664,12 +664,31 @@ _PROCESS = re.compile(r"(?:^|_)(decode|parse|process|read|update|feed|run|scan|c
 _DESTROY = re.compile(r"(?:^|_)(free|destroy|close|delete|release|done|finish|cleanup|dispose|"
                       r"deinit|fini|term|end)", re.I)
 _FINAL_NAME = re.compile(r"(?:^|_)(final|last|eos|is_?final|is_?last|end)s?$", re.I)
+# A function that FEEDS the fuzzer bytes into a handle (JxlDecoderSetInput), preferred over
+# other const-buffer takers (SetOutputColorProfile), and a DRIVER that then does the decode
+# work on the handle (JxlDecoderProcessInput) -- the feed-then-process streaming shape.
+_FEED = re.compile(r"(?:^|_)(set_?input|input|feed|push|supply|add_?data|scan|write_?data)", re.I)
+_DRIVE = re.compile(r"(?:^|_)(process|decode|convert|render)", re.I)
+
+
+def _is_bytey(ty: str) -> bool:
+    t = (ty or "").lower()
+    return any(b in t for b in ("char", "uint8", "int8", "byte")) and "void" not in t
 
 
 def _snake(name: str) -> str:
     """Insert underscores at CamelCase humps so the snake-case verb regexes also match a
     CamelCase API: XML_ParserCreate -> XML_Parser_Create, so _CREATE sees the `Create`."""
     return re.sub(r"(?<=[a-z0-9])(?=[A-Z])", "_", name or "")
+
+
+def _verb(name: str, htype: str) -> str:
+    """The verb part of a function name, with the handle-TYPE prefix stripped, so a type name
+    that embeds a verb does not pollute matching: every JxlDecoder* function contains 'Decoder'
+    (-> 'decode'), so match `SetInput`/`ProcessInput`/`Reset`, not the shared `JxlDecoder` stem."""
+    if htype and name.startswith(htype):
+        name = name[len(htype):].lstrip("_")
+    return _snake(name)
 
 
 def _norm_ty(t: str) -> str:
@@ -747,24 +766,36 @@ def lift_sequence(headers: list, target, includes: tuple = ()):
                                                      "unsigned", "size_t"):
             continue                                        # create must return a handle
         cparams = list(getattr(cd, "params", []) or [])
+        htype = _norm_ty(H).rstrip(" *").split()[-1] if _norm_ty(H) else ""   # e.g. JxlDecoder
+        V = lambda n: _verb(n, htype)                                          # noqa: E731
         destroys = [n for n, d in decls.items()
-                    if _DESTROY.search(_snake(n)) and n != cname and _first_param_is(d, H)]
+                    if _DESTROY.search(V(n)) and n != cname and _first_param_is(d, H)]
         if not destroys:
             continue                                        # no matching destroy: not a lifecycle
         procs = [(n, d) for n, d in decls.items()
-                 if _PROCESS.search(_snake(n)) and not _DESTROY.search(_snake(n)) and not _CREATE.search(_snake(n))
+                 if _PROCESS.search(V(n)) and not _DESTROY.search(V(n)) and not _CREATE.search(V(n))
                  and n != cname and _first_param_is(d, H)]
         cbi, cli = _buffer_pair(cparams)
         shape_a = cbi >= 0
         input_proc = None
         if not shape_a:
-            for n, d in sorted(procs, key=lambda x: _proc_rank(x[0])):
-                pb, pl = _buffer_pair(list(getattr(d, "params", []) or []))
-                if pb >= 0:
-                    input_proc = (n, d, pb, pl)
-                    break
-            if input_proc is None:
+            # The feeder takes (handle, CONST byte buffer at index>=1, len): const so it is the
+            # input, not an output buffer (SetJPEGBuffer); index>=1 so the const HANDLE itself is
+            # not mistaken for the buffer. Prefer a feed-named function (SetInput) over any other.
+            feeders = []
+            for n, d in decls.items():          # a feeder is any H-taking fn with a const byte
+                if n == cname or _DESTROY.search(V(n)) or _CREATE.search(V(n)) \
+                        or not _first_param_is(d, H):        # buffer -- NOT necessarily a _PROCESS
+                    continue                                 # verb (JxlDecoderSetInput is not)
+                ps = list(getattr(d, "params", []) or [])
+                pb, pl = _buffer_pair(ps)
+                if pb >= 1 and "const" in ps[pb][0] and _is_bytey(ps[pb][0]):
+                    feeders.append((0 if _FEED.search(V(n)) else 1, _proc_rank(n), n, d, pb, pl))
+            if not feeders:
                 continue                                    # no way to deliver the fuzzer bytes
+            feeders.sort(key=lambda t: (t[0], t[1], t[2]))
+            _, _, n, d, pb, pl = feeders[0]
+            input_proc = (n, d, pb, pl)
         # a create that needs the input but ALSO has no process is still worth driving
         score = (2 if shape_a else 1) + len(procs)
         if best is None or score > best[0]:
@@ -774,6 +805,7 @@ def lift_sequence(headers: list, target, includes: tuple = ()):
                           "a handle with a matching destroy and a way to deliver input)")
         return None, rec
     (_s, cname, cd, H, cparams, destroys, procs, shape_a, cbi, cli, input_proc) = best
+    htype = _norm_ty(H).rstrip(" *").split()[-1] if _norm_ty(H) else ""
     locals_: list = []
     steps: list = []
     hv = "hf_h"
@@ -799,6 +831,20 @@ def lift_sequence(headers: list, target, includes: tuple = ()):
                       0, hv, (pb, pl), locals_), "out_type": "", "out_var": "", "guard": False,
                       "sink": _sink(d)})
         used_syms.add(n)
+        # After a pure feeder (SetInput just stores the pointer), the DRIVER does the decode work
+        # (ProcessInput). Call every driver-verb handle-only process once so the bytes are decoded,
+        # not merely queued. A feeder that itself parses (XML_Parse) has no such driver, so none run.
+        for pn, pd in sorted(procs, key=lambda x: _proc_rank(x[0])):
+            if pn in used_syms:
+                continue
+            pps = list(getattr(pd, "params", []) or [])
+            # a true driver takes ONLY the handle and does the decode work (ProcessInput(dec));
+            # requiring no other args excludes config setters and queries (which also need an
+            # out-struct/flag we would have to invent) and keeps the sequence to the real work.
+            if len(pps) == 1 and _DRIVE.search(_verb(pn, htype)):
+                steps.append({"symbol": pn, "args": [hv],
+                              "out_type": "", "out_var": "", "guard": False, "sink": _sink(pd)})
+                used_syms.add(pn)
     # destroy: the object's own destructor takes ONLY the handle (XML_ParserFree(p)); a helper
     # like XML_MemFree(p, ptr) frees something else and would leak the handle. Fewest params wins.
     dname = sorted(destroys, key=lambda n: (len(list(getattr(decls[n], "params", []) or [])),
