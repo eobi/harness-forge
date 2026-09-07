@@ -35,3 +35,24 @@ config arg is not mis-paired with a preceding size. Committed (525 tests).
 Black-box replay: feed the coverage-maximised corpora above (+ mutations) to FSViewer.exe on the
 VM and watch for crashes (WER/exit code). Tests FastStone's real code incl. the closed plugins;
 no coverage feedback, so shallower than the source track. Not yet run.
+
+## Update: libjxl (JPEG XL) — now generator-liftable via --sequence, fuzzed clean
+FastStone bundles jxl.dll (libjxl). Its decode API is streaming/handle-based (JxlDecoderCreate ->
+SetInput -> ProcessInput -> Destroy), which the single-call path refused. The new `--sequence`
+producer lifts it end to end with NO hand-harness:
+    JxlDecoder* h = JxlDecoderCreate(&mm);
+    if (!h) return 0;
+    JxlDecoderSetInput(h, hf_data, hf_size);
+    JxlDecoderProcessInput(h);
+    JxlDecoderDestroy(h);
+Built against libjxl 0.11.1 (decoder + highway + brotli, ASan+coverage), fuzzed 240s under
+libFuzzer with 3 real .jxl seeds: 2.3M execs, cov 1155, corpus 3 -> 433, **0 crashes / 0 OOM**.
+Clean (current, OSS-Fuzz-hardened). Honest limitation: a single ProcessInput (no SubscribeEvents
++ status loop) reaches the container/signature/basic-info/partial-codestream front end, not the
+full pixel pipeline -- the generic sequence gets the parsing surface where container/header bugs
+live; full-image decode needs libjxl's protocol loop (its own fuzzer's job).
+
+## What this session added to the GENERATOR (the durable win)
+- decompressor idiom (zlib/zstd), void* out, opaque-handle refusal, one-shot preference, path/
+  err-buffer exclusion, errbuf scratch, length-before-buffer (brotli), and the SEQUENCE producer
+  (create->process->destroy AND feed-then-process: upng, expat, libjxl). ~528 tests.
