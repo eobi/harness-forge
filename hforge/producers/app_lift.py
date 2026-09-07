@@ -37,6 +37,10 @@ _PATH_NAME = re.compile(r"(path|file|filename|fname|filepath|fpath)", re.I)
 # A name that says "this is the content to parse", not a path.
 _CONTENT_NAME = re.compile(r"(data|input|buf|buffer|str|string|text|src|json|xml|content|"
                            r"msg|payload|s)$", re.I)
+# A name that says "this pointer is where the callee WRITES output/errors", not input to read.
+# Matched before _CONTENT_NAME so `errbuf`/`errmsg`/`outbuf` are not mistaken for the input.
+_ERR_NAME = re.compile(r"(?:^|_)?(err|error|errbuf|errmsg|out|outbuf|output|result|resp|dest|dst)",
+                       re.I)
 # Entry points worth ranking to the top: they consume attacker input.
 _PARSEISH = re.compile(r"(?:^|_)(main|parse|read|load|decode|decompress|uncompress|inflate|"
                        r"scan|deserial|process|handle|from_|ingest|import)", re.I)
@@ -105,12 +109,18 @@ def _looks_buffer(ty: str, nm: str) -> bool:
     """
     if ty.count("*") != 1:
         return False
+    name = (nm or "").strip()
     # A path/filename pointer is not CONTENT to parse -- fuzzing it would exercise filesystem
     # path handling (ufbx_load_file_len's `filename`), not the format decoder. Never a buffer.
-    if _PATH_NAME.search((nm or "").strip()):
+    if _PATH_NAME.search(name):
+        return False
+    # An error/output buffer is written BY the callee, not read from -- toml_parse's `errbuf`
+    # matches _CONTENT_NAME on "buf" but is where the parser writes its message, not the input.
+    # Feeding it the fuzzer bytes both mis-targets the harness and corrupts a const input.
+    if _ERR_NAME.search(name):
         return False
     is_const = "const" in ty
-    return is_const or bool(_CONTENT_NAME.search((nm or "").strip()))
+    return is_const or bool(_CONTENT_NAME.search(name))
 
 
 # A parameter that carries a LENGTH even when its type is a library typedef the generator does
@@ -246,9 +256,28 @@ def _cstring_plan(params: list):
     is filled safely or the whole entry is refused."""
     args = ["(%s)hf_cstr" % params[0][0].strip()]
     locs: list = []
+    # Error/output message buffer + its capacity: toml_parse(char* conf, char* errbuf, int
+    # errbufsz). A writable byte/char pointer followed by a size scalar is where the parser
+    # writes a message; back it with a real scratch buffer and pass its true size, instead of
+    # refusing the entry (which lost every parser that reports errors through a caller buffer).
+    _CAP = 1 << 12                                     # 4 KiB scratch for a message buffer
+    scratch: dict = {}                                 # out-buffer index -> capacity index
+    for j in range(1, len(params) - 1):
+        ty, _nm = params[j]
+        nty, nnm = params[j + 1]
+        if ty.count("*") == 1 and "const" not in ty \
+                and any(t in ty for t in ("char", "uint8", "int8", "void")) \
+                and nty.count("*") == 0 and _looks_len(nty, nnm):
+            scratch[j] = j + 1
+    scratch_lens = {v: k for k, v in scratch.items()}
     for j in range(1, len(params)):
         ty, _nm = params[j]
-        if ty.count("*") == 0 and _SCALAR.match(ty.strip()):
+        if j in scratch:
+            locs.append(f"char hf_out{j}[{_CAP}];")    # message buffer the parser writes into
+            args.append(f"({ty.strip()})hf_out{j}")
+        elif j in scratch_lens:
+            args.append(f"({ty.strip()}){_CAP}")       # its capacity, in the callee's units
+        elif ty.count("*") == 0 and _SCALAR.match(ty.strip()):
             if _FLAG_NAME.search(_nm or "") and not _SIZE_NAME.search(_nm or ""):
                 args.append(_fuzz_scalar_arg(ty, j))
             else:
