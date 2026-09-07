@@ -15,3 +15,6 @@ Crash_*.java
 timeout-*
 leak-*
 oom-*
+
+# undisclosed security findings + reproducers — NEVER commit to this public repo
+security-findings/
