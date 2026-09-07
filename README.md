@@ -553,10 +553,15 @@ distinct outcome** so an absent check never reads as a passed one.
 
 ## Findings: harnesses this engine graded, and the defects it found
 
-Updated 2026-09-06. **Two harness defects filed upstream (the table below), plus four
-memory-safety out-of-bounds reads in widely-embedded parsers found via the application-entry
-path ([2026-09-06 subsection](#memory-safety-defects-from-the-application-entry-path-2026-09-06)) —
-verified against each library's own source before filing rather than against our own verdict.**
+Updated 2026-09-07. **Two harness defects filed upstream (the table below), plus five
+memory-safety findings in widely-embedded parsers — out-of-bounds reads, and one out-of-bounds
+heap *write* (pl_mpeg#73's `decode_block`) — each reproduced, minimized, and checked against the
+library's own source and prior art before filing. Two landed upstream: pl_mpeg#73 (both halves,
+merged and credited) and [FastLZ#12](https://github.com/ariya/FastLZ/pull/12), a novel finding
+opened with a merge-ready 3-line fix; the rest were duplicates, an unmaintained project, or a
+report the maintainer did not already have. See the
+[2026-09-06](#memory-safety-defects-from-the-application-entry-path-2026-09-06) subsection and the
+2026-09-07 FastLZ update below.**
 
 | | defect | status |
 |---|---|---|
@@ -735,6 +740,13 @@ with get-task-allow; arm64e system binaries do not attach). This is the un-fuzze
 closed apps, games, firmware — and the pipeline now reaches it: a certified target and its
 coverage, handed to NemesisForge to search. The remaining variable is
 target selection, not capability.
+
+**Windows is platform-gated, and the honest boundary is the instrumentation, not the engine.**
+The closed-binary track is demonstrated on macOS and Linux (TinyInst has x64 **and** arm64 there).
+On Windows TinyInst supports x86/x64 only, and DynamoRIO/WinAFL have no working Windows-ARM64 path —
+so a stock **ARM64** Windows binary (a current `7z.exe`, for one) cannot be instrumented here yet,
+while an **x64** Windows target can. The source track (native `hf_winfuzz`, `trace-pc`+`trace-cmp`)
+runs on Windows regardless; it is only the *no-source* path that inherits this gap.
 
 ## What these harnesses cannot find
 
@@ -1059,12 +1071,12 @@ docs/              EVIDENCE.md — the measured claims   PLATFORMS.md — the ma
 ## Checks
 
 ```
-pip install pytest && python3 -m pytest -q     # 345 passed
+pip install pytest && python3 -m pytest -q     # 523 passed
 python3 tools/plancheck.py                     # repository vs manifest: no drift
 python3 -m hforge selftest                     # the pipeline, end to end, on this machine
 ```
 
-326 tests across eleven files, each pinning a failure that really happened rather than a
+523 tests across 28 files, each pinning a failure that really happened rather than a
 function that exists. **`plancheck` is a gate, not a report**: every deliverable the manifest
 marks `DONE` must name a module that imports and a test that exists, and CI fails when one
 does not. That is what makes the status table above worth reading.
