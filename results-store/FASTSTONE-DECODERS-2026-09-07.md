@@ -56,3 +56,29 @@ live; full-image decode needs libjxl's protocol loop (its own fuzzer's job).
 - decompressor idiom (zlib/zstd), void* out, opaque-handle refusal, one-shot preference, path/
   err-buffer exclusion, errbuf scratch, length-before-buffer (brotli), and the SEQUENCE producer
   (create->process->destroy AND feed-then-process: upng, expat, libjxl). ~528 tests.
+
+## Rugged deep re-scan (2026-09-07, evening) — ASan+UBSan, value-profile, dicts, real seeds
+Re-scanned every FastStone-bundled open decoder with the deepest source-fuzzing rig:
+AddressSanitizer + UndefinedBehaviorSanitizer (-fno-sanitize-recover), libFuzzer value-profile,
+a format dictionary, real seeds, and -malloc_limit_mb (catches uncontrolled allocation).
+
+| decoder (FastStone DLL) | harness | seeds | cov / features | runs | result |
+|---|---|---|---|---:|---|
+| libjxl (jxl.dll) | hand-written FULL pipeline (SubscribeEvents+ProcessInput loop+SetImageOutBuffer) | 60 real .jxl | 2273 / 15508 | 2.1M | clean |
+| libwebp (libwebp.dll) | HF composed 9 decoders | 26 mined WebP | 5151 / 24167 | 47K | clean |
+| brotli (brotli*.dll) | HF BrotliDecoderDecompress | valid .br | 4797 / 29805 | 1.46M | clean |
+| lcms2 (lcms2-2.dll) | HF cmsOpenProfileFromMem | 35 real system .icc | 427 / 3364 | 9.4M | clean |
+
+0 crashes, 0 UBSan runtime errors, 0 OOM across all four. These are the exact decoders FSViewer.exe
+loads; FastStone ships current, OSS-Fuzz-hardened versions, so clean is the honest expected result.
+Coverage is deep (the full-pipeline libjxl harness reaches ~2x the one-shot; UBSan added no new
+faults). The proprietary fsplugin01..09.dll remain the only unscanned surface (no source; Windows-
+ARM64 has no binary-coverage backend).
+
+## Rig ruggedness (what "deepest" means here)
+- two sanitizer classes at once (ASan memory + UBSan undefined behaviour), non-recovering
+- libFuzzer value-profile (CMP feedback), format dictionaries, real seed corpora, malloc-limit
+- full-pixel-pipeline harnesses for streaming codecs (not just the front end)
+- Harness Forge generates the harness; libFuzzer+ASan+UBSan (NemesisForge's engine class) fuzzes.
+NemesisForge's oracle ladder (sanitizer -> controllability -> packaged -> VENDOR_READY rung 6) is
+already full-depth; it certifies higher rungs only when a crash is a controlled primitive.
