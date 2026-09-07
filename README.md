@@ -15,8 +15,25 @@ and a verdict does not tell you which checks ran, which could not, and what the 
 therefore cannot find. When a campaign then reports nothing, there is no way to tell a
 clean library from an unexercised one.
 
-So this is not a generator. It is an **IR**, a **gate bank** and an **evidence record**.
+So this is not *only* a generator. It is an **IR**, a **gate bank** and an **evidence record**.
 A producer proposes a plan; the gates certify it; confidence decides nothing.
+
+### What it is, and what it is not
+
+Harness Forge **generates and certifies harnesses**. It is the front half of a pipeline: it
+produces deep, buildable, certified harnesses and hands them to a coverage-guided fuzzer —
+**[NemesisForge](https://github.com/eobi/nemesisforge)**, the autonomous vulnerability-discovery
+engine — which does the actual searching. Harness Forge does **not** do the discovery itself and
+is **not** a fuzzing engine competitor.
+
+The coverage, campaign and closed-binary machinery in this repo exists to **measure that the
+generated harnesses are good** — do they build, do they reach deep coverage, does a composed
+harness beat a hand-written developer harness — not to run a discovery campaign of its own. When
+this README compares against WinAFL, OGHarn or QuartetFuzz, it is measuring the *quality of the
+harnesses the generator emits*, on those tools' own axes. The bugs found with it were found by
+feeding its generated harnesses to a fuzzer, which is exactly NemesisForge's lane.
+
+**In one line: a powerful harness generator and certifier that feeds NemesisForge.**
 
 ---
 
