@@ -157,3 +157,43 @@ def test_encoder_ranks_below_decoder():
                                     ("const Bytef *", "source"), ("uLong", "sourceLen")])
     ranked = sorted([classify(enc), classify(dec)], key=_rank)
     assert ranked[0]["symbol"] == "uncompress"           # decoder first
+
+
+def test_zstd_void_out_buffer_scratch():
+    # ZSTD_decompress(void* dst, size_t dstCap, const void* src, size_t srcSize): a void* output
+    # is a byte sink -- sized with a scratch buffer + capacity, same as a typed byte* output.
+    d = _decl("ZSTD_decompress", "size_t",
+              [("void *", "dst"), ("size_t", "dstCapacity"),
+               ("const void *", "src"), ("size_t", "srcSize")])
+    c = classify(d)
+    assert c is not None and not c["has_out_buffer"] and c["out_scratch"] is True
+    assert c["call_args"][2].endswith(")hf_data") and c["call_args"][3].endswith(")hf_size")
+    assert c["call_args"][0].endswith("hf_out0") and c["call_args"][1].endswith("65536")
+
+
+def test_opaque_handle_out_param_refused():
+    # ZSTD_decompress_usingDDict(ZSTD_DCtx* dctx, void* dst, size_t dstCap, const void* src,
+    # size_t srcSize, const ZSTD_DDict* ddict): dctx/ddict are opaque handles with no complete
+    # type -- a local of one will not compile, so the entry is refused, not emitted broken.
+    d = _decl("ZSTD_decompress_usingDDict", "size_t",
+              [("ZSTD_DCtx *", "dctx"), ("void *", "dst"), ("size_t", "dstCap"),
+               ("const void *", "src"), ("size_t", "srcSize"), ("const ZSTD_DDict *", "ddict")])
+    c = classify(d)
+    # either refused outright, or at least never chosen over the plain decoder
+    from hforge.producers.app_lift import _rank
+    plain = classify(_decl("ZSTD_decompress", "size_t",
+                           [("void *", "dst"), ("size_t", "dstCap"),
+                            ("const void *", "src"), ("size_t", "srcSize")]))
+    cands = [x for x in (c, plain) if x is not None]
+    assert sorted(cands, key=_rank)[0]["symbol"] == "ZSTD_decompress"
+
+
+def test_dict_loader_ranks_below_decoder():
+    from hforge.producers.app_lift import _rank
+    dec = classify(_decl("ZSTD_decompress", "size_t",
+                         [("void *", "d"), ("size_t", "dc"),
+                          ("const void *", "s"), ("size_t", "ss")]))
+    dic = classify(_decl("ZSTD_CCtx_loadDictionary", "size_t",
+                         [("void *", "cctx"), ("const void *", "dict"), ("size_t", "dictSize")]))
+    cands = [x for x in (dic, dec) if x is not None]
+    assert sorted(cands, key=_rank)[0]["symbol"] == "ZSTD_decompress"

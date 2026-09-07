@@ -38,8 +38,17 @@ _PATH_NAME = re.compile(r"(path|file|filename|fname|filepath|fpath)", re.I)
 _CONTENT_NAME = re.compile(r"(data|input|buf|buffer|str|string|text|src|json|xml|content|"
                            r"msg|payload|s)$", re.I)
 # Entry points worth ranking to the top: they consume attacker input.
-_PARSEISH = re.compile(r"(?:^|_)(main|parse|read|load|decode|scan|deserial|process|handle|"
-                       r"from_|ingest|import)", re.I)
+_PARSEISH = re.compile(r"(?:^|_)(main|parse|read|load|decode|decompress|uncompress|inflate|"
+                       r"scan|deserial|process|handle|from_|ingest|import)", re.I)
+# Config / dictionary / lifecycle helpers that also take a (buffer,len) -- ZSTD_CCtx_loadDictionary,
+# LZ4_loadDict, *_setParameter. They consume attacker bytes but are not the format's DECODER; rank
+# them below a real decode entry so the default harness drives the decompressor, not dict-loading.
+_NOT_PRIMARY = re.compile(r"(dict|set_?param|_using|_reset|_create|_alloc|_free|_ctx)", re.I)
+# A pointer whose pointee is an OPAQUE handle typedef (ZSTD_DCtx, XML_Parser, a *Stream/*Context):
+# it has no complete definition in the header, so a local of that type will not compile and there
+# is nothing valid to point it at. An entry that needs one is left to test-lift, not emitted.
+_OPAQUE_HANDLE = re.compile(
+    r"(Ctx|Context|Handle|Stream|Dict|State|Session|Parser|Reader|Writer|Decoder|Encoder)$")
 # A shallow query: reads a header and answers a question, never entering the decode body.
 _QUERY = re.compile(r"(?:^|_)(info|is_|is[A-Z]|get_?(?:size|width|height|len|info|count|"
                     r"dimensions|num)|test|check|valid|probe|detect|sniff|peek)", re.I)
@@ -128,7 +137,7 @@ def _out_scratch(params: list, buf_i: int, len_i: int) -> dict:
         if j in (buf_i, len_i):
             continue
         if ty.count("*") == 1 and "const" not in ty and \
-                any(t in ty for t in ("char", "uint8", "int8", "Byte")):
+                any(t in ty for t in ("char", "uint8", "int8", "Byte", "void")):
             li = None
             for k in (j + 1, j - 1):
                 if 0 <= k < len(params) and k not in (buf_i, len_i) and k not in out:
@@ -164,8 +173,10 @@ def _buffer_plan(params: list, buf_i: int, len_i: int):
     """
     args: list = []
     locals_: list = []
-    scratch = _out_scratch(params, buf_i, len_i)     # decompressor out-buffers and their lens
-    scratch_lens = {li for li in scratch.values() if li is not None}
+    # Only an out-buffer whose CAPACITY we located is safe to back with a real scratch area;
+    # a length-less output stays an ordinary (flagged-unsafe) out-param, never a sized buffer.
+    scratch = {j for j, li in _out_scratch(params, buf_i, len_i).items() if li is not None}
+    scratch_lens = {li for li in _out_scratch(params, buf_i, len_i).values() if li is not None}
     _CAP = 1 << 16                                    # 64 KiB scratch decode target
     for j, (ty, nm) in enumerate(params):
         if j == buf_i:
@@ -190,6 +201,8 @@ def _buffer_plan(params: list, buf_i: int, len_i: int):
             if pt == "void":
                 args.append("0")            # void* out: NULL, nothing to point at
                 continue
+            if _OPAQUE_HANDLE.search(pt):
+                return None, None           # opaque handle: no complete type to declare
             ln = f"hf_a{j}"
             locals_.append(f"{pt} {ln} = {{0}};")
             args.append(f"&{ln}")
@@ -321,6 +334,8 @@ def _rank(c: dict) -> tuple:
     # An encoder (compress/deflate/encode) takes raw bytes and PRODUCES a format -- it is not the
     # attack surface a fuzzer wants; rank every decoder ahead of it so uncompress beats compress.
     is_encode = 1 if _is_encoder(c["symbol"]) else 0
+    # A dictionary/config/lifecycle helper ranks below a real decode entry (see _NOT_PRIMARY).
+    not_primary = 1 if _NOT_PRIMARY.search(c["symbol"]) else 0
     # Parse-like names first; among those main() last (argv is the heaviest channel), so a
     # direct parse function is preferred over driving the whole CLI when both exist.
     parseish = 0 if _PARSEISH.search(c["symbol"]) else 1
@@ -332,7 +347,7 @@ def _rank(c: dict) -> tuple:
     is_main = 1 if c["channel"] == APP_ARGV else 0
     # buffer/cstring (no file I/O) are the most direct, then file_arg, then argv.
     directness = {APP_BUFFER: 0, APP_CSTRING: 0, APP_FILE_ARG: 1, APP_ARGV: 2}[c["channel"]]
-    return (is_encode, parseish, is_query, is_main, directness, depth, c["symbol"])
+    return (is_encode, not_primary, parseish, is_query, is_main, directness, depth, c["symbol"])
 
 
 def discover(headers: list, includes: tuple = ()) -> list:
