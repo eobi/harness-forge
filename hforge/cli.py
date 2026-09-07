@@ -848,6 +848,30 @@ def _attach_contracts(ir, contracts: dict) -> int:
     return n
 
 
+def _provision_seeds(args, symbols):
+    """Write a ready-to-fuzz seed corpus beside the harness, or None if --out is unset.
+
+    A harness is only as deep as the corpus it starts from; the generator ships the seeds
+    (mined from the target's own repository plus synthesised minimal-valid files) so the
+    artifact NemesisForge receives reaches the decoder immediately, not the header check.
+    """
+    if not getattr(args, "out", ""):
+        return None
+    from . import seeds as _seeds                                   # noqa: PLC0415
+    roots: list = list(args.include or [])
+    for h in list(args.header or []):
+        roots.append(str(Path(h).resolve().parent))
+    for s in list(args.source or []):
+        roots.append(str(Path(s).resolve().parent))
+    roots = list(dict.fromkeys(roots))
+    dest = Path(args.out).with_suffix(".seeds")
+    try:
+        return _seeds.provision(dest, roots=roots, name=args.name or "",
+                                headers=list(args.header or []), symbols=symbols)
+    except OSError:
+        return None
+
+
 def cmd_app_lift(args) -> int:
     """Discover an application entry point and emit a harness that drives it (B1 producer).
 
@@ -873,7 +897,12 @@ def cmd_app_lift(args) -> int:
         e = emit(plan)
         if args.out:
             Path(args.out).write_text(e.source)
-            print(f"wrote {args.out}")
+            msg = f"wrote {args.out}"
+            sp = _provision_seeds(args, rec.get("family", []))
+            if sp:
+                msg += f" and {sp['dir']} ({sp['total']} seeds: {sp['mined']} mined, " \
+                       f"{sp['synthesised']} synth)"
+            print(msg)
         else:
             print(e.source)
         return 0
@@ -918,9 +947,11 @@ def cmd_app_lift(args) -> int:
         dpath = Path(args.out).with_suffix(".dict")
         if n_tokens:
             dpath.write_text(body)
+        sp = _provision_seeds(args, [rec["chosen"]["symbol"]])
         print(f"wrote {args.out}"
               + (f" and {Path(args.out).with_suffix('.driver.c')}" if e.driver else "")
-              + (f" and {dpath} ({n_tokens} tokens)" if n_tokens else ""))
+              + (f" and {dpath} ({n_tokens} tokens)" if n_tokens else "")
+              + (f" and {sp['dir']} ({sp['total']} seeds)" if sp else ""))
     else:
         print(e.source)
     return 0
