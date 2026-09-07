@@ -43,7 +43,16 @@ _PARSEISH = re.compile(r"(?:^|_)(main|parse|read|load|decode|decompress|uncompre
 # Config / dictionary / lifecycle helpers that also take a (buffer,len) -- ZSTD_CCtx_loadDictionary,
 # LZ4_loadDict, *_setParameter. They consume attacker bytes but are not the format's DECODER; rank
 # them below a real decode entry so the default harness drives the decompressor, not dict-loading.
-_NOT_PRIMARY = re.compile(r"(dict|set_?param|_using|_reset|_create|_alloc|_free|_ctx)", re.I)
+# Secondary variants of a decoder that a fuzzer should NOT prefer when a clean one-shot exists:
+#   - dict/param/lifecycle helpers (loadDictionary, setParameter, create/reset/free)
+#   - streaming/incremental entries that need a stream object or a prior handle (pushdata, stream,
+#     prefix), and path/fd entries that read a file rather than the in-memory fuzzer buffer.
+# The one-shot `*_from_memory` / `*_load_memory` / `*_parse` decoder carries none of these tokens,
+# so it ranks first automatically (ufbx_load_memory over ufbx_load_stream_prefix; cgltf_parse over
+# cgltf_load_buffer_base64; stb_vorbis_decode_memory over ..._decode_frame_pushdata).
+_NOT_PRIMARY = re.compile(
+    r"(dict|set_?param|_using|_reset|_create|_alloc|_free|_ctx|pushdata|_stream|_prefix|"
+    r"base64|from_?file|filename|_fd\b|open_file)", re.I)
 # A pointer whose pointee is an OPAQUE handle typedef (ZSTD_DCtx, XML_Parser, a *Stream/*Context):
 # it has no complete definition in the header, so a local of that type will not compile and there
 # is nothing valid to point it at. An entry that needs one is left to test-lift, not emitted.
@@ -95,6 +104,10 @@ def _looks_buffer(ty: str, nm: str) -> bool:
     requiring const keeps an out-pointer+count pair (int *out, int n) from being read as input.
     """
     if ty.count("*") != 1:
+        return False
+    # A path/filename pointer is not CONTENT to parse -- fuzzing it would exercise filesystem
+    # path handling (ufbx_load_file_len's `filename`), not the format decoder. Never a buffer.
+    if _PATH_NAME.search((nm or "").strip()):
         return False
     is_const = "const" in ty
     return is_const or bool(_CONTENT_NAME.search((nm or "").strip()))

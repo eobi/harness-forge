@@ -197,3 +197,32 @@ def test_dict_loader_ranks_below_decoder():
                          [("void *", "cctx"), ("const void *", "dict"), ("size_t", "dictSize")]))
     cands = [x for x in (dic, dec) if x is not None]
     assert sorted(cands, key=_rank)[0]["symbol"] == "ZSTD_decompress"
+
+
+def test_prefers_oneshot_memory_decoder_over_variants():
+    # When a clean one-shot *_memory/*_parse decoder sits beside streaming/path/dict variants,
+    # the fuzzer must pick the one-shot: it takes the buffer directly, no stream object or file.
+    from hforge.producers.app_lift import _rank
+    mem = classify(_decl("ufbx_load_memory", "void *",
+                         [("const void *", "data"), ("size_t", "size"),
+                          ("const void *", "opts"), ("void *", "error")]))
+    strm = classify(_decl("ufbx_load_stream_prefix", "void *",
+                          [("const void *", "prefix"), ("size_t", "prefix_size"),
+                           ("void *", "stream"), ("void *", "error")]))
+    cands = sorted([x for x in (strm, mem) if x is not None], key=_rank)
+    assert cands[0]["symbol"] == "ufbx_load_memory"
+
+
+def test_path_named_pointer_is_not_a_content_buffer():
+    # f(const char* filename, size_t filename_len, ...) reads a PATH -- fuzzing it would exercise
+    # filesystem handling, not the decoder. It must not be lifted as a (buffer,len) content entry.
+    from hforge.producers.app_lift import _looks_buffer
+    assert not _looks_buffer("const char *", "filename")
+    assert not _looks_buffer("const char *", "path")
+    assert _looks_buffer("const char *", "data")          # real content still recognised
+    d = _decl("ufbx_load_file_len", "void *",
+              [("const char *", "filename"), ("size_t", "filename_len"),
+               ("const void *", "opts"), ("void *", "error")])
+    c = classify(d)
+    # no content (buffer,len) pair -> not a buffer-channel entry (filename is a path, not bytes)
+    assert c is None or c["channel"] != "buffer"
