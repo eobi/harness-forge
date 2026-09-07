@@ -540,11 +540,22 @@ class AppEntry:
     # every existing harness emits byte-for-byte as before.
     call_args: list = field(default_factory=list)
     call_locals: list = field(default_factory=list)
+    # COMPOSITION FOR CODECS. A media decoder exposes several decode subsystems -- RGBA / YUV
+    # / advanced-with-options / incremental -- that all take the SAME (bytes, len). A single
+    # developer fuzzer usually drives one; folding them all onto one input reaches the union
+    # of their coverage. `fold` is the additional buffer entries called on hf_data/hf_size
+    # after the primary; `free_symbol` is a one-arg deallocator (WebPFree) for the pointers
+    # they return, so a long campaign does not OOM.
+    fold: list = field(default_factory=list)      # list[AppEntry], same-input decode family
+    free_symbol: str = ""                          # e.g. WebPFree; frees returned buffers
+    returns_ptr: bool = False                      # the call returns a buffer to free
 
     def to_json(self) -> dict:
         return {"symbol": self.symbol, "channel": self.channel, "header": self.header,
                 "argv": list(self.argv), "returns_int": self.returns_int,
-                "call_args": list(self.call_args), "call_locals": list(self.call_locals)}
+                "call_args": list(self.call_args), "call_locals": list(self.call_locals),
+                "fold": [e.to_json() for e in self.fold], "free_symbol": self.free_symbol,
+                "returns_ptr": self.returns_ptr}
 
     @staticmethod
     def from_json(d: dict) -> "AppEntry":
@@ -552,7 +563,10 @@ class AppEntry:
                         header=d.get("header", ""), argv=list(d.get("argv", [])),
                         returns_int=d.get("returns_int", True),
                         call_args=list(d.get("call_args", [])),
-                        call_locals=list(d.get("call_locals", [])))
+                        call_locals=list(d.get("call_locals", [])),
+                        fold=[AppEntry.from_json(x) for x in d.get("fold", [])],
+                        free_symbol=d.get("free_symbol", ""),
+                        returns_ptr=d.get("returns_ptr", False))
 
 
 @dataclass

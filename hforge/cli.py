@@ -861,6 +861,22 @@ def cmd_app_lift(args) -> int:
     tgt = Target(name=args.name or Path(args.header[0]).stem,
                  sources=list(args.source or []),
                  include_dirs=list(args.include or []))
+    if getattr(args, "compose", False):
+        plan, rec = app_lift.compose_app(list(args.header), tgt,
+                                         includes=tuple(args.include or []))
+        if plan is None:
+            print(f"refused: {rec.get('why_not', 'no decode family to compose')}")
+            return 1
+        print("codec-compose family: " + ", ".join(rec.get("family", [])))
+        print(f"chosen: fold {rec['chosen']['folded'] + 1} decoders onto one input"
+              + (f", free via {rec['chosen']['free_symbol']}" if rec['chosen']['free_symbol'] else ""))
+        e = emit(plan)
+        if args.out:
+            Path(args.out).write_text(e.source)
+            print(f"wrote {args.out}")
+        else:
+            print(e.source)
+        return 0
     plan, rec = app_lift.propose(list(args.header), tgt,
                                  includes=tuple(args.include or []), only=args.only)
     # A main(int, char**) cannot be told apart from an argv or a stdin app by its SIGNATURE
@@ -1749,6 +1765,9 @@ def main(argv=None) -> int:
                          "main(int,char**) cannot be told from a stdin app by signature")
     al.add_argument("--out", default="", help="write the emitted C here instead of stdout")
     al.add_argument("--force", action="store_true", help="emit even if a static gate blocks")
+    al.add_argument("--compose", action="store_true",
+                    help="fold the header's whole decode FAMILY onto one input (codec "
+                         "composition) instead of the single best entry")
     al.set_defaults(fn=cmd_app_lift)
 
     cl = sub.add_parser("closed",

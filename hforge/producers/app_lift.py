@@ -185,9 +185,21 @@ def classify(decl) -> Optional[dict]:
             returns_ptr = "*" in getattr(decl, "ret", "")
             is_query = bool(_QUERY.search(name))
             depth = len(call_locals) + (1 if returns_ptr else 0)
+            # A WRITABLE BYTE-POINTER output (the *DecodeInto family: the caller passes the
+            # pixel buffer) cannot be folded safely -- we would hand the decoder a 1-byte
+            # local and it writes a whole image. Mark it so composition can exclude it.
+            # Only a SINGLE-level writable byte pointer is a caller-provided output buffer
+            # (WebPDecodeRGBAInto's `output_buffer`). A DOUBLE pointer (uint8_t** u in
+            # WebPDecodeYUV) is an out-parameter the decoder ALLOCATES -- safe to fill with a
+            # local pointer by address -- so it must not disqualify the entry.
+            has_out_buffer = any(
+                j not in (bi, bi + 1) and pty.count("*") == 1 and "const" not in pty
+                and any(t in pty for t in ("char", "uint8", "int8", "void"))
+                for j, (pty, _pn) in enumerate(params))
             return {"channel": APP_BUFFER, "symbol": name, "param": params[bi][1],
                     "call_args": call_args, "call_locals": call_locals,
-                    "arity": len(params), "depth": depth, "is_query": is_query}
+                    "arity": len(params), "depth": depth, "is_query": is_query,
+                    "returns_ptr": returns_ptr, "has_out_buffer": has_out_buffer}
     # f(const char *) -- lone char pointer: path or content
     if len(params) == 1 and _is_byte_ptr(params[0][0]) and "char" in params[0][0]:
         pn = params[0][1] or ""
@@ -270,4 +282,99 @@ def propose(headers: list, target: Target, includes: tuple = (),
                      platforms=list(target.__dict__.get("platforms", []))
                      or ["linux-x86_64-glibc"],
                      producer=PRODUCER)
+    return plan, rec
+
+
+# Encode/serialise names never belong in a DECODE fold -- they consume a decoded object, not
+# the fuzzer's bytes, and would add nothing an attacker controls.
+_ENCODE = re.compile(r"(encode|write|save|dump|serial|compress|mux)", re.I)
+
+
+def _find_free(decls: dict) -> str:
+    """A one-argument deallocator for RETURNED BUFFERS. Prefer one taking void* (frees a
+    malloc'd block, e.g. WebPFree) over a struct-specific destructor (WebPFreeDecBuffer)."""
+    generic, other = "", ""
+    for name, d in decls.items():
+        params = list(getattr(d, "params", []) or [])
+        if len(params) == 1 and params[0][0].count("*") >= 1 \
+                and re.search(r"(?:^|_|[a-z])(free|delete|release|destroy)", name, re.I):
+            if "void" in params[0][0] and params[0][0].count("*") == 1:
+                if not generic or len(name) < len(generic):
+                    generic = name
+            elif not other:
+                other = name
+    return generic or other
+
+
+def compose_app(headers: list, target, includes: tuple = (), max_fold: int = 16):
+    """Fold a codec header's DECODE FAMILY -- every safe (buffer,size) decoder -- onto one
+    input, the shape that reaches the union of their coverage. Returns (HarnessIR, record).
+
+    A media decoder exposes RGBA / BGRA / YUV / info / advanced-with-options / incremental
+    entries that all take the same bytes; a single developer fuzzer usually drives one.
+    Excludes encoders and the *Into family (writable output buffers we cannot size).
+    """
+    from .header_graph import parse_header                          # noqa: PLC0415
+    # Parse the given headers AND their siblings: a decoder's deallocator (WebPFree) and its
+    # complete-struct definitions often live in a neighbouring header (webp/types.h).
+    hdr_paths = list(headers)
+    for h in headers:
+        d = Path(h).parent
+        if d.exists():
+            hdr_paths += [str(p) for p in d.glob("*.h") if str(p) not in hdr_paths]
+    decls: dict = {}
+    complete: set = set()
+    for h in hdr_paths:
+        if Path(h).exists():
+            for d in parse_header(h, tuple(includes), ()):
+                decls.setdefault(d.name, d)
+                complete |= set(getattr(d, "complete", ()) or ())
+
+    def _local_ok(local: str) -> bool:
+        # `TYPE hf_aN = {0};` -- safe when TYPE is a builtin/scalar, a pointer, or a struct
+        # whose body we parsed (complete). An OPAQUE struct (WebPIDecoder) is not: a stack
+        # local of an incomplete type does not compile, so its entry cannot be folded.
+        ty = local.split("hf_a")[0].strip()
+        if "*" in ty or _SCALAR.match(ty + " "):
+            return True
+        base = ty.replace("const", "").replace("struct", "").strip()
+        return base in complete or base in ("", "int", "float", "double")
+
+    cands = discover(headers, includes)
+    fam, seen = [], set()
+    for c in cands:
+        if not (c["channel"] == APP_BUFFER and c.get("call_args")
+                and not c.get("has_out_buffer") and not _ENCODE.search(c["symbol"])
+                and c["symbol"] not in seen):
+            continue
+        if "Internal" in c["symbol"] or "__" in c["symbol"]:
+            continue
+        if not all(_local_ok(l) for l in c.get("call_locals", [])):
+            continue                                     # opaque out-local: cannot stack-alloc
+        seen.add(c["symbol"]); fam.append(c)
+        if len(fam) >= max_fold:
+            break
+    rec = {"producer": PRODUCER, "family": [c["symbol"] for c in fam]}
+    if len(fam) < 2:
+        rec["why_not"] = "fewer than two safe (buffer,size) decoders to compose"
+        return None, rec
+    free = _find_free(decls)
+
+    def mk(c) -> AppEntry:
+        rp = c.get("returns_ptr", False)
+        return AppEntry(symbol=c["symbol"], channel=APP_BUFFER, header=c.get("header", ""),
+                        call_args=c["call_args"], call_locals=c["call_locals"],
+                        returns_ptr=rp, returns_int=not rp)
+
+    primary = mk(fam[0])
+    primary.header = ""   # target.public_headers spells the include path correctly
+    primary.free_symbol = free
+    primary.fold = [mk(c) for c in fam[1:]]
+    from ..ir import HarnessIR, Knobs                               # noqa: PLC0415
+    plan = HarnessIR(name=f"{target.name}_codec_compose"[:60], target=target,
+                     app_entry=primary, knobs=Knobs(),
+                     platforms=list(getattr(target, "platforms", [])) or ["linux-x86_64-glibc"],
+                     producer=PRODUCER)
+    rec["chosen"] = {"primary": primary.symbol, "folded": len(primary.fold),
+                     "free_symbol": free}
     return plan, rec

@@ -66,3 +66,44 @@ def test_cstring_refuses_writable_out_buffer():
     # the fuzzer string). The dangerous shape is a non-const char* AFTER content:
     d2 = _decl("f", "int", [("char *", "input"), ("char *", "outbuf")])
     assert classify(d2) is None
+
+
+def _decl_ret(name, ret, params):
+    return D(name=name, ret=ret, params=params, complete=frozenset(), ptr_types=frozenset())
+
+
+def test_compose_app_folds_decode_family(tmp_path):
+    # a tiny codec header: two decoders sharing (buf,len) + a free
+    h = tmp_path / "dec.h"
+    h.write_text(
+        "unsigned char* Dec_RGBA(const unsigned char* data, unsigned long size, int* w, int* h);\n"
+        "unsigned char* Dec_BGRA(const unsigned char* data, unsigned long size, int* w, int* h);\n"
+        "int Dec_Info(const unsigned char* data, unsigned long size, int* w, int* h);\n"
+        "void Dec_Free(void* ptr);\n")
+    from hforge.producers import app_lift
+    from hforge.ir import Target
+    from hforge.emit import emit
+    tgt = Target(name="tinycodec", public_headers=["dec.h"])
+    plan, rec = app_lift.compose_app([str(h)], tgt)
+    assert plan is not None
+    assert set(rec["family"]) >= {"Dec_RGBA", "Dec_BGRA"}     # folded the decode family
+    assert rec["chosen"]["free_symbol"] == "Dec_Free"         # found the void* deallocator
+    src = emit(plan).source
+    assert "Dec_RGBA(" in src and "Dec_BGRA(" in src          # both folded onto one input
+    assert "Dec_Free(" in src                                 # returned buffers are freed
+    assert src.count("hf_data") >= 2                          # same input to each
+
+
+def test_compose_app_excludes_encoders_and_out_buffers(tmp_path):
+    h = tmp_path / "c.h"
+    h.write_text(
+        "unsigned char* Dec_A(const unsigned char* d, unsigned long n, int* w);\n"
+        "int Enc_Save(const unsigned char* d, unsigned long n, char* out);\n"   # encoder: excluded
+        "int Dec_Into(const unsigned char* d, unsigned long n, unsigned char* outbuf);\n")  # out buffer: excluded
+    from hforge.producers import app_lift
+    from hforge.ir import Target
+    tgt = Target(name="c", public_headers=["c.h"])
+    plan, rec = app_lift.compose_app([str(h)], tgt)
+    # only Dec_A is a safe decoder; fewer than two -> refused, and Enc/Into never appear
+    assert "Enc_Save" not in rec.get("family", [])
+    assert "Dec_Into" not in rec.get("family", [])
