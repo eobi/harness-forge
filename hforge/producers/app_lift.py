@@ -91,14 +91,57 @@ def _looks_buffer(ty: str, nm: str) -> bool:
     return is_const or bool(_CONTENT_NAME.search((nm or "").strip()))
 
 
+# A parameter that carries a LENGTH even when its type is a library typedef the generator does
+# not expand (zlib's uLong sourceLen, a codec's mySize_t n): recognised by a sizeish type OR a
+# length-hinting name. Name-matching is looser than _SIZE_NAME (no _-boundary) on purpose --
+# camelCase `sourceLen`/`destLen` carry no underscore -- but it is only ever consulted for the
+# arg that immediately follows a byte pointer, so a stray "linено"-style name cannot trip it.
+_LEN_HINT = re.compile(r"(?i)(len|size|count|bytes|nmemb|nbyte|amount|avail)")
+
+
+def _looks_len(ty: str, nm: str) -> bool:
+    return ty.count("*") == 0 and (bool(_SIZEISH.search(ty)) or bool(_LEN_HINT.search(nm or "")))
+
+
 def _buffer_pair(params: list):
-    """Index of the (buffer, len) pair: first const/content pointer with a sizeish next arg."""
+    """Index of the (buffer, len) pair: first const/content pointer with a length next arg."""
     for i in range(len(params) - 1):
         pty, pnm = params[i]
-        nty = params[i + 1][0]
-        if _looks_buffer(pty, pnm) and nty.count("*") == 0 and _SIZEISH.search(nty):
+        nty, nnm = params[i + 1]
+        if _looks_buffer(pty, pnm) and _looks_len(nty, nnm):
             return i
     return -1
+
+
+def _out_scratch(params: list, buf_i: int, len_i: int) -> dict:
+    """Map {out_buffer_index: length_index or None} for the DECOMPRESSOR idiom.
+
+    f(out_buf, *out_len, const in_buf, in_len) -- zlib uncompress, and the same shape in zstd,
+    lz4, brotli -- writes the decoded bytes into a caller-provided buffer. A single-level
+    writable byte pointer (not the input, not const) is such an output; its capacity is the
+    adjacent length argument (a *out_len the callee updates, or a scalar we set). Handing the
+    callee a real scratch buffer + its true capacity fuzzes the DECODER instead of overflowing a
+    one-byte local, which is why the entry would otherwise be refused as unsafe.
+    """
+    out: dict = {}
+    for j, (ty, nm) in enumerate(params):
+        if j in (buf_i, len_i):
+            continue
+        if ty.count("*") == 1 and "const" not in ty and \
+                any(t in ty for t in ("char", "uint8", "int8", "Byte")):
+            li = None
+            for k in (j + 1, j - 1):
+                if 0 <= k < len(params) and k not in (buf_i, len_i) and k not in out:
+                    kty, knm = params[k]
+                    if kty.count("*") == 0 and _looks_len(kty, knm):
+                        li = k
+                        break                                 # scalar capacity
+                    if kty.count("*") == 1 and (_SIZEISH.search(kty) or
+                                                _LEN_HINT.search(knm or "")):
+                        li = k
+                        break                                 # *out_len the callee updates
+            out[j] = li
+    return out
 
 
 def _pointee(ty: str) -> str:
@@ -121,11 +164,26 @@ def _buffer_plan(params: list, buf_i: int, len_i: int):
     """
     args: list = []
     locals_: list = []
+    scratch = _out_scratch(params, buf_i, len_i)     # decompressor out-buffers and their lens
+    scratch_lens = {li for li in scratch.values() if li is not None}
+    _CAP = 1 << 16                                    # 64 KiB scratch decode target
     for j, (ty, nm) in enumerate(params):
         if j == buf_i:
             args.append(f"({ty.strip()})hf_data")
         elif j == len_i:
             args.append(f"({ty.strip()})hf_size")
+        elif j in scratch:
+            # caller-provided output buffer: a real fixed scratch area, not a 1-byte local
+            locals_.append(f"static unsigned char hf_out{j}[{_CAP}];")
+            args.append(f"({ty.strip()})hf_out{j}")
+        elif j in scratch_lens:
+            # capacity of a scratch output buffer: the true size, in the callee's units
+            if ty.count("*") >= 1:
+                pt = _pointee(ty)
+                locals_.append(f"{pt} hf_len{j} = {_CAP};")
+                args.append(f"&hf_len{j}")
+            else:
+                args.append(f"({ty.strip()}){_CAP}")
         elif ty.count("*") >= 1:
             # out-parameter: a local of the pointed-to type, passed by address
             pt = _pointee(ty)
@@ -212,14 +270,21 @@ def classify(decl) -> Optional[dict]:
             # (WebPDecodeRGBAInto's `output_buffer`). A DOUBLE pointer (uint8_t** u in
             # WebPDecodeYUV) is an out-parameter the decoder ALLOCATES -- safe to fill with a
             # local pointer by address -- so it must not disqualify the entry.
+            # A writable byte output we CAN size (a scratch buffer + its capacity) is handled by
+            # _buffer_plan; only an UNHANDLED writable byte/void output (no length to bound it,
+            # or a void* of unknown element size) is still unsafe to fold or drive.
+            scratch = _out_scratch(params, bi, bi + 1)
+            handled = {j for j, li in scratch.items() if li is not None}
             has_out_buffer = any(
-                j not in (bi, bi + 1) and pty.count("*") == 1 and "const" not in pty
+                j not in (bi, bi + 1) and j not in handled and pty.count("*") == 1
+                and "const" not in pty
                 and any(t in pty for t in ("char", "uint8", "int8", "void"))
                 for j, (pty, _pn) in enumerate(params))
             return {"channel": APP_BUFFER, "symbol": name, "param": params[bi][1],
                     "call_args": call_args, "call_locals": call_locals,
                     "arity": len(params), "depth": depth, "is_query": is_query,
-                    "returns_ptr": returns_ptr, "has_out_buffer": has_out_buffer}
+                    "returns_ptr": returns_ptr, "has_out_buffer": has_out_buffer,
+                    "out_scratch": bool(handled)}
     # f(const char *) -- lone char pointer: path or content
     if len(params) == 1 and _is_byte_ptr(params[0][0]) and "char" in params[0][0]:
         pn = params[0][1] or ""
@@ -242,7 +307,20 @@ def classify(decl) -> Optional[dict]:
     return None
 
 
+def _is_encoder(sym: str) -> bool:
+    """An ENCODE/compress entry, which consumes raw bytes and emits a format -- the opposite of
+    the attack surface. `uncompress`/`decompress`/`inflate`/`decode` are decoders despite sharing
+    the substring, so they are excluded explicitly."""
+    s = sym.lower()
+    if any(d in s for d in ("uncompress", "decompress", "inflate", "decode", "unpack")):
+        return False
+    return bool(re.search(r"(compress|deflate|encode|(?:^|_)(?:write|save|dump|serial|mux))", s))
+
+
 def _rank(c: dict) -> tuple:
+    # An encoder (compress/deflate/encode) takes raw bytes and PRODUCES a format -- it is not the
+    # attack surface a fuzzer wants; rank every decoder ahead of it so uncompress beats compress.
+    is_encode = 1 if _is_encoder(c["symbol"]) else 0
     # Parse-like names first; among those main() last (argv is the heaviest channel), so a
     # direct parse function is preferred over driving the whole CLI when both exist.
     parseish = 0 if _PARSEISH.search(c["symbol"]) else 1
@@ -254,7 +332,7 @@ def _rank(c: dict) -> tuple:
     is_main = 1 if c["channel"] == APP_ARGV else 0
     # buffer/cstring (no file I/O) are the most direct, then file_arg, then argv.
     directness = {APP_BUFFER: 0, APP_CSTRING: 0, APP_FILE_ARG: 1, APP_ARGV: 2}[c["channel"]]
-    return (parseish, is_query, is_main, directness, depth, c["symbol"])
+    return (is_encode, parseish, is_query, is_main, directness, depth, c["symbol"])
 
 
 def discover(headers: list, includes: tuple = ()) -> list:
@@ -369,7 +447,8 @@ def compose_app(headers: list, target, includes: tuple = (), max_fold: int = 16)
     fam, seen = [], set()
     for c in cands:
         if not (c["channel"] == APP_BUFFER and c.get("call_args")
-                and not c.get("has_out_buffer") and not _ENCODE.search(c["symbol"])
+                and not c.get("has_out_buffer") and not c.get("out_scratch")
+                and not _ENCODE.search(c["symbol"])
                 and c["symbol"] not in seen):
             continue
         if "Internal" in c["symbol"] or "__" in c["symbol"] or _AUX_CODEC.search(c["symbol"]):
@@ -408,7 +487,15 @@ def compose_app(headers: list, target, includes: tuple = (), max_fold: int = 16)
         return e
 
     primary = mk(fam[0])
-    primary.header = ""   # target.public_headers spells the include path correctly
+    primary.header = ""   # emitter spells the include from target.public_headers below
+    # The composed harness must #include the target header; ensure it is on the target so the
+    # emitter spells it relative to the include dirs (stb_image.h, webp/decode.h), not omit it.
+    try:
+        have = set(getattr(target, "public_headers", []) or [])
+        target.public_headers = list(getattr(target, "public_headers", []) or []) + \
+            [h for h in headers if h not in have]
+    except (AttributeError, TypeError):
+        pass
     primary.free_symbol = free
     primary.fold = [mk(c) for c in fam[1:]]
     from ..ir import HarnessIR, Knobs                               # noqa: PLC0415

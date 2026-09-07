@@ -125,3 +125,35 @@ def test_size_scalar_is_not_fuzzed():
     from hforge.producers.app_lift import _fuzz_scalar_arg, _FLAG_NAME, _SIZE_NAME
     assert _SIZE_NAME.search("count") and not _FLAG_NAME.search("count")
     assert _FLAG_NAME.search("decode_flags") and not _SIZE_NAME.search("decode_flags")
+
+
+def test_decompressor_idiom_scratch_buffer():
+    # uncompress(Bytef *dest, uLongf *destLen, const Bytef *source, uLong sourceLen) -- the
+    # zlib/zstd/lz4/brotli shape: input is NOT the first arg, and a writable output buffer is
+    # present. The (source,sourceLen) pair must be found via the library size typedef/name, and
+    # dest/destLen filled with a real scratch buffer + its capacity, not a 1-byte local.
+    d = _decl("uncompress", "int",
+              [("Bytef *", "dest"), ("uLongf *", "destLen"),
+               ("const Bytef *", "source"), ("uLong", "sourceLen")])
+    c = classify(d)
+    assert c is not None and c["channel"] == "buffer"
+    assert not c["has_out_buffer"]                       # the out buffer is handled, not unsafe
+    assert c["out_scratch"] is True
+    # input flows into source/sourceLen (args 2,3); dest is a sized scratch, destLen its capacity
+    assert c["call_args"][2].endswith(")hf_data") and c["call_args"][3].endswith(")hf_size")
+    assert any("hf_out0[" in l for l in c["call_locals"])        # a real scratch array
+    assert any("hf_len1 = " in l for l in c["call_locals"])      # capacity, not zero
+    assert c["call_args"][0].endswith("hf_out0") and c["call_args"][1] == "&hf_len1"
+
+
+def test_encoder_ranks_below_decoder():
+    # among compress + uncompress, the decoder is chosen (attacker controls compressed input)
+    from hforge.producers.app_lift import _is_encoder
+    assert _is_encoder("compress") and _is_encoder("deflate")
+    assert not _is_encoder("uncompress") and not _is_encoder("inflate")
+    dec = _decl("uncompress", "int", [("Bytef *", "dest"), ("uLongf *", "destLen"),
+                                      ("const Bytef *", "source"), ("uLong", "sourceLen")])
+    enc = _decl("compress", "int", [("Bytef *", "dest"), ("uLongf *", "destLen"),
+                                    ("const Bytef *", "source"), ("uLong", "sourceLen")])
+    ranked = sorted([classify(enc), classify(dec)], key=_rank)
+    assert ranked[0]["symbol"] == "uncompress"           # decoder first
