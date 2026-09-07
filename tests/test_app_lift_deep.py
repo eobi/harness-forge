@@ -123,5 +123,5 @@ def test_flag_scalar_is_fuzzed_not_defaulted():
 def test_size_scalar_is_not_fuzzed():
     # a `count`/`size` scalar must stay 0 -- fuzzing it to a large value would hang/over-read
     from hforge.producers.app_lift import _fuzz_scalar_arg, _FLAG_NAME, _SIZE_NAME
-    assert _SIZE_NAME.search("num_items") and not _FLAG_NAME.search("num_items")
+    assert _SIZE_NAME.search("count") and not _FLAG_NAME.search("count")
     assert _FLAG_NAME.search("decode_flags") and not _SIZE_NAME.search("decode_flags")
