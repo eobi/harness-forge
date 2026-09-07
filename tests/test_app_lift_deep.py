@@ -226,3 +226,28 @@ def test_path_named_pointer_is_not_a_content_buffer():
     c = classify(d)
     # no content (buffer,len) pair -> not a buffer-channel entry (filename is a path, not bytes)
     assert c is None or c["channel"] != "buffer"
+
+
+def test_length_before_buffer_brotli_shape():
+    # BrotliDecoderDecompress(size_t encoded_size, const uint8_t* encoded_buffer,
+    #                         size_t* decoded_size, uint8_t* decoded_buffer)
+    # input length precedes the buffer; output buffer + its *size are a scratch pair.
+    d = _decl("BrotliDecoderDecompress", "int",
+              [("size_t", "encoded_size"), ("const uint8_t *", "encoded_buffer"),
+               ("size_t *", "decoded_size"), ("uint8_t *", "decoded_buffer")])
+    c = classify(d)
+    assert c is not None and c["channel"] == "buffer"
+    # encoded_buffer gets the fuzzer bytes, encoded_size gets hf_size (length before buffer)
+    assert c["call_args"][1].endswith(")hf_data") and c["call_args"][0].endswith(")hf_size")
+    # decoded_buffer is a real scratch, decoded_size its capacity -> not an unhandled out buffer
+    assert not c["has_out_buffer"] and c["out_scratch"] is True
+    assert any("hf_out3" in l for l in c["call_locals"])
+
+
+def test_length_before_buffer_does_not_pair_void_config():
+    # a const void* config arg must NOT be paired with an unrelated preceding size (ufbx opts)
+    d = _decl("ufbx_load_file_len", "void *",
+              [("const char *", "filename"), ("size_t", "filename_len"),
+               ("const void *", "opts"), ("void *", "error")])
+    c = classify(d)
+    assert c is None or c["channel"] != "buffer"

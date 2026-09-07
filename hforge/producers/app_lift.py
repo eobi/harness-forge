@@ -136,13 +136,23 @@ def _looks_len(ty: str, nm: str) -> bool:
 
 
 def _buffer_pair(params: list):
-    """Index of the (buffer, len) pair: first const/content pointer with a length next arg."""
-    for i in range(len(params) - 1):
+    """(buffer_index, length_index) of the input pair, or (-1, -1).
+
+    The length usually follows the buffer (f(buf, len, ...)), but some decoders put it FIRST
+    (brotli's BrotliDecoderDecompress(size_t encoded_size, const uint8_t* encoded_buffer, ...)),
+    so a length immediately before the buffer counts too."""
+    for i in range(len(params)):
         pty, pnm = params[i]
-        nty, nnm = params[i + 1]
-        if _looks_buffer(pty, pnm) and _looks_len(nty, nnm):
-            return i
-    return -1
+        if not _looks_buffer(pty, pnm):
+            continue
+        if i + 1 < len(params) and _looks_len(params[i + 1][0], params[i + 1][1]):
+            return i, i + 1
+        # Length BEFORE the buffer is the unusual case (brotli); accept it only for a genuine
+        # byte pointer, so a const void* config arg is not paired with an unrelated preceding size.
+        if i - 1 >= 0 and _looks_len(params[i - 1][0], params[i - 1][1]) \
+                and any(t in pty.lower() for t in ("char", "uint8", "int8", "byte")):
+            return i, i - 1
+    return -1, -1
 
 
 def _out_scratch(params: list, buf_i: int, len_i: int) -> dict:
@@ -308,9 +318,9 @@ def classify(decl) -> Optional[dict]:
         return {"channel": APP_ARGV, "symbol": name,
                 "argv": [name.replace("_main", "") or "app", "@INPUT@"]}
     # f(buffer, len, ...) -- a real loader: the (buf,len) pair anywhere, trailing out-locals.
-    bi = _buffer_pair(params)
+    bi, li = _buffer_pair(params)
     if bi >= 0:
-        call_args, call_locals = _buffer_plan(params, bi, bi + 1)
+        call_args, call_locals = _buffer_plan(params, bi, li)
         if call_args is not None:
             # DEPTH: a full decoder writes several out-parameters and returns a buffer of
             # decoded data; a query (info/is_/get_size) reads a header and returns a flag.
@@ -328,10 +338,10 @@ def classify(decl) -> Optional[dict]:
             # A writable byte output we CAN size (a scratch buffer + its capacity) is handled by
             # _buffer_plan; only an UNHANDLED writable byte/void output (no length to bound it,
             # or a void* of unknown element size) is still unsafe to fold or drive.
-            scratch = _out_scratch(params, bi, bi + 1)
-            handled = {j for j, li in scratch.items() if li is not None}
+            scratch = _out_scratch(params, bi, li)
+            handled = {j for j, si in scratch.items() if si is not None}
             has_out_buffer = any(
-                j not in (bi, bi + 1) and j not in handled and pty.count("*") == 1
+                j not in (bi, li) and j not in handled and pty.count("*") == 1
                 and "const" not in pty
                 and any(t in pty for t in ("char", "uint8", "int8", "void"))
                 for j, (pty, _pn) in enumerate(params))
