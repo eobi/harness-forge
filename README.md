@@ -672,9 +672,11 @@ that *"the decompression is crash-proof against corrupted and/or malicious data.
 Reproduced, minimized to 3 bytes, root-caused, and a **3-line fix written and verified** (reproducer
 no longer faults, valid data still round-trips, 27 M re-fuzz iterations clean). Prior-art check: **no
 CVE and no matching issue** (checked 2026-09-07). FastLZ is embedded in Godot, Facebook HHVM and
-Apache Traffic Server. Reported to the maintainer with the fix; reproducer held until a patch ships.
-The point of the entry is the mechanism: **the harness that found it was generated end to end by
-Harness Forge**, on a target the generator could not even reach before this change.
+Apache Traffic Server. Reported upstream with a merge-ready 3-line fix as
+[FastLZ#12](https://github.com/ariya/FastLZ/pull/12) (Issues are disabled on the repo, so the fix
+went straight in as a pull request). The point of the entry is the mechanism: **the harness that
+found it was generated end to end by Harness Forge**, on a target the generator could not even reach
+before this change.
 
 ---
 
