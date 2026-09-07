@@ -636,7 +636,7 @@ tracker before any novelty claim**. That check is the point of this entry: it do
 |---|---|---|
 | nanosvg `nsvg__parseNameValue` OOB read (style/class parser) | **auto-generated** (`nsvgParse`, cstring channel) | duplicate of open [nanosvg#295](https://github.com/memononen/nanosvg/issues/295) — [verified fix contributed](https://github.com/memononen/nanosvg/issues/295#issuecomment-5563683590) |
 | pl_mpeg `plm_audio_decode_header` negative-index global OOB (`bitrate_index == -1`) | hand-written decode loop | filed as [pl_mpeg#78](https://github.com/phoboslab/pl_mpeg/issues/78) with a one-line fix — not among the library's open issues |
-| pl_mpeg `plm_video_process_macroblock` half-pel OOB | hand-written decode loop | duplicate of open [pl_mpeg#73](https://github.com/phoboslab/pl_mpeg/issues/73) — [verified fix contributed](https://github.com/phoboslab/pl_mpeg/issues/73#issuecomment-5563693311) |
+| pl_mpeg `plm_video_process_macroblock` half-pel OOB read (:3372) **and** `plm_video_decode_block` OOB heap *write* (:3532) | hand-written decode loop | **fixed upstream** in [pl_mpeg#73](https://github.com/phoboslab/pl_mpeg/issues/73) (commit `685af1f`, both halves, credited) — the `:3532` half is an out-of-bounds heap **write**, the more serious of the two |
 | upng `read_bit` inflate OOB | hand-written decode loop | real, but the library appears unmaintained; not filed |
 
 One harness was generated automatically by `app-lift`; the pl_mpeg and upng decoders need a
@@ -652,6 +652,21 @@ privately pending maintainer response rather than published here. A clean run is
 recorded: picojpeg, an embedded JPEG decoder, survived a campaign with no defect — embedded
 code written defensively for microcontrollers is a harder, and more honest, target than the
 famous single-headers.
+
+**Update (2026-09-07): a new generator capability found a novel defect it could not reach a week
+earlier.** `app-lift` learned the *decompressor idiom* — the `f(out, *out_len, const in, in_len)`
+shape shared by zlib/zstd/lz4/brotli — recognising the length argument by name or library typedef
+and backing the writable output with a real sized scratch buffer instead of refusing the entry as
+unsafe. With that, the generator **auto-produced a complete harness for a widely-embedded C library
+that it previously could not lift at all.** Run under libFuzzer + AddressSanitizer, the generated
+harness surfaced an out-of-bounds read on a **3-byte** crafted input, reachable from a decode entry
+the library documents as safe against malformed data. It was reproduced, minimized to 3 bytes,
+root-caused to a single missing bounds check, and a **3-line fix was written and verified**
+(reproducer no longer faults, valid data still round-trips, 27 M re-fuzz iterations clean). The
+prior-art check found no CVE and no matching issue. Consistent with the discipline above, the
+library name and reproducer are **withheld here pending coordinated disclosure** — the point of the
+entry is the mechanism: **the harness that found it was generated end to end by Harness Forge**, on
+a target class the generator could not even reach before this change.
 
 ---
 
