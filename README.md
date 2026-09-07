@@ -654,19 +654,27 @@ code written defensively for microcontrollers is a harder, and more honest, targ
 famous single-headers.
 
 **Update (2026-09-07): a new generator capability found a novel defect it could not reach a week
-earlier.** `app-lift` learned the *decompressor idiom* — the `f(out, *out_len, const in, in_len)`
-shape shared by zlib/zstd/lz4/brotli — recognising the length argument by name or library typedef
-and backing the writable output with a real sized scratch buffer instead of refusing the entry as
-unsafe. With that, the generator **auto-produced a complete harness for a widely-embedded C library
-that it previously could not lift at all.** Run under libFuzzer + AddressSanitizer, the generated
-harness surfaced an out-of-bounds read on a **3-byte** crafted input, reachable from a decode entry
-the library documents as safe against malformed data. It was reproduced, minimized to 3 bytes,
-root-caused to a single missing bounds check, and a **3-line fix was written and verified**
-(reproducer no longer faults, valid data still round-trips, 27 M re-fuzz iterations clean). The
-prior-art check found no CVE and no matching issue. Consistent with the discipline above, the
-library name and reproducer are **withheld here pending coordinated disclosure** — the point of the
-entry is the mechanism: **the harness that found it was generated end to end by Harness Forge**, on
-a target class the generator could not even reach before this change.
+earlier — [FastLZ](https://github.com/ariya/FastLZ).** `app-lift` learned the *decompressor idiom* —
+the `f(out, *out_len, const in, in_len)` shape shared by zlib/zstd/lz4/brotli — recognising the
+length argument by name or library typedef and backing the writable output with a real sized scratch
+buffer instead of refusing the entry as unsafe. With that, the generator **auto-produced a complete
+harness for FastLZ 0.5.0 / current `master`, a library it previously could not lift at all** (its
+decompressor takes the input as arguments 3–4, not first, with a writable output buffer).
+
+Run under libFuzzer + AddressSanitizer, that generated harness found an **out-of-bounds read in
+`fastlz2_decompress` (`fastlz.c:449`)** on a **3-byte** input, `20 ff 38`: the byte read immediately
+after the run-length extension loop, `code = *ip++;`, is the one input read of seven in that function
+that is missing the always-on `FASTLZ_BOUND_CHECK`, so a truncated stream reads one byte past the
+end of the input. `fastlz1_decompress` has the same gap (`ref -= *ip++;`), and `fastlz_decompress`
+reads the level byte before checking `length >= 1`. This violates FastLZ's own documented guarantee
+that *"the decompression is crash-proof against corrupted and/or malicious data."*
+
+Reproduced, minimized to 3 bytes, root-caused, and a **3-line fix written and verified** (reproducer
+no longer faults, valid data still round-trips, 27 M re-fuzz iterations clean). Prior-art check: **no
+CVE and no matching issue** (checked 2026-09-07). FastLZ is embedded in Godot, Facebook HHVM and
+Apache Traffic Server. Reported to the maintainer with the fix; reproducer held until a patch ships.
+The point of the entry is the mechanism: **the harness that found it was generated end to end by
+Harness Forge**, on a target the generator could not even reach before this change.
 
 ---
 
