@@ -707,7 +707,8 @@ track reports NOT_RUN and says what to install, rather than failing the engine. 
 macOS path taught: instrument modules by their **exact loaded-image name** (the version is
 part of it — `libwebp.7.2.0.dylib`, not `.7.dylib`), and a target must be attachable (re-sign
 with get-task-allow; arm64e system binaries do not attach). This is the un-fuzzed frontier —
-closed apps, games, firmware — and the engine now reaches it. The remaining variable is
+closed apps, games, firmware — and the pipeline now reaches it: a certified target and its
+coverage, handed to NemesisForge to search. The remaining variable is
 target selection, not capability.
 
 ## What these harnesses cannot find
