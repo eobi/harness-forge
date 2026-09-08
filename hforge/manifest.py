@@ -2054,7 +2054,18 @@ PHASES: tuple = (
                          "roles (info bar, alert, dialog) and not one spelling. That is the "
                          "same shape as BYTE_BASES in the C producer — a hand-maintained "
                          "list of spellings that grew once per library until we read the "
-                         "header instead. Here it would grow once per toolkit."),
+                         "header instead. Here it would grow once per toolkit. "
+                         "macOS (2026-09): the SAME split holds. DETECTION works -- macos_ax "
+                         "reads sheets/alerts from the AX tree and the shared classifier "
+                         "calls them REJECTED, a pass. DISMISSAL is implemented "
+                         "(dismiss_dialogs clicks the default/OK button via System Events; "
+                         "modal_targets purely separates a real modal from a status "
+                         "indicator, tested) AND is used in session recycling, but reliable "
+                         "dismissal of an ARBITRARY modal is not proven: a live probe fired "
+                         "and clicked a button yet did not clear a display-dialog modal, the "
+                         "same finicky result the Linux side hit. So this stays PARTIAL, with "
+                         "session recycling (kill after each input) as the guaranteed fallback "
+                         "that keeps a campaign from ever getting stuck on a modal."),
         Deliverable("P6.MACOS",
                     "macOS observation layer: .ips crash oracle + AX rejection oracle + "
                     "file-drop / out-of-process driver", DONE,

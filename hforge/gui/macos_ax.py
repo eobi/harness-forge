@@ -347,6 +347,85 @@ def wait_until_quiescent(proc: str, *, deadline_s: float = QUIESCE_DEADLINE_S,
 
 # ── the environment: strip the throughput shim so ReportCrash runs ───────────
 
+# ── P6.DIALOG: dismiss a genuinely modal dialog ──────────────────────────────
+#
+# The Linux track's hard-won lesson applies unchanged: an error STATUS INDICATOR (an info
+# bar / an AXStaticText saying "unsupported") is not a modal and has nothing to dismiss --
+# treating it as one manufactures work that never completes. Only a dialog/sheet/alert that
+# actually carries a button is a dismissable modal. `modal_targets` encodes that distinction
+# purely; `dismiss_dialogs` acts on it via System Events, best-effort and permission-gated,
+# and session recycling (_kill_proc) is the guaranteed fallback when the grant is absent.
+
+_MODAL_ROLES = ("dialog", "alert", "alert dialog", "sheet")
+
+
+def modal_targets(tree: Sequence) -> list:
+    """From a normalised (role, name) tree, the entries that are dismissable modals: a modal
+    role, not a bare status indicator. Pure, so the rule is testable without a display."""
+    out = []
+    for entry in tree:
+        role = str(entry[0] if len(entry) > 0 else "")
+        name = entry[1] if len(entry) > 1 else ""
+        if role in _MODAL_ROLES:
+            out.append((role, name))
+    return out
+
+
+_DISMISS_SCRIPT = r'''
+on run argv
+  set appName to item 1 of argv
+  set n to 0
+  try
+    tell application "System Events"
+      if not (exists process appName) then return "NO_PROCESS"
+      tell process appName
+        repeat with w in windows
+          try
+            repeat with sh in sheets of w
+              try
+                click (first button of sh whose name is "OK" or name is "Cancel" or name is "Close" or name is "Don't Save")
+              on error
+                try
+                  click button 1 of sh
+                end try
+              end try
+              set n to n + 1
+            end repeat
+          end try
+          try
+            if (count of buttons of w) > 0 then
+              click button 1 of w
+              set n to n + 1
+            end if
+          end try
+        end repeat
+      end tell
+    end tell
+  on error errMsg
+    return "AX_ERROR " & errMsg
+  end try
+  return "DISMISSED " & n
+end run
+'''
+
+
+def dismiss_dialogs(app_name: str, *, timeout_s: float = 5.0) -> int:
+    """Best-effort: click the default/OK button of any modal sheet or dialog `app_name` has
+    up. Returns how many it dismissed (0 if none, no grant, or the process is gone)."""
+    try:
+        proc = subprocess.run(["osascript", "-", app_name], input=_DISMISS_SCRIPT,
+                              capture_output=True, text=True, timeout=timeout_s)
+    except (subprocess.TimeoutExpired, OSError):
+        return 0
+    out = (proc.stdout or "").strip()
+    if out.startswith("DISMISSED"):
+        try:
+            return int(out.split()[1])
+        except (IndexError, ValueError):
+            return 0
+    return 0
+
+
 def _kill_proc(proc: str) -> None:
     """Terminate the target so a GUI campaign does not pile up windows and each input starts
     clean. Best-effort: a target that already exited is fine."""
@@ -396,14 +475,17 @@ def run_one(*, app: str, input_path: str, proc_name: Optional[str] = None,
                                     floor_s=min(settle_s, 0.6))
         report = poll_for_crash(proc, exclude=before, deadline_s=crash_deadline_s)
         if report is not None:
+            dismiss_dialogs(proc)   # clear any CrashReporter dialog before recycling
             _kill_proc(proc)
             return crash_verdict(report)
         tree = ax_tree(proc)
         window_ms = 0.0 if tree else None  # a mapped window is implied by any AX node
         verdict = classify(tree=tree, exited=False, window_ms=window_ms,
                            serviced_action=None, termination=term)
-        # session recycling: record the verdict, then kill so windows do not pile up and the
-        # next input starts clean (the doctrine's "record, kill the process, next input").
+        # session recycling: record the verdict, dismiss any modal it left up, then kill so
+        # windows do not pile up and the next input starts clean (the doctrine's "record,
+        # kill the process, next input").
+        dismiss_dialogs(proc)
         _kill_proc(proc)
         return verdict
 

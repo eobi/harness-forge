@@ -178,3 +178,18 @@ def test_driver_for_host_returns_a_module_or_none():
     d = driver_for_host()
     # on this repo's supported hosts it is a module exposing run_one; unknown host -> None
     assert d is None or hasattr(d, "GuiOutcome")
+
+
+# ── P6.DIALOG: which nodes are dismissable modals (pure) ──────────────────────
+
+def test_modal_targets_picks_sheets_and_alerts():
+    tree = [("window", "Doc"), ("dialog", "Save?"), ("alert", "Unsupported"),
+            ("statictext", "just a label")]
+    mt = M.modal_targets(tree)
+    assert ("dialog", "Save?") in mt and ("alert", "Unsupported") in mt
+
+
+def test_modal_targets_ignores_status_indicators():
+    # an error STATUS INDICATOR is not a modal -- nothing to dismiss
+    tree = [("window", "Doc"), ("statictext", "error: bad file"), ("notification", "hint")]
+    assert M.modal_targets(tree) == []
