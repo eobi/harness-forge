@@ -668,12 +668,19 @@ _FINAL_NAME = re.compile(r"(?:^|_)(final|last|eos|is_?final|is_?last|end)s?$", r
 # other const-buffer takers (SetOutputColorProfile), and a DRIVER that then does the decode
 # work on the handle (JxlDecoderProcessInput) -- the feed-then-process streaming shape.
 _FEED = re.compile(r"(?:^|_)(set_?input|input|feed|push|supply|add_?data|scan|write_?data)", re.I)
-_DRIVE = re.compile(r"(?:^|_)(process|decode|convert|render)", re.I)
+_DRIVE = re.compile(r"(?:^|_)(process|decode|decompress|convert|render|unpack)", re.I)
 
 
 def _is_bytey(ty: str) -> bool:
     t = (ty or "").lower()
     return any(b in t for b in ("char", "uint8", "int8", "byte")) and "void" not in t
+
+
+def _is_input_bytes(ty: str) -> bool:
+    """A pointer that carries input bytes: a byte type, or a generic void* (const void* buffer,
+    the shape libraw_open_buffer/many APIs take). A void* is generic bytes, not a typed handle."""
+    t = (ty or "").lower()
+    return _is_bytey(ty) or ("void" in t and t.count("*") == 1)
 
 
 def _snake(name: str) -> str:
@@ -783,13 +790,14 @@ def lift_sequence(headers: list, target, includes: tuple = ()):
             # input, not an output buffer (SetJPEGBuffer); index>=1 so the const HANDLE itself is
             # not mistaken for the buffer. Prefer a feed-named function (SetInput) over any other.
             feeders = []
-            for n, d in decls.items():          # a feeder is any H-taking fn with a const byte
-                if n == cname or _DESTROY.search(V(n)) or _CREATE.search(V(n)) \
-                        or not _first_param_is(d, H):        # buffer -- NOT necessarily a _PROCESS
-                    continue                                 # verb (JxlDecoderSetInput is not)
+            for n, d in decls.items():          # a feeder is any H-taking fn with a const input
+                # NOT excluded on _CREATE: `open_buffer` carries the create-verb "open" but is the
+                # feeder, not the constructor. `n != cname` already prevents re-picking the create.
+                if n == cname or _DESTROY.search(V(n)) or not _first_param_is(d, H):
+                    continue
                 ps = list(getattr(d, "params", []) or [])
                 pb, pl = _buffer_pair(ps)
-                if pb >= 1 and "const" in ps[pb][0] and _is_bytey(ps[pb][0]):
+                if pb >= 1 and "const" in ps[pb][0] and _is_input_bytes(ps[pb][0]):
                     feeders.append((0 if _FEED.search(V(n)) else 1, _proc_rank(n), n, d, pb, pl))
             if not feeders:
                 continue                                    # no way to deliver the fuzzer bytes
@@ -834,17 +842,30 @@ def lift_sequence(headers: list, target, includes: tuple = ()):
         # After a pure feeder (SetInput just stores the pointer), the DRIVER does the decode work
         # (ProcessInput). Call every driver-verb handle-only process once so the bytes are decoded,
         # not merely queued. A feeder that itself parses (XML_Parse) has no such driver, so none run.
-        for pn, pd in sorted(procs, key=lambda x: _proc_rank(x[0])):
+        # a true driver takes ONLY the handle and does the decode work (ProcessInput; libraw_unpack
+        # then libraw_dcraw_process). Scan ALL H-taking handle-only fns (not just _PROCESS ones --
+        # 'unpack' is no _PROCESS verb), and order primary decode (unpack/decode/load) before
+        # post-processing (process/convert/render) so the raw decode runs before its post-pass.
+        def _is_getter(pd) -> bool:
+            # a name/version string getter (libraw_unpack_function_name -> const char *) is not
+            # a decode driver; real drivers return a status int or void.
+            r = str(getattr(pd, "ret", "") or "")
+            return "char" in r and "*" in r
+        drivers = [pn for pn, pd in decls.items()
+                   if pn not in used_syms and len(list(getattr(pd, "params", []) or [])) == 1
+                   and _first_param_is(pd, H) and _DRIVE.search(_verb(pn, htype))
+                   and not _is_getter(pd)]
+
+        def _drank(pn):
+            v = _verb(pn, htype)
+            prim = 0 if re.search(r"(?i)(unpack|decode|load|read|build|parse)", v) else 1
+            return (prim, _proc_rank(pn), pn)
+        for pn in sorted(drivers, key=_drank):
             if pn in used_syms:
                 continue
-            pps = list(getattr(pd, "params", []) or [])
-            # a true driver takes ONLY the handle and does the decode work (ProcessInput(dec));
-            # requiring no other args excludes config setters and queries (which also need an
-            # out-struct/flag we would have to invent) and keeps the sequence to the real work.
-            if len(pps) == 1 and _DRIVE.search(_verb(pn, htype)):
-                steps.append({"symbol": pn, "args": [hv],
-                              "out_type": "", "out_var": "", "guard": False, "sink": _sink(pd)})
-                used_syms.add(pn)
+            steps.append({"symbol": pn, "args": [hv], "out_type": "", "out_var": "",
+                          "guard": False, "sink": _sink(decls[pn])})
+            used_syms.add(pn)
     # destroy: the object's own destructor takes ONLY the handle (XML_ParserFree(p)); a helper
     # like XML_MemFree(p, ptr) frees something else and would leak the handle. Fewest params wins.
     dname = sorted(destroys, key=lambda n: (len(list(getattr(decls[n], "params", []) or [])),
