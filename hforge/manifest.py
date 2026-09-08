@@ -1944,7 +1944,7 @@ PHASES: tuple = (
         Deliverable("P5.PE", "PE posture table and SEH-aware crash parsing", PLANNED),
     )),
 
-    Phase("P6", "GUI track", PLANNED, (
+    Phase("P6", "GUI track", PARTIAL, (
         Deliverable("P6.TERM", "coverage-guided termination", PLANNED),
         Deliverable("P6.DROP", "file-drop driver", PARTIAL,
                     note="THE CAPABILITY IS DEMONSTRATED, THE DRIVER IS NOT WRITTEN. On the "
@@ -2010,6 +2010,49 @@ PHASES: tuple = (
                          "same shape as BYTE_BASES in the C producer — a hand-maintained "
                          "list of spellings that grew once per library until we read the "
                          "header instead. Here it would grow once per toolkit."),
+        Deliverable("P6.MACOS",
+                    "macOS observation layer: .ips crash oracle + AX rejection oracle + "
+                    "file-drop / out-of-process driver", DONE,
+                    modules=("hforge.gui.macos_ax",),
+                    tests=("test_wild_write_is_a_memory_safety_crash",
+                           "test_abort_is_a_crash_but_not_memory_safety",
+                           "test_ax_error_sheet_classifies_as_rejected_not_hang",
+                           "test_no_error_nodes_reads_as_accepted_not_hang",
+                           "test_new_path_attribution_ignores_a_pre_existing_report",
+                           "test_clean_env_removes_crashcatch_preload"),
+                    note="The Darwin sibling of the Linux AT-SPI driver, reusing the same "
+                         "pure classifier (GuiOutcome/classify/error_nodes/is_finding) "
+                         "unchanged and contributing only macOS observation. "
+                         "THE CRASH IS A FILE, NOT AN EXIT CODE: an app launched with "
+                         "`open -a` returns 0 from the shell, so the only crash signal is the "
+                         "DiagnosticReports .ips ReportCrash writes. Parsed (header + body "
+                         "JSON), it classifies EXC_BAD_ACCESS/SIGSEGV/SIGBUS as "
+                         "memory-safety and EXC_CRASH/SIGABRT (an abort/assert/escaped throw) "
+                         "as a crash that is NOT memory-safety — reporting the second as the "
+                         "first is the mirror of the false hang this track refuses. "
+                         "ATTRIBUTION IS BY NEW REPORT PATH, NOT TIMESTAMP: ReportCrash "
+                         "writes with ~1 s mtime resolution, so two back-to-back runs land in "
+                         "one tick and a since-time filter blames a clean input for the "
+                         "previous crasher's report — caught by live-testing (clean input "
+                         "read as crashed) and fixed by snapshotting existing paths before "
+                         "the launch. "
+                         "THE AX WALK IS BEST-EFFORT AND MUST NOT MANUFACTURE A FINDING: "
+                         "reading another process's accessibility tree needs a TCC grant; "
+                         "without it the walk returns no nodes, which the shared classifier "
+                         "reads as ACCEPTED, never a false rejection or hang. The .ips oracle "
+                         "needs no grant and is the load-bearing signal. "
+                         "clean_env() strips DYLD_INSERT_LIBRARIES so a GUI launch does not "
+                         "inherit the other engine's crashcatch shim, which would swallow the "
+                         ".ips it depends on. "
+                         "LIVE-PROVEN end to end on this host: TextEdit + a valid file reads "
+                         "ACCEPTED (a real AX window node), a segfaulting CLI target reads "
+                         "CRASHED (memory-safety), and a clean input on the same target reads "
+                         "ACCEPTED. Serves out-of-process CLI/daemon targets as well as GUI "
+                         "apps — the same .ips signal. The .ips parser this builds is what "
+                         "P7.IOS_DEV also needs. "
+                         "STILL DARWIN-SCOPED: coverage-guided GUI termination (P6.TERM) and "
+                         "modal-dialog dismissal (P6.DIALOG) remain open; this is the "
+                         "observation half, not the greybox search."),
     )),
 
     Phase("P7", "mobile: Android and iOS", PARTIAL, (
