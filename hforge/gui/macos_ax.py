@@ -347,6 +347,15 @@ def wait_until_quiescent(proc: str, *, deadline_s: float = QUIESCE_DEADLINE_S,
 
 # ── the environment: strip the throughput shim so ReportCrash runs ───────────
 
+def _kill_proc(proc: str) -> None:
+    """Terminate the target so a GUI campaign does not pile up windows and each input starts
+    clean. Best-effort: a target that already exited is fine."""
+    try:
+        subprocess.run(["pkill", "-x", proc], capture_output=True, timeout=3)
+    except (OSError, subprocess.TimeoutExpired):
+        pass
+
+
 def clean_env(base: Optional[dict] = None) -> dict:
     """A launch environment with NemesisForge's crashcatch preload removed, so a fault is
     written to DiagnosticReports instead of being swallowed by `_exit(128+n)`."""
@@ -387,11 +396,16 @@ def run_one(*, app: str, input_path: str, proc_name: Optional[str] = None,
                                     floor_s=min(settle_s, 0.6))
         report = poll_for_crash(proc, exclude=before, deadline_s=crash_deadline_s)
         if report is not None:
+            _kill_proc(proc)
             return crash_verdict(report)
         tree = ax_tree(proc)
         window_ms = 0.0 if tree else None  # a mapped window is implied by any AX node
-        return classify(tree=tree, exited=False, window_ms=window_ms,
-                        serviced_action=None, termination=term)
+        verdict = classify(tree=tree, exited=False, window_ms=window_ms,
+                           serviced_action=None, termination=term)
+        # session recycling: record the verdict, then kill so windows do not pile up and the
+        # next input starts clean (the doctrine's "record, kill the process, next input").
+        _kill_proc(proc)
+        return verdict
 
     # CLI target: crash oracle only.
     argv = [a.replace("@@", input_path) for a in (argv_template or [app, "@@"])]
