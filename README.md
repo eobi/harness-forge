@@ -553,15 +553,17 @@ distinct outcome** so an absent check never reads as a passed one.
 
 ## Findings: harnesses this engine graded, and the defects it found
 
-Updated 2026-09-07. **Two harness defects filed upstream (the table below), plus five
-memory-safety findings in widely-embedded parsers — out-of-bounds reads, and one out-of-bounds
-heap *write* (pl_mpeg#73's `decode_block`) — each reproduced, minimized, and checked against the
-library's own source and prior art before filing. Two landed upstream: pl_mpeg#73 (both halves,
-merged and credited) and [FastLZ#12](https://github.com/ariya/FastLZ/pull/12), a novel finding
-opened with a merge-ready 3-line fix; the rest were duplicates, an unmaintained project, or a
-report the maintainer did not already have. See the
+Updated 2026-09-07. **Two harness defects filed upstream (the table below), plus six
+memory-safety findings in widely-embedded parsers — out-of-bounds reads, one out-of-bounds
+heap *write* (pl_mpeg#73's `decode_block`), and a heap use-after-free (LibRaw) — each reproduced,
+minimized, and checked against the library's own source and prior art before filing. Three landed
+upstream: pl_mpeg#73 (both halves, merged and credited),
+[FastLZ#12](https://github.com/ariya/FastLZ/pull/12), a novel finding opened with a merge-ready
+3-line fix, and [LibRaw#861](https://github.com/LibRaw/LibRaw/issues/861), a heap use-after-free
+found by the sequence lifter and filed with a verified fix; the rest were duplicates, an
+unmaintained project, or a report the maintainer did not already have. See the
 [2026-09-06](#memory-safety-defects-from-the-application-entry-path-2026-09-06) subsection and the
-2026-09-07 FastLZ update below.**
+2026-09-07 FastLZ and LibRaw updates below.**
 
 | | defect | status |
 |---|---|---|
@@ -682,6 +684,33 @@ Apache Traffic Server. Reported upstream with a merge-ready 3-line fix as
 went straight in as a pull request). The point of the entry is the mechanism: **the harness that
 found it was generated end to end by Harness Forge**, on a target the generator could not even reach
 before this change.
+
+**Update (2026-09-07): the sequence lifter reached a stateful handle API and found a heap
+use-after-free in [LibRaw](https://github.com/LibRaw/LibRaw) 0.22.0 / current `master`.** FastLZ was a
+single decompress call; LibRaw's decode is a *sequence* over an opaque handle. `app-lift --sequence`
+learned to lift that shape — recognising the create call, the buffer feeder, and the ordered decode
+drivers — and **auto-produced the harness `libraw_init → libraw_open_buffer → libraw_unpack →
+libraw_unpack_thumb → libraw_dcraw_process → libraw_close` with no hand-editing**, ordering the raw
+decode ahead of the post-processing pass. The whole loop — generate, build under ASan+UBSan, fuzz —
+ran **natively on an Apple-silicon Mac**, no Linux or Windows tooling.
+
+Run under libFuzzer + AddressSanitizer, that harness found a **heap use-after-free read in
+`unpack_thumb()` (`unpack_thumb.cpp:148`)** on a 64-byte input. On a failed open, `open_buffer()` /
+`open_file()` free the datastream but leave the `ID.input` member pointing at the freed object; a
+following `unpack_thumb()` dereferences it. The library already ships the guard meant to stop this —
+`if (!ID.input) return LIBRAW_INPUT_CLOSED;` — but a *non-null* dangling pointer defeats it.
+**Stated honestly:** the crash requires calling `unpack_thumb()` after the open returned an error, so
+it is not reachable by strictly-correct API usage; it is a genuine defect because that existing guard
+is clearly meant to make the call safe and a dangling member pointer silently defeats it. Same class
+as the maintainer's recently-fixed [#820](https://github.com/LibRaw/LibRaw/issues/820) (that was the
+`T.thumb` buffer; this is the `ID.input` datastream). Reproduced, minimized to 64 bytes, root-caused,
+and a **one-line-per-branch fix written and verified** (PoC no longer faults; `unpack_thumb()` then
+returns `LIBRAW_INPUT_CLOSED` cleanly through the existing guard). Prior-art check: distinct from #820
+and no matching open issue (checked 2026-09-07). Reported upstream with the fix as
+[LibRaw#861](https://github.com/LibRaw/LibRaw/issues/861). A LibRaw 0.21.2 out-of-bounds in
+`remove_trailing_spaces` was also found in the same run but the prior-art check retired it — already
+fixed in `master`. The point of the entry is the mechanism: **a stateful multi-call decode harness,
+generated end to end**, on a target class the generator could not sequence before.
 
 ---
 
