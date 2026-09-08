@@ -53,12 +53,12 @@ feeding its generated harnesses to a fuzzer, which is exactly NemesisForge's lan
 | `L` | language coverage beyond C | 13/15 | partial |
 | `P4` | lift-and-grade third-party harnesses | 3/4 | partial |
 | `P5` | Windows and closed binary | 2/3 | partial |
-| `P6` | GUI track | 1/4 | partial |
+| `P6` | GUI track | 2/4 | partial |
 | `P7` | mobile: Android and iOS | 0/3 | partial |
 | `P8` | snapshot and scale | 0/2 | planned |
 | `P9` | exotic targets | 0/2 | planned |
 
-**107 of 132 deliverables done**, and `plancheck` refuses to let any of them say so without a module that imports and a test that exists.
+**108 of 132 deliverables done**, and `plancheck` refuses to let any of them say so without a module that imports and a test that exists.
 
 <!-- PHASES:END -->
 

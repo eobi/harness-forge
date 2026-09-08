@@ -1038,6 +1038,39 @@ def cmd_closed(args) -> int:
     return 0
 
 
+def cmd_gui_fuzz(args) -> int:
+    """Blind file-drop campaign over a GUI app or out-of-process CLI (P6).
+
+    Deliberately not coverage-guided: the GUI track's contribution is the observation layer
+    (rejection vs hang vs crash), not the search. The host's driver is chosen automatically;
+    a host without one reports NOT_RUN rather than pretending. A finding is only a crash or a
+    genuine hang -- a rejection the target was right to make is a pass, and is not reported.
+    Triage every crash before any claim (a memory-safety fault vs a plain abort), then check
+    prior art.
+    """
+    from .gui import driver_for_host                                # noqa: PLC0415
+    from .gui import campaign                                       # noqa: PLC0415
+    driver = driver_for_host()
+    if driver is None or not hasattr(driver, "run_one"):
+        print("NOT_RUN: no GUI observation layer for this host.")
+        print("  cost: the GUI track is macOS (.ips + AX) and Linux (AT-SPI) only.")
+        return 1
+    seeds = Path(args.seeds)
+    if not seeds.is_dir() or not any(p.is_file() for p in seeds.glob("*")):
+        print(f"no seed files in {args.seeds}")
+        return 2
+    argv_template = list(args.arg) if args.arg else None
+    res = campaign.run_campaign(
+        driver, app=args.target, seeds_dir=str(seeds), out_dir=args.out,
+        gui=not args.cli, proc_name=args.proc, argv_template=argv_template,
+        budget_s=args.budget, settle_s=args.settle)
+    print(res.summary())
+    if res.findings:
+        print(f"  {res.unique()} unique finding(s) saved under {args.out} -- triage each "
+              "(memory-safety fault vs plain abort) before any claim, then check prior art.")
+    return 0
+
+
 def cmd_test_lift(args) -> int:
     """Lift ONE of a library's own unit tests into a certified harness plan.
 
@@ -1840,6 +1873,25 @@ def main(argv=None) -> int:
     cl.add_argument("--smoke", action="store_true",
                     help="only run the coverage probe, do not launch a campaign")
     cl.set_defaults(fn=cmd_closed)
+
+    gf = sub.add_parser("gui-fuzz",
+                        help="blind file-drop campaign over a GUI app or out-of-process CLI, "
+                             "judged by the host observation layer (P6)")
+    gf.add_argument("target", help="GUI app name (open -a) or CLI binary path")
+    gf.add_argument("--seeds", required=True, help="seed corpus directory")
+    gf.add_argument("--out", default="build/gui-fuzz", help="campaign output directory")
+    gf.add_argument("--cli", action="store_true",
+                    help="target is an out-of-process CLI binary, not a .app "
+                         "(crash oracle only, no window/AX)")
+    gf.add_argument("--proc", default=None,
+                    help="process name as it appears in the crash reporter "
+                         "(default: target basename)")
+    gf.add_argument("--arg", action="append", default=[], dest="arg",
+                    help="CLI argument; use @@ for the input file (repeatable, --cli only)")
+    gf.add_argument("--budget", type=int, default=60, help="campaign seconds (default 60)")
+    gf.add_argument("--settle", type=float, default=1.2,
+                    help="GUI settle seconds before reading state (default 1.2)")
+    gf.set_defaults(fn=cmd_gui_fuzz)
 
     tl = sub.add_parser("test-lift",
                         help="lift one of a library's own unit tests into a harness plan")

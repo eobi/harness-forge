@@ -1946,9 +1946,26 @@ PHASES: tuple = (
 
     Phase("P6", "GUI track", PARTIAL, (
         Deliverable("P6.TERM", "coverage-guided termination", PLANNED),
-        Deliverable("P6.DROP", "file-drop driver", PARTIAL,
-                    note="THE CAPABILITY IS DEMONSTRATED, THE DRIVER IS NOT WRITTEN. On the "
-                         "Ubuntu VM: a real GTK application (eog) launched on a PRIVATE "
+        Deliverable("P6.DROP", "file-drop driver", DONE,
+                    modules=("hforge.gui.campaign", "hforge.gui.macos_ax"),
+                    cli=("gui-fuzz",),
+                    tests=("test_run_campaign_finds_and_dedups_crashers",
+                           "test_run_campaign_accept_is_not_reported",
+                           "test_mutation_is_deterministic_for_a_fixed_seed",
+                           "test_finding_key_collapses_identical_crashes"),
+                    note="WRITTEN AND LIVE-PROVEN ON macOS. macos_ax.run_one drops a file on "
+                         "a .app (open -a) or an out-of-process CLI and classifies the "
+                         "outcome; campaign.run_campaign mutates a seed corpus, drives that "
+                         "driver, dedups findings by crash signature and saves crashers; the "
+                         "`gui-fuzz` CLI exposes it. Live: mutation reached a segfaulting CLI "
+                         "target and the loop reported one deduped memory-safety crash; a "
+                         "benign target reported none. The search is BLIND on purpose -- the "
+                         "oracle is the contribution, coverage-guided termination is P6.TERM. "
+                         "Linux still has only the demonstrated capability below (the AT-SPI "
+                         "oracle exists; a linux_atspi.run_one launcher is not written), so "
+                         "the campaign runs on macOS today. "
+                         "THE ORIGINAL LINUX CAPABILITY, kept for the record: on the "
+                         "Ubuntu VM a real GTK application (eog) launched on a PRIVATE "
                          "display and a PRIVATE session bus, opening a file the harness "
                          "supplies, mapping a real window, with AT-SPI able to enumerate it "
                          "down to its frame. Isolation and introspection together, which is "
