@@ -1060,10 +1060,27 @@ def cmd_gui_fuzz(args) -> int:
         print(f"no seed files in {args.seeds}")
         return 2
     argv_template = list(args.arg) if args.arg else None
+    coverage_fn = None
+    if args.instrument_module:
+        if not args.cli:
+            print("greybox coverage is --cli only (litecov runs the binary); staying blind "
+                  "for the GUI target.")
+        else:
+            from . import closed                                    # noqa: PLC0415
+            lc = tc.inventory().get("litecov")
+            if lc and getattr(lc, "present", False):
+                mods = list(args.instrument_module)
+                cov_args = argv_template or [closed.INPUT]
+                coverage_fn = lambda pth: closed.coverage_once(   # noqa: E731
+                    args.target, mods, pth, litecov=lc.path, target_args=cov_args)
+                print(f"greybox: coverage via litecov on {mods}")
+            else:
+                print("NOT_RUN (greybox): no litecov; staying blind. "
+                      "Build TinyInst and set $LITECOV/$TINYINST_DIR for coverage-guided search.")
     res = campaign.run_campaign(
         driver, app=args.target, seeds_dir=str(seeds), out_dir=args.out,
         gui=not args.cli, proc_name=args.proc, argv_template=argv_template,
-        budget_s=args.budget, settle_s=args.settle)
+        budget_s=args.budget, settle_s=args.settle, coverage_fn=coverage_fn)
     print(res.summary())
     if res.findings:
         print(f"  {res.unique()} unique finding(s) saved under {args.out} -- triage each "
@@ -1890,7 +1907,12 @@ def main(argv=None) -> int:
                     help="CLI argument; use @@ for the input file (repeatable, --cli only)")
     gf.add_argument("--budget", type=int, default=60, help="campaign seconds (default 60)")
     gf.add_argument("--settle", type=float, default=1.2,
-                    help="GUI settle seconds before reading state (default 1.2)")
+                    help="GUI settle floor before reading state (default 1.2; termination is "
+                         "CPU-quiescence, not a fixed sleep)")
+    gf.add_argument("--instrument-module", action="append", default=[],
+                    dest="instrument_module",
+                    help="module to instrument for GREYBOX coverage (repeatable, --cli only; "
+                         "needs litecov/TinyInst, else falls back to blind)")
     gf.set_defaults(fn=cmd_gui_fuzz)
 
     tl = sub.add_parser("test-lift",

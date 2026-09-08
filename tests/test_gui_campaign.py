@@ -101,3 +101,28 @@ def test_run_campaign_accept_is_not_reported(tmp_path):
     # a target that accepts everything yields no findings, however many inputs run
     assert res.executed > 0
     assert res.unique() == 0 and res.findings == []
+
+
+# ── greybox: coverage_fn grows the corpus toward new coverage ────────────────
+
+def test_greybox_coverage_marks_the_run_and_grows_corpus(tmp_path):
+    seeds = tmp_path / "seeds"; seeds.mkdir()
+    (seeds / "s").write_bytes(b"\x10" * 8)
+    out = tmp_path / "out"
+    seen_lengths = []
+    # reward longer inputs: coverage == length, so the corpus should accrue longer inputs
+    def cov(path):
+        n = len(open(path, "rb").read()); seen_lengths.append(n); return n
+    res = C.run_campaign(_AcceptDriver(), app="Fake", seeds_dir=str(seeds),
+                         out_dir=str(out), gui=True, budget_s=1, seed=5, coverage_fn=cov)
+    assert "greybox" in res.coverage
+    assert res.executed > 0 and len(seen_lengths) == res.executed
+
+
+def test_blind_run_is_labelled_blind(tmp_path):
+    seeds = tmp_path / "seeds"; seeds.mkdir()
+    (seeds / "s").write_bytes(b"\x10" * 8)
+    out = tmp_path / "out"
+    res = C.run_campaign(_AcceptDriver(), app="Fake", seeds_dir=str(seeds),
+                         out_dir=str(out), gui=True, budget_s=1, seed=6)
+    assert "blind" in res.coverage

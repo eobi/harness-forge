@@ -194,3 +194,154 @@ def classify(*, tree: Sequence, exited: bool, window_ms: Optional[float],
 
 def _v(termination, outcome, nodes, window_ms, action_ms, evidence, note) -> GuiVerdict:
     return GuiVerdict(outcome, nodes, window_ms, action_ms, evidence, note, termination)
+
+
+# ── the live driver: one input, one launch (Linux) ───────────────────────────
+#
+# The Darwin sibling (macos_ax) reads crashes from DiagnosticReports; on Linux a spawned
+# process reports its own fatal signal in the return code, so the CLI crash oracle needs no
+# external file. The GUI path reuses this module's classifier and adds the AT-SPI walk the
+# doctrine above describes; the walk is best-effort (pygobject/pyatspi are Linux-only) and
+# degrades to no nodes, which the classifier reads as ACCEPTED, never a false finding.
+#
+# WRITTEN HERE, VM-VERIFIED SEPARATELY: the CLI crash-signal path is portable and unit-tested;
+# the AT-SPI GUI path matches the mechanism proven on the Ubuntu VM (private display + session
+# bus + windowed launch) and is exercised there, not on a macOS host.
+import os as _os                                                    # noqa: E402
+import subprocess as _subprocess                                    # noqa: E402
+import time as _time                                                # noqa: E402
+
+# Linux signal numbers for a memory-relevant fault (SIGBUS is 7 on Linux, not 10).
+_SIG_MEMSAFE = {11: "SIGSEGV", 7: "SIGBUS", 4: "SIGILL", 6: "SIGABRT", 8: "SIGFPE"}
+
+
+def _parse_stat_cpu(stat_line: str):
+    """utime+stime (clock ticks) from a /proc/<pid>/stat line, or None. Pure, so the field
+    arithmetic is testable without /proc. Fields 14 and 15 are utime/stime, but comm (field
+    2) can contain spaces and parens, so split on the last ')'."""
+    rp = stat_line.rfind(")")
+    if rp < 0:
+        return None
+    rest = stat_line[rp + 1:].split()
+    # after comm: state is rest[0]; utime is field 14 -> rest[11], stime field 15 -> rest[12]
+    try:
+        return float(rest[11]) + float(rest[12])
+    except (IndexError, ValueError):
+        return None
+
+
+def _cpu_ticks(pid: int):
+    try:
+        with open(f"/proc/{pid}/stat", "r") as f:
+            return _parse_stat_cpu(f.read())
+    except OSError:
+        return None
+
+
+def quiescence_reached(cpu_series, polls: int = QUIESCE_POLLS) -> bool:
+    """Pure: has CPU stopped growing for `polls` consecutive samples? (Same rule as Darwin.)"""
+    if polls < 2 or len(cpu_series) < polls:
+        return False
+    tail = cpu_series[-polls:]
+    return all(x == tail[0] for x in tail)
+
+
+def ax_tree(app_name: str, *, timeout_s: float = 4.0) -> list:
+    """Best-effort (role, name) pairs via AT-SPI. Returns [] when pyatspi/gi is unavailable
+    (e.g. on a non-Linux host), which the classifier reads as no error nodes."""
+    try:
+        import gi                                                   # noqa: PLC0415
+        gi.require_version("Atspi", "2.0")
+        from gi.repository import Atspi                             # noqa: PLC0415
+    except Exception:
+        return []
+    out: list = []
+    try:
+        desktop = Atspi.get_desktop(0)
+        for i in range(desktop.get_child_count()):
+            app = desktop.get_child_at_index(i)
+            if app is None or app.get_name() != app_name:
+                continue
+            stack = [app]
+            while stack:
+                node = stack.pop()
+                try:
+                    out.append((Atspi.role_get_name(node.get_role()), node.get_name()))
+                    for j in range(node.get_child_count()):
+                        stack.append(node.get_child_at_index(j))
+                except Exception:
+                    continue
+    except Exception:
+        return out
+    return out
+
+
+def _crash_from_returncode(rc: int):
+    """A GuiVerdict for a process that died by signal, or None if it exited normally."""
+    if rc is None or rc >= 0:
+        return None
+    sig = -rc
+    name = _SIG_MEMSAFE.get(sig, f"SIG{sig}")
+    memsafe = sig in _SIG_MEMSAFE and sig != 6  # SIGABRT is a crash but not memory-safety
+    kind = "memory-safety" if memsafe else "abort/other"
+    return GuiVerdict(GuiOutcome.CRASHED, evidence=[(name,)],
+                      note=f"the process died: {name} ({kind})",
+                      termination=TerminationReason.QUIESCED)
+
+
+def wait_until_quiescent(pid: int, *, deadline_s: float = WINDOW_DEADLINE_S,
+                         polls: int = QUIESCE_POLLS, interval_s: float = QUIESCE_INTERVAL_S,
+                         floor_s: float = 0.4) -> TerminationReason:
+    _time.sleep(floor_s)
+    end = _time.time() + deadline_s
+    series: list = []
+    while _time.time() < end:
+        c = _cpu_ticks(pid)
+        if c is None:
+            return TerminationReason.QUIESCED
+        series.append(c)
+        if quiescence_reached(series, polls):
+            return TerminationReason.QUIESCED
+        _time.sleep(interval_s)
+    return TerminationReason.DEADLINE
+
+
+def run_one(*, app: str, input_path: str, proc_name=None, gui: bool = True,
+            argv_template=None, settle_s: float = 1.2, timeout_s: float = 20.0) -> GuiVerdict:
+    """Drive one input into a Linux target and classify it, matching macos_ax.run_one's
+    signature so the campaign is host-agnostic."""
+    proc = proc_name or _os.path.splitext(_os.path.basename(app))[0]
+
+    if not gui:
+        argv = [a.replace("@@", input_path) for a in (argv_template or [app, "@@"])]
+        try:
+            r = _subprocess.run(argv, timeout=timeout_s, stdin=_subprocess.DEVNULL,
+                                stdout=_subprocess.DEVNULL, stderr=_subprocess.DEVNULL)
+        except _subprocess.TimeoutExpired:
+            return GuiVerdict(GuiOutcome.UNRESPONSIVE, note="CLI target exceeded the timeout",
+                              termination=TerminationReason.DEADLINE)
+        except OSError:
+            return GuiVerdict(GuiOutcome.NO_WINDOW, note="CLI target failed to launch")
+        v = _crash_from_returncode(r.returncode)
+        return v or GuiVerdict(GuiOutcome.ACCEPTED, note="ran to completion without a crash",
+                               termination=TerminationReason.QUIESCED)
+
+    # GUI: launch windowed, wait for quiescence, walk AT-SPI, classify.
+    try:
+        p = _subprocess.Popen([app, input_path], stdout=_subprocess.DEVNULL,
+                              stderr=_subprocess.DEVNULL)
+    except OSError:
+        return GuiVerdict(GuiOutcome.NO_WINDOW, note="GUI target failed to launch")
+    term = wait_until_quiescent(p.pid, floor_s=min(settle_s, 0.6))
+    rc = p.poll()
+    if rc is not None and rc < 0:
+        v = _crash_from_returncode(rc)
+        if v is not None:
+            return v
+    tree = ax_tree(proc)
+    window_ms = 0.0 if tree else None
+    verdict = classify(tree=tree, exited=(rc is not None and rc < 0), window_ms=window_ms,
+                       serviced_action=None, termination=term)
+    if p.poll() is None:
+        p.kill()
+    return verdict

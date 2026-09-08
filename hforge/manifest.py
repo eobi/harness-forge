@@ -1945,7 +1945,30 @@ PHASES: tuple = (
     )),
 
     Phase("P6", "GUI track", PARTIAL, (
-        Deliverable("P6.TERM", "coverage-guided termination", PLANNED),
+        Deliverable("P6.TERM", "coverage-guided termination", DONE,
+                    modules=("hforge.gui.macos_ax", "hforge.gui.campaign"),
+                    tests=("test_quiescence_reached_when_cpu_flat_for_polls",
+                           "test_quiescence_not_reached_while_cpu_still_growing",
+                           "test_quiescence_flat_then_busy_again_is_not_settled",
+                           "test_greybox_coverage_marks_the_run_and_grows_corpus",
+                           "test_blind_run_is_labelled_blind"),
+                    note="TWO SIGNALS, HONESTLY SEPARATED. "
+                         "TERMINATION is CPU-quiescence, not a fixed sleep -- the doctrine "
+                         "the Linux track settled on, now delivered for macOS. run_one waits "
+                         "until the target stops consuming CPU (sampled via ps, a deadline "
+                         "ceiling) before reading state; a fixed settle was both too slow and "
+                         "unable to tell 'not yet' from 'never'. LIVE-PROVEN: a spin-1.5s-"
+                         "then-idle target is called finished at 2.1 s, not at the 15 s "
+                         "ceiling. quiescence_reached() is pure and tested without a process. "
+                         "COVERAGE-GUIDANCE is wired into the search: campaign.run_campaign "
+                         "takes a coverage_fn and retains any input that reaches new "
+                         "coverage, growing the corpus toward new code (greybox) instead of "
+                         "mutating blindly; tested with a synthetic coverage function. The "
+                         "litecov/TinyInst backend behind it (CLI targets, `gui-fuzz "
+                         "--instrument-module`) is the same one the P5 closed track uses and "
+                         "reports NOT_RUN when the tool is absent, so the honest default "
+                         "stays blind. GUI apps launched via open -a cannot be litecov-"
+                         "instrumented and remain quiescence-terminated but blind."),
         Deliverable("P6.DROP", "file-drop driver", DONE,
                     modules=("hforge.gui.campaign", "hforge.gui.macos_ax"),
                     cli=("gui-fuzz",),
@@ -1961,9 +1984,14 @@ PHASES: tuple = (
                          "target and the loop reported one deduped memory-safety crash; a "
                          "benign target reported none. The search is BLIND on purpose -- the "
                          "oracle is the contribution, coverage-guided termination is P6.TERM. "
-                         "Linux still has only the demonstrated capability below (the AT-SPI "
-                         "oracle exists; a linux_atspi.run_one launcher is not written), so "
-                         "the campaign runs on macOS today. "
+                         "CROSS-PLATFORM: linux_atspi.run_one is now written to the same "
+                         "signature, so the campaign runs on Linux too. Its CLI crash path "
+                         "(a spawned process reports its own fatal signal in the return code) "
+                         "is portable and unit-tested, and live-proven even on the macOS host "
+                         "(a segfaulting binary reads CRASHED/memory-safety, a clean input "
+                         "ACCEPTED). Its AT-SPI GUI walk matches the mechanism proven on the "
+                         "Ubuntu VM and is exercised there, not on a macOS host; off-Linux it "
+                         "degrades to no nodes rather than raising. "
                          "THE ORIGINAL LINUX CAPABILITY, kept for the record: on the "
                          "Ubuntu VM a real GTK application (eog) launched on a PRIVATE "
                          "display and a PRIVATE session bus, opening a file the harness "

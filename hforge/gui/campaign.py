@@ -105,12 +105,16 @@ def run_campaign(driver, *, app: str, seeds_dir: str, out_dir: str,
                  gui: bool = True, proc_name: Optional[str] = None,
                  argv_template: Optional[Sequence[str]] = None,
                  budget_s: int = 60, seed: int = 1337,
-                 settle_s: float = 1.2, timeout_s: float = 20.0) -> CampaignResult:
-    """Blind mutation campaign against one out-of-process target.
+                 settle_s: float = 1.2, timeout_s: float = 20.0,
+                 coverage_fn=None) -> CampaignResult:
+    """Mutation campaign against one out-of-process target.
 
     `driver` is a platform observation module exposing `run_one` (macos_ax / linux_atspi).
-    Saves each unique crasher and its verdict note under `out_dir`. Returns a
-    CampaignResult; the caller decides how to report it.
+    `coverage_fn(input_path) -> int`, if given, turns the search GREYBOX: an input that
+    reaches more coverage than any before it is retained in the corpus, so the search grows
+    toward new code instead of mutating blindly. Without it the search is blind and the
+    corpus is fixed -- the honest default, since coverage needs instrumentation (litecov)
+    the host may not have. Saves each unique crasher under `out_dir`.
     """
     os.makedirs(out_dir, exist_ok=True)
     corpus = [open(os.path.join(seeds_dir, f), "rb").read()
@@ -122,7 +126,10 @@ def run_campaign(driver, *, app: str, seeds_dir: str, out_dir: str,
     rng = random.Random(seed)
     work = os.path.join(out_dir, "cur.input")
     res = CampaignResult()
+    if coverage_fn is not None:
+        res.coverage = "greybox (coverage-guided corpus growth)"
     seen: set = set()
+    best_cov = -1
     start = time.time()
     while time.time() - start < budget_s:
         data = mutate(rng.choice(corpus), rng, corpus)
@@ -132,6 +139,11 @@ def run_campaign(driver, *, app: str, seeds_dir: str, out_dir: str,
                            argv_template=argv_template, settle_s=settle_s,
                            timeout_s=timeout_s)
         res.executed += 1
+        if coverage_fn is not None:                       # greybox: keep new-coverage inputs
+            cov = coverage_fn(work)
+            if cov is not None and cov > best_cov:
+                best_cov = cov
+                corpus.append(data)
         if v.is_finding():
             k = finding_key(v)
             if k not in seen:

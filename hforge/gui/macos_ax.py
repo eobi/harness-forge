@@ -262,6 +262,89 @@ def ax_tree(app_name: str, *, timeout_s: float = 4.0) -> list:
     return tree
 
 
+# ── P6.TERM: when is one GUI input finished? ─────────────────────────────────
+#
+# The same doctrine the Linux track settled on: do NOT sleep a fixed time (both far too slow
+# and unable to tell "not yet" from "never"). Wait for the process to stop consuming CPU --
+# quiescence is the signal that means "the app has finished working on this input" -- then
+# read the state once. Termination is decided WITHOUT walking the AX tree, because polling
+# accessibility makes the target service every request and it never quiesces (measured on
+# Linux; the same trap applies to System Events here).
+
+QUIESCE_POLLS = 4             # consecutive unchanged CPU samples that count as settled
+QUIESCE_INTERVAL_S = 0.10     # between samples
+QUIESCE_DEADLINE_S = 15.0     # ceiling; a window maps and settles well under this
+
+
+def quiescence_reached(cpu_series: Sequence, polls: int = QUIESCE_POLLS) -> bool:
+    """Pure: has CPU time stopped growing for `polls` consecutive samples?
+
+    `cpu_series` is cumulative CPU seconds sampled over time. Settled means the last `polls`
+    samples are all equal (the process did no measurable work between them). Tested without a
+    process, the way the Linux termination rule is.
+    """
+    if polls < 2 or len(cpu_series) < polls:
+        return False
+    tail = cpu_series[-polls:]
+    return all(x == tail[0] for x in tail)
+
+
+def _pid_of(proc: str) -> Optional[int]:
+    """Newest pid whose name matches `proc`, or None. `pgrep -n` picks the most recent, which
+    is the instance this input just launched."""
+    try:
+        out = subprocess.run(["pgrep", "-n", proc], capture_output=True, text=True,
+                             timeout=3).stdout.strip()
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    return int(out) if out.isdigit() else None
+
+
+def _cpu_seconds(pid: int) -> Optional[float]:
+    """Cumulative CPU time (seconds) for `pid` via `ps`, or None if it is gone."""
+    try:
+        out = subprocess.run(["ps", "-o", "cputime=", "-p", str(pid)],
+                             capture_output=True, text=True, timeout=3).stdout.strip()
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    if not out:
+        return None
+    # ps prints [[dd-]hh:]mm:ss(.ff); parse the trailing colon-separated fields
+    parts = out.replace("-", ":").split(":")
+    try:
+        nums = [float(p) for p in parts]
+    except ValueError:
+        return None
+    secs = 0.0
+    for n in nums:
+        secs = secs * 60 + n
+    return secs
+
+
+def wait_until_quiescent(proc: str, *, deadline_s: float = QUIESCE_DEADLINE_S,
+                         polls: int = QUIESCE_POLLS, interval_s: float = QUIESCE_INTERVAL_S,
+                         floor_s: float = 0.4) -> TerminationReason:
+    """Block until `proc` stops consuming CPU (quiesced), it exits, or the deadline.
+
+    `floor_s` is a short minimum so a window has time to map before we start believing a
+    flat CPU reading. Returns the reason, mirroring the Linux TerminationReason vocabulary.
+    """
+    time.sleep(floor_s)
+    end = time.time() + deadline_s
+    series: list = []
+    while time.time() < end:
+        pid = _pid_of(proc)
+        if pid is None:
+            return TerminationReason.QUIESCED  # nothing running: finished (or crashed)
+        c = _cpu_seconds(pid)
+        if c is not None:
+            series.append(c)
+            if quiescence_reached(series, polls):
+                return TerminationReason.QUIESCED
+        time.sleep(interval_s)
+    return TerminationReason.DEADLINE
+
+
 # ── the environment: strip the throughput shim so ReportCrash runs ───────────
 
 def clean_env(base: Optional[dict] = None) -> dict:
@@ -299,14 +382,16 @@ def run_one(*, app: str, input_path: str, proc_name: Optional[str] = None,
                            timeout=timeout_s, capture_output=True, text=True)
         except (subprocess.TimeoutExpired, OSError):
             pass
-        time.sleep(settle_s)  # let the window map and any error sheet attach
+        # P6.TERM: wait for the process to stop working, do not sleep a fixed guess.
+        term = wait_until_quiescent(proc, deadline_s=max(settle_s, QUIESCE_DEADLINE_S),
+                                    floor_s=min(settle_s, 0.6))
         report = poll_for_crash(proc, exclude=before, deadline_s=crash_deadline_s)
         if report is not None:
             return crash_verdict(report)
         tree = ax_tree(proc)
         window_ms = 0.0 if tree else None  # a mapped window is implied by any AX node
         return classify(tree=tree, exited=False, window_ms=window_ms,
-                        serviced_action=None, termination=TerminationReason.QUIESCED)
+                        serviced_action=None, termination=term)
 
     # CLI target: crash oracle only.
     argv = [a.replace("@@", input_path) for a in (argv_template or [app, "@@"])]
