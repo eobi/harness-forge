@@ -270,6 +270,63 @@ def push_and_run(serial: str, binary: Path, data: bytes, *,
         tombstone=tomb)
 
 
+def ios_run(udid: str, binary: Path, data: bytes, *, timeout: float = 30.0) -> DeviceRun:
+    """Run a prebuilt iOS-Simulator binary against one input via `simctl spawn`, and classify
+    the exit. The simulator is a REACHABILITY oracle, not a discovery box (see the platform
+    model), so this confirms a path and never certifies a fault on its own.
+
+    Deliberately does not build: a simulator binary is produced by `build_ios_sim` (or the
+    emitted build.sh) on the macOS host. If xcrun is absent, this says so rather than guessing.
+    """
+    x = tc.find_xcrun()
+    if not x:
+        return DeviceRun(False, "unavailable", None, "xcrun not found")
+    if not binary.exists():
+        return DeviceRun(False, "unavailable", None, f"{binary} does not exist")
+
+    import tempfile
+    with tempfile.NamedTemporaryFile(delete=False) as f:
+        f.write(data)
+        local_in = f.name
+    try:
+        r = subprocess.run([x, "simctl", "spawn", udid, str(binary), local_in],
+                           capture_output=True, text=True, timeout=timeout)
+        code, out = r.returncode, (r.stdout or "") + (r.stderr or "")
+    except subprocess.TimeoutExpired:
+        code, out = None, "timed out"
+    except Exception as e:                                   # noqa: BLE001
+        return DeviceRun(False, "unavailable", None, f"simctl spawn failed: {e}")
+    finally:
+        Path(local_in).unlink(missing_ok=True)
+
+    # iOS is Darwin/POSIX: negative or 128+N is a fatal signal (ASan aborts with SIGABRT->134).
+    outcome = tc.classify_exit(code, os_name="macos", sanitized=True)
+    # The ASan report is printed, not written to a tombstone; carry it so the differential can
+    # see a genuine sanitizer report and downgrade a startup artifact that produced none.
+    report = out if any(k in out for k in
+                        ("AddressSanitizer", "SUMMARY:", "runtime error:")) else None
+    detail = tc.describe_exit(code, "macos")
+    if outcome == tc.FAULT and report is None:
+        detail += "; no sanitizer report captured — cannot yet distinguish a real fault"
+    return DeviceRun(ok=outcome != "unavailable", outcome=outcome, exit_code=code,
+                     detail=detail, tombstone=report)
+
+
+def run_ios_differential(udid: str, instrumented: Path, baseline: Path, data: bytes,
+                         **kw) -> DifferentialRun:
+    """The device-side differential on the iOS Simulator, same doctrine as Android's: an ASan
+    binary that faults only where an uninstrumented baseline does not, WITH a sanitizer report,
+    is a real fault; a fault with no report is an instrumentation artifact — downgraded, not
+    dropped. Reuses the pure `decide_differential`."""
+    a = ios_run(udid, instrumented, data, **kw)
+    if a.outcome == "unavailable" or a.outcome != tc.FAULT:
+        v, why = decide_differential(a, None)
+        return DifferentialRun(v, a, None, why)
+    b = ios_run(udid, baseline, data, **kw)
+    v, why = decide_differential(a, b)
+    return DifferentialRun(v, a, b, why)
+
+
 def capability_report() -> dict:
     """What this host can and cannot do with devices, stated so an absent capability is
     never mistaken for a clean result."""
@@ -283,6 +340,7 @@ def capability_report() -> dict:
         "can_build_android": bool(ndk),
         "can_run_android": bool(adb and andro),
         "can_build_ios_sim": bool(xcrun),
+        "can_run_ios_sim": bool(xcrun and sims),
         "blocked": [m for m in (
             None if adb else "adb absent: no Android device is reachable",
             None if ndk else "NDK absent: an Android harness cannot be BUILT here, only run "
@@ -380,6 +438,72 @@ def ndk_clang_for(ndk: str, abi: str, api: int) -> Optional[str]:
         if (p := tc.ndk_clang(ndk, abi, cand)):
             return p
     return None
+
+
+# ── building for the iOS Simulator ───────────────────────────────────────────
+
+_IOS_SIM_TARGET = {
+    "ios-arm64-simulator": "arm64-apple-ios13.0-simulator",
+    "ios-x86_64-simulator": "x86_64-apple-ios13.0-simulator",
+}
+
+
+@dataclass
+class IosSimBuild:
+    ok: bool
+    binary: Optional[Path]
+    triple: str
+    detector: str
+    log: str
+    reason: str = ""
+
+
+def _xcrun_out(*args, timeout: float = 30.0) -> str:
+    x = tc.find_xcrun()
+    if not x:
+        return ""
+    try:
+        r = subprocess.run([x, *args], capture_output=True, text=True, timeout=timeout)
+        return r.stdout.strip()
+    except Exception:                                        # noqa: BLE001
+        return ""
+
+
+def build_ios_sim(sources: list, out_dir: Path, *,
+                  platform_id: str = "ios-arm64-simulator", detector: str = "asan",
+                  include_dirs: Optional[list] = None, extra: Optional[list] = None,
+                  suffix: str = "") -> IosSimBuild:
+    """Cross-compile a harness for the iOS Simulator with xcrun's clang.
+
+    Applies `-target <triple>-simulator` and `-isysroot <iphonesimulator sdk>` — the flags the
+    platform table used to claim it applied and did not. ASan is the detector (Apple's clang
+    ships the simulator ASan runtime but not libFuzzer's), so `detector='asan'` yields a
+    reachability/replay binary and `detector='none'` the uninstrumented baseline.
+    """
+    triple = _IOS_SIM_TARGET.get(platform_id, "arm64-apple-ios13.0-simulator")
+    cc = _xcrun_out("-sdk", "iphonesimulator", "--find", "clang")
+    sdk = _xcrun_out("-sdk", "iphonesimulator", "--show-sdk-path")
+    if not cc or not sdk:
+        return IosSimBuild(False, None, triple, detector, "",
+                           "no iphonesimulator toolchain: install Xcode and its command-line "
+                           "tools (xcrun -sdk iphonesimulator --find clang failed)")
+    out_dir.mkdir(parents=True, exist_ok=True)
+    binary = out_dir / f"harness-iossim{suffix or ('-' + detector)}"
+    flags = ["-target", triple, "-isysroot", sdk, "-O1", "-g", "-fno-omit-frame-pointer"]
+    if detector == "asan":
+        flags += ["-fsanitize=address", "-fsanitize-address-use-after-scope"]
+    for d in (include_dirs or []):
+        flags += ["-I", str(d)]
+    cmd = [cc, *flags, *[str(s) for s in sources], *(extra or []), "-o", str(binary)]
+    try:
+        r = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
+    except Exception as e:                                   # noqa: BLE001
+        return IosSimBuild(False, None, triple, detector, str(e),
+                           "compiler invocation failed")
+    if r.returncode != 0:
+        return IosSimBuild(False, None, triple, detector, r.stderr[-3000:],
+                           "iOS-sim cross-compile failed")
+    return IosSimBuild(True, binary, triple, detector, f"$ {' '.join(cmd)}\nrc=0")
 
 
 def emulators_available() -> list:

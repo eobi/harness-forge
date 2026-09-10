@@ -27,13 +27,47 @@ def normalise(language: str) -> str:
     return _ALIASES.get((language or "c").strip().lower(), "")
 
 
-def backend_for(language: str) -> Callable:
-    """The emitter for a language, or a refusal naming what IS supported.
+def _mobile_backend(lang: str, platforms):
+    """A native-mobile emitter when `platforms` names one, else None.
+
+    This is the platform axis the router was missing. `Target.language` alone routed emit,
+    so a plan whose `platforms` said Android or the iOS Simulator still went to the host C
+    backend and got a host build — the same silent-ignore that made `--platform
+    ios-arm64-simulator` a lie. Only the native languages cross-compile (the JVM abstracts the
+    OS, so a `java` plan stays on Jazzer regardless of platform).
+
+    Android is the DISCOVERY platform and the iOS Simulator is a REACHABILITY oracle, so when
+    a plan lists both, Android wins: fuzz where instrumentation is cheap, prove reachability
+    where the target runs. An iOS *device* is never emitted (reachability-only, no toolchain);
+    it falls through to the host backend, which the caller's platform note already flags.
+    """
+    if lang not in ("c", "c++"):
+        return None
+    plats = list(platforms or [])
+    if any(p.startswith("android-") for p in plats):
+        from .android_ndk import emit as f
+        return f
+    if any(p.startswith("ios-") and p.endswith("-simulator") for p in plats):
+        from .ios_sim import emit as f
+        return f
+    return None
+
+
+def backend_for(language: str, platforms=()) -> Callable:
+    """The emitter for a language (and optionally a platform set), or a refusal naming what IS
+    supported.
+
+    Back-compatible: called with just a language string it behaves exactly as before. Given
+    `platforms`, a C/C++ plan targeting Android or the iOS Simulator routes to the matching
+    cross-compile backend instead of the host one.
 
     Imported lazily so that a broken or dependency-heavy backend cannot stop the others
     loading — the C path must not become unavailable because a Java module has a typo.
     """
     lang = normalise(language)
+    mobile = _mobile_backend(lang, platforms)
+    if mobile is not None:
+        return mobile
     if lang == "c":
         from .c_libfuzzer import emit as f
         return f
@@ -53,8 +87,8 @@ def backend_for(language: str) -> Callable:
 
 
 def emit(ir):
-    """Emit `ir` with the backend its language names."""
-    return backend_for(ir.target.language)(ir)
+    """Emit `ir` with the backend its language — and its platforms — name."""
+    return backend_for(ir.target.language, getattr(ir, "platforms", ()))(ir)
 
 
 def languages() -> list:

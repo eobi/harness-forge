@@ -191,16 +191,19 @@ PLATFORMS: dict[str, Platform] = {p.id: p for p in [
     _p(id="ios-arm64-simulator", os="ios", arch="aarch64", variant="simulator",
        toolchain="xcode-clang", sanitizers=("asan", "ubsan", "tsan"),
        allocator="libmalloc", coverage=("libfuzzer",), crash_artifact="mach-exception",
-       trust_ceiling=TRUST_FULL, emit_ready=False,
-       notes="THE practical iOS discovery path in principle -- normal libFuzzer and ASan, "
-             "no signing fight -- but NOT emit-ready: the C backend produces a host build "
-             "and ignores this platform. `--platform ios-arm64-simulator` was accepted and "
-             "then dropped, emitting a build.sh byte-identical to the default, with no "
-             "-isysroot and no -target. docs/PLATFORMS.md was right and this table was not"),
+       trust_ceiling=TRUST_FULL, emit_ready=True,
+       notes="the practical iOS path -- ASan works normally, no signing fight. NOW emit-ready: "
+             "emit/ios_sim.py applies -target arm64-apple-ios13.0-simulator and -isysroot, and "
+             "the binary runs under `simctl spawn`. It is a REACHABILITY/replay build (ASan + "
+             "standalone driver), NOT a libFuzzer campaign: Apple's clang ships the ASan "
+             "simulator runtime but not libFuzzer's (libclang_rt.fuzzer_iossim.a is absent), so "
+             "discovery still happens on the macOS host and the simulator confirms the path"),
     _p(id="ios-x86_64-simulator", os="ios", arch="x86_64", variant="simulator",
        toolchain="xcode-clang", sanitizers=("asan", "ubsan"), allocator="libmalloc",
        coverage=("libfuzzer",), crash_artifact="mach-exception", trust_ceiling=TRUST_FULL,
-       emit_ready=False),
+       emit_ready=True,
+       notes="Intel-host simulator; emit/ios_sim.py targets x86_64-apple-ios13.0-simulator. "
+             "Same reachability-build role as the arm64 simulator"),
     _p(id="ios-arm64-device", os="ios", arch="aarch64", variant="device",
        toolchain="xcode-clang+entitlements", sanitizers=("asan-devsigned",),
        allocator="libmalloc+pac", coverage=(), crash_artifact="ips-crash-report",

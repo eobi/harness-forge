@@ -2115,11 +2115,34 @@ PHASES: tuple = (
         Deliverable("P7.ANDROID", "NDK toolchain matrix, HWASan, tombstone oracle", PARTIAL,
                     note="VERIFIED on a live arm64-v8a API-35 emulator: cross-build, "
                          "device-aware detector selection, push-run and the instrumentation "
-                         "differential all pass end to end. Still unverified: HWASan itself "
-                         "(needs a _hwasan system image) and tombstone retrieval (needs a "
-                         "rooted device; the unrooted path correctly reports that it cannot "
-                         "read one). Binder/AIDL surface not started."),
-        Deliverable("P7.IOS_SIM", "simulator-first discovery", PLANNED),
+                         "differential all pass end to end. The C emitter now ROUTES an "
+                         "Android plan to emit/android_ndk.py (platform-aware backend_for), so "
+                         "the emitted build.sh is a real NDK cross-build, not a host build "
+                         "mislabelled; `hforge run-on-device` wires build_android + push_and_run "
+                         "+ run_differential. Still unverified: HWASan itself (needs a _hwasan "
+                         "system image; the stock-image run correctly downgrades to ASan) and "
+                         "tombstone retrieval (needs a rooted device). Binder/AIDL not started."),
+        Deliverable("P7.IOS_SIM", "simulator-first discovery", PARTIAL,
+                    note="emit/ios_sim.py applies -target arm64-apple-ios13.0-simulator and "
+                         "-isysroot (backend_for routes an ios-*-simulator plan here), so "
+                         "ios-*-simulator.emit_ready is now honestly True; devices.build_ios_sim "
+                         "+ ios_run (simctl spawn) + run_ios_differential run it. VERIFIED live "
+                         "on a booted simulator: cross-build, spawn and the baseline differential "
+                         "pass end to end, and an ASan fault is caught on-sim (rc 134). It is a "
+                         "REACHABILITY/replay build: Apple's clang ships the ASan iossim runtime "
+                         "but not libFuzzer's (libclang_rt.fuzzer_iossim.a absent), so a "
+                         "coverage-guided campaign on the simulator is not yet available and "
+                         "discovery still happens on the macOS host."),
+        Deliverable("P7.MSG_SURFACE", "message-surface producer: SMS/PDU + attachment/media",
+                    PARTIAL,
+                    note="producers/message_surface.py recognises the two zero-interaction "
+                         "shapes — SMS/PDU parsing and attachment/media decoding — and emits "
+                         "AppEntry-based plans defaulted to the mobile platforms, REUSING "
+                         "app_lift.compose_app for the codec fold (the Stagefright/libwebp "
+                         "shape). Exposed as `hforge message-surface`; verified live emitting "
+                         "and running on both the Android emulator and the iOS Simulator. No IR "
+                         "schema change. Real device corpora / a message-format dictionary and "
+                         "the Binder/XPC delivery path remain open."),
         Deliverable("P7.IOS_DEV", "device-side reachability oracle, .ips parser", PLANNED),
     )),
 
