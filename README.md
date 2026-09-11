@@ -37,6 +37,28 @@ feeding its generated harnesses to a fuzzer, which is exactly NemesisForge's lan
 
 ---
 
+## Field results
+
+Two results from feeding real targets through the certify-then-fuzz pipeline show both halves of the
+thesis at once:
+
+- **A false positive the gates exist to stop.** A hand-written, *uncertified* harness for the `dr_wav`
+  audio decoder reported an AddressSanitizer stack-buffer-overflow at `dr_wav.h:5601`. Reading the
+  sanitizer frame showed the overflowing write landed in the *harness's own* output buffer — a
+  252-channel WAV against a fixed 2048-byte buffer — not a `dr_wav` bug. A channel-aware buffer makes
+  the same input replay cleanly. This is exactly the buffer-contract defect a gate refuses before any
+  fuzzing begins; the uncertified harness bypassed it, and the ~94% harness-defect false-positive rate
+  is what that looks like in the field.
+- **Real bugs, honestly gated.** Harnesses driven into NemesisForge found and minimized real Class-1
+  memory-safety bugs in `minimp4` (heap OOB write, CWE-787) and `pl_mpeg` (heap OOB read, CWE-125),
+  each contributed upstream as a proof-of-concept and labeled an n-day rediscovery by the novelty gate
+  (open issues #50 and #73). Reproducers live in NemesisForge.
+
+The generator now also composes **mobile message-surface** harnesses (SMS/PDU plus attachment/media
+decoders) and emits for the **Android NDK** and the **iOS simulator**.
+
+---
+
 ## Where this stands
 
 <!-- PHASES:BEGIN -->
